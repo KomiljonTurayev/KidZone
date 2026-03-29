@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Color Rush!</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+
+body {
+  background: #0a0a0a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* HEADER */
+#header {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px 24px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-box {
+  text-align: center;
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 10px 18px;
+  min-width: 80px;
+}
+.stat-label { color: #555; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+.stat-value { color: #fff; font-size: 26px; font-weight: 900; margin-top: 2px; }
+#best-val { color: #ffd700; }
+#streak-val { color: #ff6b9d; }
+
+/* LIVES */
+#lives {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 4px 0;
+}
+.heart { font-size: 24px; transition: transform 0.2s; }
+.heart.lost { opacity: 0.2; transform: scale(0.8); }
+
+/* GAME FIELD */
+#game-field {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 20px;
+  position: relative;
+}
+
+/* COLOR INDICATOR */
+#target-area {
+  text-align: center;
+  padding: 10px;
+}
+#target-label { color: #555; font-size: 12px; letter-spacing: 2px; }
+#target-name {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin-top: 4px;
+  transition: color 0.1s;
+}
+
+/* BUTTONS GRID */
+#buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+}
+
+.color-btn {
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.5);
+  transition: transform 0.08s, filter 0.08s;
+  min-height: 100px;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 2px;
+}
+.color-btn:active { transform: scale(0.94); filter: brightness(1.2); }
+
+.color-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.1s;
+  border-radius: 24px;
+}
+
+.btn-correct-flash::after { background: rgba(255,255,255,0.3) !important; }
+.btn-wrong-flash { animation: wrongShake 0.3s ease; }
+
+@keyframes wrongShake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* SPEED BAR */
+#speed-bar-wrap {
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0 4px;
+}
+#speed-bar {
+  height: 100%;
+  width: 100%;
+  border-radius: 6px;
+  background: #333;
+  transition: width 0.08s linear;
+}
+
+/* ADMOB */
+#admob-banner {
+  width: 100%;
+  max-width: 420px;
+  height: 60px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid #1f1f1f;
+}
+#admob-banner span { color: #333; font-size: 11px; }
+
+/* SCREEN OVERLAY */
+.screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 40px 30px;
+}
+.hidden { display: none !important; }
+
+.big-icon { font-size: 80px; line-height: 1; }
+.screen-title { color: #fff; font-size: 34px; font-weight: 900; text-align: center; }
+.screen-sub { color: #666; font-size: 15px; text-align: center; line-height: 1.7; }
+
+.rule-box {
+  background: #151515;
+  border-radius: 20px;
+  padding: 18px 24px;
+  width: 100%;
+  max-width: 320px;
+}
+.rule-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid #1f1f1f;
+}
+.rule-row:last-child { border: none; }
+.rule-color {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.rule-text { color: #aaa; font-size: 14px; }
+
+.result-card {
+  background: #111;
+  border-radius: 24px;
+  padding: 24px 40px;
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+}
+.result-num { color: #fff; font-size: 64px; font-weight: 900; line-height: 1; }
+.result-lbl { color: #444; font-size: 13px; margin-top: 4px; letter-spacing: 1px; }
+
+.new-best-badge {
+  background: linear-gradient(135deg, #ffd700, #ff9500);
+  color: #000;
+  font-weight: 900;
+  font-size: 14px;
+  border-radius: 30px;
+  padding: 8px 20px;
+  letter-spacing: 1px;
+}
+
+.btn {
+  padding: 18px 44px;
+  border-radius: 50px;
+  border: none;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: transform 0.08s;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: #fff; color: #000; }
+.btn-ghost { background: #1a1a1a; color: #666; }
+
+/* FEEDBACK */
+#feedback {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 300;
+  font-size: 48px;
+  animation: feedAnim 0.5s ease-out forwards;
+}
+@keyframes feedAnim {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(0.8); }
+  60%  { opacity: 1; transform: translateX(-50%) translateY(-20px) scale(1.1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(1); }
+}
+</style>
+<script src="admob.js"></script>
+<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
+</head>
+<body>
+
+<div id="header">
+  <div class="stat-box">
+    <div class="stat-label">BALL</div>
+    <div class="stat-value" id="score-val">0</div>
+  </div>
+  <div id="lives">
+    <span class="heart" id="h1">❤️</span>
+    <span class="heart" id="h2">❤️</span>
+    <span class="heart" id="h3">❤️</span>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">REKORD</div>
+    <div class="stat-value" id="best-val">0</div>
+  </div>
+</div>
+
+<div id="speed-bar-wrap">
+  <div id="speed-bar"></div>
+</div>
+
+<div id="game-field">
+  <div id="target-area">
+    <div id="target-label">QAYSI RANG?</div>
+    <div id="target-name">—</div>
+  </div>
+  <div id="buttons-grid">
+    <button class="color-btn" id="btn0" onclick="tap(0)"></button>
+    <button class="color-btn" id="btn1" onclick="tap(1)"></button>
+    <button class="color-btn" id="btn2" onclick="tap(2)"></button>
+    <button class="color-btn" id="btn3" onclick="tap(3)"></button>
+  </div>
+</div>
+
+<div id="admob-banner">
+  <!-- ✅ ADMOB BANNER SHU YERGA KELADI -->
+  <span>📢 AdMob Banner Reklama</span>
+</div>
+
+<!-- START SCREEN -->
+<div class="screen" id="start-screen">
+  <div class="big-icon">🎨</div>
+  <div class="screen-title">Color Rush!</div>
+  <div class="screen-sub">Ismga mos rangni toping<br>Tez va to'g'ri bosing! ⚡</div>
+  <div class="rule-box">
+    <div class="rule-row">
+      <div class="rule-color" style="background:#ff453a"></div>
+      <div class="rule-text"><b style="color:#ff453a">QIZIL</b> — qizil tugmani bos</div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-color" style="background:#30d158"></div>
+      <div class="rule-text"><b style="color:#30d158">YASHIL</b> — yashil tugmani bos</div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-color" style="background:#0a84ff"></div>
+      <div class="rule-text"><b style="color:#0a84ff">KO'K</b> — ko'k tugmani bos</div>
+    </div>
+    <div class="rule-row">
+      <div class="rule-color" style="background:#ffd700"></div>
+      <div class="rule-text"><b style="color:#ffd700">SARIQ</b> — sariq tugmani bos</div>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="startGame()">🚀 BOSHLASH</button>
+</div>
+
+<!-- GAME OVER -->
+<div class="screen hidden" id="over-screen">
+  <div class="big-icon" id="over-icon">💥</div>
+  <div class="screen-title" id="over-title">O'yin Tugadi!</div>
+  <div class="result-card">
+    <div class="result-num" id="over-score">0</div>
+    <div class="result-lbl">BALL</div>
+  </div>
+  <div class="new-best-badge hidden" id="new-best">🏆 YANGI REKORD!</div>
+  <button class="btn btn-primary" onclick="startGame()">🔄 QAYTA O'YNASH</button>
+  <button class="btn btn-ghost" onclick="goHome()">🏠 BOSH SAHIFA</button>
+</div>
+
+<script>
+// =============================================
+// ADMOB KOD — Capacitor Android uchun tayyor
+// =============================================
+/*
+QADAMLAR:
+1. npm install @capacitor/core @capacitor/android @capacitor-community/admob
+2. npx cap init
+3. npx cap add android
+4. Quyidagi ID larni o'z AdMob ID laringiz bilan almashtiring:
+
+const ADMOB_APP_ID    = "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX";
+const BANNER_ID       = "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX";
+const INTERSTITIAL_ID = "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX";
+
+5. AndroidManifest.xml ga qo'shing:
+<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
+           android:value="ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"/>
+
+6. Ishlatish:
+import { AdMob } from '@capacitor-community/admob';
+await AdMob.initialize({ testingDevices: ['TEST_DEVICE_ID'] });
+// Banner
+await AdMob.showBanner({ adId: BANNER_ID, position: 'BOTTOM_CENTER', isTesting: true });
+// Interstitial (o'yin tugaganda)
+await AdMob.prepareInterstitial({ adId: INTERSTITIAL_ID, isTesting: true });
+await AdMob.showInterstitial();
+*/
+
+// =============================================
+// O'YIN LOGIKASI
+// =============================================
+
+const COLORS = [
+  { name: 'QIZIL',  hex: '#ff453a', dark: '#cc2a20' },
+  { name: 'YASHIL', hex: '#30d158', dark: '#1a8c36' },
+  { name: "KO'K",   hex: '#0a84ff', dark: '#0055cc' },
+  { name: 'SARIQ',  hex: '#ffd700', dark: '#cc9f00' },
+];
+
+let score = 0;
+let best = parseInt(localStorage.getItem('colorBest') || '0');
+let lives = 3;
+let gameOn = false;
+let currentAnswer = 0;
+let buttonColors = [];
+let timePerQ = 3000;
+let timer = null;
+let barAnim = null;
+let barStart = 0;
+let streak = 0;
+
+document.getElementById('best-val').textContent = best;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startGame() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('over-screen').classList.add('hidden');
+
+  score = 0;
+  lives = 3;
+  streak = 0;
+  gameOn = true;
+  timePerQ = 3000;
+
+  updateScore();
+  updateHearts();
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (!gameOn) return;
+
+  // Pick correct answer
+  currentAnswer = Math.floor(Math.random() * 4);
+
+  // Assign colors to buttons (shuffled, correct one included)
+  const indices = shuffle([0,1,2,3]);
+  buttonColors = indices;
+
+  // Place correct color at random button position
+  const correctButtonIndex = Math.floor(Math.random() * 4);
+  buttonColors[correctButtonIndex] = currentAnswer;
+
+  // Fill others with different colors
+  let used = [currentAnswer];
+  for (let i = 0; i < 4; i++) {
+    if (i === correctButtonIndex) continue;
+    let c;
+    do { c = Math.floor(Math.random() * 4); } while (used.includes(c));
+    used.push(c);
+    buttonColors[i] = c;
+  }
+
+  // Update target text
+  const targetEl = document.getElementById('target-name');
+  targetEl.textContent = COLORS[currentAnswer].name;
+  targetEl.style.color = COLORS[currentAnswer].hex;
+
+  // Update buttons
+  for (let i = 0; i < 4; i++) {
+    const btn = document.getElementById('btn' + i);
+    const c = COLORS[buttonColors[i]];
+    btn.style.background = c.hex;
+    btn.textContent = '';
+    btn.disabled = false;
+    btn.className = 'color-btn';
+  }
+
+  // Start timer bar
+  clearTimeout(timer);
+  cancelAnimationFrame(barAnim);
+  barStart = Date.now();
+  animBar();
+
+  timer = setTimeout(() => {
+    if (!gameOn) return;
+    loseLife();
+    if (lives > 0) nextQuestion();
+    else endGame();
+  }, timePerQ);
+}
+
+function animBar() {
+  const elapsed = Date.now() - barStart;
+  const pct = Math.max(0, 100 - (elapsed / timePerQ) * 100);
+  const bar = document.getElementById('speed-bar');
+
+  const r = Math.round(255 * (1 - pct/100));
+  const g = Math.round(200 * (pct/100));
+  bar.style.width = pct + '%';
+  bar.style.background = `rgb(${r}, ${g}, 50)`;
+
+  if (pct > 0) barAnim = requestAnimationFrame(animBar);
+}
+
+function tap(btnIndex) {
+  if (!gameOn) return;
+  const chosen = buttonColors[btnIndex];
+  const btn = document.getElementById('btn' + btnIndex);
+
+  if (chosen === currentAnswer) {
+    // CORRECT
+    clearTimeout(timer);
+    cancelAnimationFrame(barAnim);
+    streak++;
+    const bonus = streak >= 5 ? 3 : streak >= 3 ? 2 : 1;
+    score += 10 * bonus;
+    updateScore();
+
+    btn.classList.add('btn-correct-flash');
+    showFeedback(streak >= 5 ? '🔥' : streak >= 3 ? '⚡' : '✅');
+
+    // Speed up slightly
+    timePerQ = Math.max(900, timePerQ - 40);
+
+    setTimeout(() => nextQuestion(), 200);
+  } else {
+    // WRONG
+    streak = 0;
+    btn.classList.add('btn-wrong-flash');
+    showFeedback('❌');
+    loseLife();
+    if (lives <= 0) {
+      clearTimeout(timer);
+      endGame();
+    }
+  }
+}
+
+function loseLife() {
+  lives = Math.max(0, lives - 1);
+  updateHearts();
+}
+
+function showFeedback(emoji) {
+  const el = document.getElementById('feedback');
+  if (el) el.remove();
+  const f = document.createElement('div');
+  f.id = 'feedback';
+  f.textContent = emoji;
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 500);
+}
+
+function updateScore() {
+  document.getElementById('score-val').textContent = score;
+}
+
+function updateHearts() {
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('h' + i).classList.toggle('lost', i > lives);
+  }
+}
+
+function endGame() {
+  gameOn = false;
+
+  window.AdMobMgr?.showInterstitial(); // ✅ AdMob
+  // await AdMob.showInterstitial();
+
+  const isNew = score > best;
+  if (isNew) {
+    best = score;
+    localStorage.setItem('colorBest', best);
+    document.getElementById('best-val').textContent = best;
+  }
+
+  document.getElementById('over-score').textContent = score;
+  document.getElementById('new-best').classList.toggle('hidden', !isNew);
+
+  let icon = '😤', title = 'Yana urining!';
+  if (score >= 200) { icon = '🏆'; title = 'Ustaxona!'; }
+  else if (score >= 100) { icon = '🔥'; title = 'Ajoyib reflex!'; }
+  else if (score >= 50) { icon = '⭐'; title = 'Yaxshi!'; }
+
+  document.getElementById('over-icon').textContent = icon;
+  document.getElementById('over-title').textContent = title;
+  document.getElementById('over-screen').classList.remove('hidden');
+}
+
+window.addEventListener("load", () => window.AdMobMgr?.init("color-rush"));
+function goHome() {
+  document.getElementById('over-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+  gameOn = false;
+}
+</script>
+</body>
+</html>

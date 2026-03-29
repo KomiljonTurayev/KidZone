@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Raqamlar O'yini 🔢</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+
+:root {
+  --c1: #FF6B6B; --c2: #4ECDC4; --c3: #45B7D1;
+  --c4: #FFA07A; --c5: #98D8C8; --c6: #DDA0DD;
+  --dark: #2D1B69; --white: #FFFFFF;
+}
+
+body {
+  min-height:100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ANIMATED BG */
+.bg-dots {
+  position: fixed; inset: 0; z-index: 0;
+  overflow: hidden;
+}
+.dot {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: floatDot ease-in-out infinite;
+}
+@keyframes floatDot {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-30px) scale(1.1); }
+}
+
+/* APP */
+#app {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-bottom: 70px;
+}
+
+/* TOP */
+#topbar {
+  width: 100%; max-width: 480px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pill {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex; align-items: center; gap: 6px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+.pill-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+
+/* LEVEL BADGE */
+#level-badge {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  border-radius: 16px;
+  padding: 6px 16px;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* TIMER */
+#timer-wrap {
+  width: 90%; max-width: 420px;
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 auto 12px;
+}
+#timer-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ECDC4, #45B7D1);
+  border-radius: 12px;
+  transition: width 0.1s linear;
+}
+
+/* QUESTION CARD */
+#q-area {
+  width: 100%; max-width: 460px;
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+#q-card {
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 28px;
+  padding: 20px;
+  text-align: center;
+}
+
+#q-label {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+#q-emojis {
+  font-size: 36px;
+  line-height: 1.4;
+  min-height: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+}
+
+#q-text {
+  color: white;
+  font-size: 22px;
+  font-weight: 900;
+  margin-top: 8px;
+  min-height: 34px;
+}
+
+/* ANSWERS */
+#answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 460px;
+  padding: 0 16px;
+}
+
+.ans-btn {
+  border: none;
+  border-radius: 22px;
+  padding: 22px 10px;
+  font-size: 32px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.12s;
+  color: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+}
+.ans-btn:active { transform: scale(0.93); }
+.ans-btn.correct {
+  box-shadow: 0 0 0 4px #10B981, 0 6px 20px rgba(16,185,129,0.4);
+  animation: ansRight 0.35s ease;
+}
+.ans-btn.wrong {
+  box-shadow: 0 0 0 4px #EF4444, 0 6px 20px rgba(239,68,68,0.4);
+  animation: ansWrong 0.35s ease;
+}
+@keyframes ansRight {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+@keyframes ansWrong {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-8px); }
+  75%      { transform: translateX(8px); }
+}
+
+/* STREAK */
+#streak-area {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  margin-top: 10px;
+}
+#streak-fire {
+  font-size: 24px;
+  transition: transform 0.2s;
+}
+
+/* ADMOB */
+#admob {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 56px;
+  background: rgba(10,10,30,0.95);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.25);
+  font-size: 11px;
+  z-index: 10;
+}
+
+/* SCREENS */
+.screen {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; padding: 24px;
+}
+.hidden { display: none !important; }
+
+.card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 32px;
+  padding: 28px 28px;
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
+}
+
+.big-e { font-size: 72px; line-height: 1; }
+.t1 { color: white; font-size: 28px; font-weight: 900; margin: 10px 0; }
+.t2 { color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.7; }
+
+.mode-btns {
+  display: grid; grid-template-columns: 1fr; gap: 10px;
+  width: 100%; max-width: 280px;
+}
+.mode-btn {
+  border: none; border-radius: 18px;
+  padding: 16px 24px;
+  font-size: 15px; font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+  color: white;
+  text-align: left;
+  display: flex; align-items: center; gap: 12px;
+}
+.mode-btn:active { transform: scale(0.96); }
+.mode-btn b { font-size: 18px; }
+.mode-btn small { font-size: 11px; opacity: 0.8; }
+
+.result-nums {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 12px 0;
+}
+.r-num { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 14px; }
+.r-num .big { color: white; font-size: 36px; font-weight: 900; }
+.r-num .lbl { color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 1px; }
+
+.play-btn {
+  background: linear-gradient(135deg, #4ECDC4, #45B7D1);
+  border: none; border-radius: 50px;
+  padding: 18px 40px;
+  color: white; font-size: 17px; font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(78,205,196,0.4);
+  width: 100%; max-width: 280px;
+}
+.back-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  padding: 14px 30px;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px; cursor: pointer;
+  width: 100%; max-width: 280px;
+}
+
+/* FLOATING SCORE */
+.float-score {
+  position: fixed;
+  pointer-events: none;
+  z-index: 70;
+  font-weight: 900;
+  font-size: 28px;
+  color: #4ECDC4;
+  text-shadow: 0 0 10px rgba(78,205,196,0.8);
+  animation: floatUp 0.8s ease-out forwards;
+}
+@keyframes floatUp {
+  0%   { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-80px); opacity: 0; }
+}
+</style>
+<script src="admob.js">window.addEventListener('load', () => window.AdMobMgr?.init('math-kids'));
+</script>
+<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
+</head>
+<body>
+
+<div class="bg-dots" id="bg-dots"></div>
+
+<div id="app">
+  <div id="topbar">
+    <div class="pill">
+      <div>
+        <div class="pill-label">BALL</div>
+        <div id="score-val">0</div>
+      </div>
+    </div>
+    <div id="level-badge">⚡ Daraja: <span id="level-name">Oson</span></div>
+    <div class="pill">
+      <div>
+        <div class="pill-label">SERIYA</div>
+        <div id="streak-val">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="timer-wrap"><div id="timer-bar" style="width:100%"></div></div>
+
+  <div id="q-area">
+    <div id="q-card">
+      <div id="q-label">SAVOL</div>
+      <div id="q-emojis">🍎🍎🍎</div>
+      <div id="q-text">Nechta? 🤔</div>
+    </div>
+  </div>
+
+  <div id="answers"></div>
+
+  <div id="streak-area">
+    <span id="streak-fire">🔥</span>
+    <span id="streak-text"></span>
+  </div>
+</div>
+
+<div id="admob">📢 AdMob — Child-Safe Reklama</div>
+
+<!-- START / MODE SELECT -->
+<div class="screen" id="start-screen" style="background:linear-gradient(135deg,#1a1a2e,#0f3460)">
+  <div class="card">
+    <div class="big-e">🔢</div>
+    <div class="t1">Raqamlar O'yini!</div>
+    <div class="t2">Sanash, qo'shish va ayirishni<br>o'yin orqali o'rganing! 🎮</div>
+  </div>
+  <div class="mode-btns">
+    <button class="mode-btn" style="background:linear-gradient(135deg,#4ECDC4,#44A08D)" onclick="startGame('count')">
+      <b>🔢</b><div><div>SANASH</div><small>Nechta? — 1 dan 10 gacha</small></div>
+    </button>
+    <button class="mode-btn" style="background:linear-gradient(135deg,#f093fb,#f5576c)" onclick="startGame('add')">
+      <b>➕</b><div><div>QO'SHISH</div><small>2+3=? — oddiy qo'shish</small></div>
+    </button>
+    <button class="mode-btn" style="background:linear-gradient(135deg,#4481eb,#04befe)" onclick="startGame('sub')">
+      <b>➖</b><div><div>AYIRISH</div><small>5-2=? — oddiy ayirish</small></div>
+    </button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen hidden" id="result-screen" style="background:linear-gradient(135deg,#1a1a2e,#0f3460)">
+  <div class="card">
+    <div class="big-e" id="r-emoji">🎉</div>
+    <div class="t1" id="r-title">Zo'r!</div>
+    <div class="result-nums">
+      <div class="r-num">
+        <div class="big" id="r-correct">0</div>
+        <div class="lbl">TO'G'RI</div>
+      </div>
+      <div class="r-num">
+        <div class="big" id="r-score">0</div>
+        <div class="lbl">BALL</div>
+      </div>
+    </div>
+    <div class="t2" id="r-msg">Davom eting!</div>
+  </div>
+  <button class="play-btn" onclick="restartGame()">🔄 QAYTA</button>
+  <button class="back-btn" onclick="goHome()">🏠 BOSH SAHIFA</button>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const EMOJIS = ["🍎","🍊","🍋","🍇","🍓","⭐","🌙","🎈","🎮","💎","🐶","🐱","🐸","🦋","🌸"];
+const COLORS  = ["#FF6B6B","#4ECDC4","#45B7D1","#FFA07A","#DDA0DD","#98D8C8","#FFD700"];
+
+let mode = "count", score = 0, streak = 0, qNum = 0;
+let totalQ = 12, correctAns = 0, answered = false;
+let timeLeft = 8, timerInterval = null;
+let audioCtx = null;
+
+// BUILD BG
+(function() {
+  const bg = document.getElementById("bg-dots");
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement("div");
+    d.className = "dot";
+    const size = 40 + Math.random() * 80;
+    d.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}vw; top:${Math.random()*100}vh;
+      background:${COLORS[i%COLORS.length]};
+      animation-duration:${3+Math.random()*4}s;
+      animation-delay:-${Math.random()*4}s;
+    `;
+    bg.appendChild(d);
+  }
+})();
+
+function beep(freq, dur=0.15, type="sine") {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur);
+    o.start(); o.stop(audioCtx.currentTime+dur);
+  } catch(e) {}
+}
+function playOk()   { [523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,"triangle",0.18),i*70)); }
+function playFail() { beep(180,"sawtooth",0.3); }
+function playTick() { beep(800,"sine",0.05); }
+
+function genQuestion() {
+  if (mode === "count") {
+    const count  = 1 + Math.floor(Math.random() * 10);
+    const emoji  = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const display = Array(count).fill(emoji).join(" ");
+    const answers = genAnswers(count, 1, 10);
+    return { display, text: "Nechta? 🤔", correct: count, answers };
+  }
+  if (mode === "add") {
+    const a = 1 + Math.floor(Math.random() * 9);
+    const b = 1 + Math.floor(Math.random() * (10 - a));
+    const e1 = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const e2 = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    const display = Array(a).fill(e1).join("") + "  +  " + Array(b).fill(e2).join("");
+    const answers = genAnswers(a+b, 1, 15);
+    return { display, text: `${a} + ${b} = ?`, correct: a+b, answers };
+  }
+  // subtract
+  const a = 2 + Math.floor(Math.random() * 9);
+  const b = 1 + Math.floor(Math.random() * (a-1));
+  const emoji = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  const display = Array(a).fill(emoji).join(" ");
+  const answers = genAnswers(a-b, 0, a);
+  return { display, text: `${a} - ${b} = ?`, correct: a-b, answers };
+}
+
+function genAnswers(correct, min, max) {
+  const set = new Set([correct]);
+  while (set.size < 4) {
+    let v = min + Math.floor(Math.random()*(max-min+1));
+    if (v !== correct) set.add(v);
+  }
+  return [...set].sort(() => Math.random()-0.5);
+}
+
+function startTimer() {
+  timeLeft = mode === "count" ? 8 : 10;
+  clearInterval(timerInterval);
+  const bar = document.getElementById("timer-bar");
+  bar.style.background = "linear-gradient(90deg, #4ECDC4, #45B7D1)";
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.1;
+    const pct = Math.max(0, (timeLeft / (mode==="count"?8:10)) * 100);
+    bar.style.width = pct + "%";
+    if (pct < 30) bar.style.background = "linear-gradient(90deg, #f5576c, #f093fb)";
+    if (timeLeft <= 1) playTick();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) {
+        answered = true;
+        streak = 0; updateStreak();
+        qNum++;
+        setTimeout(nextQ, 600);
+      }
+    }
+  }, 100);
+}
+
+let currentQ = null;
+function nextQ() {
+  if (qNum >= totalQ) { endGame(); return; }
+  answered = false;
+  currentQ = genQuestion();
+
+  document.getElementById("q-emojis").textContent = currentQ.display;
+  document.getElementById("q-text").textContent   = currentQ.text;
+
+  const ans = document.getElementById("answers");
+  ans.innerHTML = "";
+  currentQ.answers.forEach((val, i) => {
+    const btn = document.createElement("button");
+    btn.className = "ans-btn";
+    btn.style.background = `linear-gradient(135deg, ${COLORS[i]}, ${COLORS[(i+2)%COLORS.length]})`;
+    btn.textContent = val;
+    btn.onclick = () => checkAns(val, btn);
+    ans.appendChild(btn);
+  });
+  startTimer();
+}
+
+function checkAns(val, btn) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+  document.getElementById("timer-bar").style.width = "0%";
+
+  const isOk = val === currentQ.correct;
+  if (isOk) {
+    btn.classList.add("correct");
+    streak++;
+    const bonus = streak >= 5 ? 3 : streak >= 3 ? 2 : 1;
+    score += 10 * bonus;
+    correctAns++;
+    document.getElementById("score-val").textContent = score;
+    playOk();
+    showFloatScore(`+${10*bonus}`, btn);
+    updateStreak();
+  } else {
+    btn.classList.add("wrong");
+    document.querySelectorAll(".ans-btn").forEach(b => {
+      if (parseInt(b.textContent) === currentQ.correct) b.classList.add("correct");
+    });
+    streak = 0;
+    updateStreak();
+    playFail();
+  }
+  qNum++;
+  setTimeout(nextQ, 1000);
+}
+
+function updateStreak() {
+  document.getElementById("streak-val").textContent = streak;
+  const fire = document.getElementById("streak-fire");
+  fire.textContent = streak >= 5 ? "🔥🔥" : streak >= 3 ? "🔥" : "💧";
+  const txt = document.getElementById("streak-text");
+  txt.textContent = streak >= 5 ? " SUPER SERIYA!" : streak >= 3 ? " Zo'r ketayapti!" : "";
+}
+
+function showFloatScore(txt, btn) {
+  const rect = btn.getBoundingClientRect();
+  const el = document.createElement("div");
+  el.className = "float-score";
+  el.textContent = txt;
+  el.style.left = (rect.left + rect.width/2 - 20) + "px";
+  el.style.top  = (rect.top - 20) + "px";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+
+function startGame(m) {
+  mode = m;
+  score = 0; streak = 0; qNum = 0; correctAns = 0;
+  document.getElementById("score-val").textContent = "0";
+  document.getElementById("streak-val").textContent = "0";
+  const names = { count: "Sanash", add: "Qo'shish", sub: "Ayirish" };
+  document.getElementById("level-name").textContent = names[m];
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("result-screen").classList.add("hidden");
+  nextQ();
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  const pct = correctAns / totalQ;
+  const emoji = pct >= 0.9 ? "🏆" : pct >= 0.7 ? "🎉" : pct >= 0.5 ? "⭐" : "💪";
+  const title = pct >= 0.9 ? "AQLLI BOLA!" : pct >= 0.7 ? "AJOYIB!" : pct >= 0.5 ? "YO'RG'AY!" : "DAVOM ET!";
+  const msg   = pct >= 0.9 ? "Hamma savolga deyarli to'g'ri javob berding!" :
+                pct >= 0.7 ? "Juda yaxshi! Yana bir oz mashq qil." :
+                "Qiyin edi, lekin keyingi safar yaxshiroq bo'lasan!";
+
+  document.getElementById("r-emoji").textContent   = emoji;
+  document.getElementById("r-title").textContent   = title;
+  document.getElementById("r-correct").textContent = `${correctAns}/${totalQ}`;
+  document.getElementById("r-score").textContent   = score;
+  document.getElementById("r-msg").textContent     = msg;
+  document.getElementById("result-screen").classList.remove("hidden");
+}
+
+function restartGame() { startGame(mode); }
+function goHome() {
+  clearInterval(timerInterval);
+  document.getElementById("result-screen").classList.add("hidden");
+  document.getElementById("start-screen").classList.remove("hidden");
+}
+window.addEventListener('load', () => window.AdMobMgr?.init('math-kids'));
+</script>
+</body>
+</html>

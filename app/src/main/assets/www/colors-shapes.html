@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ranglar va Shakllar 🎨</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+
+body {
+  min-height: 100vh;
+  background: #FFF9F0;
+  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* RAINBOW TOP */
+#rainbow {
+  height: 8px;
+  background: linear-gradient(90deg, #FF6B6B,#FF9F43,#FECA57,#48DBFB,#1DD1A1,#5F27CD);
+}
+
+#app {
+  display: flex; flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - 8px);
+  padding-bottom: 70px;
+}
+
+/* TOP BAR */
+#topbar {
+  width: 100%; max-width: 480px;
+  padding: 12px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.badge {
+  background: white;
+  border-radius: 20px;
+  padding: 8px 16px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.badge-label { color: #999; font-size: 10px; letter-spacing: 1px; }
+.badge-val   { color: #2D3436; font-size: 20px; font-weight: 900; }
+
+/* MODE TABS */
+#mode-tabs {
+  display: flex; gap: 8px;
+  padding: 0 16px;
+  margin-bottom: 12px;
+}
+.tab {
+  flex: 1; border: none; border-radius: 16px;
+  padding: 10px 6px; font-size: 13px; font-weight: bold;
+  cursor: pointer; transition: all 0.15s;
+  color: #666; background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.tab.active {
+  color: white;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.tab:active { transform: scale(0.96); }
+
+/* QUESTION */
+#q-section {
+  width: 100%; max-width: 480px;
+  padding: 0 16px 12px;
+}
+
+#q-card {
+  background: white;
+  border-radius: 28px;
+  padding: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: background 0.3s;
+}
+
+#q-instruction {
+  font-size: 13px;
+  color: #888;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+#q-target {
+  font-size: 80px;
+  line-height: 1;
+  margin: 8px 0;
+}
+
+#q-target-shape {
+  margin: 8px auto;
+  transition: all 0.3s;
+}
+
+#q-name {
+  font-size: 24px;
+  font-weight: 900;
+  margin-top: 8px;
+}
+#q-hint {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+/* CHOICES GRID */
+#choices-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%; max-width: 480px;
+  padding: 0 16px;
+}
+
+.choice {
+  background: white;
+  border: 3px solid transparent;
+  border-radius: 22px;
+  padding: 18px 8px;
+  cursor: pointer;
+  transition: all 0.12s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+}
+.choice:active { transform: scale(0.93); }
+.choice-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+}
+.choice.correct { background: #D1FAE5; border-color: #10B981; }
+.choice.wrong   { background: #FEE2E2; border-color: #EF4444; }
+
+/* SVG SHAPES */
+.shape-svg { width: 56px; height: 56px; }
+
+/* PROGRESS BAR */
+#prog-outer {
+  width: 90%; max-width: 420px;
+  height: 10px;
+  background: #F0F0F0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 10px auto 0;
+}
+#prog-inner {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #FECA57, #FF6B6B);
+  transition: width 0.3s ease;
+}
+
+/* ADMOB */
+#admob {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 56px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #bbb;
+  z-index: 10;
+}
+
+/* SCREENS */
+.screen {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; padding: 30px;
+  background: linear-gradient(160deg, #FFECD2 0%, #FCB69F 100%);
+}
+.hidden { display: none !important; }
+
+.white-card {
+  background: white; border-radius: 32px;
+  padding: 28px 28px; text-align: center;
+  width: 100%; max-width: 340px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+.wc-title { font-size: 26px; font-weight: 900; color: #2D3436; margin: 8px 0; }
+.wc-sub   { font-size: 13px; color: #636E72; line-height: 1.7; }
+.wc-big   { font-size: 72px; line-height: 1; }
+
+.action-btn {
+  background: linear-gradient(135deg, #FF6B6B, #FF9F43);
+  border: none; border-radius: 50px;
+  padding: 18px 40px;
+  color: white; font-size: 17px; font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(255,107,107,0.4);
+  width: 100%; max-width: 280px;
+}
+.ghost-btn {
+  background: white; border: 2px solid #FF6B6B;
+  border-radius: 50px; padding: 14px 30px;
+  color: #FF6B6B; font-size: 14px; font-weight: bold;
+  cursor: pointer; width: 100%; max-width: 280px;
+}
+
+/* CONFETTI */
+.confetti {
+  position: fixed; pointer-events: none; z-index: 80;
+  font-size: 24px;
+  animation: confettiFall 1.2s ease-in forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translate(0,0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx), 100vh) rotate(360deg); opacity: 0; }
+}
+</style>
+<script src="admob.js">window.addEventListener('load', () => window.AdMobMgr?.init('colors-shapes'));
+</script>
+<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
+</head>
+<body>
+
+<div id="rainbow"></div>
+
+<div id="app">
+  <div id="topbar">
+    <div class="badge">
+      <div class="badge-label">BALL</div>
+      <div class="badge-val" id="score">0</div>
+    </div>
+    <div class="badge" style="background:linear-gradient(135deg,#FFECD2,#FCB69F)">
+      <div class="badge-label">DARAJA</div>
+      <div class="badge-val" id="mode-label" style="font-size:14px">🎨 Rang</div>
+    </div>
+    <div class="badge">
+      <div class="badge-label">REKORD</div>
+      <div class="badge-val" id="best">0</div>
+    </div>
+  </div>
+
+  <div id="mode-tabs" style="width:100%;max-width:480px">
+    <button class="tab active" id="tab-color" style="background:linear-gradient(135deg,#FF6B6B,#FF9F43)" onclick="setMode('color')">🎨 Ranglar</button>
+    <button class="tab" id="tab-shape" onclick="setMode('shape')">🔷 Shakllar</button>
+    <button class="tab" id="tab-mix" onclick="setMode('mix')">🌈 Aralash</button>
+  </div>
+
+  <div id="prog-outer"><div id="prog-inner" style="width:0%"></div></div>
+
+  <div id="q-section" style="margin-top:12px">
+    <div id="q-card">
+      <div id="q-instruction">TOPISH KERAK</div>
+      <div id="q-target">🔴</div>
+      <svg id="q-target-shape" class="shape-svg" viewBox="0 0 56 56" style="display:none"></svg>
+      <div id="q-name">QIZIL RANG</div>
+      <div id="q-hint">Qizil rangni toping 👇</div>
+    </div>
+  </div>
+
+  <div id="choices-grid"></div>
+</div>
+
+<div id="admob">📢 AdMob — Bolalar uchun xavfsiz reklama</div>
+
+<!-- START -->
+<div class="screen" id="start-screen">
+  <div class="white-card">
+    <div class="wc-big">🌈</div>
+    <div class="wc-title">Ranglar & Shakllar!</div>
+    <div class="wc-sub">Ranglarni va shakllarni<br>o'yin orqali o'rganing!<br>🎨 🔷 ⭐ 🔴</div>
+  </div>
+  <button class="action-btn" onclick="startGame()">🎮 BOSHLASH!</button>
+</div>
+
+<!-- RESULT -->
+<div class="screen hidden" id="result-screen">
+  <div class="white-card">
+    <div class="wc-big" id="r-emoji">🏆</div>
+    <div class="wc-title" id="r-title">Ajoyib!</div>
+    <div style="display:flex;justify-content:center;gap:12px;margin:12px 0">
+      <div style="background:#FFF3CD;border-radius:16px;padding:12px 20px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:#D63031" id="r-score">0</div>
+        <div style="font-size:11px;color:#999">BALL</div>
+      </div>
+      <div style="background:#D1FAE5;border-radius:16px;padding:12px 20px;text-align:center">
+        <div style="font-size:28px;font-weight:900;color:#00B894" id="r-correct">0/0</div>
+        <div style="font-size:11px;color:#999">TO'G'RI</div>
+      </div>
+    </div>
+    <div class="wc-sub" id="r-msg"></div>
+  </div>
+  <button class="action-btn" onclick="startGame()">🔄 QAYTA</button>
+  <button class="ghost-btn" onclick="goHome()">🏠 BOSH SAHIFA</button>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const COLORS_DATA = [
+  { name:"Qizil",     emoji:"🔴", hex:"#FF6B6B", light:"#FFE5E5" },
+  { name:"Ko'k",      emoji:"🔵", hex:"#4ECDC4", light:"#E0FAF8" },
+  { name:"Yashil",    emoji:"🟢", hex:"#55EFC4", light:"#E0FAF0" },
+  { name:"Sariq",     emoji:"🟡", hex:"#FECA57", light:"#FFFBE0" },
+  { name:"To'q sariq",emoji:"🟠", hex:"#FF9F43", light:"#FFF0D9" },
+  { name:"Binafsha",  emoji:"🟣", hex:"#A29BFE", light:"#F0EEFF" },
+  { name:"Pushti",    emoji:"🩷", hex:"#FD79A8", light:"#FFE5F0" },
+  { name:"Jigarrang", emoji:"🟤", hex:"#CD853F", light:"#F5E6D0" },
+];
+
+const SHAPES_DATA = [
+  { name:"Doira",        type:"circle" },
+  { name:"Kvadrat",      type:"square" },
+  { name:"Uchburchak",   type:"triangle" },
+  { name:"Yulduz",       type:"star" },
+  { name:"Yurak",        type:"heart" },
+  { name:"Olmoscha",     type:"diamond" },
+];
+
+function drawShape(svgEl, type, color, size=56) {
+  svgEl.innerHTML = "";
+  svgEl.setAttribute("viewBox", `0 0 ${size} ${size}`);
+  const h = size/2;
+  let path = "";
+  if (type === "circle")   path = `<circle cx="${h}" cy="${h}" r="${h-4}" fill="${color}"/>`;
+  if (type === "square")   path = `<rect x="4" y="4" width="${size-8}" height="${size-8}" rx="6" fill="${color}"/>`;
+  if (type === "triangle") path = `<polygon points="${h},4 ${size-4},${size-4} 4,${size-4}" fill="${color}"/>`;
+  if (type === "star") {
+    const pts = [];
+    for (let i=0;i<10;i++) {
+      const r = i%2===0 ? h-4 : (h-4)*0.45;
+      const a = (i/10)*Math.PI*2 - Math.PI/2;
+      pts.push(`${h+r*Math.cos(a)},${h+r*Math.sin(a)}`);
+    }
+    path = `<polygon points="${pts.join(" ")}" fill="${color}"/>`;
+  }
+  if (type === "heart") {
+    path = `<path d="M${h},${size-8} C${h},${size-8} 4,${h+4} 4,${h-4} C4,${h/2} ${h},${h/2} ${h},${h} C${h},${h/2} ${size-4},${h/2} ${size-4},${h-4} C${size-4},${h+4} ${h},${size-8} ${h},${size-8}Z" fill="${color}"/>`;
+  }
+  if (type === "diamond") {
+    path = `<polygon points="${h},4 ${size-4},${h} ${h},${size-4} 4,${h}" fill="${color}"/>`;
+  }
+  svgEl.innerHTML = path;
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let gameMode = "color", score = 0, qNum = 0, correctCount = 0;
+let totalQ = 10, answered = false;
+let best = parseInt(localStorage.getItem("colorShapeBest")||"0");
+let audioCtx = null;
+document.getElementById("best").textContent = best;
+
+function beep(f, d=0.15, t="sine") {
+  try {
+    if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(0.2,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d);
+    o.start();o.stop(audioCtx.currentTime+d);
+  } catch(e){}
+}
+const playOk   = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,"triangle"),i*60));
+const playFail = () => { beep(200,"sawtooth",0.3); };
+
+function setMode(m) {
+  gameMode = m;
+  ["color","shape","mix"].forEach(x => {
+    const tab = document.getElementById("tab-"+x);
+    tab.classList.toggle("active", x===m);
+    if (x===m) {
+      tab.style.background = m==="color"
+        ? "linear-gradient(135deg,#FF6B6B,#FF9F43)"
+        : m==="shape" ? "linear-gradient(135deg,#4ECDC4,#45B7D1)"
+        : "linear-gradient(135deg,#A29BFE,#FD79A8)";
+    } else {
+      tab.style.background = "";
+      tab.style.color = "";
+    }
+  });
+  const labels = {color:"🎨 Rang", shape:"🔷 Shakl", mix:"🌈 Aralash"};
+  document.getElementById("mode-label").textContent = labels[m];
+}
+
+function shuffle(a) { return [...a].sort(()=>Math.random()-0.5); }
+
+function getPool() {
+  if (gameMode==="color") return COLORS_DATA.map(c=>({...c, kind:"color"}));
+  if (gameMode==="shape") {
+    const color = COLORS_DATA[Math.floor(Math.random()*COLORS_DATA.length)];
+    return SHAPES_DATA.map(s=>({...s, kind:"shape", color}));
+  }
+  // mix
+  const pool = [];
+  COLORS_DATA.slice(0,4).forEach(c => pool.push({...c, kind:"color"}));
+  const col = COLORS_DATA[Math.floor(Math.random()*COLORS_DATA.length)];
+  SHAPES_DATA.slice(0,4).forEach(s => pool.push({...s, kind:"shape", color:col}));
+  return pool;
+}
+
+let currentItem = null, choiceItems = [];
+function nextQ() {
+  if (qNum >= totalQ) { endGame(); return; }
+  answered = false;
+  document.getElementById("prog-inner").style.width = (qNum/totalQ*100) + "%";
+
+  const pool = shuffle(getPool());
+  currentItem = pool[0];
+  const wrong = pool.slice(1,4);
+  choiceItems = shuffle([currentItem, ...wrong]);
+
+  const emojiEl = document.getElementById("q-target");
+  const svgEl   = document.getElementById("q-target-shape");
+  const nameEl  = document.getElementById("q-name");
+  const hintEl  = document.getElementById("q-hint");
+  const cardEl  = document.getElementById("q-card");
+
+  if (currentItem.kind === "color") {
+    emojiEl.style.display = "block";
+    svgEl.style.display   = "none";
+    emojiEl.textContent   = currentItem.emoji;
+    nameEl.textContent    = currentItem.name.toUpperCase() + " RANG";
+    nameEl.style.color    = currentItem.hex;
+    hintEl.textContent    = "Shu rangni topib bosing 👇";
+    cardEl.style.background = currentItem.light;
+  } else {
+    emojiEl.style.display = "none";
+    svgEl.style.display   = "block";
+    drawShape(svgEl, currentItem.type, currentItem.color.hex, 72);
+    svgEl.setAttribute("width","72"); svgEl.setAttribute("height","72");
+    nameEl.textContent  = currentItem.name.toUpperCase();
+    nameEl.style.color  = currentItem.color.hex;
+    hintEl.textContent  = "Shu shaklni topib bosing 👇";
+    cardEl.style.background = currentItem.color.light;
+  }
+  document.getElementById("q-instruction").textContent = `${qNum+1} / ${totalQ} — TOPISH KERAK`;
+
+  // Build choices
+  const grid = document.getElementById("choices-grid");
+  grid.innerHTML = "";
+  const choiceColors = ["#FF6B6B","#4ECDC4","#FECA57","#A29BFE"];
+  choiceItems.forEach((item, i) => {
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    if (item.kind === "color") {
+      btn.innerHTML = `
+        <div style="width:54px;height:54px;border-radius:50%;background:${item.hex};
+                    box-shadow:0 3px 10px ${item.hex}66"></div>
+        <span class="choice-label">${item.name}</span>`;
+    } else {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+      svg.setAttribute("width","54"); svg.setAttribute("height","54");
+      svg.setAttribute("viewBox","0 0 56 56");
+      drawShape(svg, item.type, item.color ? item.color.hex : choiceColors[i]);
+      btn.appendChild(svg);
+      const lbl = document.createElement("span");
+      lbl.className = "choice-label";
+      lbl.textContent = item.name;
+      btn.appendChild(lbl);
+    }
+    btn.onclick = () => checkChoice(item, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function checkChoice(item, btn) {
+  if (answered) return;
+  answered = true;
+  const isOk = item.name === currentItem.name;
+  if (isOk) {
+    btn.classList.add("correct");
+    score += 10; correctCount++;
+    document.getElementById("score").textContent = score;
+    playOk();
+    confetti();
+  } else {
+    btn.classList.add("wrong");
+    document.querySelectorAll(".choice").forEach((b,i) => {
+      if (choiceItems[i].name === currentItem.name) b.classList.add("correct");
+    });
+    playFail();
+  }
+  qNum++;
+  setTimeout(nextQ, 900);
+}
+
+function confetti() {
+  const emojis = ["🌟","⭐","✨","🎉","🌈","💫"];
+  for (let i=0;i<8;i++) {
+    setTimeout(() => {
+      const el = document.createElement("div");
+      el.className = "confetti";
+      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.left = (10 + Math.random()*80)+"vw";
+      el.style.top  = "-30px";
+      el.style.setProperty("--tx", (Math.random()*60-30)+"px");
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 1200);
+    }, i*80);
+  }
+}
+
+function startGame() {
+  score=0; qNum=0; correctCount=0;
+  document.getElementById("score").textContent="0";
+  document.getElementById("prog-inner").style.width="0%";
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("result-screen").classList.add("hidden");
+  nextQ();
+}
+
+function endGame() {
+  if (score>best) {
+    best=score;
+    localStorage.setItem("colorShapeBest",best);
+    document.getElementById("best").textContent=best;
+  }
+  const pct = correctCount/totalQ;
+  document.getElementById("r-emoji").textContent = pct>=0.9?"🏆":pct>=0.7?"🎉":"⭐";
+  document.getElementById("r-title").textContent = pct>=0.9?"AQLLI BOLA!":pct>=0.7?"ZO'R!":"YAXSHI URINISH!";
+  document.getElementById("r-score").textContent   = score;
+  document.getElementById("r-correct").textContent = `${correctCount}/${totalQ}`;
+  document.getElementById("r-msg").textContent = pct>=0.9
+    ? "Barcha ranglar va shakllarni bilasiz! 🌟"
+    : pct>=0.7 ? "Deyarli hammasi to'g'ri! Davom eting 💪"
+    : "Yana bir oz mashq qiling! 📚";
+  if (pct>=0.8) confetti(); confetti();
+  document.getElementById("result-screen").classList.remove("hidden");
+}
+function goHome() {
+  document.getElementById("result-screen").classList.add("hidden");
+  document.getElementById("start-screen").classList.remove("hidden");
+}
+
+setMode("color");
+window.addEventListener('load', () => window.AdMobMgr?.init('colors-shapes'));
+</script>
+</body>
+</html>

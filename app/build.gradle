@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'uz.kidzone.app'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "uz.kidzone.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // Tablet support
+    splits {
+        density { enable false }
+        abi { enable false }
+    }
+}
+
+dependencies {
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
+
+    // WebView (o'yinlarni ichida chiqarish uchun)
+    implementation 'androidx.webkit:webkit:1.9.0'
+
+    // ✅ ADMOB — Google Mobile Ads
+    implementation 'com.google.android.gms:play-services-ads:23.0.0'
+
+    // Material 3
+    implementation 'com.google.android.material:material:1.11.0'
+
+    // Status bar
+    implementation 'androidx.core:core-splashscreen:1.0.1'
+}
