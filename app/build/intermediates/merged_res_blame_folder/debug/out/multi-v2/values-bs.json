@@ -4,7 +4,7 @@
             "outputFile": "uz.kidzone.app-mergeDebugResources-40:/values-bs/values-bs.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\d838f81d25b5f243ecd1beeb9ebe0a07\\transformed\\jetified-play-services-base-18.0.0\\res\\values-bs\\values.xml",
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\d838f81d25b5f243ecd1beeb9ebe0a07\\transformed\\jetified-play-services-base-18.0.0\\res\\values-bs\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -21,24 +21,24 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\f158641c8e258229cf82202dd4ab8baa\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-bs\\values.xml",
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\d511208821ecc3c2ce9f1cd84695c895\\transformed\\browser-1.4.0\\res\\values-bs\\values-bs.xml",
                     "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "136",
-                        "endOffsets": "331"
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,159,259,373",
+                        "endColumns": "103,99,113,99",
+                        "endOffsets": "154,254,368,468"
                     },
                     "to": {
-                        "startLines": "57",
-                        "startColumns": "4",
-                        "startOffsets": "5559",
-                        "endColumns": "140",
-                        "endOffsets": "5695"
+                        "startLines": "67,70,71,72",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "6760,7022,7122,7236",
+                        "endColumns": "103,99,113,99",
+                        "endOffsets": "6859,7117,7231,7331"
                     }
                 },
                 {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\e10574d536c501787d77eafb3c2a3ca2\\transformed\\material-1.11.0\\res\\values-bs\\values-bs.xml",
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\e10574d536c501787d77eafb3c2a3ca2\\transformed\\material-1.11.0\\res\\values-bs\\values-bs.xml",
                     "from": {
                         "startLines": "2,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -57,41 +57,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\a65d085d398b8c635743653a920b8cb3\\transformed\\core-1.12.0\\res\\values-bs\\values-bs.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,255,353,457,561,663,780",
-                        "endColumns": "97,101,97,103,103,101,116,100",
-                        "endOffsets": "148,250,348,452,556,658,775,876"
-                    },
-                    "to": {
-                        "startLines": "39,40,41,42,43,44,45,152",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "3539,3637,3739,3837,3941,4045,4147,13484",
-                        "endColumns": "97,101,97,103,103,101,116,100",
-                        "endOffsets": "3632,3734,3832,3936,4040,4142,4259,13580"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\994c8642df83bc90d87bea45959d49ca\\transformed\\jetified-play-services-ads-23.0.0\\res\\values-bs\\values.xml",
-                    "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "199,241,288,344,409,482,585,648,751,854,907,964,1077,1164,1205,1294,1330,1363,1421,1506,1546",
-                        "endColumns": "41,46,55,64,72,102,62,102,102,52,56,112,86,40,88,35,32,57,84,39,55",
-                        "endOffsets": "240,287,343,408,481,584,647,750,853,906,963,1076,1163,1204,1293,1329,1362,1420,1505,1545,1601"
-                    },
-                    "to": {
-                        "startLines": "130,131,132,133,134,135,136,137,138,139,140,141,142,144,145,146,147,148,149,150,153",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "11890,11936,11987,12047,12116,12193,12300,12367,12474,12581,12638,12699,12816,12987,13032,13125,13165,13202,13264,13353,13585",
-                        "endColumns": "45,50,59,68,76,106,66,106,106,56,60,116,90,44,92,39,36,61,88,43,59",
-                        "endOffsets": "11931,11982,12042,12111,12188,12295,12362,12469,12576,12633,12694,12811,12902,13027,13120,13160,13197,13259,13348,13392,13640"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\149f59938b35074dc7fe35e9f9516797\\transformed\\appcompat-1.6.1\\res\\values-bs\\values-bs.xml",
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\149f59938b35074dc7fe35e9f9516797\\transformed\\appcompat-1.6.1\\res\\values-bs\\values-bs.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -108,20 +74,54 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Komiljon\\.gradle\\caches\\transforms-4\\d511208821ecc3c2ce9f1cd84695c895\\transformed\\browser-1.4.0\\res\\values-bs\\values-bs.xml",
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\994c8642df83bc90d87bea45959d49ca\\transformed\\jetified-play-services-ads-23.0.0\\res\\values-bs\\values.xml",
                     "from": {
-                        "startLines": "2,3,4,5",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "55,159,259,373",
-                        "endColumns": "103,99,113,99",
-                        "endOffsets": "154,254,368,468"
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "199,241,288,344,409,482,585,648,751,854,907,964,1077,1164,1205,1294,1330,1363,1421,1506,1546",
+                        "endColumns": "41,46,55,64,72,102,62,102,102,52,56,112,86,40,88,35,32,57,84,39,55",
+                        "endOffsets": "240,287,343,408,481,584,647,750,853,906,963,1076,1163,1204,1293,1329,1362,1420,1505,1545,1601"
                     },
                     "to": {
-                        "startLines": "67,70,71,72",
-                        "startColumns": "4,4,4,4",
-                        "startOffsets": "6760,7022,7122,7236",
-                        "endColumns": "103,99,113,99",
-                        "endOffsets": "6859,7117,7231,7331"
+                        "startLines": "130,131,132,133,134,135,136,137,138,139,140,141,142,144,145,146,147,148,149,150,153",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "11890,11936,11987,12047,12116,12193,12300,12367,12474,12581,12638,12699,12816,12987,13032,13125,13165,13202,13264,13353,13585",
+                        "endColumns": "45,50,59,68,76,106,66,106,106,56,60,116,90,44,92,39,36,61,88,43,59",
+                        "endOffsets": "11931,11982,12042,12111,12188,12295,12362,12469,12576,12633,12694,12811,12902,13027,13120,13160,13197,13259,13348,13392,13640"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\a65d085d398b8c635743653a920b8cb3\\transformed\\core-1.12.0\\res\\values-bs\\values-bs.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,255,353,457,561,663,780",
+                        "endColumns": "97,101,97,103,103,101,116,100",
+                        "endOffsets": "148,250,348,452,556,658,775,876"
+                    },
+                    "to": {
+                        "startLines": "39,40,41,42,43,44,45,152",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "3539,3637,3739,3837,3941,4045,4147,13484",
+                        "endColumns": "97,101,97,103,103,101,116,100",
+                        "endOffsets": "3632,3734,3832,3936,4040,4142,4259,13580"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\f158641c8e258229cf82202dd4ab8baa\\transformed\\jetified-play-services-basement-18.2.0\\res\\values-bs\\values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "136",
+                        "endOffsets": "331"
+                    },
+                    "to": {
+                        "startLines": "57",
+                        "startColumns": "4",
+                        "startOffsets": "5559",
+                        "endColumns": "140",
+                        "endOffsets": "5695"
                     }
                 }
             ]

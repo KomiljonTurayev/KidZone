@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Meva va Sabzavot 🍎</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+body {
+  min-height:100vh; min-height:100dvh;
+  background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+  overflow: hidden; user-select: none;
+  display: flex; flex-direction: column; align-items: center; color: white;
+}
+#topbar { width:100%; max-width:440px; padding:16px 20px 8px; display:flex; justify-content:space-between; align-items:center; }
+.pill { background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.25); border-radius:20px; padding:8px 16px; text-align:center; min-width:72px; }
+.pill-sm { font-size:10px; color:rgba(255,255,255,0.7); display:block; letter-spacing:1px; }
+.pill-val { font-size:20px; font-weight:900; }
+#prog-wrap { width:88%; max-width:400px; height:7px; background:rgba(255,255,255,0.15); border-radius:4px; margin:4px auto 14px; }
+#prog-bar { height:100%; background:rgba(255,255,255,0.85); border-radius:4px; transition:width 0.4s; width:0%; }
+#q-card {
+  background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+  border-radius:28px; padding:24px 20px; width:90%; max-width:400px;
+  text-align:center; margin-bottom:18px;
+}
+#q-emoji { font-size:84px; line-height:1; margin-bottom:8px; animation:float 2.5s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-10px) scale(1.05)} }
+#q-hint { font-size:14px; color:rgba(255,255,255,0.75); margin-top:6px; }
+#answers { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:90%; max-width:400px; }
+.ans-btn {
+  background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.25);
+  border-radius:20px; padding:14px 8px; font-size:15px; font-weight:900;
+  color:white; cursor:pointer; transition:transform 0.12s, background 0.15s;
+  min-height:70px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+}
+.ans-btn:active { transform:scale(0.91); }
+.ans-em { font-size:28px; }
+.ans-nm { font-size:12px; }
+.ans-btn.correct { background:rgba(76,175,80,0.5); border-color:#4CAF50; }
+.ans-btn.wrong   { background:rgba(244,67,54,0.4); border-color:#F44336; }
+#combo-bar { font-size:13px; color:rgba(255,255,255,0.7); margin-top:10px; min-height:20px; }
+/* Result */
+#result { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
+#result.h { display:none; }
+#result-card { background:linear-gradient(135deg,#134e5e,#71b280); border:1px solid rgba(255,255,255,0.2); border-radius:28px; padding:32px 24px; text-align:center; width:min(320px,90vw); }
+#result-em  { font-size:60px; margin-bottom:10px; }
+#result-ttl { font-size:22px; font-weight:900; margin-bottom:6px; }
+#result-sc  { font-size:15px; color:rgba(255,255,255,0.75); margin-bottom:20px; }
+.btn-restart { background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.4); border-radius:20px; padding:14px 32px; color:white; font-size:16px; font-weight:900; cursor:pointer; width:100%; }
+.btn-restart:active { transform:scale(0.96); }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="pill"><span class="pill-sm">BALL</span><span class="pill-val" id="score-val">0</span></div>
+  <div style="font-size:17px;font-weight:900;">🍎 Mevalar</div>
+  <div class="pill"><span class="pill-sm">SAVOL</span><span class="pill-val" id="q-num">1/12</span></div>
+</div>
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+
+<div id="q-card">
+  <div id="q-emoji">🍎</div>
+  <div id="q-hint">Bu nima? To'g'ri javobni tanlang!</div>
+</div>
+
+<div id="answers">
+  <button class="ans-btn" id="btn0" onclick="answer(0)"><span class="ans-em" id="em0"></span><span class="ans-nm" id="nm0"></span></button>
+  <button class="ans-btn" id="btn1" onclick="answer(1)"><span class="ans-em" id="em1"></span><span class="ans-nm" id="nm1"></span></button>
+  <button class="ans-btn" id="btn2" onclick="answer(2)"><span class="ans-em" id="em2"></span><span class="ans-nm" id="nm2"></span></button>
+  <button class="ans-btn" id="btn3" onclick="answer(3)"><span class="ans-em" id="em3"></span><span class="ans-nm" id="nm3"></span></button>
+</div>
+
+<div id="combo-bar"></div>
+
+<div id="result" class="h">
+  <div id="result-card">
+    <div id="result-em">🎉</div>
+    <div id="result-ttl">Barakalla!</div>
+    <div id="result-sc"></div>
+    <button class="btn-restart" onclick="restart()">🔄 Qayta o'ynash</button>
+  </div>
+</div>
+
+<script>
+const ITEMS = [
+  {em:"🍎",name:"Olma"},  {em:"🍌",name:"Banan"},  {em:"🍇",name:"Uzum"},
+  {em:"🍊",name:"Apelsin"},{em:"🍋",name:"Limon"},  {em:"🍓",name:"Qulupnay"},
+  {em:"🍑",name:"Shaftoli"},{em:"🍒",name:"Gilos"},  {em:"🍐",name:"Nok"},
+  {em:"🥭",name:"Mango"},  {em:"🍍",name:"Ananas"}, {em:"🥝",name:"Kivi"},
+  {em:"🥕",name:"Sabzi"},  {em:"🥦",name:"Brokkoli"},{em:"🌽",name:"Makkajo'xori"},
+  {em:"🥔",name:"Kartoshka"},{em:"🍅",name:"Pomidor"},{em:"🧅",name:"Piyoz"},
+  {em:"🥬",name:"Karam"},  {em:"🫑",name:"Qalampir"},
+];
+const TOTAL = 12;
+let score=0, qIdx=0, answered=false, combo=0, questions=[];
+
+function shuffle(a) { return [...a].sort(()=>Math.random()-0.5); }
+function buildQuestions() { questions = shuffle(ITEMS).slice(0, TOTAL); }
+
+function loadQ() {
+  if (qIdx >= TOTAL) { showResult(); return; }
+  answered = false;
+  const q = questions[qIdx];
+  document.getElementById("q-emoji").textContent = q.em;
+  document.getElementById("q-num").textContent   = `${qIdx+1}/${TOTAL}`;
+  document.getElementById("prog-bar").style.width = `${(qIdx/TOTAL)*100}%`;
+  const pool = shuffle(ITEMS.filter(i=>i.em!==q.em)).slice(0,3);
+  const opts  = shuffle([q, ...pool]);
+  opts.forEach((o,i) => {
+    document.getElementById("em"+i).textContent = o.em;
+    document.getElementById("nm"+i).textContent = o.name;
+    document.getElementById("btn"+i).className = "ans-btn";
+    document.getElementById("btn"+i).dataset.correct = (o.em===q.em) ? "1":"0";
+  });
+}
+
+function answer(idx) {
+  if (answered) return; answered = true;
+  const btn = document.getElementById("btn"+idx);
+  if (btn.dataset.correct === "1") {
+    btn.classList.add("correct"); combo++;
+    const pts = 10 + (combo>2?5:0);
+    score += pts; document.getElementById("score-val").textContent = score;
+    document.getElementById("combo-bar").textContent = combo>2 ? `🔥 Combo x${combo}! +${pts}` : "";
+    const prev = parseInt(localStorage.getItem("kz-prog-fruits")||"0");
+    localStorage.setItem("kz-prog-fruits", Math.max(prev, Math.round((qIdx+1)/TOTAL*100)));
+  } else {
+    btn.classList.add("wrong"); combo = 0;
+    document.getElementById("combo-bar").textContent = "";
+    document.querySelectorAll(".ans-btn").forEach(b=>{ if(b.dataset.correct==="1") b.classList.add("correct"); });
+  }
+  setTimeout(()=>{ qIdx++; loadQ(); }, 900);
+}
+
+function showResult() {
+  const pct = score/(TOTAL*10)*100;
+  document.getElementById("result-em").textContent  = pct>=80?"🏆":pct>=50?"⭐":"💪";
+  document.getElementById("result-ttl").textContent = pct>=80?"Ajoyib!":pct>=50?"Yaxshi!":"Harakat qiling!";
+  document.getElementById("result-sc").textContent  = `Natija: ${score} ball`;
+  document.getElementById("result").classList.remove("h");
+  localStorage.setItem("kz-pts", (parseInt(localStorage.getItem("kz-pts")||"0")) + Math.round(score/2));
+}
+
+function restart() {
+  score=0; qIdx=0; combo=0;
+  document.getElementById("score-val").textContent="0";
+  document.getElementById("combo-bar").textContent="";
+  document.getElementById("result").classList.add("h");
+  buildQuestions(); loadQ();
+}
+
+buildQuestions(); loadQ();
+</script>
+</body>
+</html>

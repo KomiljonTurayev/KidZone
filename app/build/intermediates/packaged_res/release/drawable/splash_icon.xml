@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54m-46,0a46,46 0,1 1,92 0a46,46 0,1 1,-92 0"/>
+
+    <!-- Rainbow arc -->
+    <path
+        android:strokeColor="#FF5252"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M22,62 A32,32 0,0,1 86,62"/>
+
+    <!-- Rainbow arc 2 -->
+    <path
+        android:strokeColor="#FF9800"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M28,62 A26,26 0,0,1 80,62"/>
+
+    <!-- Rainbow arc 3 -->
+    <path
+        android:strokeColor="#FFEB3B"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M34,62 A20,20 0,0,1 74,62"/>
+
+    <!-- Star -->
+    <path
+        android:fillColor="#FF9F1C"
+        android:pathData="M54,30 L57,42 L70,42 L60,50 L63,62 L54,54 L45,62 L48,50 L38,42 L51,42 Z"/>
+
+</vector>
