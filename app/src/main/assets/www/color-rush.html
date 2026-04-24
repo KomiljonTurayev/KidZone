@@ -542,6 +542,13 @@ function endGame() {
   document.getElementById('over-score').textContent = score;
   document.getElementById('new-best').classList.toggle('hidden', !isNew);
 
+  // Update total points in the main app
+  const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
+  localStorage.setItem('kz-pts', currentTotal + Math.round(score / 5));
+
+  // Update progress
+  localStorage.setItem('kz-prog-color-sort', '100');
+
   let icon = '😤', title = 'Yana urining!';
   if (score >= 200) { icon = '🏆'; title = 'Ustaxona!'; }
   else if (score >= 100) { icon = '🔥'; title = 'Ajoyib reflex!'; }

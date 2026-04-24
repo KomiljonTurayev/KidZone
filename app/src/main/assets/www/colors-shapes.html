@@ -522,6 +522,14 @@ function endGame() {
     ? "Barcha ranglar va shakllarni bilasiz! 🌟"
     : pct>=0.7 ? "Deyarli hammasi to'g'ri! Davom eting 💪"
     : "Yana bir oz mashq qiling! 📚";
+
+  // Update total points in the main app
+  const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
+  localStorage.setItem('kz-pts', currentTotal + Math.round(score / 2));
+
+  // Update progress
+  localStorage.setItem('kz-prog-colors', '100');
+
   if (pct>=0.8) confetti(); confetti();
   document.getElementById("result-screen").classList.remove("hidden");
 }

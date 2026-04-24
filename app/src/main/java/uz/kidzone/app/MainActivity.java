@@ -1,28 +1,24 @@
 package uz.kidzone.app;
 
-import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
+import android.webkit.JavascriptInterface;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int INTERSTITIAL_EVERY = 3;
+    private static final String JS_INTERFACE_NAME = "AndroidAdMob";
+    private static final String INDEX_PATH = "file:///android_asset/www/index.html";
 
-    private WebView webView;
-    private AdsManager adsManager;
+    private KidWebViewManager webViewManager;
+    private IAdsManager adsManager;
     private int gameCount = 0;
-    private boolean isTablet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setupWindow();
         setContentView(R.layout.activity_main);
 
-        isTablet = checkIsTablet();
-        adsManager = new AdsManager(this);
-        adsManager.loadBanner(findViewById(R.id.bannerContainer), isTablet);
-
-        setupWebView();
+        initManagers();
     }
 
     private void setupWindow() {
@@ -47,57 +39,36 @@ public class MainActivity extends AppCompatActivity {
         hideSystemUI();
     }
 
+    private void initManagers() {
+        boolean isTablet = checkIsTablet();
+        adsManager = new AdsManager(this);
+        adsManager.loadBanner(findViewById(R.id.bannerContainer), isTablet);
+
+        webViewManager = new KidWebViewManager(findViewById(R.id.webView));
+        webViewManager.setup(new AdMobBridge(), JS_INTERFACE_NAME);
+        webViewManager.loadUrl(INDEX_PATH);
+
+        setupBackPressed();
+    }
+
+    private void setupBackPressed() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webViewManager != null && webViewManager.canGoBack()) {
+                    webViewManager.goBack();
+                } else {
+                    setEnabled(false);
+                    MainActivity.super.onBackPressed();
+                }
+            }
+        });
+    }
+
     private boolean checkIsTablet() {
         return (getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private void setupWebView() {
-        webView = findViewById(R.id.webView);
-        WebSettings s = webView.getSettings();
-        s.setJavaScriptEnabled(true);
-        s.setDomStorageEnabled(true);
-        s.setAllowFileAccess(true);
-        s.setMediaPlaybackRequiresUserGesture(false);
-
-        webView.addJavascriptInterface(new AdMobBridge(), "AndroidAdMob");
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
-                return !req.getUrl().toString().startsWith("file://");
-            }
-        });
-        webView.setWebChromeClient(new WebChromeClient());
-        webView.loadUrl("file:///android_asset/www/index.html");
-    }
-
-    public class AdMobBridge {
-        @android.webkit.JavascriptInterface
-        public void showBanner() {
-            runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE));
-        }
-
-        @android.webkit.JavascriptInterface
-        public void hideBanner() {
-            runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.GONE));
-        }
-
-        @android.webkit.JavascriptInterface
-        public void showInterstitial() {
-            gameCount++;
-            if (gameCount % INTERSTITIAL_EVERY == 0) {
-                runOnUiThread(() -> adsManager.showInterstitial());
-            }
-        }
-
-        @android.webkit.JavascriptInterface
-        public void showRewarded() {
-            runOnUiThread(() -> adsManager.showRewarded(amount -> 
-                webView.evaluateJavascript("window.onRewardGranted(" + amount + ")", null)
-            ));
-        }
     }
 
     private void hideSystemUI() {
@@ -111,34 +82,52 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    public class AdMobBridge {
+        @JavascriptInterface
+        public void showBanner() {
+            runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE));
+        }
+
+        @JavascriptInterface
+        public void hideBanner() {
+            runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.GONE));
+        }
+
+        @JavascriptInterface
+        public void showInterstitial() {
+            gameCount++;
+            if (gameCount % INTERSTITIAL_EVERY == 0) {
+                runOnUiThread(() -> adsManager.showInterstitial());
+            }
+        }
+
+        @JavascriptInterface
+        public void showRewarded() {
+            runOnUiThread(() -> adsManager.showRewarded(amount -> 
+                webViewManager.evaluateJavascript("window.onRewardGranted(" + amount + ")")
+            ));
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         hideSystemUI();
-        adsManager.onResume();
+        if (adsManager != null) adsManager.onResume();
     }
 
     @Override
     protected void onPause() {
-        adsManager.onPause();
+        if (adsManager != null) adsManager.onPause();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        adsManager.onDestroy();
-        if (webView != null) {
-            webView.destroy();
-        }
+        if (adsManager != null) adsManager.onDestroy();
+        if (webViewManager != null) webViewManager.destroy();
         super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
-    }
+
 }
