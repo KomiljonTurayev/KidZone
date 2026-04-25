@@ -3,8 +3,11 @@ package uz.kidzone.app;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -18,10 +21,16 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 
-import androidx.annotation.NonNull;
-
+/**
+ * Implementation of IAdsManager using Google Mobile Ads (AdMob).
+ * Adheres to SRP by focusing only on Advertisement lifecycle.
+ */
 public class AdsManager implements IAdsManager {
+    private static final String TAG = "AdsManager";
+    private static final int BANNER_RETRY_DELAY_MS = 30000;
+
     private final Activity activity;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     
     private AdView bannerAdView;
     private InterstitialAd interstitialAd;
@@ -29,27 +38,29 @@ public class AdsManager implements IAdsManager {
 
     public AdsManager(Activity activity) {
         this.activity = activity;
-        initAdMob();
     }
 
-    private void initAdMob() {
-        RequestConfiguration config = new RequestConfiguration.Builder()
-                .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
-                .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
-                .build();
-        MobileAds.setRequestConfiguration(config);
+    @Override
+    public void initialize() {
+        configureAdMob();
         MobileAds.initialize(activity, status -> {
+            Log.d(TAG, "AdMob Initialized");
             loadInterstitial();
             loadRewarded();
         });
     }
 
+    private void configureAdMob() {
+        RequestConfiguration config = new RequestConfiguration.Builder()
+                .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
+                .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+                .build();
+        MobileAds.setRequestConfiguration(config);
+    }
+
     @Override
     public void loadBanner(ViewGroup container, boolean isTablet) {
-        if (bannerAdView != null) {
-            container.removeView(bannerAdView);
-            bannerAdView.destroy();
-        }
+        cleanupBanner(container);
 
         bannerAdView = new AdView(activity);
         bannerAdView.setAdSize(isTablet ? AdSize.LEADERBOARD : AdSize.BANNER);
@@ -63,12 +74,21 @@ public class AdsManager implements IAdsManager {
 
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError e) {
-                new Handler(Looper.getMainLooper()).postDelayed(() -> loadBanner(container, isTablet), 30000);
+                Log.e(TAG, "Banner failed: " + e.getMessage());
+                mainHandler.postDelayed(() -> loadBanner(container, isTablet), BANNER_RETRY_DELAY_MS);
             }
         });
 
         container.addView(bannerAdView);
-        bannerAdView.loadAd(new AdRequest.Builder().build());
+        bannerAdView.loadAd(createAdRequest());
+    }
+
+    private void cleanupBanner(ViewGroup container) {
+        if (bannerAdView != null) {
+            container.removeView(bannerAdView);
+            bannerAdView.destroy();
+            bannerAdView = null;
+        }
     }
 
     @Override
@@ -76,16 +96,24 @@ public class AdsManager implements IAdsManager {
         if (interstitialAd != null) {
             interstitialAd.show(activity);
             interstitialAd = null;
+            loadInterstitial();
+        } else {
+            Log.d(TAG, "Interstitial not ready yet");
+            loadInterstitial();
         }
-        loadInterstitial();
     }
 
     private void loadInterstitial() {
         InterstitialAd.load(activity, activity.getString(R.string.interstitial_ad_unit_id),
-                new AdRequest.Builder().build(), new InterstitialAdLoadCallback() {
+                createAdRequest(), new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd ad) {
                         interstitialAd = ad;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        interstitialAd = null;
                     }
                 });
     }
@@ -97,24 +125,42 @@ public class AdsManager implements IAdsManager {
             rewardedAd = null;
             loadRewarded();
         } else {
+            Log.d(TAG, "Rewarded ad not ready");
             loadRewarded();
         }
     }
 
     private void loadRewarded() {
         RewardedAd.load(activity, activity.getString(R.string.rewarded_ad_unit_id),
-                new AdRequest.Builder().build(), new RewardedAdLoadCallback() {
+                createAdRequest(), new RewardedAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull RewardedAd ad) {
                         rewardedAd = ad;
                     }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        rewardedAd = null;
+                    }
                 });
     }
 
+    private AdRequest createAdRequest() {
+        return new AdRequest.Builder().build();
+    }
+
     @Override
-    public void onResume() { if (bannerAdView != null) bannerAdView.resume(); }
+    public void onResume() {
+        if (bannerAdView != null) bannerAdView.resume();
+    }
+
     @Override
-    public void onPause() { if (bannerAdView != null) bannerAdView.pause(); }
+    public void onPause() {
+        if (bannerAdView != null) bannerAdView.pause();
+    }
+
     @Override
-    public void onDestroy() { if (bannerAdView != null) bannerAdView.destroy(); }
+    public void onDestroy() {
+        if (bannerAdView != null) bannerAdView.destroy();
+    }
 }

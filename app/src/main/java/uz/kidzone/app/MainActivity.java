@@ -10,52 +10,59 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+/**
+ * Main Activity of the KidZone application.
+ * Manages the lifecycle of WebView and Advertisements.
+ * Follows Clean Architecture by delegating responsibilities to Managers.
+ */
 public class MainActivity extends AppCompatActivity {
 
-    private static final int INTERSTITIAL_EVERY = 3;
     private static final String JS_INTERFACE_NAME = "AndroidAdMob";
     private static final String INDEX_PATH = "file:///android_asset/www/index.html";
+    private static final int INTERSTITIAL_FREQUENCY = 3;
 
     private KidWebViewManager webViewManager;
     private IAdsManager adsManager;
-    private int gameCount = 0;
+    private SystemUiHelper systemUiHelper;
+    private int gameLaunchCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
 
-        setupWindow();
+        initializeUI();
+        initializeManagers();
+    }
+
+    private void initializeUI() {
+        // Keep screen on for games
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-        initManagers();
+        systemUiHelper = new SystemUiHelper(getWindow());
+        systemUiHelper.enableImmersiveMode();
     }
 
-    private void setupWindow() {
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-        );
-        hideSystemUI();
-    }
-
-    private void initManagers() {
-        boolean isTablet = checkIsTablet();
+    private void initializeManagers() {
+        // Ads Management
         adsManager = new AdsManager(this);
-        adsManager.loadBanner(findViewById(R.id.bannerContainer), isTablet);
+        adsManager.initialize();
+        adsManager.loadBanner(findViewById(R.id.bannerContainer), isTabletDevice());
 
+        // WebView Management
         webViewManager = new KidWebViewManager(findViewById(R.id.webView));
         webViewManager.setup(new AdMobBridge(), JS_INTERFACE_NAME);
         webViewManager.loadUrl(INDEX_PATH);
 
-        setupBackPressed();
+        setupNavigation();
     }
 
-    private void setupBackPressed() {
+    private void setupNavigation() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (webViewManager != null && webViewManager.canGoBack()) {
+                if (webViewManager.canGoBack()) {
                     webViewManager.goBack();
                 } else {
                     setEnabled(false);
@@ -65,24 +72,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private boolean checkIsTablet() {
+    private boolean isTabletDevice() {
         return (getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
-    private void hideSystemUI() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-        );
-    }
-
-    public class AdMobBridge {
+    /**
+     * JavaScript Interface for communicating between WebView and Native Android.
+     */
+    private class AdMobBridge {
         @JavascriptInterface
         public void showBanner() {
             runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE));
@@ -95,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void showInterstitial() {
-            gameCount++;
-            if (gameCount % INTERSTITIAL_EVERY == 0) {
+            gameLaunchCount++;
+            if (gameLaunchCount % INTERSTITIAL_FREQUENCY == 0) {
                 runOnUiThread(() -> adsManager.showInterstitial());
             }
         }
@@ -107,18 +106,25 @@ public class MainActivity extends AppCompatActivity {
                 webViewManager.evaluateJavascript("window.onRewardGranted(" + amount + ")")
             ));
         }
+
+        @JavascriptInterface
+        public void toggleMusic(boolean mute) {
+            runOnUiThread(() -> MusicManager.getInstance().setMuted(mute));
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        hideSystemUI();
+        systemUiHelper.enableImmersiveMode();
         if (adsManager != null) adsManager.onResume();
+        MusicManager.getInstance().startMusic(this);
     }
 
     @Override
     protected void onPause() {
         if (adsManager != null) adsManager.onPause();
+        MusicManager.getInstance().pauseMusic();
         super.onPause();
     }
 
@@ -128,6 +134,4 @@ public class MainActivity extends AppCompatActivity {
         if (webViewManager != null) webViewManager.destroy();
         super.onDestroy();
     }
-
-
 }

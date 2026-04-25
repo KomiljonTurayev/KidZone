@@ -1,13 +1,19 @@
 package uz.kidzone.app;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+/**
+ * Manages WebView configuration and operations.
+ * Decouples WebView logic from the Activity.
+ */
 public class KidWebViewManager {
+    private static final String TAG = "KidWebViewManager";
     private final WebView webView;
 
     public KidWebViewManager(WebView webView) {
@@ -16,45 +22,66 @@ public class KidWebViewManager {
 
     @SuppressLint("SetJavaScriptEnabled")
     public void setup(Object jsInterface, String interfaceName) {
-        WebSettings s = webView.getSettings();
-        s.setJavaScriptEnabled(true);
-        s.setDomStorageEnabled(true);
-        s.setAllowFileAccess(true);
-        s.setMediaPlaybackRequiresUserGesture(false);
-        s.setCacheMode(WebSettings.LOAD_DEFAULT);
-        
-        // Performance optimization
-        s.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        if (webView == null) {
+            Log.e(TAG, "WebView is null, cannot setup");
+            return;
+        }
+
+        WebSettings settings = webView.getSettings();
+        applySettings(settings);
 
         webView.addJavascriptInterface(jsInterface, interfaceName);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
-                return !req.getUrl().toString().startsWith("file://");
-            }
-        });
+        webView.setWebViewClient(new InternalWebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
     }
 
+    private void applySettings(WebSettings settings) {
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setMediaPlaybackRequiresUserGesture(false);
+        
+        // Cache optimization for smoother game loading
+        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+    }
+
     public void loadUrl(String url) {
-        webView.loadUrl(url);
+        if (webView != null) {
+            webView.loadUrl(url);
+        }
     }
 
     public boolean canGoBack() {
-        return webView.canGoBack();
+        return webView != null && webView.canGoBack();
     }
 
     public void goBack() {
-        webView.goBack();
-    }
-
-    public void destroy() {
         if (webView != null) {
-            webView.destroy();
+            webView.goBack();
         }
     }
 
     public void evaluateJavascript(String script) {
-        webView.evaluateJavascript(script, null);
+        if (webView != null) {
+            webView.post(() -> webView.evaluateJavascript(script, null));
+        }
+    }
+
+    public void destroy() {
+        if (webView != null) {
+            webView.stopLoading();
+            webView.onPause();
+            webView.removeAllViews();
+            webView.destroy();
+        }
+    }
+
+    private static class InternalWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
+            // Only allow local file navigation for security
+            return !url.startsWith("file://");
+        }
     }
 }

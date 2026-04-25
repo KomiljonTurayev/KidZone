@@ -3,624 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Hayvonlar Olamı 🐾</title>
+<title>Animal World 🐾</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
-
 body {
   min-height: 100vh;
-  background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Arial Rounded MT Bold', 'Nunito', Arial, sans-serif;
-  overflow: hidden;
-  user-select: none;
-}
-
-/* SKY & GROUND */
-.sky {
-  position: fixed; inset: 0;
   background: linear-gradient(180deg, #87CEEB 0%, #B0E2FF 60%, #90EE90 60%, #228B22 100%);
-  z-index: 0;
+  font-family: 'Arial Rounded MT Bold', 'Nunito', Arial, sans-serif;
+  overflow: hidden; user-select: none;
 }
-.cloud {
-  position: absolute;
-  background: white;
-  border-radius: 50px;
-  opacity: 0.85;
-  animation: floatCloud linear infinite;
-}
-.cloud::before, .cloud::after {
-  content:''; position:absolute; background:white; border-radius:50%;
-}
-
-@keyframes floatCloud {
-  0%   { transform: translateX(-200px); }
-  100% { transform: translateX(110vw); }
-}
-
-/* STARS for night mode */
-.star {
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-
-/* MAIN LAYOUT */
-#app {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding-bottom: 20px;
-}
-
-/* TOP BAR */
-#topbar {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px 0;
-}
-
-.score-pill {
-  background: rgba(255,255,255,0.9);
-  border-radius: 30px;
-  padding: 8px 18px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
-}
-.score-pill span { font-size: 20px; }
+#app { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 20px; }
+#topbar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 0; }
+.score-pill { background: rgba(255,255,255,0.9); border-radius: 30px; padding: 8px 18px; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 12px rgba(0,0,0,0.15); }
 .score-pill b { font-size: 18px; color: #5B21B6; }
-
-#title-box {
-  background: rgba(255,255,255,0.95);
-  border-radius: 20px;
-  padding: 8px 20px;
-  text-align: center;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
-}
+#title-box { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 8px 20px; text-align: center; box-shadow: 0 3px 12px rgba(0,0,0,0.15); }
 #title-box h1 { font-size: 18px; color: #4C1D95; }
-
-/* QUESTION AREA */
-#question-area {
-  width: 100%;
-  max-width: 480px;
-  padding: 16px;
-  text-align: center;
-}
-
-#question-card {
-  background: rgba(255,255,255,0.95);
-  border-radius: 28px;
-  padding: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  margin-bottom: 14px;
-}
-
-#question-text {
-  font-size: 15px;
-  color: #7C3AED;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-#animal-display {
-  font-size: 90px;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform 0.1s;
-  display: inline-block;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-  animation: bounce 2s ease-in-out infinite;
-}
-#animal-display:active { transform: scale(0.85) rotate(-5deg); }
-
-@keyframes bounce {
-  0%,100% { transform: translateY(0); }
-  50%      { transform: translateY(-10px); }
-}
-
-#animal-name {
-  font-size: 26px;
-  font-weight: 900;
-  color: #1E1B4B;
-  margin: 8px 0 4px;
-}
-#animal-sound {
-  font-size: 14px;
-  color: #6D28D9;
-  font-style: italic;
-}
-
-/* CHOICES */
-#choices {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  width: 100%;
-  max-width: 480px;
-  padding: 0 16px;
-}
-
-.choice-btn {
-  background: white;
-  border: 3px solid transparent;
-  border-radius: 22px;
-  padding: 14px 8px;
-  font-size: 40px;
-  cursor: pointer;
-  transition: all 0.15s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-.choice-btn span.name {
-  font-size: 13px;
-  font-weight: bold;
-  color: #4C1D95;
-}
-.choice-btn:active { transform: scale(0.92); }
-.choice-btn.correct {
-  background: #D1FAE5;
-  border-color: #10B981;
-  animation: correctPop 0.4s ease;
-}
-.choice-btn.wrong {
-  background: #FEE2E2;
-  border-color: #EF4444;
-  animation: wrongShake 0.4s ease;
-}
-
-@keyframes correctPop {
-  0%,100% { transform: scale(1); }
-  50%      { transform: scale(1.12); }
-}
-@keyframes wrongShake {
-  0%,100% { transform: translateX(0); }
-  25%      { transform: translateX(-8px); }
-  75%      { transform: translateX(8px); }
-}
-
-/* PROGRESS */
-#progress-wrap {
-  width: 100%;
-  max-width: 480px;
-  padding: 10px 16px 0;
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-}
-.prog-dot {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.4);
-  transition: all 0.3s;
-  border: 2px solid rgba(255,255,255,0.6);
-}
-.prog-dot.done-ok  { background: #10B981; border-color: #059669; }
-.prog-dot.done-no  { background: #EF4444; border-color: #DC2626; }
-.prog-dot.current  { background: white; border-color: #7C3AED; transform: scale(1.3); }
-
-/* ADMOB */
-#admob {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: 56px;
-  background: rgba(255,255,255,0.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: #999;
-  border-top: 1px solid #eee;
-  z-index: 10;
-}
-
-/* SCREENS */
-.screen {
-  position: fixed; inset: 0;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 30px;
-}
+#question-card { background: rgba(255,255,255,0.95); border-radius: 28px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); margin-bottom: 14px; text-align: center; width: 90%; max-width: 400px; }
+#animal-display { font-size: 80px; animation: bounce 2s infinite; cursor: pointer; display: inline-block; }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+#choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 480px; padding: 0 16px; }
+.choice-btn { background: white; border: 3px solid transparent; border-radius: 22px; padding: 14px 8px; font-size: 40px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.choice-btn .name { font-size: 13px; font-weight: bold; color: #4C1D95; }
+.correct { background: #D1FAE5 !important; border-color: #10B981 !important; }
+.wrong { background: #FEE2E2 !important; border-color: #EF4444 !important; }
+.screen { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #7C3AED; color: white; padding: 20px; text-align: center; }
 .hidden { display: none !important; }
-
-.glass-card {
-  background: rgba(255,255,255,0.97);
-  border-radius: 32px;
-  padding: 28px 32px;
-  text-align: center;
-  width: 100%;
-  max-width: 340px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-}
-
-.big-emoji { font-size: 80px; line-height: 1; }
-.card-title { font-size: 28px; font-weight: 900; color: #1E1B4B; margin: 10px 0; }
-.card-sub   { font-size: 14px; color: #6D28D9; line-height: 1.6; }
-
-.stars-row { font-size: 36px; margin: 8px 0; }
-
-.play-btn {
-  background: linear-gradient(135deg, #7C3AED, #4F46E5);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 18px 44px;
-  font-size: 18px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 6px 24px rgba(124,58,237,0.4);
-  transition: transform 0.1s;
-  width: 100%;
-  max-width: 280px;
-}
-.play-btn:active { transform: scale(0.96); }
-
-.secondary-btn {
-  background: white;
-  color: #7C3AED;
-  border: 2px solid #7C3AED;
-  border-radius: 50px;
-  padding: 14px 36px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  max-width: 280px;
-  margin-top: 4px;
-}
-
-/* FIREWORKS */
-.firework {
-  position: fixed;
-  pointer-events: none;
-  z-index: 60;
-  font-size: 30px;
-  animation: fw 1s ease-out forwards;
-}
-@keyframes fw {
-  0%   { transform: translate(0,0) scale(0); opacity: 1; }
-  100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
-}
-
-/* FEEDBACK */
-.feedback-pop {
-  position: fixed;
-  top: 35%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 56px;
-  z-index: 80;
-  pointer-events: none;
-  animation: fbAnim 0.7s ease-out forwards;
-}
-@keyframes fbAnim {
-  0%   { transform: translateX(-50%) scale(0.5); opacity: 1; }
-  60%  { transform: translateX(-50%) scale(1.3); opacity: 1; }
-  100% { transform: translateX(-50%) translateY(-40px) scale(1); opacity: 0; }
-}
+.btn-p { background: white; color: #7C3AED; border: none; border-radius: 50px; padding: 18px 44px; font-size: 18px; font-weight: 900; cursor: pointer; margin-top: 20px; }
+#progress-wrap { display: flex; gap: 5px; margin-top: 10px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+.dot.ok { background: #10B981; }
+.dot.no { background: #EF4444; }
 </style>
-<script src="admob.js">window.addEventListener('load', () => window.AdMobMgr?.init('animals'));
-</script>
-<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 </head>
 <body>
 
-<!-- BACKGROUND -->
-<div class="sky" id="sky">
-  <div class="cloud" style="width:120px;height:40px;top:8%;animation-duration:18s;animation-delay:-3s">
-    <div style="width:60px;height:55px;border-radius:50%;top:-30px;left:20px;position:absolute;background:white"></div>
-    <div style="width:45px;height:45px;border-radius:50%;top:-20px;left:50px;position:absolute;background:white"></div>
-  </div>
-  <div class="cloud" style="width:90px;height:30px;top:15%;animation-duration:24s;animation-delay:-10s">
-    <div style="width:50px;height:40px;border-radius:50%;top:-22px;left:10px;position:absolute;background:white"></div>
-  </div>
-</div>
-
 <div id="app">
-  <!-- TOP BAR -->
   <div id="topbar">
-    <div class="score-pill">
-      <span>⭐</span><b id="score">0</b>
-    </div>
-    <div id="title-box">
-      <h1>🐾 Hayvonlar Olami</h1>
-    </div>
-    <div class="score-pill">
-      <span>🏆</span><b id="best">0</b>
-    </div>
+    <div class="score-pill"><span>⭐</span><b id="score">0</b></div>
+    <div id="title-box"><h1 id="ui-title">Animal World</h1></div>
+    <div class="score-pill"><span>🏆</span><b id="best">0</b></div>
   </div>
-
-  <!-- PROGRESS -->
   <div id="progress-wrap"></div>
-
-  <!-- QUESTION -->
-  <div id="question-area">
-    <div id="question-card">
-      <div id="question-text">Qaysi hayvon?</div>
-      <div id="animal-display" onclick="playSound()">🐶</div>
-      <div id="animal-name">Kuchuk</div>
-      <div id="animal-sound">Vov-vov! 🔊</div>
-    </div>
+  <div style="height: 20px;"></div>
+  <div id="question-card">
+    <div id="ui-quest" style="color:#7C3AED; font-weight:bold; margin-bottom:10px;">Which animal?</div>
+    <div id="animal-display" onclick="playSound()">🐶</div>
+    <div id="animal-sound" style="font-size: 20px; font-weight: 900; margin-top: 10px;">Vov-vov!</div>
+    <div id="ui-hint" style="font-size: 12px; color: #666;">Tap animal to hear sound</div>
   </div>
-
-  <!-- CHOICES -->
   <div id="choices"></div>
 </div>
 
-<!-- ADMOB BANNER -->
-<div id="admob">📢 AdMob Banner — Bolalar uchun (child-safe) reklamalar</div>
-
-<!-- START SCREEN -->
-<div class="screen" id="start-screen" style="background:linear-gradient(160deg,#667eea,#764ba2)">
-  <div class="glass-card">
-    <div class="big-emoji">🐾</div>
-    <div class="card-title">Hayvonlar Olami!</div>
-    <div class="card-sub">Hayvonlarni tanib oling<br>Ovozlarini eshiting 🎵<br>Va nomini toping! 🎯</div>
-  </div>
-  <button class="play-btn" onclick="startGame()">🚀 O'YINNI BOSHLASH</button>
+<div id="start-screen" class="screen">
+  <h1 id="ui-start-t">Animal World</h1>
+  <p id="ui-start-d">Learn animal names and sounds!</p>
+  <button class="btn-p" onclick="start()">START GAME</button>
 </div>
 
-<!-- RESULT SCREEN -->
-<div class="screen hidden" id="result-screen" style="background:linear-gradient(160deg,#667eea,#764ba2)">
-  <div class="glass-card" id="result-card">
-    <div class="big-emoji" id="result-emoji">🎉</div>
-    <div class="card-title" id="result-title">Zo'r!</div>
-    <div class="stars-row" id="stars-row">⭐⭐⭐</div>
-    <div class="card-sub" id="result-sub">10/10 to'g'ri javob!</div>
-  </div>
-  <button class="play-btn" onclick="startGame()">🔄 QAYTA O'YNASH</button>
-  <button class="secondary-btn" onclick="showLevel()">📚 BOSHQA DARAJA</button>
+<div id="result-screen" class="screen hidden">
+  <h1 id="ui-res-t">Great Job!</h1>
+  <div id="ui-res-s" style="font-size: 24px; margin: 20px 0;">Score: 100</div>
+  <button class="btn-p" onclick="start()">PLAY AGAIN</button>
 </div>
 
 <script>
-// ── ADMOB (Capacitor, faqat bolalar uchun reklama!)  ─────────────────────
-/*
-  import { AdMob } from '@capacitor-community/admob';
-  // MUHIM: Bolalar o'yini uchun "child-directed" reklama
-  await AdMob.initialize({
-    requestTrackingAuthorization: false,
-    tagForChildDirectedTreatment: true,  // ← BOLALAR UCHUN MAJBURIY
-    tagForUnderAgeOfConsent: true
-  });
-  const opts = {
-    adId: 'ca-app-pub-XXXXXXXX/XXXXXXXX',
-    adSize: BannerAdSize.BANNER,
-    position: BannerAdPosition.BOTTOM_CENTER,
-    isTesting: true
-  };
-  await AdMob.showBanner(opts);
-*/
-
-// ── HAYVONLAR MA'LUMOTLARI ──────────────────────────────────────────────────
 const ANIMALS = [
-  { emoji:"🐶", name:"Kuchuk",     sound:"Vov-vov!",      freq:440,  color:"#FEF3C7" },
-  { emoji:"🐱", name:"Mushuk",     sound:"Miyov-miyov!",  freq:600,  color:"#FCE7F3" },
-  { emoji:"🐮", name:"Sigir",      sound:"Moo-moo!",      freq:200,  color:"#DBEAFE" },
-  { emoji:"🐷", name:"Cho'chqa",   sound:"Oink-oink!",    freq:350,  color:"#FEE2E2" },
-  { emoji:"🐸", name:"Qurbaqa",    sound:"Qva-qva!",      freq:300,  color:"#D1FAE5" },
-  { emoji:"🐔", name:"Tovuq",      sound:"Qug-qug!",      freq:800,  color:"#FEF9C3" },
-  { emoji:"🦆", name:"O'rdak",     sound:"Vak-vak!",      freq:500,  color:"#BFDBFE" },
-  { emoji:"🐑", name:"Qo'y",       sound:"Me-me!",        freq:400,  color:"#E0E7FF" },
-  { emoji:"🐴", name:"Ot",         sound:"Igg-hihi!",     freq:250,  color:"#FED7AA" },
-  { emoji:"🦁", name:"Sher",       sound:"Ro'o'r!",       freq:100,  color:"#FEF08A" },
-  { emoji:"🐘", name:"Fil",        sound:"Trrrr!",        freq:80,   color:"#E5E7EB" },
-  { emoji:"🐧", name:"Pingvin",    sound:"Ork-ork!",      freq:650,  color:"#BAE6FD" },
-  { emoji:"🦊", name:"Tulki",      sound:"Yip-yip!",      freq:700,  color:"#FED7AA" },
-  { emoji:"🐰", name:"Quyon",      sound:"Pip-pip!",      freq:900,  color:"#FCE7F3" },
-  { emoji:"🐻", name:"Ayiq",       sound:"Grr-grr!",      freq:150,  color:"#D6B896" },
-  { emoji:"🦒", name:"Jiraf",      sound:"Hmm~",          freq:450,  color:"#FEF08A" },
+  { id:"dog", emoji:"🐶", sounds:{en:"Woof!", uz:"Vov-vov!", ru:"Гав!"}, names:{en:"Dog", uz:"Kuchuk", ru:"Собака"}, freq:400 },
+  { id:"cat", emoji:"🐱", sounds:{en:"Meow!", uz:"Miyov!", ru:"Мяу!"}, names:{en:"Cat", uz:"Mushuk", ru:"Кошка"}, freq:600 },
+  { id:"cow", emoji:"🐮", sounds:{en:"Moo!", uz:"Ma-a!", ru:"Му-у!"}, names:{en:"Cow", uz:"Sigir", ru:"Корова"}, freq:200 },
+  { id:"lion", emoji:"🦁", sounds:{en:"Roar!", uz:"Rrrr!", ru:"Ррр!"}, names:{en:"Lion", uz:"Sher", ru:"Лев"}, freq:150 }
 ];
 
-let score = 0;
-let best  = parseInt(localStorage.getItem("animalBest") || "0");
-let current = null;
-let choices = [];
-let answered = false;
-let questionNum = 0;
-let totalQ = 10;
-let results = [];
-let audioCtx = null;
+const T = {
+  en: { title:"Animal World", quest:"Which animal?", hint:"Tap animal to hear sound", start:"START GAME", desc:"Learn names and sounds!", great:"Great Job!", score:"Score", again:"PLAY AGAIN" },
+  uz: { title:"Hayvonlar Olami", quest:"Qaysi hayvon?", hint:"Ovozni eshitish uchun bosing", start:"BOSHLASH", desc:"Nomlar va ovozlarni o'rganing!", great:"Ajoyib!", score:"Ball", again:"QAYTA O'YNASH" },
+  ru: { title:"Мир Животных", quest:"Кто это?", hint:"Нажми, чтобы услышать", start:"ИГРАТЬ", desc:"Учи имена и звуки!", great:"Молодец!", score:"Счет", again:"ЕЩЕ РАЗ" }
+};
 
-document.getElementById("best").textContent = best;
+let lang = new URLSearchParams(window.location.search).get('lang') || 'en';
+let score = 0, current = null, qNum = 0, total = 5;
 
-// Build progress dots
-function buildProgress() {
-  const wrap = document.getElementById("progress-wrap");
-  wrap.innerHTML = "";
-  for (let i = 0; i < totalQ; i++) {
-    const d = document.createElement("div");
-    d.className = "prog-dot" + (i === questionNum ? " current" : "");
-    if (i < results.length) {
-      d.classList.add(results[i] ? "done-ok" : "done-no");
-      d.classList.remove("current");
-    }
-    wrap.appendChild(d);
-  }
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-function playBeep(freq, type="sine", duration=0.3) {
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
-  } catch(e) {}
-}
-
-function playSuccess() {
-  [523, 659, 784, 1047].forEach((f, i) =>
-    setTimeout(() => playBeep(f, "triangle", 0.2), i * 80));
-}
-
-function playFail() {
-  [300, 200].forEach((f, i) =>
-    setTimeout(() => playBeep(f, "sawtooth", 0.25), i * 120));
+function updateUI() {
+  const t = T[lang];
+  document.getElementById('ui-title').textContent = t.title;
+  document.getElementById('ui-quest').textContent = t.quest;
+  document.getElementById('ui-hint').textContent = t.hint;
+  document.getElementById('ui-start-t').textContent = t.title;
+  document.getElementById('ui-start-d').textContent = t.desc;
+  document.querySelector('#start-screen .btn-p').textContent = t.start;
 }
 
 function playSound() {
-  if (current) {
-    // Melody for the animal
-    const freqs = [current.freq, current.freq * 1.25, current.freq];
-    freqs.forEach((f, i) => setTimeout(() => playBeep(f, "sine", 0.25), i * 180));
-  }
+  if (!current) return;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.value = current.freq;
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+  osc.start(); osc.stop(ctx.currentTime + 0.5);
 }
 
-function nextQuestion() {
-  if (questionNum >= totalQ) { endGame(); return; }
-  answered = false;
-
-  const pool = shuffle(ANIMALS);
+function next() {
+  if (qNum >= total) {
+    document.getElementById('ui-res-s').textContent = `${T[lang].score}: ${score}`;
+    document.getElementById('result-screen').classList.remove('hidden');
+    return;
+  }
+  const pool = [...ANIMALS].sort(() => Math.random() - 0.5);
   current = pool[0];
-  const wrongOptions = pool.slice(1, 4);
-  const allOptions = shuffle([current, ...wrongOptions]);
-  choices = allOptions;
+  const options = pool.slice(0, 4).sort(() => Math.random() - 0.5);
 
-  // Update display
-  document.getElementById("animal-display").textContent = current.emoji;
-  document.getElementById("animal-display").style.animation = "none";
-  setTimeout(() => document.getElementById("animal-display").style.animation = "bounce 2s ease-in-out infinite", 10);
-  document.getElementById("question-text").textContent = `${questionNum + 1}-savol: Bu qaysi hayvon? 👇`;
-  document.getElementById("animal-name").textContent = current.sound;
-  document.getElementById("animal-sound").textContent = "Hayvonni bosing — ovozini eshiting! 🔊";
-  document.getElementById("question-card").style.background = current.color;
+  document.getElementById('animal-display').textContent = current.emoji;
+  document.getElementById('animal-sound').textContent = current.sounds[lang];
 
-  // Build choices
-  const choicesEl = document.getElementById("choices");
-  choicesEl.innerHTML = "";
-  allOptions.forEach((animal, idx) => {
-    const btn = document.createElement("button");
-    btn.className = "choice-btn";
-    btn.innerHTML = `<span>${animal.emoji}</span><span class="name">${animal.name}</span>`;
-    btn.onclick = () => checkAnswer(idx, btn);
-    choicesEl.appendChild(btn);
+  const grid = document.getElementById('choices');
+  grid.innerHTML = '';
+  options.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span>${a.emoji}</span><span class="name">${a.names[lang]}</span>`;
+    btn.onclick = () => {
+      if (a.id === current.id) {
+        btn.classList.add('correct'); score += 20;
+        document.getElementById('score').textContent = score;
+        setTimeout(next, 800);
+      } else {
+        btn.classList.add('wrong');
+      }
+    };
+    grid.appendChild(btn);
   });
-
-  buildProgress();
-  // Auto play sound
-  setTimeout(playSound, 400);
+  qNum++;
 }
 
-function checkAnswer(idx, btn) {
-  if (answered) return;
-  answered = true;
-
-  const allBtns = document.querySelectorAll(".choice-btn");
-  const isCorrect = choices[idx].name === current.name;
-
-  if (isCorrect) {
-    btn.classList.add("correct");
-    score += 10;
-    document.getElementById("score").textContent = score;
-    playSuccess();
-    showFeedback("⭐");
-    fireFireworks();
-    results.push(true);
-  } else {
-    btn.classList.add("wrong");
-    // Show correct answer
-    allBtns.forEach((b, i) => {
-      if (choices[i].name === current.name) b.classList.add("correct");
-    });
-    playFail();
-    showFeedback("❌");
-    results.push(false);
-  }
-
-  buildProgress();
-  questionNum++;
-  setTimeout(nextQuestion, 1200);
+function start() {
+  score = 0; qNum = 0;
+  document.getElementById('score').textContent = "0";
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  next();
 }
 
-function showFeedback(emoji) {
-  const f = document.createElement("div");
-  f.className = "feedback-pop";
-  f.textContent = emoji;
-  document.body.appendChild(f);
-  setTimeout(() => f.remove(), 700);
-}
-
-function fireFireworks() {
-  const emojis = ["⭐","✨","🌟","💫","🎉"];
-  for (let i = 0; i < 6; i++) {
-    setTimeout(() => {
-      const el = document.createElement("div");
-      el.className = "firework";
-      el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      el.style.left = (20 + Math.random() * 60) + "vw";
-      el.style.top  = (20 + Math.random() * 40) + "vh";
-      el.style.setProperty("--tx", (Math.random()*100-50)+"px");
-      el.style.setProperty("--ty", (Math.random()*(-100)-20)+"px");
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1000);
-    }, i * 100);
-  }
-}
-
-function startGame() {
-  score = 0;
-  questionNum = 0;
-  results = [];
-  document.getElementById("score").textContent = "0";
-  document.getElementById("start-screen").classList.add("hidden");
-  document.getElementById("result-screen").classList.add("hidden");
-  nextQuestion();
-}
-
-function endGame() {
-  const correct = results.filter(Boolean).length;
-  if (score > best) {
-    best = score;
-    localStorage.setItem("animalBest", best);
-    document.getElementById("best").textContent = best;
-  }
-
-  const stars = correct >= 9 ? "⭐⭐⭐" : correct >= 6 ? "⭐⭐" : "⭐";
-  const emoji  = correct >= 9 ? "🏆" : correct >= 6 ? "🎉" : "😊";
-  const title  = correct >= 9 ? "AJOYIB!" : correct >= 6 ? "YO'RG'AY!" : "HARAKATLANING!";
-
-  document.getElementById("result-emoji").textContent = emoji;
-  document.getElementById("result-title").textContent = title;
-  document.getElementById("stars-row").textContent = stars;
-  document.getElementById("result-sub").textContent =
-    `${correct}/${totalQ} to'g'ri javob!\nBall: ${score} ⭐`;
-
-  if (correct >= 8) fireFireworks();
-  document.getElementById("result-screen").classList.remove("hidden");
-}
-
-function showLevel() {
-  totalQ = totalQ === 10 ? 16 : 10;
-  startGame();
-}
-
-// INIT
-document.getElementById("start-screen").classList.remove("hidden");
-window.addEventListener('load', () => window.AdMobMgr?.init('animals'));
+window.onload = () => {
+  updateUI();
+  // Android integration
+  if (window.AndroidAdMob) window.AndroidAdMob.showInterstitial();
+};
 </script>
 </body>
 </html>
