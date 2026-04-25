@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">સાઇન ઇન કરો</string>
     <string name="common_signin_button_text_long">Google માં સાઇન ઇન કરો</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"ક્લિપબોર્ડ પર લિંક કૉપિ કરી"</string>
+    <string name="error_a11y_label">ભૂલ: અમાન્ય</string>
     <string name="error_icon_content_description">ભૂલ</string>
     <string name="exposed_dropdown_menu_content_description">ડ્રૉપડાઉન મેનૂ બતાવો</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"લિંક કૉપિ કરો"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">સમય પસંદ કરો</string>
     <string name="material_timepicker_text_input_mode_description">સમય દાખલ કરવા માટે ટેક્સ્ટ ઇનપુટ મોડમાં સ્વિચ કરો.</string>
     <string name="mtrl_badge_numberless_content_description">નવું નોટિફિકેશન</string>
+    <string name="mtrl_checkbox_state_description_checked">ચેક કરેલું છે</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">આંશિક રીતે ચેક કરેલું છે</string>
+    <string name="mtrl_checkbox_state_description_unchecked">ચેક કરેલું નથી</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s કાઢી નાખો</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$dથી વધુ નવા નોટિફિકેશન</string>
     <string name="mtrl_picker_a11y_next_month">આગલા મહિના પર બદલો</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">તારીખ પસંદ કરો</string>
     <string name="mtrl_picker_date_header_unselected">પસંદ કરેલી તારીખ</string>
-    <string name="mtrl_picker_day_of_week_column_header">દિવસોની કૉલમ: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">સમાપ્તિ તારીખ %1$s</string>
     <string name="mtrl_picker_invalid_format">અમાન્ય ફોર્મેટ.</string>
     <string name="mtrl_picker_invalid_format_example">ઉદાહરણ: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">મંજૂરી આપશો નહીં</string>
     <string name="notifications_permission_title">શું ઍપને તમને નોટિફિકેશન મોકલવાની મંજૂરી આપીએ?</string>
     <string name="offline_dialog_image_description">આઇકન</string>
-    <string name="offline_dialog_text">તમે ફરી પાછા ઑનલાઇન થાઓ, ત્યારે તમને લિંક ધરાવતું નોટિફિકેશન મળશે</string>
-    <string name="offline_notification_title">તમે ઑફલાઇન હતા, ત્યારે તમે સાચવેલી જાહેરાત જુઓ</string>
+    <string name="offline_dialog_text">તમારી રુચિ બતાવવા બદલ આભાર.\nતમે પાછા ઑનલાઇન આવો ત્યારે અમે વધુ માહિતી શેર કરીશું.</string>
+    <string name="offline_notification_title">તમે પાછા ઑનલાઇન છો! ચાલો, આપણે જ્યાંથી છોડ્યું હતું ત્યાંથી શરૂ કરીએ</string>
+    <string name="offline_notification_title_with_advertiser">તમે પાછા ઑનલાઇન છો! %s વિશે શીખવાનું ચાલુ રાખો</string>
     <string name="offline_opt_in_confirm">ઓકે</string>
     <string name="offline_opt_in_decline">ના, આભાર</string>
     <string name="offline_opt_in_message">અમે તમને જાહેરાતકર્તાની સાઇટની લિંક ધરાવતું નોટિફિકેશન મોકલીશું.</string>
@@ -149,6 +154,9 @@
     <string name="s6">જાહેરાતને કૅલેન્ડર ઇવેન્ટ બનાવવાની મંજૂરી આપીએ?</string>
     <string name="s7">પરીક્ષણની જાહેરાત</string>
     <string msgid="6264217191555673260" name="search_menu_title">"શોધો"</string>
+    <string name="searchview_clear_text_content_description">ટેક્સ્ટ સાફ કરો</string>
+    <string name="searchview_navigation_content_description">પાછળ</string>
+    <string name="side_sheet_accessibility_pane_title">સાઇડ શીટ</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

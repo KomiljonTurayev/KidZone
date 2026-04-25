@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">Meld aan</string>
     <string name="common_signin_button_text_long">Meld aan met Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Skakel is na knipbord gekopieer"</string>
+    <string name="error_a11y_label">Fout: ongeldig</string>
     <string name="error_icon_content_description">Fout</string>
     <string name="exposed_dropdown_menu_content_description">Wys aftrekkieslys</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Kopieer skakel"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Kies tyd</string>
     <string name="material_timepicker_text_input_mode_description">Skakel oor na teksmodus vir die tydinvoer.</string>
     <string name="mtrl_badge_numberless_content_description">Nuwe kennisgewing</string>
+    <string name="mtrl_checkbox_state_description_checked">Gemerk</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Gedeeltelik gemerk</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Nie gemerk nie</string>
     <string name="mtrl_chip_close_icon_content_description">Verwyder %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Meer as %1$d nuwe kennisgewings</string>
     <string name="mtrl_picker_a11y_next_month">Verander na volgende maand</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Kies datum</string>
     <string name="mtrl_picker_date_header_unselected">Gekose datum</string>
-    <string name="mtrl_picker_day_of_week_column_header">Kolom van dae: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Einddatum %1$s</string>
     <string name="mtrl_picker_invalid_format">Ongeldige formaat.</string>
     <string name="mtrl_picker_invalid_format_example">Voorbeeld: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">Moenie toelaat nie</string>
     <string name="notifications_permission_title">Laat app toe om vir jou kennisgewings te stuur?</string>
     <string name="offline_dialog_image_description">Ikoon</string>
-    <string name="offline_dialog_text">Jy sal ’n kennisgewing met die skakel kry wanneer jy weer aanlyn is</string>
-    <string name="offline_notification_title">Bekyk die advertensie wat jy gestoor het toe jy vanlyn was</string>
+    <string name="offline_dialog_text">Dankie vir jou belangstelling.\nOns sal meer deel sodra jy weer aanlyn is.</string>
+    <string name="offline_notification_title">Jy is weer aanlyn! Kom ons gaan aan waar ons opgehou het</string>
+    <string name="offline_notification_title_with_advertiser">Jy is weer aanlyn! Hou aan om te leer oor %s</string>
     <string name="offline_opt_in_confirm">OK</string>
     <string name="offline_opt_in_decline">Nee, dankie</string>
     <string name="offline_opt_in_message">Ons sal vir jou \'n kennisgewing stuur met \'n skakel na die adverteerder se werf toe.</string>
@@ -149,6 +154,9 @@
     <string name="s6">Laat advertensie toe om \'n kalendergeleentheid te skep?</string>
     <string name="s7">Toetsadvertensie</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Soek"</string>
+    <string name="searchview_clear_text_content_description">Vee teks uit</string>
+    <string name="searchview_navigation_content_description">Terug</string>
+    <string name="side_sheet_accessibility_pane_title">Kantblad</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

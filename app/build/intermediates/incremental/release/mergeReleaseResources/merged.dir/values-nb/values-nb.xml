@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">Logg på</string>
     <string name="common_signin_button_text_long">Logg på med Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Linken er kopiert til utklippstavlen"</string>
+    <string name="error_a11y_label">Feil: ugyldig</string>
     <string name="error_icon_content_description">Feil</string>
     <string name="exposed_dropdown_menu_content_description">Vis rullegardinmenyen</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Kopiér linken"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Velg tidspunkt</string>
     <string name="material_timepicker_text_input_mode_description">Bytt til tekstinndatamodus for tidsinndata.</string>
     <string name="mtrl_badge_numberless_content_description">Nytt varsel</string>
+    <string name="mtrl_checkbox_state_description_checked">Avmerket</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Delvis avmerket</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Ikke avmerket</string>
     <string name="mtrl_chip_close_icon_content_description">Fjern %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Flere enn %1$d nye varsler</string>
     <string name="mtrl_picker_a11y_next_month">Endre til neste måned</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Velg dato</string>
     <string name="mtrl_picker_date_header_unselected">Valgt dato</string>
-    <string name="mtrl_picker_day_of_week_column_header">Kolonne for dager: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Sluttdato %1$s</string>
     <string name="mtrl_picker_invalid_format">Ugyldig format.</string>
     <string name="mtrl_picker_invalid_format_example">Eksempel: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">Ikke tillat</string>
     <string name="notifications_permission_title">Vil du la appen sende deg varsler?</string>
     <string name="offline_dialog_image_description">Ikon</string>
-    <string name="offline_dialog_text">Du får et varsel med linken når du er på nettet igjen</string>
-    <string name="offline_notification_title">Se annonsen du lagret mens du var uten nett</string>
+    <string name="offline_dialog_text">Takk for interessen.\nVi deler mer når du er på nettet igjen.</string>
+    <string name="offline_notification_title">Du er på nettet igjen. La oss fortsette der vi slapp</string>
+    <string name="offline_notification_title_with_advertiser">Du er på nettet igjen. Fortsett å lære om %s</string>
     <string name="offline_opt_in_confirm">OK</string>
     <string name="offline_opt_in_decline">Nei takk</string>
     <string name="offline_opt_in_message">Vi sender deg et varsel med en link til annonsørnettstedet.</string>
@@ -149,6 +154,9 @@
     <string name="s6">Vil du la annonsen opprette en kalenderaktivitet?</string>
     <string name="s7">Testannonse</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Søk"</string>
+    <string name="searchview_clear_text_content_description">Fjern teksten</string>
+    <string name="searchview_navigation_content_description">Tilbake</string>
+    <string name="side_sheet_accessibility_pane_title">Sideark</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

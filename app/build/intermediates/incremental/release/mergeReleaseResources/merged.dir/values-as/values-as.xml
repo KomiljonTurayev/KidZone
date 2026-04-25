@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">ছাইন ইন কৰক</string>
     <string name="common_signin_button_text_long">Googleৰ জৰিয়তে ছাইন ইন কৰক</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"লিংক ক্লিপব’ৰ্ডত প্ৰতিলিপি কৰা হ’ল"</string>
+    <string name="error_a11y_label">Error: invalid</string>
     <string name="error_icon_content_description">Error</string>
     <string name="exposed_dropdown_menu_content_description">Show dropdown menu</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"লিংক প্ৰতিলিপি কৰক"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Select time</string>
     <string name="material_timepicker_text_input_mode_description">সময়ৰ ইনপুটৰ বাবে পাঠৰ ইনপুট ম\'ডলৈ যাওক।</string>
     <string name="mtrl_badge_numberless_content_description">New notification</string>
+    <string name="mtrl_checkbox_state_description_checked">Checked</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Partially checked</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Not checked</string>
     <string name="mtrl_chip_close_icon_content_description">%1$sক আঁতৰাওক</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">More than %1$d new notifications</string>
     <string name="mtrl_picker_a11y_next_month">Change to next month</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Select Date</string>
     <string name="mtrl_picker_date_header_unselected">Selected date</string>
-    <string name="mtrl_picker_day_of_week_column_header">Column of days: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">End date %1$s</string>
     <string name="mtrl_picker_invalid_format">Invalid format.</string>
     <string name="mtrl_picker_invalid_format_example">Example: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">অনুমতি নিদিব</string>
     <string name="notifications_permission_title">এপক আপোনালৈ জাননী পঠিয়াবলৈ অনুমতি দিবনে?</string>
     <string name="offline_dialog_image_description">চিহ্ন</string>
-    <string name="offline_dialog_text">আপুনি পুনৰ অনলাইন হ’লে লিংকটোৰ সৈতে এটা জাননী পাব</string>
-    <string name="offline_notification_title">আপুনি অফলাইন হৈ থাকোঁতে ছেভ কৰা বিজ্ঞাপনটো চাওক</string>
+    <string name="offline_dialog_text">আপোনাৰ আগ্ৰহৰ বাবে ধন্যবাদ।\nআপুনি পুনৰ অনলাইন হ’লে আমি অধিক শ্বেয়াৰ কৰিম।</string>
+    <string name="offline_notification_title">আপুনি পুনৰ অনলাইন হৈছে! আমি য’ত এৰিছিলো তাতে আৰম্ভ কৰোঁ আহক</string>
+    <string name="offline_notification_title_with_advertiser">আপুনি পুনৰ অনলাইন হৈছে! %sৰ বিষয়ে শিকি থকাটো অব্যাহত ৰাখক</string>
     <string name="offline_opt_in_confirm">ঠিক আছে</string>
     <string name="offline_opt_in_decline">নালাগে দিয়ক</string>
     <string name="offline_opt_in_message">বিজ্ঞাপনদাতাৰ ছাইটৰ এটা লিংকৰ সৈতে আমি আপোনালৈ এটা জাননী পঠিয়াম।</string>
@@ -149,6 +154,9 @@
     <string name="s6">বিজ্ঞাপনক কোনো কেলেণ্ডাৰৰ কাৰ্যক্ৰম সৃষ্টি কৰিবলৈ অনুমতি দিবনে?</string>
     <string name="s7">পৰীক্ষণ বিজ্ঞাপন</string>
     <string msgid="6264217191555673260" name="search_menu_title">"সন্ধান"</string>
+    <string name="searchview_clear_text_content_description">Clear text</string>
+    <string name="searchview_navigation_content_description">Back</string>
+    <string name="side_sheet_accessibility_pane_title">Side Sheet</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"৯৯৯+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

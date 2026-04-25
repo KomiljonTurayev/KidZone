@@ -67,6 +67,7 @@
     <string name="common_signin_button_text">Prihlásiť sa</string>
     <string name="common_signin_button_text_long">Prihlásiť sa do účtu Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Odkaz bol skopírovaný do schránky"</string>
+    <string name="error_a11y_label">Chyba: neplatné</string>
     <string name="error_icon_content_description">Chyba</string>
     <string name="exposed_dropdown_menu_content_description">Zobraziť rozbaľovaciu ponuku</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Kopírovať odkaz"</string>
@@ -88,6 +89,9 @@
     <string name="material_timepicker_select_time">Vyberte čas</string>
     <string name="material_timepicker_text_input_mode_description">Ak chcete zadať čas, prepnite na textový režim vstupu</string>
     <string name="mtrl_badge_numberless_content_description">Nové upozornenie</string>
+    <string name="mtrl_checkbox_state_description_checked">Začiarknuté</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Čiastočne začiarknuté</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Nezačiarknuté</string>
     <string name="mtrl_chip_close_icon_content_description">Odstrániť položku %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Viac než %1$d nových upozornení</string>
     <string name="mtrl_picker_a11y_next_month">Ďalší mesiac</string>
@@ -100,7 +104,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Vyberte dátum</string>
     <string name="mtrl_picker_date_header_unselected">Vybraný dátum</string>
-    <string name="mtrl_picker_day_of_week_column_header">Stĺpec dní: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Dátum ukončenia %1$s</string>
     <string name="mtrl_picker_invalid_format">Neplatný formát.</string>
     <string name="mtrl_picker_invalid_format_example">Príklad: %1$s</string>
@@ -136,8 +140,9 @@
     <string name="notifications_permission_decline">Nepovoliť</string>
     <string name="notifications_permission_title">Chcete povoliť aplikácii posielať vám upozornenia?</string>
     <string name="offline_dialog_image_description">Ikona</string>
-    <string name="offline_dialog_text">Po opätovnom pripojení k internetu dostanete upozornenie s odkazom</string>
-    <string name="offline_notification_title">Zobrazte si reklamu, ktorú ste uložili v režime offline</string>
+    <string name="offline_dialog_text">Ďakujeme vám za záujem.\nĎalšie informácie s vami budeme zdieľať, keď budete opäť online.</string>
+    <string name="offline_notification_title">Opäť ste online. Pokračujme, kde sme skončili.</string>
+    <string name="offline_notification_title_with_advertiser">Opäť ste online. Pokračujte v zisťovaní ďalších informácií o inzerentovi %s.</string>
     <string name="offline_opt_in_confirm">OK</string>
     <string name="offline_opt_in_decline">Nie, ďakujem</string>
     <string name="offline_opt_in_message">Pošleme vám upozornenie s odkazom na web inzerenta.</string>
@@ -151,6 +156,9 @@
     <string name="s6">Povoliť reklame vytvoriť udalosť v kalendári?</string>
     <string name="s7">Testovacia reklama</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Hľadať"</string>
+    <string name="searchview_clear_text_content_description">Vymazať text</string>
+    <string name="searchview_navigation_content_description">Späť</string>
+    <string name="side_sheet_accessibility_pane_title">Bočný hárok</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">Anmelden</string>
     <string name="common_signin_button_text_long">Über Google anmelden</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Link in Zwischenablage kopiert"</string>
+    <string name="error_a11y_label">Fehler: ungültig</string>
     <string name="error_icon_content_description">Fehler</string>
     <string name="exposed_dropdown_menu_content_description">Drop-down-Menü anzeigen</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Link kopieren"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Uhrzeit auswählen</string>
     <string name="material_timepicker_text_input_mode_description">In den Texteingabemodus wechseln, um die Uhrzeit einzugeben.</string>
     <string name="mtrl_badge_numberless_content_description">Neue Benachrichtigung</string>
+    <string name="mtrl_checkbox_state_description_checked">Aktiviert</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Teilweise aktiviert</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Nicht aktiviert</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s entfernen</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Mehr als %1$d neue Benachrichtigungen</string>
     <string name="mtrl_picker_a11y_next_month">Zum nächsten Monat wechseln</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Datum auswählen</string>
     <string name="mtrl_picker_date_header_unselected">Ausgewähltes Datum</string>
-    <string name="mtrl_picker_day_of_week_column_header">Spalte \"Wochentag\": %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Enddatum %1$s</string>
     <string name="mtrl_picker_invalid_format">Ungültiges Format.</string>
     <string name="mtrl_picker_invalid_format_example">Beispiel: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">Nicht zulassen</string>
     <string name="notifications_permission_title">App-Benachrichtigungen zulassen?</string>
     <string name="offline_dialog_image_description">Symbol</string>
-    <string name="offline_dialog_text">Du bekommst eine Benachrichtigung mit dem Link, wenn du wieder online bist</string>
-    <string name="offline_notification_title">Werbung anzeigen, die du gespeichert hast, während du offline warst</string>
+    <string name="offline_dialog_text">Vielen Dank für dein Interesse.\nDu erhältst weitere Informationen, sobald du wieder online bist.</string>
+    <string name="offline_notification_title">Du bist wieder online! Machen wir da weiter, wo wir aufgehört haben</string>
+    <string name="offline_notification_title_with_advertiser">Du bist wieder online! Weitere Informationen zu %s</string>
     <string name="offline_opt_in_confirm">OK</string>
     <string name="offline_opt_in_decline">Nein danke</string>
     <string name="offline_opt_in_message">Wir senden dir eine Benachrichtigung mit einem Link zur Website des Werbetreibenden.</string>
@@ -149,6 +154,9 @@
     <string name="s6">Der Werbeanzeige erlauben, einen Kalendertermin zu erstellen?</string>
     <string name="s7">Testanzeige</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Suche"</string>
+    <string name="searchview_clear_text_content_description">Text löschen</string>
+    <string name="searchview_navigation_content_description">Zurück</string>
+    <string name="side_sheet_accessibility_pane_title">Seitenblatt</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

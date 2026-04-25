@@ -54,7 +54,7 @@
     <string msgid="7215213145546190223" name="common_google_play_services_install_title">Google Play సేవలను పొందండి</string>
     <string name="common_google_play_services_notification_channel_name">Google Play సేవల లభ్యత</string>
     <string name="common_google_play_services_notification_ticker">Google Play సేవల ఎర్రర్</string>
-    <string name="common_google_play_services_unknown_issue">%1$s Google Play సేవలతో సమస్య కలిగి ఉంది. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
+    <string name="common_google_play_services_unknown_issue">%1$s Google Play సేవలతో సమస్య కలిగి ఉంది. దయచేసి మళ్లీ ట్రై చేయండి.</string>
     <string name="common_google_play_services_unsupported_text">%1$s Google Play సేవలు లేకుండా అమలు కాదు, ఈ సేవలకు మీ పరికరంలో మద్దతు లేదు.</string>
     <string msgid="6556509956452265614" name="common_google_play_services_update_button">అప్‌డేట్ చేయి</string>
     <string msgid="9053896323427875356" name="common_google_play_services_update_text">మీరు Google Play సేవలను నవీకరిస్తే మినహా %1$s అమలు కాదు.</string>
@@ -65,9 +65,10 @@
     <string name="common_signin_button_text">సైన్ ఇన్ చేయండి</string>
     <string name="common_signin_button_text_long">Googleతో సైన్ ఇన్ చేయి</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"క్లిప్‌బోర్డ్‌కు లింక్ కాపీ చేయబడింది"</string>
+    <string name="error_a11y_label">ఎర్రర్: చెల్లదు</string>
     <string name="error_icon_content_description">ఎర్రర్</string>
     <string name="exposed_dropdown_menu_content_description">డ్రాప్‌డౌన్ మెనూను చూపు</string>
-    <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"లింక్‌ను కాపీ చేయి"</string>
+    <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"లింక్‌ను కాపీ చేయండి"</string>
     <string msgid="3413186855122069269" name="fallback_menu_item_open_in_browser">"బ్రౌజర్‌లో తెరువు"</string>
     <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"లింక్‌ను షేర్ చేయి"</string>
     <string name="icon_content_description">డైలాగ్ చిహ్నం</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">సమయాన్ని ఎంచుకోండి</string>
     <string name="material_timepicker_text_input_mode_description">సమయాన్ని నమోదు చేయడం కోసం వచన నమోదు మోడ్‌కి మారండి.</string>
     <string name="mtrl_badge_numberless_content_description">కొత్త నోటిఫికేషన్</string>
+    <string name="mtrl_checkbox_state_description_checked">ఎంచుకోబడింది</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">పాక్షికంగా ఎంచుకోబడింది</string>
+    <string name="mtrl_checkbox_state_description_unchecked">ఎంచుకోబడలేదు</string>
     <string name="mtrl_chip_close_icon_content_description">(%1$s)ని తీసివేస్తుంది</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$d కంటే ఎక్కువ కొత్త నోటిఫికేషన్‌లు</string>
     <string name="mtrl_picker_a11y_next_month">వచ్చే నెలకు మార్చుతుంది</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">తేదీని ఎంచుకోండి</string>
     <string name="mtrl_picker_date_header_unselected">ఎంచుకున్న తేది</string>
-    <string name="mtrl_picker_day_of_week_column_header">రోజుల నిలువు వరుస: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">ముగింపు తేదీ %1$s</string>
     <string name="mtrl_picker_invalid_format">ఫార్మాట్ చెల్లదు.</string>
     <string name="mtrl_picker_invalid_format_example">ఉదాహరణ: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">అనుమతించవద్దు</string>
     <string name="notifications_permission_title">మీకు నోటిఫికేషన్‌లను పంపడానికి యాప్‌ను అనుమతించాలా?</string>
     <string name="offline_dialog_image_description">చిహ్నం</string>
-    <string name="offline_dialog_text">మీరు తిరిగి ఆన్‌లైన్‌కు వచ్చినప్పుడు, లింక్‌తో కూడిన నోటిఫికేషన్ మీకు అందుతుంది</string>
-    <string name="offline_notification_title">మీరు ఆఫ్‌లైన్‌లో ఉన్నప్పుడు కూడా, సేవ్ చేసిన యాడ్‌ను చూడండి</string>
+    <string name="offline_dialog_text">ఆసక్తి చూపినందుకు మీకు ధన్యవాదాలు.\nమీరు తిరిగి ఆన్‌లైన్‌లోకి వచ్చిన తర్వాత మేము మరిన్నింటిని షేర్ చేస్తాము.</string>
+    <string name="offline_notification_title">మీరు తిరిగి ఆన్‌లైన్‌లోకి వచ్చారు! మనం ఎక్కడ అయితే పాజ్ చేశామో, అక్కడి నుండే కొనసాగిద్దాం</string>
+    <string name="offline_notification_title_with_advertiser">మీరు తిరిగి ఆన్‌లైన్‌లోకి వచ్చారు! %s గురించి తెలుసుకోవడం కొనసాగించండి</string>
     <string name="offline_opt_in_confirm">సరే</string>
     <string name="offline_opt_in_decline">వద్దు, ధన్యవాదాలు</string>
     <string name="offline_opt_in_message">అడ్వర్టైజర్ సైట్‌కు లింక్‌ను మేము మీకు నోటిఫికేషన్‌గా పంపుతాము.</string>
@@ -144,11 +149,14 @@
     <string name="s1">చిత్రాన్ని సేవ్ చేయండి</string>
     <string name="s2">చిత్ర గ్యాలరీలో చిత్రాన్ని స్టోరేజ్‌ చేయడానికి ప్రకటనను అనుమతించాలా?</string>
     <string name="s3">అంగీకరించండి</string>
-    <string name="s4">తిరస్కరించు</string>
+    <string name="s4">తిరస్కరించండి</string>
     <string name="s5">క్యాలెండర్ ఈవెంట్‌ను క్రియేట్ చేయండి</string>
     <string name="s6">క్యాలెండర్ ఈవెంట్‌ను క్రియేట్ చేయడానికి ప్రకటనను అనుమతించాలా?</string>
     <string name="s7">ప్రకటనను పరీక్షించండి</string>
     <string msgid="6264217191555673260" name="search_menu_title">"సెర్చ్"</string>
+    <string name="searchview_clear_text_content_description">టెక్స్ట్‌ను క్లియర్ చేయండి</string>
+    <string name="searchview_navigation_content_description">వెనుకకు</string>
+    <string name="side_sheet_accessibility_pane_title">సైడ్ షీట్</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

@@ -66,6 +66,7 @@
     <string name="common_signin_button_text">כניסה</string>
     <string name="common_signin_button_text_long">‏היכנס באמצעות Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"הקישור הועתק ללוח"</string>
+    <string name="error_a11y_label">שגיאה: לא תקין</string>
     <string name="error_icon_content_description">שגיאה</string>
     <string name="exposed_dropdown_menu_content_description">הצגת התפריט הנפתח</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"העתקת הקישור"</string>
@@ -87,6 +88,9 @@
     <string name="material_timepicker_select_time">בחר שעה</string>
     <string name="material_timepicker_text_input_mode_description">העבר למצב קלט טקסט לצורך הזנת השעה</string>
     <string name="mtrl_badge_numberless_content_description">התראה חדשה</string>
+    <string name="mtrl_checkbox_state_description_checked">מסומנת</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">מסומנת חלקית</string>
+    <string name="mtrl_checkbox_state_description_unchecked">לא מסומנת</string>
     <string name="mtrl_chip_close_icon_content_description">הסרה של %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">יותר מ-%1$d התראות חדשות</string>
     <string name="mtrl_picker_a11y_next_month">מעבר לחודש הבא</string>
@@ -99,7 +103,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">יש לבחור תאריך</string>
     <string name="mtrl_picker_date_header_unselected">התאריך הנבחר</string>
-    <string name="mtrl_picker_day_of_week_column_header">עמודה של ימים: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">תאריך הסיום %1$s</string>
     <string name="mtrl_picker_invalid_format">פורמט לא חוקי.</string>
     <string name="mtrl_picker_invalid_format_example">דוגמה: %1$s</string>
@@ -135,8 +139,9 @@
     <string name="notifications_permission_decline">אין אישור</string>
     <string name="notifications_permission_title">לאפשר לאפליקציה לשלוח לך התראות?</string>
     <string name="offline_dialog_image_description">סמל</string>
-    <string name="offline_dialog_text">תישלח לך התראה עם קישור כשהחיבור לאינטרנט יתחדש</string>
-    <string name="offline_notification_title">צפייה במודעה ששמרת כשלא היה לך חיבור לאינטרנט</string>
+    <string name="offline_dialog_text">‏תודה על ההתעניינות.\nנשתף עוד מידע ברגע שיהיה שוב חיבור לאינטרנט.</string>
+    <string name="offline_notification_title">החיבור לאינטרנט חזר. נמשיך בדיוק מאיפה שהפסקנו</string>
+    <string name="offline_notification_title_with_advertiser">החיבור לאינטרנט חזר. עכשיו אפשר להמשיך לקרוא על %s</string>
     <string name="offline_opt_in_confirm">אישור</string>
     <string name="offline_opt_in_decline">לא תודה</string>
     <string name="offline_opt_in_message">נשלח לך התראה עם קישור לאתר המפרסם.</string>
@@ -150,6 +155,9 @@
     <string name="s6">האם לאפשר למודעה ליצור אירוע ביומן?</string>
     <string name="s7">מודעת בדיקה</string>
     <string msgid="6264217191555673260" name="search_menu_title">"חיפוש"</string>
+    <string name="searchview_clear_text_content_description">מחיקת הטקסט</string>
+    <string name="searchview_navigation_content_description">חזרה</string>
+    <string name="side_sheet_accessibility_pane_title">גיליון צדדי</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

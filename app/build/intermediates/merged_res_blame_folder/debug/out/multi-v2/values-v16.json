@@ -1,20 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "uz.kidzone.app-mergeDebugResources-40:/values-v16/values-v16.xml",
+            "outputFile": "uz.kidzone.app-mergeDebugResources-41:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\a65d085d398b8c635743653a920b8cb3\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "65",
-                        "endOffsets": "116"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\149f59938b35074dc7fe35e9f9516797\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "source": "C:\\Users\\Komiljon\\AppData\\Local\\Android\\Sdk\\caches\\transforms-4\\44f83f129bad92d07aa3545c0420ace1\\transformed\\appcompat-1.7.0\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -22,14 +12,6 @@
                         "endLines": "5",
                         "endColumns": "12",
                         "endOffsets": "223"
-                    },
-                    "to": {
-                        "startLines": "3",
-                        "startColumns": "4",
-                        "startOffsets": "121",
-                        "endLines": "6",
-                        "endColumns": "12",
-                        "endOffsets": "289"
                     }
                 }
             ]

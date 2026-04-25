@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">সাইন-ইন করুন</string>
     <string name="common_signin_button_text_long">Google এর মাধ্যমে সাইন-ইন করুন</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"লিঙ্ক ক্লিপবোর্ডে কপি করা হয়েছে"</string>
+    <string name="error_a11y_label">সমস্যা: সঠিক নয়</string>
     <string name="error_icon_content_description">সমস্যা</string>
     <string name="exposed_dropdown_menu_content_description">ড্রপ-ডাউন মেনু দেখুন</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"লিঙ্ক কপি করুন"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">সময় বেছে নিন</string>
     <string name="material_timepicker_text_input_mode_description">সময় ইনপুট দেওয়ার জন্য পাঠ্য ইনপুট মোডে যান।</string>
     <string name="mtrl_badge_numberless_content_description">নতুন বিজ্ঞপ্তি</string>
+    <string name="mtrl_checkbox_state_description_checked">টিক চিহ্ন দেওয়া হয়েছে</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">আংশিকভাবে টিক চিহ্ন দেওয়া হয়েছে</string>
+    <string name="mtrl_checkbox_state_description_unchecked">টিক চিহ্ন দেওয়া নেই</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s সরিয়ে দিন</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$dটির বেশি নতুন বিজ্ঞপ্তি</string>
     <string name="mtrl_picker_a11y_next_month">আগামী মাসে যান</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">তারিখ বেছে নিন</string>
     <string name="mtrl_picker_date_header_unselected">বেছে নেওয়া তারিখ</string>
-    <string name="mtrl_picker_day_of_week_column_header">সপ্তাহের দিনগুলির কলাম: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">শেষ হওয়ার তারিখ %1$s</string>
     <string name="mtrl_picker_invalid_format">ভুল ফর্ম্যাট।</string>
     <string name="mtrl_picker_invalid_format_example">উদাহরণ: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">অনুমতি দেবেন না</string>
     <string name="notifications_permission_title">আপনাকে বিজ্ঞপ্তি পাঠানোর জন্য অ্যাপকে অনুমতি দেবেন?</string>
     <string name="offline_dialog_image_description">আইকন</string>
-    <string name="offline_dialog_text">আপনি আবার অনলাইন হলে লিঙ্ক সহ বিজ্ঞপ্তি পাবেন</string>
-    <string name="offline_notification_title">অফলাইন থাকাকালীন আপনার সেভ করা বিজ্ঞাপন দেখুন</string>
+    <string name="offline_dialog_text">আপনার আগ্রহের জন্য ধন্যবাদ।\nআপনি অনলাইন হলেই, আমরা আরও কিছু শেয়ার করব।</string>
+    <string name="offline_notification_title">আপনি আবার অনলাইন হয়েছেন! আমরা যেখানে শেষ করেছিলাম সেখান থেকেই শুরু করা যাক</string>
+    <string name="offline_notification_title_with_advertiser">আপনি আবার অনলাইন হয়েছেন! %s-এর বিষয়ে শিখতে থাকুন</string>
     <string name="offline_opt_in_confirm">বুঝেছি</string>
     <string name="offline_opt_in_decline">না থাক</string>
     <string name="offline_opt_in_message">আমরা বিজ্ঞাপনদাতার সাইটে লিঙ্ক সহ একটি বিজ্ঞপ্তি পাঠাব।</string>
@@ -149,6 +154,9 @@
     <string name="s6">বিজ্ঞাপনকে একটি ক্যালেন্ডার ইভেন্ট তৈরি করার অনুমতি দেবেন?</string>
     <string name="s7">পরীক্ষামূলক বিজ্ঞাপন</string>
     <string msgid="6264217191555673260" name="search_menu_title">"সার্চ করুন"</string>
+    <string name="searchview_clear_text_content_description">টেক্সট মুছুন</string>
+    <string name="searchview_navigation_content_description">ফিরে যান</string>
+    <string name="side_sheet_accessibility_pane_title">সাইড শিট</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"৯৯৯+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

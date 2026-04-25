@@ -840,6 +840,13 @@ function showResult(won) {
   document.getElementById("win-msg").textContent   =
     `${matched}/${DIFFICULTY[diff].pairs} juft topildi`;
 
+  // Update total points in the main app
+  const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
+  localStorage.setItem('kz-pts', currentTotal + Math.round(score / 4));
+
+  // Update progress
+  localStorage.setItem('kz-prog-memory', '100');
+
   window.AdMobMgr?.showInterstitial(); // ✅ AdMob
   // await showInterstitial();
 

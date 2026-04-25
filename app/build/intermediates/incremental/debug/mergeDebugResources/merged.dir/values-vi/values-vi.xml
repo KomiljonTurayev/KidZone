@@ -65,11 +65,12 @@
     <string name="common_signin_button_text">Đăng nhập</string>
     <string name="common_signin_button_text_long">Đăng nhập bằng Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Đã sao chép đường liên kết vào bảng nhớ tạm"</string>
+    <string name="error_a11y_label">Lỗi: không hợp lệ</string>
     <string name="error_icon_content_description">Lỗi</string>
     <string name="exposed_dropdown_menu_content_description">Hiển thị menu thả xuống</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Sao chép đường liên kết"</string>
     <string msgid="3413186855122069269" name="fallback_menu_item_open_in_browser">"Mở trong trình duyệt"</string>
-    <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"Chia sẻ liên kết"</string>
+    <string msgid="7145444925855055364" name="fallback_menu_item_share_link">"Chia sẻ đường liên kết"</string>
     <string name="icon_content_description">Biểu tượng hộp thoại</string>
     <string name="item_view_role_description">Thẻ</string>
     <string name="material_clock_toggle_content_description">Chọn SA hoặc CH</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Chọn thời gian</string>
     <string name="material_timepicker_text_input_mode_description">Chuyển sang chế độ nhập văn bản để nhập thời gian.</string>
     <string name="mtrl_badge_numberless_content_description">Thông báo mới</string>
+    <string name="mtrl_checkbox_state_description_checked">Đã đánh dấu</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Đã đánh dấu một phần</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Chưa đánh dấu</string>
     <string name="mtrl_chip_close_icon_content_description">Xóa %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Hơn %1$d thông báo mới</string>
     <string name="mtrl_picker_a11y_next_month">Chuyển sang tháng tiếp theo</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Chọn ngày</string>
     <string name="mtrl_picker_date_header_unselected">Ngày đã chọn</string>
-    <string name="mtrl_picker_day_of_week_column_header">Cột ngày: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Ngày kết thúc %1$s</string>
     <string name="mtrl_picker_invalid_format">Định dạng không hợp lệ.</string>
     <string name="mtrl_picker_invalid_format_example">Ví dụ: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">Không cho phép</string>
     <string name="notifications_permission_title">Cho phép ứng dụng gửi thông báo cho bạn?</string>
     <string name="offline_dialog_image_description">Biểu tượng</string>
-    <string name="offline_dialog_text">Bạn sẽ nhận được thông báo kèm theo đường liên kết khi có kết nối mạng trở lại</string>
-    <string name="offline_notification_title">Xem quảng cáo đã lưu khi bạn không có kết nối mạng</string>
+    <string name="offline_dialog_text">Cảm ơn bạn đã quan tâm.\nChúng tôi sẽ chia sẻ nhiều hơn khi bạn kết nối mạng trở lại.</string>
+    <string name="offline_notification_title">Bạn đã kết nối mạng trở lại! Hãy tiếp tục từ thời điểm chúng ta dừng lại lần trước</string>
+    <string name="offline_notification_title_with_advertiser">Bạn đã kết nối mạng trở lại! Tiếp tục tìm hiểu về %s</string>
     <string name="offline_opt_in_confirm">OK</string>
     <string name="offline_opt_in_decline">Để sau</string>
     <string name="offline_opt_in_message">Chúng tôi sẽ gửi thông báo cho bạn kèm theo đường liên kết đến trang web của nhà quảng cáo.</string>
@@ -149,6 +154,9 @@
     <string name="s6">Cho phép Quảng cáo tạo sự kiện lịch?</string>
     <string name="s7">Quảng cáo thử nghiệm</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Tìm kiếm"</string>
+    <string name="searchview_clear_text_content_description">Xoá văn bản</string>
+    <string name="searchview_navigation_content_description">Quay lại</string>
+    <string name="side_sheet_accessibility_pane_title">Trang bên</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

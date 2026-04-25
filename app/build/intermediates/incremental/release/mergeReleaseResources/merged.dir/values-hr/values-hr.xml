@@ -66,6 +66,7 @@
     <string name="common_signin_button_text">Prijava</string>
     <string name="common_signin_button_text_long">Prijava putem Googlea</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Veza je kopirana u međuspremnik"</string>
+    <string name="error_a11y_label">Pogreška: nije važeće</string>
     <string name="error_icon_content_description">Pogreška</string>
     <string name="exposed_dropdown_menu_content_description">Prikaži padajući izbornik</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Kopiraj vezu"</string>
@@ -87,6 +88,9 @@
     <string name="material_timepicker_select_time">Odabir vremena</string>
     <string name="material_timepicker_text_input_mode_description">Prijeđite na način unosa teksta da biste unijeli vrijeme.</string>
     <string name="mtrl_badge_numberless_content_description">Nova obavijest</string>
+    <string name="mtrl_checkbox_state_description_checked">Potvrđeno</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Djelomično potvrđeno</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Nije potvrđeno</string>
     <string name="mtrl_chip_close_icon_content_description">Ukloni %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Više od %1$d novih obavijesti</string>
     <string name="mtrl_picker_a11y_next_month">Prijelaz na sljedeći mjesec</string>
@@ -99,7 +103,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Odaberite datum</string>
     <string name="mtrl_picker_date_header_unselected">Odabrani datum</string>
-    <string name="mtrl_picker_day_of_week_column_header">Stupac s danima: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Datum završetka %1$s</string>
     <string name="mtrl_picker_invalid_format">Nevažeći format.</string>
     <string name="mtrl_picker_invalid_format_example">Primjer: %1$s</string>
@@ -135,8 +139,9 @@
     <string name="notifications_permission_decline">Ne dopuštaj</string>
     <string name="notifications_permission_title">Želite li dopustiti aplikaciji da vam šalje obavijesti?</string>
     <string name="offline_dialog_image_description">Ikona</string>
-    <string name="offline_dialog_text">Primit ćete obavijest s vezom kad se ponovo povežete s internetom</string>
-    <string name="offline_notification_title">Pogledajte oglas koji ste spremili dok ste bili offline</string>
+    <string name="offline_dialog_text">Zahvaljujemo na interesu.\nPružit ćemo vam više informacija kada se ponovno povežete s internetom.</string>
+    <string name="offline_notification_title">Ponovno ste online! Nastavimo tamo gdje smo stali</string>
+    <string name="offline_notification_title_with_advertiser">Ponovno ste online! Saznajte više o oglašivaču %s</string>
     <string name="offline_opt_in_confirm">U redu</string>
     <string name="offline_opt_in_decline">Ne, hvala</string>
     <string name="offline_opt_in_message">Poslat ćemo vam obavijest s vezom do web-lokacije oglašivača.</string>
@@ -150,6 +155,9 @@
     <string name="s6">Želite li dopustiti oglasu da izradi događaj u kalendaru?</string>
     <string name="s7">Testni oglas</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Pretraži"</string>
+    <string name="searchview_clear_text_content_description">Ukloni tekst</string>
+    <string name="searchview_navigation_content_description">Natrag</string>
+    <string name="side_sheet_accessibility_pane_title">Bočni list</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">Iniciar sessão</string>
     <string name="common_signin_button_text_long">Iniciar sessão com o Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Link copiado para a área de transferência."</string>
+    <string name="error_a11y_label">Erro: inválida</string>
     <string name="error_icon_content_description">Erro</string>
     <string name="exposed_dropdown_menu_content_description">Mostrar menu pendente</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Copiar link"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Selecionar hora</string>
     <string name="material_timepicker_text_input_mode_description">Mude para o modo de introdução de texto para a introdução da hora.</string>
     <string name="mtrl_badge_numberless_content_description">Nova notificação</string>
+    <string name="mtrl_checkbox_state_description_checked">Selecionada</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Parcialmente selecionada</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Não selecionada</string>
     <string name="mtrl_chip_close_icon_content_description">Remover %1$s</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">Mais de %1$d notificações novas</string>
     <string name="mtrl_picker_a11y_next_month">Mudar para o mês seguinte</string>
@@ -98,11 +102,11 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Selecione a data</string>
     <string name="mtrl_picker_date_header_unselected">Data selecionada</string>
-    <string name="mtrl_picker_day_of_week_column_header">Coluna de dias: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Data de fim: %1$s</string>
     <string name="mtrl_picker_invalid_format">Formato inválido.</string>
     <string name="mtrl_picker_invalid_format_example">Exemplo: %1$s</string>
-    <string name="mtrl_picker_invalid_format_use">Utilize: %1$s</string>
+    <string name="mtrl_picker_invalid_format_use">Use: %1$s</string>
     <string name="mtrl_picker_invalid_range">Intervalo inválido.</string>
     <string name="mtrl_picker_navigate_to_current_year_description">Navegar para o ano atual %1$d</string>
     <string name="mtrl_picker_navigate_to_year_description">Navegue para o ano %1$d</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">Não permitir</string>
     <string name="notifications_permission_title">Permitir que a app lhe envie notificações?</string>
     <string name="offline_dialog_image_description">Ícone</string>
-    <string name="offline_dialog_text">Vai receber uma notificação com o link quando voltar a estar online.</string>
-    <string name="offline_notification_title">Veja o anúncio que guardou quando estava offline</string>
+    <string name="offline_dialog_text">Agradecemos o seu interesse.\nVamos partilhar mais informações quando estiver novamente online.</string>
+    <string name="offline_notification_title">Está novamente online! Continuemos a partir do ponto em que ficámos</string>
+    <string name="offline_notification_title_with_advertiser">Está novamente online! Continue a aprender sobre %s</string>
     <string name="offline_opt_in_confirm">OK</string>
     <string name="offline_opt_in_decline">Não</string>
     <string name="offline_opt_in_message">Receberá uma notificação com um link para o site do anunciante.</string>
@@ -149,6 +154,9 @@
     <string name="s6">Permitir ao anúncio criar um evento de calendário?</string>
     <string name="s7">Anúncio de teste</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Pesquisar"</string>
+    <string name="searchview_clear_text_content_description">Limpar texto</string>
+    <string name="searchview_navigation_content_description">Anterior</string>
+    <string name="side_sheet_accessibility_pane_title">Página lateral</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

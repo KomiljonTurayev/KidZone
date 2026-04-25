@@ -38,7 +38,7 @@
     <string name="bottomsheet_drag_handle_content_description">ਘਸੀਟਣ ਵਾਲਾ ਹੈਂਡਲ</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"ਜਵਾਬ ਦਿਓ"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"ਵੀਡੀਓ"</string>
-    <string msgid="3229508546291798546" name="call_notification_decline_action">"ਅਸਵੀਕਾਰ ਕਰੋ"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"ਕਾਲ ਕੱਟੋ"</string>
     <string msgid="2659457946726154263" name="call_notification_hang_up_action">"ਸਮਾਪਤ ਕਰੋ"</string>
     <string msgid="6107532579223922871" name="call_notification_incoming_text">"ਇਨਕਮਿੰਗ ਕਾਲ"</string>
     <string msgid="8623827134497363134" name="call_notification_ongoing_text">"ਜਾਰੀ ਕਾਲ"</string>
@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">ਸਾਈਨ-ਇਨ ਕਰੋ</string>
     <string name="common_signin_button_text_long">Google ਨਾਲ ਸਾਈਨ-ਇਨ ਕਰੋ</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"ਲਿੰਕ ਕਲਿੱਪਬੋਰਡ \'ਤੇ ਕਾਪੀ ਹੋ ਗਿਆ"</string>
+    <string name="error_a11y_label">ਗੜਬੜ: ਅਵੈਧ</string>
     <string name="error_icon_content_description">ਗੜਬੜ</string>
     <string name="exposed_dropdown_menu_content_description">ਡ੍ਰੌਪ-ਡਾਊਨ ਮੀਨੂ ਦਿਖਾਓ</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"ਲਿੰਕ ਕਾਪੀ ਕਰੋ"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">ਸਮਾਂ ਚੁਣੋ</string>
     <string name="material_timepicker_text_input_mode_description">ਸਮਾਂ ਇਨਪੁੱਟ ਕਰਨ ਲਈ ਲਿਖਤ ਇਨਪੁੱਟ ਮੋਡ \'ਤੇ ਸਵਿੱਚ ਕਰੋ।</string>
     <string name="mtrl_badge_numberless_content_description">ਨਵੀਂ ਸੂਚਨਾ</string>
+    <string name="mtrl_checkbox_state_description_checked">ਸਹੀ ਦਾ ਨਿਸ਼ਾਨ ਲਾਇਆ ਗਿਆ</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">ਅੰਸ਼ਕ ਤੌਰ ਤੇ ਜਾਂਚ ਕੀਤੀ ਗਈ</string>
+    <string name="mtrl_checkbox_state_description_unchecked">ਸਹੀ ਦਾ ਨਿਸ਼ਾਨ ਨਹੀਂ ਲਾਇਆ ਗਿਆ</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s ਹਟਾਓ</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$d ਤੋਂ ਵੱਧ ਨਵੀਆਂ ਸੂਚਨਾਵਾਂ</string>
     <string name="mtrl_picker_a11y_next_month">ਅਗਲੇ ਮਹੀਨੇ \'ਤੇ ਜਾਓ</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">ਤਾਰੀਖ ਚੁਣੋ</string>
     <string name="mtrl_picker_date_header_unselected">ਚੁਣੀ ਗਈ ਤਾਰੀਖ</string>
-    <string name="mtrl_picker_day_of_week_column_header">ਦਿਨਾਂ ਦਾ ਕਾਲਮ: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">ਸਮਾਪਤੀ ਤਾਰੀਖ %1$s</string>
     <string name="mtrl_picker_invalid_format">ਅਵੈਧ ਫਾਰਮੈਟ।</string>
     <string name="mtrl_picker_invalid_format_example">ਉਦਾਹਰਨ: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">ਆਗਿਆ ਨਾ ਦਿਓ</string>
     <string name="notifications_permission_title">ਕੀ ਐਪ ਨੂੰ ਤੁਹਾਨੂੰ ਸੂਚਨਾਵਾਂ ਭੇਜਣ ਦੀ ਆਗਿਆ ਦੇਣੀ ਹੈ?</string>
     <string name="offline_dialog_image_description">ਪ੍ਰਤੀਕ</string>
-    <string name="offline_dialog_text">ਤੁਹਾਡੇ ਵਾਪਸ ਆਨਲਾਈਨ ਹੋਣ \'ਤੇ ਤੁਹਾਨੂੰ ਇੱਕ ਸੂਚਨਾ ਪ੍ਰਾਪਤ ਹੋਵੇਗੀ ਜਿਸ ਵਿੱਚ ਲਿੰਕ ਹੋਵੇਗਾ</string>
-    <string name="offline_notification_title">ਤੁਹਾਡੇ ਵੱਲੋਂ ਆਫ਼ਲਾਈਨ ਹੋਣ ਦੌਰਾਨ ਰੱਖਿਅਤ ਕੀਤੇ ਵਿਗਿਆਪਨ ਦੇਖੋ</string>
+    <string name="offline_dialog_text">ਤੁਹਾਡੀ ਦਿਲਚਸਪੀ ਲਈ ਧੰਨਵਾਦ।\nਅਸੀਂ ਤੁਹਾਡੇ ਵਾਪਸ ਆਨਲਾਈਨ ਹੋਣ \'ਤੇ ਹੋਰ ਜਾਣਕਾਰੀ ਨੂੰ ਸਾਂਝਾ ਕਰਾਂਗੇ।</string>
+    <string name="offline_notification_title">ਤੁਸੀਂ ਵਾਪਸ ਆਨਲਾਈਨ ਹੋ ਗਏ ਹੋ! ਜਿੱਥੇ ਅਸੀਂ ਛੱਡਿਆ ਸੀ ਉੱਥੋਂ ਸ਼ੁਰੂ ਕਰੀਏ</string>
+    <string name="offline_notification_title_with_advertiser">ਤੁਸੀਂ ਵਾਪਸ ਆਨਲਾਈਨ ਹੋ ਗਏ ਹੋ! %s ਬਾਰੇ ਜਾਣਨਾ ਜਾਰੀ ਰੱਖੋ</string>
     <string name="offline_opt_in_confirm">ਠੀਕ ਹੈ</string>
     <string name="offline_opt_in_decline">ਨਹੀਂ ਧੰਨਵਾਦ</string>
     <string name="offline_opt_in_message">ਅਸੀਂ ਤੁਹਾਨੂੰ ਇੱਕ ਸੂਚਨਾ ਭੇਜਾਂਗੇ ਜਿਸ ਵਿੱਚ ਵਿਗਿਆਪਨਦਾਤਾ ਦੀ ਸਾਈਟ ਦਾ ਲਿੰਕ ਹੋਵੇਗਾ।</string>
@@ -149,6 +154,9 @@
     <string name="s6">ਕੀ ਇਸ਼ਤਿਹਾਰ ਨੂੰ ਇੱਕ ਕੈਲੰਡਰ ਇਵੈਂਟ ਬਣਾਉਣ ਦੀ ਆਗਿਆ ਦੇਣੀ ਹੈ?</string>
     <string name="s7">ਟੈਸਟ ਇਸ਼ਤਿਹਾਰ</string>
     <string msgid="6264217191555673260" name="search_menu_title">"ਖੋਜ"</string>
+    <string name="searchview_clear_text_content_description">ਲਿਖਤ ਕਲੀਅਰ ਕਰੋ</string>
+    <string name="searchview_navigation_content_description">ਪਿੱਛੇ</string>
+    <string name="side_sheet_accessibility_pane_title">ਸਾਈਡ ਸ਼ੀਟ</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">შესვლა</string>
     <string name="common_signin_button_text_long">Google-ით შესვლა</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"გაცვლის ბუფერში კოპირებული ბმული"</string>
+    <string name="error_a11y_label">შეცდომა: არასწორი</string>
     <string name="error_icon_content_description">შეცდომა</string>
     <string name="exposed_dropdown_menu_content_description">ჩამოსაშლელი მენიუს ჩვენება</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"ბმულის კოპირება"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">აირჩიეთ დრო</string>
     <string name="material_timepicker_text_input_mode_description">დროის შეყვანისთვის ტექსტის შეყვანის რეჟიმზე გადართვა.</string>
     <string name="mtrl_badge_numberless_content_description">ახალი შეტყობინება</string>
+    <string name="mtrl_checkbox_state_description_checked">მონიშნულია</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">ნაწილობრივ შემოწმებულია</string>
+    <string name="mtrl_checkbox_state_description_unchecked">არ არის მონიშნული</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s-ის ამოშლა</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$d-ზე მეტი ახალი შეტყობინება</string>
     <string name="mtrl_picker_a11y_next_month">შემდეგ თვეზე გადასვლა</string>
@@ -98,11 +102,11 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">აირჩიეთ თარიღი</string>
     <string name="mtrl_picker_date_header_unselected">არჩეული თარიღი</string>
-    <string name="mtrl_picker_day_of_week_column_header">დღეების სვეტი: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">დასრულების თარიღი %1$s</string>
     <string name="mtrl_picker_invalid_format">არასწორი ფორმატი.</string>
     <string name="mtrl_picker_invalid_format_example">მაგალითი: %1$s</string>
-    <string name="mtrl_picker_invalid_format_use">%1$s-ის გამოყენება</string>
+    <string name="mtrl_picker_invalid_format_use">ფორმატი: %1$s</string>
     <string name="mtrl_picker_invalid_range">დიაპაზონი არასწორია.</string>
     <string name="mtrl_picker_navigate_to_current_year_description">ნავიგაცია მიმდინარე წელზე (%1$d)</string>
     <string name="mtrl_picker_navigate_to_year_description">%1$d წელზე ნავიგაცია</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">უარყოფა</string>
     <string name="notifications_permission_title">ნებას დართავთ აპს, გამოგიგზავნოთ შეტყობინებები?</string>
     <string name="offline_dialog_image_description">ხატულა</string>
-    <string name="offline_dialog_text">თქვენ მიიღებთ შეტყობინებას ბმულით, როდესაც ონლაინ დაბრუნდებით</string>
-    <string name="offline_notification_title">ნახეთ თქვენ მიერ ხაზგარეშე ყოფნისას შენახული რეკლამა</string>
+    <string name="offline_dialog_text">გმადლობთ დაინტერესებისთვის.\nჩვენ კვლავ გაგიზიარებთ, როგორც კი ონლაინ დაბრუნდებით.</string>
+    <string name="offline_notification_title">თქვენ კვლავ ონლაინ ხართ! გავაგრძელოთ იქიდან, სადაც შევჩერდით</string>
+    <string name="offline_notification_title_with_advertiser">თქვენ კვლავ ონლაინ ხართ! განაგრძეთ %s-ის გაცნობა</string>
     <string name="offline_opt_in_confirm">კარგი</string>
     <string name="offline_opt_in_decline">არა, გმადლობთ</string>
     <string name="offline_opt_in_message">ჩვენ გამოგიგზავნით შეტყობინებას რეკლამის განმთავსების საიტის ბმულით.</string>
@@ -149,6 +154,9 @@
     <string name="s6">აძლევთ ნებას რეკლამას, შექმნას მოვლენა კალენდარში?</string>
     <string name="s7">სატესტო რეკლამა</string>
     <string msgid="6264217191555673260" name="search_menu_title">"ძიება"</string>
+    <string name="searchview_clear_text_content_description">ტექსტის გასუფთავება</string>
+    <string name="searchview_navigation_content_description">უკან</string>
+    <string name="side_sheet_accessibility_pane_title">გვერდითი ფურცელი</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

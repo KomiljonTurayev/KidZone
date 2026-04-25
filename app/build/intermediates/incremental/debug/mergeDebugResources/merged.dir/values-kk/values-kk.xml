@@ -36,7 +36,7 @@
     <string name="bottomsheet_action_expand_halfway">Жартылай кеңейту</string>
     <string name="bottomsheet_drag_handle_clicked">Сүйрейтін тетік екі рет түртілді.</string>
     <string name="bottomsheet_drag_handle_content_description">Сүйрейтін тетік</string>
-    <string msgid="881409763997275156" name="call_notification_answer_action">"Жауап"</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Жауап беру"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Бейне"</string>
     <string msgid="3229508546291798546" name="call_notification_decline_action">"Қабылдамау"</string>
     <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Тұтқаны қою"</string>
@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">Кіру</string>
     <string name="common_signin_button_text_long">Google арқылы кіру</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Сілтеме буферге көшірілді."</string>
+    <string name="error_a11y_label">Қате: жарамсыз</string>
     <string name="error_icon_content_description">Қате</string>
     <string name="exposed_dropdown_menu_content_description">Ашылмалы мәзірді көрсету</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"Сілтемені көшіру"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">Уақытты таңдау</string>
     <string name="material_timepicker_text_input_mode_description">Уақытты енгізу үшін мәтін енгізу режиміне өтіңіз.</string>
     <string name="mtrl_badge_numberless_content_description">Жаңа хабарландыру</string>
+    <string name="mtrl_checkbox_state_description_checked">Құсбелгі қойылды.</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">Құсбелгі жартылай қойылды.</string>
+    <string name="mtrl_checkbox_state_description_unchecked">Құсбелгі қойылмады.</string>
     <string name="mtrl_chip_close_icon_content_description">%1$s контентін өшіру</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">%1$d санынан көп жаңа хабарландыру</string>
     <string name="mtrl_picker_a11y_next_month">Келесі айға өту</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">Күнді таңдау</string>
     <string name="mtrl_picker_date_header_unselected">Таңдалған күн</string>
-    <string name="mtrl_picker_day_of_week_column_header">Күндер бағаны: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">Аяқталу күні: %1$s</string>
     <string name="mtrl_picker_invalid_format">Формат жарамсыз.</string>
     <string name="mtrl_picker_invalid_format_example">Мысал: %1$s.</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">Рұқсат бермеу</string>
     <string name="notifications_permission_title">Қолданбаның хабарландырулар жіберуіне рұқсат берілсін бе?</string>
     <string name="offline_dialog_image_description">Белгіше</string>
-    <string name="offline_dialog_text">Онлайн режимге оралғанда, сілтемесі бар хабарландыру аласыз.</string>
-    <string name="offline_notification_title">Офлайн режимге өткенде, сақталған жарнамаңызды көріңіз</string>
+    <string name="offline_dialog_text">Қызығушылық танытқаныңыз үшін рақмет.\nСіз желіге қайта қосылған кезде, қосымша ақпарат жібереміз.</string>
+    <string name="offline_notification_title">Желіге қайта қосылдыңыз. Тоқтаған жеріңізден қайта жалғастырайық.</string>
+    <string name="offline_notification_title_with_advertiser">Желіге қайта қосылдыңыз. %s туралы ақпарат алуды жалғастырыңыз.</string>
     <string name="offline_opt_in_confirm">Жарайды</string>
     <string name="offline_opt_in_decline">Жоқ, рақмет</string>
     <string name="offline_opt_in_message">Сізге жарнама беруші сайтына сілтемесі бар хабарландыру жібереміз.</string>
@@ -149,6 +154,9 @@
     <string name="s6">Жарнамаға күнтізбе оқиғасын жасауға рұқсат берілсін бе?</string>
     <string name="s7">Сынақ жарнама</string>
     <string msgid="6264217191555673260" name="search_menu_title">"Іздеу"</string>
+    <string name="searchview_clear_text_content_description">Мәтінді өшіру</string>
+    <string name="searchview_navigation_content_description">Артқа</string>
+    <string name="side_sheet_accessibility_pane_title">Бүйірлік парақ</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob – </string>
 </resources>

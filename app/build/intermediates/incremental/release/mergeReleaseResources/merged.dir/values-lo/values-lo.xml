@@ -65,6 +65,7 @@
     <string name="common_signin_button_text">ລົງຊື່ເຂົ້າໃຊ້</string>
     <string name="common_signin_button_text_long">ລົງຊື່ເຂົ້າໃຊ້ດ້ວຍ Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"ສຳເນົາລິ້ງໃສ່ຄລິບບອດແລ້ວ"</string>
+    <string name="error_a11y_label">ຂໍ້ຜິດພາດ: ບໍ່ຖືກຕ້ອງ</string>
     <string name="error_icon_content_description">ຜິດພາດ</string>
     <string name="exposed_dropdown_menu_content_description">ສະແດງເມນູເລື່ອນລົງ</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"ສຳເນົາລິ້ງ"</string>
@@ -86,6 +87,9 @@
     <string name="material_timepicker_select_time">ເລືອກເວ​ລາ</string>
     <string name="material_timepicker_text_input_mode_description">ສະຫຼັບໄປໃຊ້ໂໝດປ້ອນຂໍ້ຄວາມສຳລັບການປ້ອນເວລາ.</string>
     <string name="mtrl_badge_numberless_content_description">ການແຈ້ງເຕືອນໃໝ່</string>
+    <string name="mtrl_checkbox_state_description_checked">ເລືອກໄວ້</string>
+    <string name="mtrl_checkbox_state_description_indeterminate">ເລືອກໄວ້ບາງສ່ວນ</string>
+    <string name="mtrl_checkbox_state_description_unchecked">ບໍ່ໄດ້ເລືອກໄວ້</string>
     <string name="mtrl_chip_close_icon_content_description">ລຶບ %1$s ອອກ</string>
     <string name="mtrl_exceed_max_badge_number_content_description" ns2:ignore="PluralsCandidate">ການແຈ້ງເຕືອນໃໝ່ຫຼາຍກວ່າ %1$d ລາຍການ</string>
     <string name="mtrl_picker_a11y_next_month">ປ່ຽນເປັນເດືອນຕໍ່ໄປ</string>
@@ -98,7 +102,7 @@
     <string name="mtrl_picker_date_header_selected">%1$s</string>
     <string name="mtrl_picker_date_header_title">ເລືອກວັນທີ</string>
     <string name="mtrl_picker_date_header_unselected">ເລືອກວັນທີ</string>
-    <string name="mtrl_picker_day_of_week_column_header">ຖັນມື້: %1$s</string>
+    <string name="mtrl_picker_day_of_week_column_header">%1$s</string>
     <string name="mtrl_picker_end_date_description">ວັນທີສິ້ນສຸດ %1$s</string>
     <string name="mtrl_picker_invalid_format">ຮູບແບບບໍ່ຖືກຕ້ອງ.</string>
     <string name="mtrl_picker_invalid_format_example">ຕົວຢ່າງ: %1$s</string>
@@ -134,8 +138,9 @@
     <string name="notifications_permission_decline">ບໍ່ອະນຸຍາດ</string>
     <string name="notifications_permission_title">ອະນຸຍາດໃຫ້ແອັບສົ່ງການແຈ້ງເຕືອນໃຫ້ທ່ານບໍ?</string>
     <string name="offline_dialog_image_description">ໄອຄອນ</string>
-    <string name="offline_dialog_text">ທ່ານຈະໄດ້ຮັບການແຈ້ງເຕືອນພ້ອມກັບລິ້ງເມື່ອທ່ານກັບມາອອນລາຍ</string>
-    <string name="offline_notification_title">ເບິ່ງໂຄສະນາທີ່ທ່ານບັນທຶກໄວ້ຕອນທ່ານອອບລາຍ</string>
+    <string name="offline_dialog_text">ຂໍຂອບໃຈສຳລັບຄວາມສົນໃຈຂອງທ່ານ.\nພວກເຮົາຈະແບ່ງປັນເພີ່ມເຕີມເມື່ອທ່ານກັບມາອອນລາຍ.</string>
+    <string name="offline_notification_title">ທ່ານກັບມາອອນລາຍແລ້ວ! ສືບຕໍ່ຈາກບ່ອນທີ່ຄ້າງໄວ້</string>
+    <string name="offline_notification_title_with_advertiser">ທ່ານກັບມາອອນລາຍແລ້ວ! ສືບຕໍ່ການຮຽນຮູ້ກ່ຽວກັບ %s</string>
     <string name="offline_opt_in_confirm">ຕົກລົງ</string>
     <string name="offline_opt_in_decline">ບໍ່, ຂອບໃຈ</string>
     <string name="offline_opt_in_message">ພວກເຮົາຈະສົ່ງການແຈ້ງເຕືອນພ້ອມກັບລິ້ງຫາເວັບໄຊຜູ້ລົງໂຄສະນາໃຫ້ທ່ານ.</string>
@@ -149,6 +154,9 @@
     <string name="s6">ອະນຸຍາດໃຫ້ໂຄສະນາສ້າງນັດໝາຍປະຕິທິນໄດ້ບໍ?</string>
     <string name="s7">ໂຄສະນາທົດສອບ</string>
     <string msgid="6264217191555673260" name="search_menu_title">"ຊອກຫາ"</string>
+    <string name="searchview_clear_text_content_description">ລຶບລ້າງຂໍ້ຄວາມ</string>
+    <string name="searchview_navigation_content_description">ກັບຄືນ</string>
+    <string name="side_sheet_accessibility_pane_title">ຊີດດ້ານຂ້າງ</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string name="watermark_label_prefix">AdMob - </string>
 </resources>

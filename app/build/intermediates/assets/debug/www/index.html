@@ -133,6 +133,22 @@
       display:flex;align-items:center;gap:5px;
       border:1.5px solid rgba(255,255,255,.3);
     }
+    #lang-pill {
+      background:rgba(255,255,255,.2);
+      border:1.5px solid rgba(255,255,255,.3);
+      border-radius:20px;padding:5px 10px;
+      color:white;font-size:12px;font-weight:800;cursor:pointer;
+      display:flex;align-items:center;gap:4px;
+      font-family:'Nunito',sans-serif;
+    }
+    #music-pill {
+      background:rgba(255,255,255,.2);
+      border:1.5px solid rgba(255,255,255,.3);
+      border-radius:20px;padding:5px;
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;color:white;font-size:16px;
+    }
     #stars-pill span{font-size:16px}
     #stars-val{font-size:14px;font-weight:900;color:white}
 
@@ -764,30 +780,53 @@
 <div class="modal-overlay h" id="age-modal" onclick="closeModal('age-modal')">
   <div class="modal-sheet" onclick="e=>e.stopPropagation()">
     <div class="modal-handle"></div>
-    <div class="modal-title">🎂 Yoshni tanlang</div>
+    <div class="modal-title">🎂 Age Selection</div>
     <div class="age-options">
       <div class="age-card sel" onclick="setAge('2-4',this)">
         <div class="ac-em">👶</div>
-        <div class="ac-range">2–4 yosh</div>
-        <div class="ac-desc">Ranglar, shakllar, hayvonlar</div>
+        <div class="ac-range">2–4 years</div>
+        <div class="ac-desc">Colors, shapes, animals</div>
       </div>
       <div class="age-card" onclick="setAge('4-6',this)">
         <div class="ac-em">🧒</div>
-        <div class="ac-range">4–6 yosh</div>
-        <div class="ac-desc">Raqamlar, harflar, musiqa</div>
+        <div class="ac-range">4–6 years</div>
+        <div class="ac-desc">Numbers, letters, music</div>
       </div>
       <div class="age-card" onclick="setAge('6-8',this)">
         <div class="ac-em">👦</div>
-        <div class="ac-range">6–8 yosh</div>
-        <div class="ac-desc">Matematik, mantiq, test</div>
+        <div class="ac-range">6–8 years</div>
+        <div class="ac-desc">Math, logic, tests</div>
       </div>
       <div class="age-card" onclick="setAge('8+',this)">
         <div class="ac-em">🧑</div>
-        <div class="ac-range">8+ yosh</div>
-        <div class="ac-desc">Barcha o'yinlar ochiq</div>
+        <div class="ac-range">8+ years</div>
+        <div class="ac-desc">All games unlocked</div>
       </div>
     </div>
-    <button class="btn-primary" onclick="closeModal('age-modal')">✅ Saqlash</button>
+    <button class="btn-primary" onclick="closeModal('age-modal')">✅ Save</button>
+  </div>
+</div>
+
+<!-- ─── LANGUAGE SELECTOR MODAL ─── -->
+<div class="modal-overlay h" id="lang-modal" onclick="closeModal('lang-modal')">
+  <div class="modal-sheet" onclick="e=>e.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🌍 Select Language</div>
+    <div class="age-options">
+      <div class="age-card" id="lc-en" onclick="setLang('en')">
+        <div class="ac-em">🇬🇧</div>
+        <div class="ac-range">English</div>
+      </div>
+      <div class="age-card" id="lc-ru" onclick="setLang('ru')">
+        <div class="ac-em">🇷🇺</div>
+        <div class="ac-range">Русский</div>
+      </div>
+      <div class="age-card" id="lc-uz" onclick="setLang('uz')">
+        <div class="ac-em">🇺🇿</div>
+        <div class="ac-range">O'zbekcha</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="closeModal('lang-modal')">✅ Close</button>
   </div>
 </div>
 
@@ -856,6 +895,14 @@
       </div>
     </div>
     <div id="hdr-spacer"></div>
+    <!-- Music Toggle -->
+    <div id="music-pill" onclick="toggleMusic()">
+      <span id="music-ic">🔊</span>
+    </div>
+    <!-- Language Selector -->
+    <div id="lang-pill" onclick="openModal('lang-modal')">
+      <span id="lang-cur">🇬🇧 EN</span>
+    </div>
     <button id="age-btn" onclick="openModal('age-modal')">👶 2–4 ▾</button>
     <div id="stars-pill">
       <span>⭐</span>
@@ -981,44 +1028,44 @@
     // ── LEARN ───────────────────────────────────────
     {id:"animals",    em:"🐾", name:"Hayvonlar",      cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
     {id:"colors",     em:"🌈", name:"Rang & Shakl",   cat:"colors", age:"2+", tag:"Ranglar", tc:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:5, plays:"10K", badge:"hot", file:"colors-shapes.html", pts:20},
-    {id:"abc-uz",     em:"🔤", name:"O'zbek Alifbosi", cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:null, pts:25},
-    {id:"abc-ru",     em:"А", name:"Rus Alifbosi",    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:null, pts:25},
-    {id:"abc-en",     em:"🔡", name:"Ingliz ABC",     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:null, pts:25},
-    {id:"body",       em:"👁️", name:"Tana A'zolari",  cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:null, pts:20},
-    {id:"fruits",     em:"🍎", name:"Meva & Sabzavot",cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#FF5722", bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:5, plays:"11K", badge:"hot", file:null, pts:20},
-    {id:"transport",  em:"🚗", name:"Transport",      cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#607D8B", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:4, plays:"5K",  badge:null,  file:null, pts:20},
+    {id:"abc-uz",     em:"🔤", name:"O'zbek Alifbosi", cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-uz.html", pts:25},
+    {id:"abc-ru",     em:"А", name:"Rus Alifbosi",    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-ru.html", pts:25},
+    {id:"abc-en",     em:"🔡", name:"Ingliz ABC",     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-en.html", pts:25},
+    {id:"body",       em:"👁️", name:"Tana A'zolari",  cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"body.html", pts:20},
+    {id:"fruits",     em:"🍎", name:"Meva & Sabzavot",cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#FF5722", bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:5, plays:"11K", badge:"hot", file:"fruits.html", pts:20},
+    {id:"transport",  em:"🚗", name:"Transport",      cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#607D8B", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:4, plays:"5K",  badge:null,  file:"transport.html", pts:20},
 
     // ── MATH ─────────────────────────────────────────
     {id:"math",       em:"🔢", name:"Raqamlar",       cat:"math",   age:"3+", tag:"Matematik",tc:"#9C27B0",bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:5, plays:"9K",  badge:"hot", file:"math-kids.html", pts:30},
-    {id:"counting",   em:"➕", name:"Qo'shish",       cat:"math",   age:"4+", tag:"Matematik",tc:"#00BCD4",bg:"linear-gradient(135deg,#E0F7FA,#B2EBF2)", stars:4, plays:"7K",  badge:null,  file:null, pts:30},
-    {id:"subtract",   em:"➖", name:"Ayirish",         cat:"math",   age:"5+", tag:"Matematik",tc:"#FF5722",bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:4, plays:"5K",  badge:null,  file:null, pts:30},
-    {id:"shapes3d",   em:"🔷", name:"Geometrik Shakllar",cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:null, pts:25},
-    {id:"clock",      em:"⏰", name:"Soat O'qish",    cat:"math",   age:"6+", tag:"Matematik",tc:"#795548",bg:"linear-gradient(135deg,#EFEBE9,#D7CCC8)", stars:3, plays:"3K",  badge:"pro", file:null, pts:35},
-    {id:"money",      em:"💰", name:"Pul Sanoq",      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:null, pts:40},
+    {id:"counting",   em:"➕", name:"Qo'shish",       cat:"math",   age:"4+", tag:"Matematik",tc:"#00BCD4",bg:"linear-gradient(135deg,#E0F7FA,#B2EBF2)", stars:4, plays:"7K",  badge:null,  file:"math-kids.html", pts:30},
+    {id:"subtract",   em:"➖", name:"Ayirish",         cat:"math",   age:"5+", tag:"Matematik",tc:"#FF5722",bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:4, plays:"5K",  badge:null,  file:"math-kids.html", pts:30},
+    {id:"shapes3d",   em:"🔷", name:"Geometrik Shakllar",cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:"colors-shapes.html", pts:25},
+    {id:"clock",      em:"⏰", name:"Soat O'qish",    cat:"math",   age:"6+", tag:"Matematik",tc:"#795548",bg:"linear-gradient(135deg,#EFEBE9,#D7CCC8)", stars:3, plays:"3K",  badge:"pro", file:"clock.html", pts:35},
+    {id:"money",      em:"💰", name:"Pul Sanoq",      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:"math-kids.html", pts:40},
 
     // ── COLORS ──────────────────────────────────────
-    {id:"paint",      em:"🖌️", name:"Bo'yash Kitobi",  cat:"colors", age:"2+", tag:"Ijodkorlik",tc:"#FF9800",bg:"linear-gradient(135deg,#FFF8E1,#FFECB3)", stars:5, plays:"14K",badge:"hot", file:null, pts:15},
-    {id:"mix-colors", em:"🎨", name:"Rang Aralash",    cat:"colors", age:"3+", tag:"Ranglar", tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:null, pts:20},
+    {id:"paint",      em:"🖌️", name:"Bo'yash Kitobi",  cat:"colors", age:"2+", tag:"Ijodkorlik",tc:"#FF9800",bg:"linear-gradient(135deg,#FFF8E1,#FFECB3)", stars:5, plays:"14K",badge:"hot", file:"paint.html", pts:15},
+    {id:"mix-colors", em:"🎨", name:"Rang Aralash",    cat:"colors", age:"3+", tag:"Ranglar", tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"color-rush.html", pts:20},
     {id:"color-sort", em:"🌀", name:"Rang Saralash",   cat:"colors", age:"4+", tag:"Mantiq",  tc:"#9C27B0", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"5K",  badge:"new", file:"color-rush.html", pts:25},
 
     // ── MUSIC ────────────────────────────────────────
-    {id:"piano",      em:"🎹", name:"Mini Piano",      cat:"music",  age:"2+", tag:"Musiqa",  tc:"#1976D2", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"10K", badge:"hot", file:null, pts:20},
-    {id:"drums",      em:"🥁", name:"Doira Chalish",   cat:"music",  age:"3+", tag:"Musiqa",  tc:"#D32F2F", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:null,  file:null, pts:20},
-    {id:"sing",       em:"🎤", name:"Qo'shiq Ayting",  cat:"music",  age:"3+", tag:"Musiqa",  tc:"#7B1FA2", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"6K",  badge:"new", file:null, pts:20},
-    {id:"rhythm",     em:"🎵", name:"Ritm O'yini",     cat:"music",  age:"4+", tag:"Musiqa",  tc:"#00796B", bg:"linear-gradient(135deg,#E0F2F1,#B2DFDB)", stars:4, plays:"5K",  badge:null,  file:null, pts:25},
+    {id:"piano",      em:"🎹", name:"Mini Piano",      cat:"music",  age:"2+", tag:"Musiqa",  tc:"#1976D2", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"10K", badge:"hot", file:"piano.html", pts:20},
+    {id:"drums",      em:"🥁", name:"Doira Chalish",   cat:"music",  age:"3+", tag:"Musiqa",  tc:"#D32F2F", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:null,  file:"piano.html", pts:20},
+    {id:"sing",       em:"🎤", name:"Qo'shiq Ayting",  cat:"music",  age:"3+", tag:"Musiqa",  tc:"#7B1FA2", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"6K",  badge:"new", file:"sing.html", pts:20},
+    {id:"rhythm",     em:"🎵", name:"Ritm O'yini",     cat:"music",  age:"4+", tag:"Musiqa",  tc:"#00796B", bg:"linear-gradient(135deg,#E0F2F1,#B2DFDB)", stars:4, plays:"5K",  badge:null,  file:"piano.html?id=rhythm", pts:25},
 
     // ── PUZZLE ──────────────────────────────────────
     {id:"memory",     em:"🧠", name:"Xotira O'yini",   cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#1565C0", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"11K", badge:"hot", file:"memory-game.html", pts:30},
-    {id:"jigsaw",     em:"🧩", name:"Puzzle",          cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#558B2F", bg:"linear-gradient(135deg,#F1F8E9,#DCEDC8)", stars:4, plays:"8K",  badge:null,  file:null, pts:30},
-    {id:"maze",       em:"🌀", name:"Labirint",        cat:"puzzle", age:"5+", tag:"Mantiq",  tc:"#E65100", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:4, plays:"6K",  badge:"new", file:null, pts:35},
-    {id:"match",      em:"🔍", name:"Juft Topish",     cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#880E4F", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"7K",  badge:null,  file:null, pts:25},
-    {id:"shadow",     em:"👤", name:"Soya Topish",     cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#37474F", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:3, plays:"4K",  badge:null,  file:null, pts:25},
+    {id:"jigsaw",     em:"🧩", name:"Puzzle",          cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#558B2F", bg:"linear-gradient(135deg,#F1F8E9,#DCEDC8)", stars:4, plays:"8K",  badge:null,  file:"jigsaw.html", pts:30},
+    {id:"maze",       em:"🌀", name:"Labirint",        cat:"puzzle", age:"5+", tag:"Mantiq",  tc:"#E65100", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:4, plays:"6K",  badge:"new", file:"maze.html", pts:35},
+    {id:"match",      em:"🔍", name:"Juft Topish",     cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#880E4F", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"7K",  badge:null,  file:"match.html", pts:25},
+    {id:"shadow",     em:"👤", name:"Soya Topish",     cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#37474F", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:3, plays:"4K",  badge:null,  file:"shadow.html", pts:25},
 
     // ── SPORT & NATURE ──────────────────────────────
-    {id:"soccer",     em:"⚽", name:"Mini Futbol",     cat:"sport",  age:"4+", tag:"Sport",   tc:"#2E7D32", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"13K", badge:"hot", file:null, pts:20},
-    {id:"jump-rope",  em:"🪢", name:"Arqon Sakrash",  cat:"sport",  age:"5+", tag:"Sport",   tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"5K",  badge:null,  file:null, pts:20},
-    {id:"plants",     em:"🌱", name:"O'simliklar",    cat:"nature", age:"3+", tag:"Tabiat",  tc:"#388E3C", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"5K",  badge:"new", file:null, pts:20},
-    {id:"weather",    em:"🌤️", name:"Ob-Havo",        cat:"nature", age:"4+", tag:"Tabiat",  tc:"#0288D1", bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:4, plays:"4K",  badge:null,  file:null, pts:20},
+    {id:"soccer",     em:"⚽", name:"Mini Futbol",     cat:"sport",  age:"4+", tag:"Sport",   tc:"#2E7D32", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"13K", badge:"hot", file:"soccer.html", pts:20},
+    {id:"jump-rope",  em:"🪢", name:"Arqon Sakrash",  cat:"sport",  age:"5+", tag:"Sport",   tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"5K",  badge:null,  file:"bubble-pop.html", pts:20},
+    {id:"plants",     em:"🌱", name:"O'simliklar",    cat:"nature", age:"3+", tag:"Tabiat",  tc:"#388E3C", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"5K",  badge:"new", file:"plants.html", pts:20},
+    {id:"weather",    em:"🌤️", name:"Ob-Havo",        cat:"nature", age:"4+", tag:"Tabiat",  tc:"#0288D1", bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:4, plays:"4K",  badge:null,  file:"weather.html", pts:20},
     {id:"bubble-pop", em:"🫧", name:"Bubble Pop",     cat:"sport",  age:"2+", tag:"Qiziqarli",tc:"#0288D1",bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:5, plays:"15K", badge:"hot", file:"bubble-pop.html", pts:15},
   ];
 
@@ -1027,8 +1074,8 @@
   // ════════════════════════════════════════════════════
   const T = {
     uz: {
-      heroH:"O'ynang va O'rganing! 🎯",
-      heroP:"30 ta qiziqarli o'yin · 3 tilda",
+      heroH:"O'ynang va<br>O'rganing! 🎯",
+      heroP:"30 ta qiziqarli o'yin<br>3 tilda: UZ · RU · EN",
       catTitle:"Kategoriyalar",
       gridTitle:"Barcha O'yinlar",
       nb:["Bosh","O'ynash","O'rganish","Yutuqlar","Ota-ona"],
@@ -1087,11 +1134,71 @@
   // ════════════════════════════════════════════════════
   // STATE
   // ════════════════════════════════════════════════════
-  let lang = localStorage.getItem("kz-lang") || "uz";
+  let lang = localStorage.getItem("kz-lang") || "en";
   let age  = localStorage.getItem("kz-age")  || "2-4";
   let pts  = parseInt(localStorage.getItem("kz-pts") || "0");
+  let isMuted = localStorage.getItem("kz-muted") === "true";
   let cat  = "all";
   let gameCount = 0;
+
+  // ════════════════════════════════════════════════════
+  // MUSIC CONTROL
+  // ════════════════════════════════════════════════════
+  function toggleMusic() {
+    isMuted = !isMuted;
+    localStorage.setItem("kz-muted", isMuted);
+    updateMusicUI();
+    if (window.AndroidAdMob && window.AndroidAdMob.toggleMusic) {
+      window.AndroidAdMob.toggleMusic(isMuted);
+    }
+  }
+
+  function updateMusicUI() {
+    document.getElementById("music-ic").textContent = isMuted ? "🔇" : "🔊";
+  }
+
+  // ════════════════════════════════════════════════════
+  // LANGUAGE SYSTEM
+  // ════════════════════════════════════════════════════
+    function updateLangUI() {
+      const t = T[lang];
+      document.getElementById("hero-h").innerHTML = t.heroH;
+      document.getElementById("hero-p").innerHTML = t.heroP;
+      document.getElementById("cat-title").textContent = t.catTitle;
+      document.getElementById("grid-title").textContent = t.gridTitle;
+
+      // Update modal titles and static text
+      const ageModalTitle = document.querySelector('#age-modal .modal-title');
+      if (ageModalTitle) ageModalTitle.textContent = lang === 'en' ? '🎂 Age Selection' : lang === 'ru' ? '🎂 Выбор возраста' : '🎂 Yoshni tanlang';
+
+      const langModalTitle = document.querySelector('#lang-modal .modal-title');
+      if (langModalTitle) langModalTitle.textContent = lang === 'en' ? '🌍 Select Language' : lang === 'ru' ? '🌍 Выбор языка' : '🌍 Tilni tanlang';
+
+      // Nav labels
+      for(let i=0; i<5; i++) {
+          const el = document.getElementById("nb"+i);
+          if(el) el.textContent = t.nb[i];
+      }
+
+      // Featured and Grid reload
+      buildFeatured();
+      buildGrid(cat);
+    }
+
+  function setLang(l) {
+    lang = l;
+    localStorage.setItem("kz-lang", l);
+    updateLangUI();
+
+    // Update active visual for language card
+    document.querySelectorAll('#lang-modal .age-card').forEach(c => c.classList.remove('sel'));
+    document.getElementById('lc-' + l)?.classList.add('sel');
+
+    const flags = {en:"🇬🇧 EN", ru:"🇷🇺 RU", uz:"🇺🇿 UZ"};
+    document.getElementById("lang-cur").textContent = flags[l];
+
+    showToast(l === "en" ? "English language selected" : l === "ru" ? "Русский язык выбран" : "O'zbek tili tanlandi");
+  }
 
   // ════════════════════════════════════════════════════
   // LEVEL SYSTEM
@@ -1218,7 +1325,10 @@
 
     document.getElementById("gv-title").textContent = g.em+" "+g.name;
     document.getElementById("gvb-txt").textContent = T[lang].back.replace("← ","");
-    document.getElementById("gv-frame").src = g.file;
+
+    // Pass language to the game
+    const gameUrl = g.file.includes("?") ? `${g.file}&lang=${lang}` : `${g.file}?lang=${lang}`;
+    document.getElementById("gv-frame").src = gameUrl;
     document.getElementById("gv").classList.remove("h");
 
     gameCount++;
@@ -1400,6 +1510,19 @@
   // ════════════════════════════════════════════════════
   window.addEventListener("load", ()=>{
     updateLevel();
+    updateLangUI(); // Set initial language UI
+    updateMusicUI(); // Set initial music UI
+
+    // Initial sync with Android if needed
+    if (isMuted && window.AndroidAdMob && window.AndroidAdMob.toggleMusic) {
+        window.AndroidAdMob.toggleMusic(true);
+    }
+
+    // Set initial language selector state
+    const currentFlags = {en:"🇬🇧 EN", ru:"🇷🇺 RU", uz:"🇺🇿 UZ"};
+    document.getElementById("lang-cur").textContent = currentFlags[lang];
+    document.getElementById('lc-' + lang)?.classList.add('sel');
+
     buildFeatured();
     buildGrid();
     document.getElementById("age-btn").textContent = `👶 ${age} ▾`;

@@ -4,14 +4,16 @@ plugins {
 
 android {
     namespace 'uz.kidzone.app'
-    compileSdk 36
+    compileSdk 35 // Stable version for production
 
     defaultConfig {
         applicationId "uz.kidzone.app"
         minSdk 26
         targetSdk 35
-        versionCode 4
-        versionName "1.0.1"
+        versionCode 6
+        versionName "1.0.3"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -19,9 +21,16 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Optimization for production
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
+        
         debug {
             applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
             debuggable true
         }
     }
@@ -31,27 +40,36 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    // Tablet support
-    splits {
-        density { enable false }
-        abi { enable false }
+    // Modern Android App Bundle configuration
+    bundle {
+        language { enableSplit = true }
+        density { enableSplit = true }
+        abi { enableSplit = true }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 
 dependencies {
-    // AndroidX
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.core:core:1.12.0'
+    // Core AndroidX
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.core:core-ktx:1.15.0' // Use KTX for better extensions even in Java
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
 
-    // WebView (o'yinlarni ichida chiqarish uchun)
-    implementation 'androidx.webkit:webkit:1.9.0'
+    // WebView and Browser
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.browser:browser:1.8.0'
 
-    // ✅ ADMOB — Google Mobile Ads
-    implementation 'com.google.android.gms:play-services-ads:23.0.0'
+    // Google Services
+    implementation 'com.google.android.gms:play-services-ads:23.6.0'
 
-    // Material 3
-    implementation 'com.google.android.material:material:1.11.0'
+    // Material Design 3
+    implementation 'com.google.android.material:material:1.12.0'
 
-    // Status bar
+    // Splash Screen API
     implementation 'androidx.core:core-splashscreen:1.0.1'
 }
