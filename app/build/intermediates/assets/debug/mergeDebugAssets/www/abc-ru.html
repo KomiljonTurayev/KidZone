@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Русский Алфавит 🇷🇺</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+body {
+  min-height:100vh; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+  overflow: hidden; display: flex; flex-direction: column; align-items: center; color: white;
+}
+#topbar { width:100%; padding:20px; display:flex; justify-content:space-between; align-items:center; }
+.pill { background:rgba(255,255,255,0.15); border-radius:20px; padding:8px 16px; font-weight:900; }
+
+#q-card {
+  background:white; border-radius:32px; padding:30px 20px; width:90%; max-width:400px;
+  text-align:center; margin-top:20px; box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
+#q-emoji { font-size:100px; line-height:1; margin-bottom:15px; }
+#q-text { font-size:24px; font-weight:900; color:#333; }
+
+#answers { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:400px; margin-top:30px; }
+.ans-btn {
+  background:white; border:none; border-radius:22px; padding:20px;
+  font-size:40px; font-weight:900; color:#333; cursor:pointer;
+  box-shadow:0 6px 15px rgba(0,0,0,0.1); transition:transform 0.1s;
+}
+.ans-btn:active { transform:scale(0.92); }
+.correct { background:#10B981 !important; color:white; }
+.wrong { background:#EF4444 !important; color:white; }
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="pill">🇷🇺 АЛФАВИТ</div>
+  <div class="pill">СЧЕТ: <span id="score">0</span></div>
+</div>
+
+<div id="q-card">
+  <div id="q-emoji">🍎</div>
+  <div id="q-text">На какую букву?</div>
+</div>
+
+<div id="answers">
+  <button class="ans-btn" id="btn0" onclick="check(0)"></button>
+  <button class="ans-btn" id="btn1" onclick="check(1)"></button>
+  <button class="ans-btn" id="btn2" onclick="check(2)"></button>
+  <button class="ans-btn" id="btn3" onclick="check(3)"></button>
+</div>
+
+<script>
+const DATA = [
+  {e:"🍎", l:"А"}, {e:"🍌", l:"Б"}, {e:"🐺", l:"В"}, {e:"🍄", l:"Г"}, {e:"🏠", l:"Д"},
+  {e:"🦔", l:"Е"}, {e:"🦒", l:"Ж"}, {e:"🦓", l:"З"}, {e:"🍦", l:"И"}, {e:"🐱", l:"К"},
+  {e:"🍋", l:"Л"}, {e:"🐻", l:"М"}, {e:"👃", l:"Н"}, {e:"☁️", l:"О"}, {e:"🐧", l:"П"},
+  {e:"🐟", l:"Р"}, {e:"☀️", l:"С"}, {e:"🐯", l:"Т"}, {e:"🦆", l:"У"}, {e:"🚩", l:"Ф"},
+  {e:"🍞", l:"Х"}, {e:"🌸", l:"Ц"}, {e:"🐢", l:"Ч"}, {e:"🎈", l:"Ш"}, {e:"🚜", l:"Щ"},
+  {e:"🐘", l:"Э"}, {e:"🎡", l:"Ю"}, {e:"🍎", l:"Я"}
+];
+const ALPHABET = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+let score = 0, currentIdx = -1;
+
+function next() {
+  currentIdx = Math.floor(Math.random() * DATA.length);
+  const q = DATA[currentIdx];
+  document.getElementById('q-emoji').textContent = q.e;
+
+  const options = [q.l];
+  while(options.length < 4) {
+    const l = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+    if(!options.includes(l)) options.push(l);
+  }
+  options.sort(() => Math.random() - 0.5).forEach((opt, i) => {
+    const btn = document.getElementById('btn'+i);
+    btn.textContent = opt;
+    btn.className = 'ans-btn';
+    btn.dataset.val = opt;
+  });
+}
+
+function check(i) {
+  const btn = document.getElementById('btn'+i);
+  const correct = DATA[currentIdx].l;
+  if(btn.dataset.val === correct) {
+    btn.classList.add('correct');
+    score += 10;
+    document.getElementById('score').textContent = score;
+    setTimeout(next, 800);
+  } else {
+    btn.classList.add('wrong');
+  }
+}
+
+next();
+
+window.addEventListener('beforeunload', () => {
+  const currentPts = parseInt(localStorage.getItem('kz-pts') || '0');
+  localStorage.setItem('kz-pts', currentPts + Math.floor(score/2));
+  localStorage.setItem('kz-prog-abc-ru', '100');
+});
+</script>
+</body>
+</html>

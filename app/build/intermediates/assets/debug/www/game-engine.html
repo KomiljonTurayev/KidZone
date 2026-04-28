@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>KidZone Engine 🚀</title>
+<style>
+  :root { --primary: #FF6B6B; --bg: #F7F9FC; }
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
+  body { background: var(--bg); font-family: 'Arial Rounded MT Bold', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  #header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+  #game-area { flex: 1; position: relative; padding: 20px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 15px; }
+
+  /* Template: Memo & Match */
+  .card { width: 80px; height: 80px; background: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; border: 3px solid white; transition: 0.3s; }
+  .card.flipped { background: #FFE66D; border-color: #FFD93D; }
+  .card.matched { background: #55EFC4; border-color: #00B894; opacity: 0.5; pointer-events: none; }
+
+  /* Template: Count & Math */
+  #task { font-size: 40px; margin-bottom: 30px; text-align: center; width: 100%; font-family: 'Fredoka One'; }
+  .choice { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; box-shadow: 0 8px 20px rgba(0,0,0,0.1); cursor: pointer; }
+
+  #feedback { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; font-size: 100px; z-index: 100; pointer-events: none; }
+  #feedback.show { display: flex; animation: zoomOut 0.8s forwards; }
+  @keyframes zoomOut { from { transform: scale(0.5); opacity: 1; } to { transform: scale(2); opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="header">
+    <div onclick="window.parent.closeGame()" style="font-size: 24px; cursor: pointer;">🔙</div>
+    <div style="font-weight: 900; color: #777;">⭐ <span id="pts">0</span></div>
+    <div style="width: 24px;"></div>
+</div>
+
+<div id="game-area"></div>
+<div id="feedback">🌟</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const type = urlParams.get('type') || 'memo';
+  const data = urlParams.get('data') || 'animals';
+
+  const EMOJIS = {
+      animals: ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🦁","🐯"],
+      fruits: ["🍎","🍉","🍇","🍓","🍌","🍒","🍍","🥝","🍑","🍐"],
+      colors: ["🔴","🟠","🟡","🟢","🔵","🟣","🟤","⚫","⚪","🟥"]
+  };
+
+  let points = 0;
+  let matches = 0;
+  let firstCard = null;
+  let secondCard = null;
+
+  function init() {
+      const area = document.getElementById('game-area');
+      area.innerHTML = '';
+
+      if (type === 'memo') {
+          let items = [...EMOJIS[data].slice(0, 6), ...EMOJIS[data].slice(0, 6)];
+          items.sort(() => Math.random() - 0.5);
+          items.forEach((item, idx) => {
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.dataset.val = item;
+              card.innerHTML = '❓';
+              card.onclick = () => flipCard(card);
+              area.appendChild(card);
+          });
+      } else if (type === 'count' || type === 'math') {
+          setupMath(area);
+      } else {
+          area.innerHTML = '<h1>Tez kunda! 🚀</h1>';
+      }
+  }
+
+  function flipCard(card) {
+      if (card === firstCard || card.classList.contains('matched')) return;
+      card.innerHTML = card.dataset.val;
+      card.classList.add('flipped');
+
+      if (!firstCard) {
+          firstCard = card;
+      } else {
+          secondCard = card;
+          if (firstCard.dataset.val === secondCard.dataset.val) {
+              firstCard.classList.add('matched');
+              secondCard.classList.add('matched');
+              points += 10;
+              matches++;
+              showFeedback('🌟');
+              if (matches === 6) win();
+              firstCard = null; secondCard = null;
+          } else {
+              setTimeout(() => {
+                  firstCard.innerHTML = '❓';
+                  secondCard.innerHTML = '❓';
+                  firstCard.classList.remove('flipped');
+                  secondCard.classList.remove('flipped');
+                  firstCard = null; secondCard = null;
+              }, 600);
+          }
+      }
+      document.getElementById('pts').textContent = points;
+  }
+
+  function setupMath(area) {
+      const n1 = Math.floor(Math.random() * 5) + 1;
+      const n2 = Math.floor(Math.random() * 5) + 1;
+      const ans = n1 + n2;
+
+      const task = document.createElement('div');
+      task.id = 'task';
+      task.innerHTML = `${"🍎".repeat(n1)} + ${"🍎".repeat(n2)} = ?`;
+      area.appendChild(task);
+
+      let choices = [ans, ans + 1, ans - 1].sort(() => Math.random() - 0.5);
+      choices.forEach(c => {
+          if (c < 0) return;
+          const btn = document.createElement('div');
+          btn.className = 'choice';
+          btn.textContent = c;
+          btn.onclick = () => {
+              if (c === ans) {
+                  showFeedback('✅');
+                  points += 20;
+                  document.getElementById('pts').textContent = points;
+                  setTimeout(init, 1000);
+              } else {
+                  showFeedback('❌');
+              }
+          };
+          area.appendChild(btn);
+      });
+  }
+
+  function showFeedback(em) {
+      const fb = document.getElementById('feedback');
+      fb.textContent = em;
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 800);
+  }
+
+  function win() {
+      if (window.parent && window.parent.onRewardGranted) {
+          window.parent.onRewardGranted(50);
+      }
+      setTimeout(init, 2000);
+  }
+
+  init();
+</script>
+</body>
+</html>

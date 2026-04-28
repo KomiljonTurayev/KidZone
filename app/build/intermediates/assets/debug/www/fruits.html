@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Meva va Sabzavot 🍎</title>
+<title>Fruits & Veggies 🍎</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body {
@@ -40,7 +40,6 @@ body {
 .ans-btn.correct { background:rgba(76,175,80,0.5); border-color:#4CAF50; }
 .ans-btn.wrong   { background:rgba(244,67,54,0.4); border-color:#F44336; }
 #combo-bar { font-size:13px; color:rgba(255,255,255,0.7); margin-top:10px; min-height:20px; }
-/* Result */
 #result { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
 #result.h { display:none; }
 #result-card { background:linear-gradient(135deg,#134e5e,#71b280); border:1px solid rgba(255,255,255,0.2); border-radius:28px; padding:32px 24px; text-align:center; width:min(320px,90vw); }
@@ -54,9 +53,9 @@ body {
 <body>
 
 <div id="topbar">
-  <div class="pill"><span class="pill-sm">BALL</span><span class="pill-val" id="score-val">0</span></div>
-  <div style="font-size:17px;font-weight:900;">🍎 Mevalar</div>
-  <div class="pill"><span class="pill-sm">SAVOL</span><span class="pill-val" id="q-num">1/12</span></div>
+  <div class="pill"><span class="pill-sm" id="lbl-score">BALL</span><span class="pill-val" id="score-val">0</span></div>
+  <div style="font-size:17px;font-weight:900;" id="lbl-title">🍎 Mevalar</div>
+  <div class="pill"><span class="pill-sm" id="lbl-quest">SAVOL</span><span class="pill-val" id="q-num">1/12</span></div>
 </div>
 <div id="prog-wrap"><div id="prog-bar"></div></div>
 
@@ -79,24 +78,72 @@ body {
     <div id="result-em">🎉</div>
     <div id="result-ttl">Barakalla!</div>
     <div id="result-sc"></div>
-    <button class="btn-restart" onclick="restart()">🔄 Qayta o'ynash</button>
+    <button class="btn-restart" id="btn-restart" onclick="restart()">🔄 Qayta o'ynash</button>
   </div>
 </div>
 
+<script src="game-engine.js"></script>
 <script>
-const ITEMS = [
-  {em:"🍎",name:"Olma"},  {em:"🍌",name:"Banan"},  {em:"🍇",name:"Uzum"},
-  {em:"🍊",name:"Apelsin"},{em:"🍋",name:"Limon"},  {em:"🍓",name:"Qulupnay"},
-  {em:"🍑",name:"Shaftoli"},{em:"🍒",name:"Gilos"},  {em:"🍐",name:"Nok"},
-  {em:"🥭",name:"Mango"},  {em:"🍍",name:"Ananas"}, {em:"🥝",name:"Kivi"},
-  {em:"🥕",name:"Sabzi"},  {em:"🥦",name:"Brokkoli"},{em:"🌽",name:"Makkajo'xori"},
-  {em:"🥔",name:"Kartoshka"},{em:"🍅",name:"Pomidor"},{em:"🧅",name:"Piyoz"},
-  {em:"🥬",name:"Karam"},  {em:"🫑",name:"Qalampir"},
-];
-const TOTAL = 12;
-let score=0, qIdx=0, answered=false, combo=0, questions=[];
+const game = new KidZoneGame({ id: 'fruits' });
+const lang = game.lang;
 
-function shuffle(a) { return [...a].sort(()=>Math.random()-0.5); }
+const T = {
+  uz: {
+    title:"🍎 Mevalar", score:"BALL", quest:"SAVOL",
+    hint:"Bu nima? To'g'ri javobni tanlang!",
+    great:"Ajoyib!", good:"Yaxshi!", tryAgain:"Harakat qiling!",
+    result:"Natija:", restart:"🔄 Qayta o'ynash", combo:"🔥 Combo x",
+  },
+  ru: {
+    title:"🍎 Фрукты", score:"ОЧКИ", quest:"ВОПРОС",
+    hint:"Что это? Выбери правильный ответ!",
+    great:"Отлично!", good:"Хорошо!", tryAgain:"Попробуй ещё!",
+    result:"Результат:", restart:"🔄 Ещё раз", combo:"🔥 Комбо x",
+  },
+  en: {
+    title:"🍎 Fruits", score:"SCORE", quest:"Q.",
+    hint:"What is this? Choose the right answer!",
+    great:"Amazing!", good:"Good job!", tryAgain:"Keep trying!",
+    result:"Score:", restart:"🔄 Play Again", combo:"🔥 Combo x",
+  },
+};
+
+const ITEMS = [
+  {em:"🍎", name:{uz:"Olma",         ru:"Яблоко",    en:"Apple"}},
+  {em:"🍌", name:{uz:"Banan",         ru:"Банан",     en:"Banana"}},
+  {em:"🍇", name:{uz:"Uzum",          ru:"Виноград",  en:"Grapes"}},
+  {em:"🍊", name:{uz:"Apelsin",       ru:"Апельсин",  en:"Orange"}},
+  {em:"🍋", name:{uz:"Limon",         ru:"Лимон",     en:"Lemon"}},
+  {em:"🍓", name:{uz:"Qulupnay",      ru:"Клубника",  en:"Strawberry"}},
+  {em:"🍑", name:{uz:"Shaftoli",      ru:"Персик",    en:"Peach"}},
+  {em:"🍒", name:{uz:"Gilos",         ru:"Вишня",     en:"Cherry"}},
+  {em:"🍐", name:{uz:"Nok",           ru:"Груша",     en:"Pear"}},
+  {em:"🥭", name:{uz:"Mango",         ru:"Манго",     en:"Mango"}},
+  {em:"🍍", name:{uz:"Ananas",        ru:"Ананас",    en:"Pineapple"}},
+  {em:"🥝", name:{uz:"Kivi",          ru:"Киви",      en:"Kiwi"}},
+  {em:"🥕", name:{uz:"Sabzi",         ru:"Морковь",   en:"Carrot"}},
+  {em:"🥦", name:{uz:"Brokkoli",      ru:"Брокколи",  en:"Broccoli"}},
+  {em:"🌽", name:{uz:"Makkajo'xori",  ru:"Кукуруза",  en:"Corn"}},
+  {em:"🥔", name:{uz:"Kartoshka",     ru:"Картофель", en:"Potato"}},
+  {em:"🍅", name:{uz:"Pomidor",       ru:"Помидор",   en:"Tomato"}},
+  {em:"🧅", name:{uz:"Piyoz",         ru:"Лук",       en:"Onion"}},
+  {em:"🥬", name:{uz:"Karam",         ru:"Капуста",   en:"Cabbage"}},
+  {em:"🫑", name:{uz:"Qalampir",      ru:"Перец",     en:"Pepper"}},
+];
+
+const t = T[lang] || T.en;
+const TOTAL = 12;
+let score = 0, qIdx = 0, answered = false, combo = 0, questions = [];
+
+function applyLang() {
+  document.getElementById('lbl-title').textContent  = t.title;
+  document.getElementById('lbl-score').textContent  = t.score;
+  document.getElementById('lbl-quest').textContent  = t.quest;
+  document.getElementById('q-hint').textContent     = t.hint;
+  document.getElementById('btn-restart').textContent = t.restart;
+}
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 function buildQuestions() { questions = shuffle(ITEMS).slice(0, TOTAL); }
 
 function loadQ() {
@@ -104,54 +151,64 @@ function loadQ() {
   answered = false;
   const q = questions[qIdx];
   document.getElementById("q-emoji").textContent = q.em;
-  document.getElementById("q-num").textContent   = `${qIdx+1}/${TOTAL}`;
-  document.getElementById("prog-bar").style.width = `${(qIdx/TOTAL)*100}%`;
-  const pool = shuffle(ITEMS.filter(i=>i.em!==q.em)).slice(0,3);
+  document.getElementById("q-num").textContent   = `${qIdx + 1}/${TOTAL}`;
+  document.getElementById("prog-bar").style.width = `${(qIdx / TOTAL) * 100}%`;
+
+  const pool = shuffle(ITEMS.filter(i => i.em !== q.em)).slice(0, 3);
   const opts  = shuffle([q, ...pool]);
-  opts.forEach((o,i) => {
-    document.getElementById("em"+i).textContent = o.em;
-    document.getElementById("nm"+i).textContent = o.name;
-    document.getElementById("btn"+i).className = "ans-btn";
-    document.getElementById("btn"+i).dataset.correct = (o.em===q.em) ? "1":"0";
+  opts.forEach((o, i) => {
+    document.getElementById("em" + i).textContent = o.em;
+    document.getElementById("nm" + i).textContent = o.name[lang] || o.name.en;
+    document.getElementById("btn" + i).className  = "ans-btn";
+    document.getElementById("btn" + i).dataset.correct = (o.em === q.em) ? "1" : "0";
   });
 }
 
 function answer(idx) {
-  if (answered) return; answered = true;
-  const btn = document.getElementById("btn"+idx);
+  if (answered) return;
+  answered = true;
+  const btn = document.getElementById("btn" + idx);
   if (btn.dataset.correct === "1") {
-    btn.classList.add("correct"); combo++;
-    const pts = 10 + (combo>2?5:0);
-    score += pts; document.getElementById("score-val").textContent = score;
-    document.getElementById("combo-bar").textContent = combo>2 ? `🔥 Combo x${combo}! +${pts}` : "";
-    const prev = parseInt(localStorage.getItem("kz-prog-fruits")||"0");
-    localStorage.setItem("kz-prog-fruits", Math.max(prev, Math.round((qIdx+1)/TOTAL*100)));
+    btn.classList.add("correct");
+    combo++;
+    const pts = 10 + (combo > 2 ? 5 : 0);
+    score += pts;
+    document.getElementById("score-val").textContent = score;
+    document.getElementById("combo-bar").textContent = combo > 2 ? `${t.combo}${combo}! +${pts}` : "";
+    const prev = parseInt(localStorage.getItem("kz-prog-fruits") || "0");
+    localStorage.setItem("kz-prog-fruits", Math.max(prev, Math.round((qIdx + 1) / TOTAL * 100)));
   } else {
-    btn.classList.add("wrong"); combo = 0;
+    btn.classList.add("wrong");
+    combo = 0;
     document.getElementById("combo-bar").textContent = "";
-    document.querySelectorAll(".ans-btn").forEach(b=>{ if(b.dataset.correct==="1") b.classList.add("correct"); });
+    document.querySelectorAll(".ans-btn").forEach(b => {
+      if (b.dataset.correct === "1") b.classList.add("correct");
+    });
   }
-  setTimeout(()=>{ qIdx++; loadQ(); }, 900);
+  setTimeout(() => { qIdx++; loadQ(); }, 900);
 }
 
 function showResult() {
-  const pct = score/(TOTAL*10)*100;
-  document.getElementById("result-em").textContent  = pct>=80?"🏆":pct>=50?"⭐":"💪";
-  document.getElementById("result-ttl").textContent = pct>=80?"Ajoyib!":pct>=50?"Yaxshi!":"Harakat qiling!";
-  document.getElementById("result-sc").textContent  = `Natija: ${score} ball`;
+  const pct = score / (TOTAL * 10) * 100;
+  document.getElementById("result-em").textContent  = pct >= 80 ? "🏆" : pct >= 50 ? "⭐" : "💪";
+  document.getElementById("result-ttl").textContent = pct >= 80 ? t.great : pct >= 50 ? t.good : t.tryAgain;
+  document.getElementById("result-sc").textContent  = `${t.result} ${score}`;
   document.getElementById("result").classList.remove("h");
-  localStorage.setItem("kz-pts", (parseInt(localStorage.getItem("kz-pts")||"0")) + Math.round(score/2));
+  game.reportScore(Math.round(score / 2));
 }
 
 function restart() {
-  score=0; qIdx=0; combo=0;
-  document.getElementById("score-val").textContent="0";
-  document.getElementById("combo-bar").textContent="";
+  score = 0; qIdx = 0; combo = 0;
+  document.getElementById("score-val").textContent = "0";
+  document.getElementById("combo-bar").textContent = "";
   document.getElementById("result").classList.add("h");
-  buildQuestions(); loadQ();
+  buildQuestions();
+  loadQ();
 }
 
-buildQuestions(); loadQ();
+applyLang();
+buildQuestions();
+loadQ();
 </script>
 </body>
 </html>

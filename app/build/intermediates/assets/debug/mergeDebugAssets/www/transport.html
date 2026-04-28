@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Transport 🚗</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+body {
+  min-height:100vh; min-height:100dvh;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+  overflow: hidden; user-select: none;
+  display: flex; flex-direction: column; align-items: center; color: white;
+}
+#topbar { width:100%; max-width:440px; padding:14px 18px 6px; display:flex; justify-content:space-between; align-items:center; }
+.pill { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:18px; padding:7px 14px; text-align:center; min-width:68px; }
+.pill-sm { font-size:10px; color:rgba(255,255,255,0.65); display:block; }
+.pill-val { font-size:19px; font-weight:900; }
+#prog-wrap { width:88%; max-width:400px; height:6px; background:rgba(255,255,255,0.12); border-radius:3px; margin:4px auto 12px; }
+#prog-bar { height:100%; background:linear-gradient(90deg,#FFD54F,#FF6B35); border-radius:3px; transition:width 0.4s; width:0%; }
+
+/* Vehicle showcase */
+#vehicle-card {
+  background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+  border-radius:26px; padding:20px; width:90%; max-width:400px; text-align:center; margin-bottom:16px;
+}
+#veh-em   { font-size:80px; animation:float 2.5s ease-in-out infinite; }
+#veh-name { font-size:20px; font-weight:900; color:#FFD54F; margin-top:8px; }
+#veh-q    { font-size:13px; color:rgba(255,255,255,0.65); margin-top:4px; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+/* Categories */
+#cats { display:flex; gap:10px; width:90%; max-width:400px; margin-bottom:12px; }
+.cat-btn {
+  flex:1; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2);
+  border-radius:18px; padding:12px 6px; text-align:center; cursor:pointer;
+  transition:transform 0.12s, background 0.15s;
+}
+.cat-btn:active { transform:scale(0.92); }
+.cat-em  { font-size:28px; display:block; }
+.cat-nm  { font-size:11px; color:rgba(255,255,255,0.8); margin-top:4px; display:block; }
+.cat-btn.correct { background:rgba(76,175,80,0.5); border-color:#4CAF50; }
+.cat-btn.wrong   { background:rgba(244,67,54,0.4); border-color:#F44336; }
+
+#feedback { font-size:14px; min-height:22px; text-align:center; color:rgba(255,255,255,0.8); }
+
+/* Result */
+#result { position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
+#result.h { display:none; }
+#result-card { background:linear-gradient(135deg,#2c3e50,#3498db); border:1px solid rgba(255,255,255,0.2); border-radius:28px; padding:32px 24px; text-align:center; width:min(320px,90vw); }
+.result-em  { font-size:60px; margin-bottom:10px; }
+.result-ttl { font-size:22px; font-weight:900; margin-bottom:6px; }
+.result-sc  { font-size:15px; color:rgba(255,255,255,0.7); margin-bottom:20px; }
+.btn-r { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.35); border-radius:20px; padding:14px; color:white; font-size:16px; font-weight:900; cursor:pointer; width:100%; }
+.btn-r:active { transform:scale(0.96); }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="pill"><span class="pill-sm">BALL</span><span class="pill-val" id="sv">0</span></div>
+  <div style="font-size:16px;font-weight:900;">🚗 Transport</div>
+  <div class="pill"><span class="pill-sm">SAVOL</span><span class="pill-val" id="qn">1/12</span></div>
+</div>
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+
+<div id="vehicle-card">
+  <div id="veh-em">🚗</div>
+  <div id="veh-name">Avtomobil</div>
+  <div id="veh-q">Bu qaysi toifaga kiradi?</div>
+</div>
+
+<div id="cats">
+  <div class="cat-btn" id="cat0" onclick="answer(0)"><span class="cat-em">🛣️</span><span class="cat-nm">Quruqlik</span></div>
+  <div class="cat-btn" id="cat1" onclick="answer(1)"><span class="cat-em">🌊</span><span class="cat-nm">Dengiz</span></div>
+  <div class="cat-btn" id="cat2" onclick="answer(2)"><span class="cat-em">✈️</span><span class="cat-nm">Havo</span></div>
+</div>
+
+<div id="feedback"></div>
+
+<div id="result" class="h">
+  <div id="result-card">
+    <div class="result-em" id="rem">🏆</div>
+    <div class="result-ttl" id="rttl">Ajoyib!</div>
+    <div class="result-sc" id="rsc"></div>
+    <button class="btn-r" onclick="restart()">🔄 Qayta o'ynash</button>
+  </div>
+</div>
+
+<script>
+const VEHICLES = [
+  {em:"🚗",name:"Avtomobil",cat:0},{em:"🚕",name:"Taksi",cat:0},{em:"🚌",name:"Avtobus",cat:0},
+  {em:"🚂",name:"Poyezd",cat:0},  {em:"🚲",name:"Velosiped",cat:0},{em:"🏍️",name:"Mototsikl",cat:0},
+  {em:"🚀",name:"Raketa",cat:2},  {em:"✈️",name:"Samolyot",cat:2},{em:"🚁",name:"Vertolyot",cat:2},
+  {em:"🛸",name:"UFO",cat:2},     {em:"🎈",name:"Havo shari",cat:2},
+  {em:"⛵",name:"Qayiq",cat:1},   {em:"🚢",name:"Kema",cat:1},  {em:"🛳️",name:"Kruiz kemasi",cat:1},
+  {em:"⛴️",name:"Parom",cat:1},   {em:"🚤",name:"Motorli qayiq",cat:1},
+];
+const TOTAL=12; let score=0,qIdx=0,answered=false,questions=[];
+
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+function buildQ(){questions=shuffle(VEHICLES).slice(0,TOTAL);}
+
+function loadQ(){
+  if(qIdx>=TOTAL){showResult();return;}
+  answered=false;
+  const q=questions[qIdx];
+  document.getElementById("veh-em").textContent=q.em;
+  document.getElementById("veh-name").textContent=q.name;
+  document.getElementById("qn").textContent=`${qIdx+1}/${TOTAL}`;
+  document.getElementById("prog-bar").style.width=`${(qIdx/TOTAL)*100}%`;
+  document.getElementById("feedback").textContent="";
+  [0,1,2].forEach(i=>document.getElementById("cat"+i).className="cat-btn");
+}
+
+function answer(catIdx){
+  if(answered)return; answered=true;
+  const q=questions[qIdx];
+  const btn=document.getElementById("cat"+catIdx);
+  if(catIdx===q.cat){
+    btn.classList.add("correct"); score+=10;
+    document.getElementById("sv").textContent=score;
+    document.getElementById("feedback").textContent="✅ To'g'ri!";
+    const prev=parseInt(localStorage.getItem("kz-prog-transport")||"0");
+    localStorage.setItem("kz-prog-transport",Math.max(prev,Math.round((qIdx+1)/TOTAL*100)));
+  } else {
+    btn.classList.add("wrong");
+    document.getElementById("cat"+q.cat).classList.add("correct");
+    document.getElementById("feedback").textContent="❌ Noto'g'ri. Qayta urining!";
+  }
+  setTimeout(()=>{qIdx++;loadQ();},1000);
+}
+
+function showResult(){
+  const pct=score/(TOTAL*10)*100;
+  document.getElementById("rem").textContent=pct>=80?"🏆":pct>=50?"⭐":"💪";
+  document.getElementById("rttl").textContent=pct>=80?"Ajoyib!":pct>=50?"Yaxshi!":"Harakat qiling!";
+  document.getElementById("rsc").textContent=`Natija: ${score}/${TOTAL*10} ball`;
+  document.getElementById("result").classList.remove("h");
+  localStorage.setItem("kz-pts",(parseInt(localStorage.getItem("kz-pts")||"0"))+Math.round(score/2));
+}
+
+function restart(){
+  score=0;qIdx=0;
+  document.getElementById("sv").textContent="0";
+  document.getElementById("result").classList.add("h");
+  buildQ();loadQ();
+}
+
+buildQ();loadQ();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Match Pair 🔍</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
+body {
+  min-height:100vh; background:#F8BBD0;
+  font-family:'Arial Rounded MT Bold',Arial,sans-serif;
+  overflow:hidden; display:flex; flex-direction:column; align-items:center;
+}
+#topbar { width:100%; padding:20px; display:flex; justify-content:space-between; align-items:center; }
+.pill { background:white; border-radius:20px; padding:8px 16px; font-weight:900; color:#AD1457; }
+#game-area { display:flex; justify-content:space-around; width:100%; max-width:400px; margin-top:20px; }
+.column { display:flex; flex-direction:column; gap:15px; }
+.item {
+  width:80px; height:80px; background:white; border-radius:15px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  cursor:pointer; border:3px solid transparent; transition:transform 0.15s;
+}
+.item.selected { border-color:#AD1457; transform:scale(1.1); }
+.item.matched { opacity:0.3; pointer-events:none; }
+.item.word { font-size:14px; font-weight:900; text-align:center; padding:4px; }
+
+/* Win overlay */
+#win-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
+#win-overlay.h { display:none; }
+#win-card { background:linear-gradient(135deg,#AD1457,#E91E63); border-radius:28px; padding:36px 28px; text-align:center; width:min(280px,85vw); color:white; }
+#win-em  { font-size:64px; margin-bottom:10px; }
+#win-msg { font-size:22px; font-weight:900; margin-bottom:18px; }
+#btn-win-play { background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.4); border-radius:20px; padding:14px 32px; color:white; font-size:16px; font-weight:900; cursor:pointer; width:100%; }
+#btn-win-play:active { transform:scale(0.96); }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="pill" id="lbl-title">🔍 JUFT TOPISH</div>
+  <div class="pill"><span id="lbl-score">BALL</span>: <span id="score">0</span></div>
+</div>
+
+<div id="game-area">
+  <div class="column" id="left-col"></div>
+  <div class="column" id="right-col"></div>
+</div>
+
+<!-- Win overlay (replaces alert) -->
+<div id="win-overlay" class="h">
+  <div id="win-card">
+    <div id="win-em">🏆</div>
+    <div id="win-msg">Barakalla!</div>
+    <button id="btn-win-play" onclick="restart()">🔄 Qayta</button>
+  </div>
+</div>
+
+<script src="game-engine.js"></script>
+<script>
+const game = new KidZoneGame({ id: 'match' });
+const lang = game.lang;
+
+const T = {
+  uz: { title:"🔍 JUFT TOPISH", score:"BALL", win:"Barakalla! Hamma juftlarni topdingiz!", again:"🔄 Qayta" },
+  ru: { title:"🔍 НАЙДИ ПАРУ",   score:"ОЧКИ", win:"Молодец! Все пары найдены!",            again:"🔄 Ещё раз" },
+  en: { title:"🔍 MATCH PAIR",   score:"SCORE",win:"Great! All pairs matched!",              again:"🔄 Play Again" },
+};
+
+const ITEMS = [
+  { id:1, e1:"🍎", word:{ uz:"Olma",   ru:"Яблоко",  en:"Apple"  } },
+  { id:2, e1:"🐶", word:{ uz:"It",     ru:"Собака",  en:"Dog"    } },
+  { id:3, e1:"🚗", word:{ uz:"Mashina",ru:"Машина",  en:"Car"    } },
+  { id:4, e1:"☀️", word:{ uz:"Quyosh", ru:"Солнце",  en:"Sun"    } },
+  { id:5, e1:"🌸", word:{ uz:"Gul",    ru:"Цветок",  en:"Flower" } },
+  { id:6, e1:"🌙", word:{ uz:"Oy",     ru:"Луна",    en:"Moon"   } },
+];
+
+const t = T[lang] || T.en;
+let score = 0, selected = null;
+
+function applyLang() {
+  document.getElementById('lbl-title').textContent    = t.title;
+  document.getElementById('lbl-score').textContent    = t.score;
+  document.getElementById('win-msg').textContent      = t.win;
+  document.getElementById('btn-win-play').textContent = t.again;
+}
+
+function init() {
+  const leftCol  = document.getElementById('left-col');
+  const rightCol = document.getElementById('right-col');
+  leftCol.innerHTML = '';
+  rightCol.innerHTML = '';
+  selected = null;
+  score = 0;
+  document.getElementById('score').textContent = 0;
+  document.getElementById('win-overlay').classList.add('h');
+
+  const leftItems  = [...ITEMS].sort(() => Math.random() - 0.5);
+  const rightItems = [...ITEMS].sort(() => Math.random() - 0.5);
+
+  leftItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.textContent = item.e1;
+    div.onclick = () => select(item, div, 'left');
+    leftCol.appendChild(div);
+  });
+
+  rightItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'item word';
+    div.textContent = item.word[lang] || item.word.en;
+    div.onclick = () => select(item, div, 'right');
+    rightCol.appendChild(div);
+  });
+}
+
+function select(item, div, side) {
+  if (div.classList.contains('matched')) return;
+  if (!selected) {
+    selected = { item, div, side };
+    div.classList.add('selected');
+    return;
+  }
+  if (selected.side === side) {
+    selected.div.classList.remove('selected');
+    selected = { item, div, side };
+    div.classList.add('selected');
+    return;
+  }
+  if (selected.item.id === item.id) {
+    selected.div.classList.add('matched');
+    div.classList.add('matched');
+    score += 20;
+    document.getElementById('score').textContent = score;
+    if (document.querySelectorAll('.matched').length === ITEMS.length * 2) {
+      setTimeout(() => {
+        document.getElementById('win-overlay').classList.remove('h');
+        game.reportScore(Math.round(score / 4));
+      }, 400);
+    }
+  }
+  selected.div.classList.remove('selected');
+  selected = null;
+}
+
+function restart() { init(); }
+
+applyLang();
+init();
+</script>
+</body>
+</html>

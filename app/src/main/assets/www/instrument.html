@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KidZone Instruments 🎵</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
+body {
+  min-height:100vh; background:#1a1a2e;
+  font-family:'Nunito', sans-serif;
+  overflow:hidden; display:flex; flex-direction:column; align-items:center;
+}
+#topbar { width:100%; padding:15px; display:flex; justify-content:space-between; align-items:center; color:white; z-index:10; }
+.pill { background:rgba(255,255,255,0.1); border-radius:20px; padding:8px 16px; font-weight:bold; display:flex; align-items:center; gap:8px; }
+
+#instrument-container {
+  flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center; padding:20px; gap:8px;
+  background:linear-gradient(to bottom, #1a1a2e, #16213e);
+}
+
+/* PIANO STYLE */
+.key-piano {
+  flex:1; height:70%; background:white; border-radius:0 0 12px 12px;
+  box-shadow:0 6px 0 #ddd, 0 10px 15px rgba(0,0,0,0.3);
+  position:relative; cursor:pointer; transition:transform 0.1s, background 0.1s;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  padding-bottom:20px; font-weight:900; color:#333;
+}
+.key-piano:active, .key-piano.active { transform:translateY(6px); background:#f0f0f0; box-shadow:0 0 0 #ddd; }
+
+/* DRUM STYLE */
+.key-drum {
+  width:120px; height:120px; background:#FF6B6B; border-radius:50%;
+  border:8px solid #fff; box-shadow:0 8px 0 #cc4b4b, 0 12px 20px rgba(0,0,0,0.4);
+  display:flex; align-items:center; justify-content:center; font-size:40px;
+  transition:transform 0.1s; cursor:pointer;
+}
+.key-drum:active { transform:scale(0.9) translateY(4px); }
+
+/* XYLOPHONE STYLE */
+.key-xylo {
+  flex:1; height:var(--h); background:var(--c); border-radius:10px;
+  box-shadow:0 6px 0 rgba(0,0,0,0.2); transition:transform 0.1s;
+  display:flex; align-items:center; justify-content:center; color:white; font-size:20px; font-weight:bold;
+}
+.key-xylo:active { transform:scale(0.95); }
+
+#viz { position:absolute; inset:0; pointer-events:none; }
+.particle {
+  position:absolute; bottom:30%; width:20px; height:20px; border-radius:50%;
+  animation:floatUp 1s ease-out forwards;
+}
+@keyframes floatUp {
+  0% { transform:translateY(0) scale(1); opacity:1; }
+  100% { transform:translateY(-200px) scale(2); opacity:0; }
+}
+
+#switch-btn {
+  background:#FF6B35; color:white; border:none; border-radius:15px; padding:10px 15px;
+  font-family:'Fredoka One'; cursor:pointer; font-size:16px; pointer-events:auto;
+}
+
+#feedback {
+  position:fixed; top:20%; font-size:40px; color:white; font-family:'Fredoka One';
+  text-shadow:0 0 15px rgba(255,255,255,0.5); opacity:0; pointer-events:none;
+}
+.show-fb { animation:pop 0.5s ease; }
+@keyframes pop { 0%{transform:scale(0.5);opacity:0} 50%{transform:scale(1.2);opacity:1} 100%{transform:scale(1);opacity:0} }
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="pill"><span id="mode-icon">🎹</span> <span id="mode-name">Piano</span></div>
+  <button id="switch-btn" onclick="nextInstrument()">🔄 Almashtirish</button>
+  <div class="pill">⭐ <span id="score">0</span></div>
+</div>
+<div id="feedback">Zo'r! 🌟</div>
+<div id="viz"></div>
+<div id="instrument-container"></div>
+
+<script src="game-engine.js"></script>
+<script>
+const game = new KidZoneGame({ id: 'instruments' });
+let audioCtx = null;
+let score = 0;
+let currentMode = 0;
+const modes = [
+  { name: 'Piano', icon: '🎹', class: 'key-piano', type: 'triangle', notes: ['C','D','E','F','G','A','B','C2'], freqs: [261, 293, 329, 349, 392, 440, 493, 523] },
+  { name: 'Drums', icon: '🥁', class: 'key-drum', type: 'sine', notes: ['🥁','💥','🔔'], freqs: [100, 150, 250] },
+  { name: 'Xylophone', icon: '🎼', class: 'key-xylo', type: 'square', notes: ['1','2','3','4','5','6','7','8'], freqs: [523, 587, 659, 698, 783, 880, 987, 1046] }
+];
+
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+function playSound(freq, color) {
+  initAudio();
+  const mode = modes[currentMode];
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = mode.type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+  gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (mode.name === 'Drums' ? 0.3 : 0.6));
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.6);
+
+  spawnParticle(color);
+  score += 1;
+  document.getElementById('score').textContent = score;
+  if (score % 20 === 0) {
+      showFeedback();
+      game.reportScore(1);
+  }
+}
+
+function spawnParticle(color) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.background = color || '#fff';
+  p.style.left = (Math.random() * 80 + 10) + 'vw';
+  document.getElementById('viz').appendChild(p);
+  setTimeout(() => p.remove(), 1000);
+}
+
+function showFeedback() {
+  const fb = document.getElementById('feedback');
+  fb.className = 'show-fb';
+  setTimeout(() => fb.className = '', 500);
+}
+
+function renderInstrument() {
+  const container = document.getElementById('instrument-container');
+  const mode = modes[currentMode];
+  container.innerHTML = '';
+  container.style.alignItems = mode.name === 'Drums' ? 'center' : 'flex-end';
+
+  document.getElementById('mode-icon').textContent = mode.icon;
+  document.getElementById('mode-name').textContent = mode.name;
+
+  mode.notes.forEach((note, i) => {
+    const el = document.createElement('div');
+    el.className = mode.class;
+    el.textContent = note;
+
+    if (mode.name === 'Xylophone') {
+        const h = 40 + (i * 5);
+        el.style.setProperty('--h', h + '%');
+        el.style.setProperty('--c', `hsl(${i * 45}, 70%, 60%)`);
+    }
+
+    const play = () => {
+      el.classList.add('active');
+      playSound(mode.freqs[i], mode.name === 'Xylophone' ? `hsl(${i * 45}, 70%, 60%)` : '#FFD700');
+      setTimeout(() => el.classList.remove('active'), 100);
+    };
+
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); play(); });
+    el.addEventListener('mousedown', play);
+    container.appendChild(el);
+  });
+}
+
+function nextInstrument() {
+  currentMode = (currentMode + 1) % modes.length;
+  renderInstrument();
+}
+
+window.onload = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    if (id === 'drums') currentMode = 1;
+    renderInstrument();
+};
+</script>
+</body>
+</html>

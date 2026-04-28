@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Puzzle 🧩</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
+body {
+  min-height:100vh; background:#F1F8E9;
+  font-family:'Arial Rounded MT Bold',Arial,sans-serif;
+  overflow:hidden; display:flex; flex-direction:column; align-items:center;
+}
+#topbar { width:100%; padding:20px; display:flex; justify-content:space-between; align-items:center; }
+.pill { background:white; border-radius:20px; padding:8px 16px; font-weight:900; color:#558B2F; }
+
+#puzzle-board {
+  display:grid; grid-template-columns:repeat(3, 100px); grid-template-rows:repeat(3, 100px);
+  gap:5px; background:#DCEDC8; padding:5px; border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1); margin-top:20px;
+}
+.tile {
+  width:100px; height:100px; background:#fff; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:40px; cursor:pointer; font-weight:bold; color:#558B2F;
+}
+.tile.empty { background:transparent; box-shadow:none; cursor:default; }
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="pill">🧩 PUZZLE</div>
+  <button class="pill" onclick="shuffle()">🔄 Aralashtirish</button>
+</div>
+
+<div id="puzzle-board"></div>
+
+<script>
+let tiles = [1,2,3,4,5,6,7,8,0];
+const emojis = ["","🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼"];
+
+function draw() {
+  const board = document.getElementById('puzzle-board');
+  board.innerHTML = '';
+  tiles.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'tile' + (t === 0 ? ' empty' : '');
+    div.textContent = t === 0 ? '' : t;
+    div.onclick = () => move(i);
+    board.appendChild(div);
+  });
+}
+
+function move(idx) {
+  const emptyIdx = tiles.indexOf(0);
+  const row = Math.floor(idx / 3);
+  const col = idx % 3;
+  const erow = Math.floor(emptyIdx / 3);
+  const ecol = emptyIdx % 3;
+
+  if(Math.abs(row - erow) + Math.abs(col - ecol) === 1) {
+    [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+    draw();
+    if(checkWin()) {
+      alert("Barakalla! Puzzle yig'ildi! 🏆");
+    }
+  }
+}
+
+function checkWin() {
+  for(let i=0; i<8; i++) if(tiles[i] !== i+1) return false;
+  return true;
+}
+
+function shuffle() {
+  for(let i=0; i<100; i++) {
+    const adj = [];
+    const emptyIdx = tiles.indexOf(0);
+    const row = Math.floor(emptyIdx / 3);
+    const col = emptyIdx % 3;
+    if(row > 0) adj.push(emptyIdx - 3);
+    if(row < 2) adj.push(emptyIdx + 3);
+    if(col > 0) adj.push(emptyIdx - 1);
+    if(col < 2) adj.push(emptyIdx + 1);
+    const rand = adj[Math.floor(Math.random() * adj.length)];
+    [tiles[rand], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[rand]];
+  }
+  draw();
+}
+
+shuffle();
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('kz-prog-jigsaw', '100');
+});
+</script>
+</body>
+</html>

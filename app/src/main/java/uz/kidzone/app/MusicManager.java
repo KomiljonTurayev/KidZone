@@ -38,42 +38,40 @@ public class MusicManager {
         return isMuted;
     }
 
-    /**
-     * Starts playing background music.
-     * Uses a fallback URL for a calm children's melody.
-     */
     public void startMusic(Context context) {
         if (mediaPlayer == null) {
-            int resId = context.getResources().getIdentifier("bg_music", "raw", context.getPackageName());
-            if (resId != 0) {
-                mediaPlayer = MediaPlayer.create(context.getApplicationContext(), resId);
-            } else {
-                try {
-                    mediaPlayer = new MediaPlayer();
-                    // Using a calmer, acoustic royalty-free track
-                    String calmMusicUrl = "https://www.bensound.com/bensound-music/bensound-lullaby.mp3"; 
-                    mediaPlayer.setDataSource(calmMusicUrl);
-                    mediaPlayer.prepareAsync(); 
-                    Log.d(TAG, "Using calm fallback music");
-                } catch (Exception e) {
-                    Log.e(TAG, "Error setting music source", e);
-                }
-            }
+            initializeMediaPlayer(context);
+        } else {
+            resumeMusic();
+        }
+    }
 
+    private void initializeMediaPlayer(Context context) {
+        int resId = context.getResources().getIdentifier("bg_music", "raw", context.getPackageName());
+        if (resId != 0) {
+            mediaPlayer = MediaPlayer.create(context.getApplicationContext(), resId);
             if (mediaPlayer != null) {
                 mediaPlayer.setLooping(true);
-                float vol = isMuted ? 0f : 0.15f; // Sokin ovoz
-                mediaPlayer.setVolume(vol, vol);
-                mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+                mediaPlayer.setVolume(isMuted ? 0f : 0.15f, isMuted ? 0f : 0.15f);
+                if (!isMuted) mediaPlayer.start();
             }
+        } else {
+            loadNetworkMusic();
         }
-        
-        if (mediaPlayer != null && !mediaPlayer.isPlaying() && !isMuted) {
-            try {
-                mediaPlayer.start();
-            } catch (Exception e) {
-                Log.w(TAG, "Music start delayed");
-            }
+    }
+
+    private void loadNetworkMusic() {
+        try {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource("https://www.bensound.com/bensound-music/bensound-lullaby.mp3");
+            mediaPlayer.setLooping(true);
+            mediaPlayer.setVolume(isMuted ? 0f : 0.15f, isMuted ? 0f : 0.15f);
+            mediaPlayer.setOnPreparedListener(mp -> { if (!isMuted) mp.start(); });
+            mediaPlayer.prepareAsync();
+            Log.d(TAG, "Loading fallback music");
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading network music", e);
+            mediaPlayer = null;
         }
     }
 

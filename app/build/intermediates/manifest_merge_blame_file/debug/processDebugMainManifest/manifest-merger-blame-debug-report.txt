@@ -1,0 +1,543 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="uz.kidzone.app.debug"
+4    android:versionCode="4"
+5    android:versionName="1.0.1" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="35" />
+10
+11    <!-- ✅ Permissions -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:5:5-66
+12-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:5:22-64
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:6:5-78
+13-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:6:22-76
+14
+15    <!-- Tablet support -->
+16    <supports-screens
+16-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:9:5-15:36
+17        android:anyDensity="true"
+17-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:15:9-34
+18        android:largeScreens="true"
+18-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:12:9-36
+19        android:normalScreens="true"
+19-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:11:9-37
+20        android:resizeable="true"
+20-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:14:9-34
+21        android:smallScreens="true"
+21-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:10:9-36
+22        android:xlargeScreens="true" />
+22-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:13:9-37
+23
+24    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+24-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:26:5-79
+24-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:26:22-76
+25    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" />
+25-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:27:5-82
+25-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:27:22-79
+26    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" />
+26-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:28:5-88
+26-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:28:22-85
+27    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_TOPICS" /> <!-- Android package visibility setting -->
+27-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:29:5-83
+27-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:29:22-80
+28    <queries>
+28-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:35:5-68:15
+29
+30        <!-- For browser content -->
+31        <intent>
+31-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:38:9-44:18
+32            <action android:name="android.intent.action.VIEW" />
+32-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:39:13-65
+32-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:39:21-62
+33
+34            <category android:name="android.intent.category.BROWSABLE" />
+34-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:41:13-74
+34-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:41:23-71
+35
+36            <data android:scheme="https" />
+36-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:43:13-44
+36-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:43:19-41
+37        </intent>
+38        <!-- End of browser content -->
+39        <!-- For CustomTabsService -->
+40        <intent>
+40-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:47:9-49:18
+41            <action android:name="android.support.customtabs.action.CustomTabsService" />
+41-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:48:13-90
+41-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:48:21-87
+42        </intent>
+43        <!-- End of CustomTabsService -->
+44        <!-- For MRAID capabilities -->
+45        <intent>
+45-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:52:9-56:18
+46            <action android:name="android.intent.action.INSERT" />
+46-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:53:13-67
+46-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:53:21-64
+47
+48            <data android:mimeType="vnd.android.cursor.dir/event" />
+48-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:43:13-44
+49        </intent>
+50        <intent>
+50-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:57:9-61:18
+51            <action android:name="android.intent.action.VIEW" />
+51-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:39:13-65
+51-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:39:21-62
+52
+53            <data android:scheme="sms" />
+53-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:43:13-44
+53-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:43:19-41
+54        </intent>
+55        <intent>
+55-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:62:9-66:18
+56            <action android:name="android.intent.action.DIAL" />
+56-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:63:13-65
+56-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:63:21-62
+57
+58            <data android:path="tel:" />
+58-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:43:13-44
+59        </intent>
+60        <!-- End of MRAID capabilities -->
+61    </queries>
+62
+63    <uses-permission android:name="android.permission.WAKE_LOCK" />
+63-->[com.google.android.gms:play-services-measurement-sdk-api:20.1.2] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\602cedd7cfe657a651ac379b8c1c8289\transformed\jetified-play-services-measurement-sdk-api-20.1.2\AndroidManifest.xml:25:5-68
+63-->[com.google.android.gms:play-services-measurement-sdk-api:20.1.2] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\602cedd7cfe657a651ac379b8c1c8289\transformed\jetified-play-services-measurement-sdk-api-20.1.2\AndroidManifest.xml:25:22-65
+64    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+64-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:28:5-77
+64-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:28:22-74
+65
+66    <permission
+66-->[androidx.core:core:1.15.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\935b7f034330caf1654b754287ca1f6f\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
+67        android:name="uz.kidzone.app.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+67-->[androidx.core:core:1.15.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\935b7f034330caf1654b754287ca1f6f\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
+68        android:protectionLevel="signature" />
+68-->[androidx.core:core:1.15.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\935b7f034330caf1654b754287ca1f6f\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
+69
+70    <uses-permission android:name="uz.kidzone.app.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+70-->[androidx.core:core:1.15.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\935b7f034330caf1654b754287ca1f6f\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
+70-->[androidx.core:core:1.15.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\935b7f034330caf1654b754287ca1f6f\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
+71
+72    <application
+72-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:17:5-58:19
+73        android:allowBackup="true"
+73-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:18:9-35
+74        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+74-->[androidx.core:core:1.15.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\935b7f034330caf1654b754287ca1f6f\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
+75        android:debuggable="true"
+76        android:extractNativeLibs="false"
+77        android:hardwareAccelerated="true"
+77-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:24:9-43
+78        android:icon="@mipmap/ic_launcher"
+78-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:19:9-43
+79        android:label="@string/app_name"
+79-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:21:9-41
+80        android:networkSecurityConfig="@xml/network_security_config"
+80-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:25:9-69
+81        android:roundIcon="@mipmap/ic_launcher_round"
+81-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:20:9-54
+82        android:supportsRtl="true"
+82-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:23:9-35
+83        android:testOnly="true"
+84        android:theme="@style/Theme.KidZone"
+84-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:22:9-45
+85        android:usesCleartextTraffic="false" >
+85-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:26:9-45
+86
+87        <!-- ✅ ADMOB APP ID — BU YERNI O'ZGARTIRING! -->
+88        <meta-data
+88-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:29:9-31:69
+89            android:name="com.google.android.gms.ads.APPLICATION_ID"
+89-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:30:13-69
+90            android:value="ca-app-pub-3291187691091325~8541921370" />
+90-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:31:13-67
+91        <!-- android:value="ca-app-pub-3940256099942544~3347511713"/> -->
+92        <!--
+93            ☝️ HOZIR TEST ID TURIBDI
+94            O'Z ID INGIZNI QUYIDAGIGA ALMASHTIRING:
+95            android:value="ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
+96
+97            BOLALAR O'YINI UCHUN COPPA (MAJBURIY):
+98        -->
+99        <meta-data
+99-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:40:9-42:35
+100            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
+100-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:41:13-81
+101            android:value="true" />
+101-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:42:13-33
+102
+103        <!-- MAIN ACTIVITY -->
+104        <activity
+104-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:45:9-56:20
+105            android:name="uz.kidzone.app.MainActivity"
+105-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:46:13-41
+106            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+106-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:49:13-106
+107            android:exported="true"
+107-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:47:13-36
+108            android:screenOrientation="user"
+108-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:48:13-45
+109            android:theme="@style/Theme.KidZone.Splash"
+109-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:51:13-56
+110            android:windowSoftInputMode="adjustResize" >
+110-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:50:13-55
+111            <intent-filter>
+111-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:52:13-55:29
+112                <action android:name="android.intent.action.MAIN" />
+112-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:53:17-68
+112-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:53:25-66
+113
+114                <category android:name="android.intent.category.LAUNCHER" />
+114-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:54:17-76
+114-->D:\android_projects\KidZone\app\src\main\AndroidManifest.xml:54:27-74
+115            </intent-filter>
+116        </activity>
+117
+118        <provider
+118-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+119            android:name="androidx.startup.InitializationProvider"
+119-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:25:13-67
+120            android:authorities="uz.kidzone.app.debug.androidx-startup"
+120-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:26:13-68
+121            android:exported="false" >
+121-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:27:13-37
+122            <meta-data
+122-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+123                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+123-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:30:17-75
+124                android:value="androidx.startup" />
+124-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\2c0ff561a24b72180ea67d44969594e7\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:31:17-49
+125            <meta-data
+125-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:36:13-38:52
+126                android:name="androidx.work.WorkManagerInitializer"
+126-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:37:17-68
+127                android:value="androidx.startup" />
+127-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:38:17-49
+128            <meta-data
+128-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\99db1878020c67626296e00a9d2586ed\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+129                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+129-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\99db1878020c67626296e00a9d2586ed\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+130                android:value="androidx.startup" />
+130-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\99db1878020c67626296e00a9d2586ed\transformed\jetified-lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+131            <meta-data
+131-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+132                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+132-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+133                android:value="androidx.startup" />
+133-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+134        </provider> <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
+135        <activity
+135-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:73:9-78:43
+136            android:name="com.google.android.gms.ads.AdActivity"
+136-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:74:13-65
+137            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+137-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:75:13-122
+138            android:exported="false"
+138-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:76:13-37
+139            android:theme="@android:style/Theme.Translucent" />
+139-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:77:13-61
+140
+141        <provider
+141-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:80:9-85:43
+142            android:name="com.google.android.gms.ads.MobileAdsInitProvider"
+142-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:81:13-76
+143            android:authorities="uz.kidzone.app.debug.mobileadsinitprovider"
+143-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:82:13-73
+144            android:exported="false"
+144-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:83:13-37
+145            android:initOrder="100" />
+145-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:84:13-36
+146
+147        <service
+147-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:87:9-91:43
+148            android:name="com.google.android.gms.ads.AdService"
+148-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:88:13-64
+149            android:enabled="true"
+149-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:89:13-35
+150            android:exported="false" />
+150-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:90:13-37
+151
+152        <activity
+152-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:93:9-97:43
+153            android:name="com.google.android.gms.ads.OutOfContextTestingActivity"
+153-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:94:13-82
+154            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+154-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:95:13-122
+155            android:exported="false" />
+155-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:96:13-37
+156        <activity
+156-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:98:9-105:43
+157            android:name="com.google.android.gms.ads.NotificationHandlerActivity"
+157-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:99:13-82
+158            android:excludeFromRecents="true"
+158-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:100:13-46
+159            android:exported="false"
+159-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:101:13-37
+160            android:launchMode="singleTask"
+160-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:102:13-44
+161            android:taskAffinity=""
+161-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:103:13-36
+162            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+162-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:104:13-72
+163
+164        <property
+164-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:107:9-109:62
+165            android:name="android.adservices.AD_SERVICES_CONFIG"
+165-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:108:13-65
+166            android:resource="@xml/gma_ad_services_config" />
+166-->[com.google.android.gms:play-services-ads-lite:23.6.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\f55d6281e9395e46a961e78cff6af4dd\transformed\jetified-play-services-ads-lite-23.6.0\AndroidManifest.xml:109:13-59
+167
+168        <activity
+168-->[com.google.android.gms:play-services-base:18.0.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\bf94f209d750cd63a9139f5bfcb5e4bc\transformed\jetified-play-services-base-18.0.0\AndroidManifest.xml:20:9-22:45
+169            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+169-->[com.google.android.gms:play-services-base:18.0.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\bf94f209d750cd63a9139f5bfcb5e4bc\transformed\jetified-play-services-base-18.0.0\AndroidManifest.xml:20:19-85
+170            android:exported="false"
+170-->[com.google.android.gms:play-services-base:18.0.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\bf94f209d750cd63a9139f5bfcb5e4bc\transformed\jetified-play-services-base-18.0.0\AndroidManifest.xml:22:19-43
+171            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+171-->[com.google.android.gms:play-services-base:18.0.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\bf94f209d750cd63a9139f5bfcb5e4bc\transformed\jetified-play-services-base-18.0.0\AndroidManifest.xml:21:19-78
+172
+173        <meta-data
+173-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\d778218665ad6a1ff53628b515255ad4\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+174            android:name="com.google.android.gms.version"
+174-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\d778218665ad6a1ff53628b515255ad4\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+175            android:value="@integer/google_play_services_version" />
+175-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\d778218665ad6a1ff53628b515255ad4\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+176
+177        <uses-library
+177-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\692c81ce6c61b14681d72ac472cd4aeb\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:23:9-25:40
+178            android:name="android.ext.adservices"
+178-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\692c81ce6c61b14681d72ac472cd4aeb\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:24:13-50
+179            android:required="false" />
+179-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\692c81ce6c61b14681d72ac472cd4aeb\transformed\jetified-ads-adservices-1.0.0-beta05\AndroidManifest.xml:25:13-37
+180
+181        <service
+181-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:41:9-46:35
+182            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+182-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:42:13-88
+183            android:directBootAware="false"
+183-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:43:13-44
+184            android:enabled="@bool/enable_system_alarm_service_default"
+184-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:44:13-72
+185            android:exported="false" />
+185-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:45:13-37
+186        <service
+186-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:47:9-53:35
+187            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+187-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:48:13-84
+188            android:directBootAware="false"
+188-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:49:13-44
+189            android:enabled="@bool/enable_system_job_service_default"
+189-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:50:13-70
+190            android:exported="true"
+190-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:51:13-36
+191            android:permission="android.permission.BIND_JOB_SERVICE" />
+191-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:52:13-69
+192        <service
+192-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:54:9-59:35
+193            android:name="androidx.work.impl.foreground.SystemForegroundService"
+193-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:55:13-81
+194            android:directBootAware="false"
+194-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:56:13-44
+195            android:enabled="@bool/enable_system_foreground_service_default"
+195-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:57:13-77
+196            android:exported="false" />
+196-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:58:13-37
+197
+198        <receiver
+198-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:61:9-66:35
+199            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
+199-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:62:13-88
+200            android:directBootAware="false"
+200-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:63:13-44
+201            android:enabled="true"
+201-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:64:13-35
+202            android:exported="false" />
+202-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:65:13-37
+203        <receiver
+203-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:67:9-77:20
+204            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
+204-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:68:13-106
+205            android:directBootAware="false"
+205-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:69:13-44
+206            android:enabled="false"
+206-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:70:13-36
+207            android:exported="false" >
+207-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:71:13-37
+208            <intent-filter>
+208-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:73:13-76:29
+209                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+209-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:74:17-87
+209-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:74:25-84
+210                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+210-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:75:17-90
+210-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:75:25-87
+211            </intent-filter>
+212        </receiver>
+213        <receiver
+213-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:78:9-88:20
+214            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy"
+214-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:79:13-104
+215            android:directBootAware="false"
+215-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:80:13-44
+216            android:enabled="false"
+216-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:81:13-36
+217            android:exported="false" >
+217-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:82:13-37
+218            <intent-filter>
+218-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:84:13-87:29
+219                <action android:name="android.intent.action.BATTERY_OKAY" />
+219-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:85:17-77
+219-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:85:25-74
+220                <action android:name="android.intent.action.BATTERY_LOW" />
+220-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:86:17-76
+220-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:86:25-73
+221            </intent-filter>
+222        </receiver>
+223        <receiver
+223-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:89:9-99:20
+224            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy"
+224-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:90:13-104
+225            android:directBootAware="false"
+225-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:91:13-44
+226            android:enabled="false"
+226-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:92:13-36
+227            android:exported="false" >
+227-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:93:13-37
+228            <intent-filter>
+228-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:95:13-98:29
+229                <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
+229-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:96:17-83
+229-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:96:25-80
+230                <action android:name="android.intent.action.DEVICE_STORAGE_OK" />
+230-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:97:17-82
+230-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:97:25-79
+231            </intent-filter>
+232        </receiver>
+233        <receiver
+233-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:100:9-109:20
+234            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy"
+234-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:101:13-103
+235            android:directBootAware="false"
+235-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:102:13-44
+236            android:enabled="false"
+236-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:103:13-36
+237            android:exported="false" >
+237-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:104:13-37
+238            <intent-filter>
+238-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:106:13-108:29
+239                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+239-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:107:17-79
+239-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:107:25-76
+240            </intent-filter>
+241        </receiver>
+242        <receiver
+242-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:110:9-121:20
+243            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+243-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:111:13-88
+244            android:directBootAware="false"
+244-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:112:13-44
+245            android:enabled="false"
+245-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:113:13-36
+246            android:exported="false" >
+246-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:114:13-37
+247            <intent-filter>
+247-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:116:13-120:29
+248                <action android:name="android.intent.action.BOOT_COMPLETED" />
+248-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:117:17-79
+248-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:117:25-76
+249                <action android:name="android.intent.action.TIME_SET" />
+249-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:118:17-73
+249-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:118:25-70
+250                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+250-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:119:17-81
+250-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:119:25-78
+251            </intent-filter>
+252        </receiver>
+253        <receiver
+253-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:122:9-131:20
+254            android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
+254-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:123:13-99
+255            android:directBootAware="false"
+255-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:124:13-44
+256            android:enabled="@bool/enable_system_alarm_service_default"
+256-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:125:13-72
+257            android:exported="false" >
+257-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:126:13-37
+258            <intent-filter>
+258-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:128:13-130:29
+259                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
+259-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:129:17-98
+259-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:129:25-95
+260            </intent-filter>
+261        </receiver>
+262        <receiver
+262-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:132:9-142:20
+263            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+263-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:133:13-78
+264            android:directBootAware="false"
+264-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:134:13-44
+265            android:enabled="true"
+265-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:135:13-35
+266            android:exported="true"
+266-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:136:13-36
+267            android:permission="android.permission.DUMP" >
+267-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:137:13-57
+268            <intent-filter>
+268-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:139:13-141:29
+269                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
+269-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:140:17-88
+269-->[androidx.work:work-runtime:2.7.0] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\beb2f5b1eb1e7e0d7262472aaf510f5a\transformed\work-runtime-2.7.0\AndroidManifest.xml:140:25-85
+270            </intent-filter>
+271        </receiver>
+272        <receiver
+272-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+273            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+273-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+274            android:directBootAware="false"
+274-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+275            android:enabled="true"
+275-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+276            android:exported="true"
+276-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+277            android:permission="android.permission.DUMP" >
+277-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+278            <intent-filter>
+278-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+279                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+279-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+279-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+280            </intent-filter>
+281            <intent-filter>
+281-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+282                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+282-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+282-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+283            </intent-filter>
+284            <intent-filter>
+284-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+285                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+285-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+285-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+286            </intent-filter>
+287            <intent-filter>
+287-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+288                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+288-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+288-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\923337c237a9d44696e8053a2cb48663\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+289            </intent-filter>
+290        </receiver>
+291
+292        <service
+292-->[androidx.room:room-runtime:2.2.5] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\6059ca6d464c56e49658793a2d62b72d\transformed\room-runtime-2.2.5\AndroidManifest.xml:25:9-28:40
+293            android:name="androidx.room.MultiInstanceInvalidationService"
+293-->[androidx.room:room-runtime:2.2.5] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\6059ca6d464c56e49658793a2d62b72d\transformed\room-runtime-2.2.5\AndroidManifest.xml:26:13-74
+294            android:directBootAware="true"
+294-->[androidx.room:room-runtime:2.2.5] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\6059ca6d464c56e49658793a2d62b72d\transformed\room-runtime-2.2.5\AndroidManifest.xml:27:13-43
+295            android:exported="false" />
+295-->[androidx.room:room-runtime:2.2.5] C:\Users\Komiljon\AppData\Local\Android\Sdk\caches\8.10.2\transforms\6059ca6d464c56e49658793a2d62b72d\transformed\room-runtime-2.2.5\AndroidManifest.xml:28:13-37
+296    </application>
+297
+298</manifest>

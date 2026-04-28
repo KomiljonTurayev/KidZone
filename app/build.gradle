@@ -27,7 +27,7 @@ android {
                 debugSymbolLevel 'FULL'
             }
         }
-        
+
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"

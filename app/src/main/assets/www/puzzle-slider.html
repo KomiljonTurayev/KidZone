@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>Puzzle Slider 🧩</title>
+  <style>
+    :root {
+      --primary: #FF6B8B;
+      --secondary: #FF8E9E;
+      --bg-gradient: linear-gradient(180deg, #FF9A9E 0%, #FAD0C4 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+    body {
+      height: 100vh; display: flex; flex-direction: column;
+      background: var(--bg-gradient); font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { font-size: 24px; cursor: pointer; }
+    .title { font-size: 20px; font-weight: bold; }
+    .sound-btn { font-size: 20px; cursor: pointer; }
+
+    #stats { display: flex; justify-content: space-between; padding: 0 25px; margin-bottom: 10px; font-size: 18px; }
+    .stat-box { display: flex; align-items: center; gap: 6px; }
+
+    #goal-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+    .goal-label { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+    #goal-preview {
+      display: grid; grid-template-columns: repeat(3, 20px); gap: 2px;
+      background: rgba(255,255,255,0.2); padding: 4px; border-radius: 6px;
+    }
+    .goal-tile { width: 20px; height: 20px; background: white; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+    #board-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 15px; }
+    #board {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      background: rgba(255,255,255,0.15); padding: 12px; border-radius: 24px;
+      width: 100%; max-width: 360px; aspect-ratio: 1;
+    }
+    .tile {
+      background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      font-size: 45px; cursor: pointer; transition: transform 0.1s;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.05);
+    }
+    .tile:active { transform: scale(0.95); }
+    .tile.empty { background: rgba(0,0,0,0.1); box-shadow: none; }
+
+    #controls { display: flex; gap: 15px; padding: 20px; justify-content: center; margin-bottom: 20px; }
+    .btn {
+      padding: 12px 25px; border-radius: 25px; border: none; font-weight: bold;
+      font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s;
+    }
+    .btn-orange { background: #FF9F43; color: white; }
+    .btn-pink { background: #FF78B0; color: white; }
+    .btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+    /* Victory Modal */
+    #victory {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    #victory.show { display: flex; animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div id="victory">
+    <h1 style="font-size: 50px;">🏆</h1>
+    <h2 style="font-size: 32px; margin-top: 10px;" id="vic-title">Barakalla!</h2>
+    <p style="margin-top: 10px; font-size: 18px;" id="vic-sub">Siz puzzle-ni yig'dingiz!</p>
+    <button class="btn btn-orange" style="margin-top: 30px;" id="vic-btn" onclick="resetGame()">Yana O'ynash 🔄</button>
+  </div>
+
+  <!-- Hint overlay (replaces alert) -->
+  <div id="hint-overlay" style="position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:14px 24px;border-radius:20px;font-size:15px;font-weight:bold;z-index:200;display:none;text-align:center;max-width:85vw">💡 <span id="hint-text"></span></div>
+
+  <div id="header">
+    <div class="back-btn" onclick="window.parent.closeGame()">⬅️</div>
+    <div class="title" id="lbl-title">Puzzle Slider</div>
+    <div class="sound-btn">🔊</div>
+  </div>
+
+  <div id="stats">
+    <div class="stat-box">🔢 <span id="moves">0</span> <span id="lbl-moves">moves</span></div>
+    <div class="stat-box">⏱️ <span id="timer">0s</span></div>
+  </div>
+
+  <div id="goal-container">
+    <div class="goal-label" id="lbl-goal">Goal:</div>
+    <div id="goal-preview"></div>
+  </div>
+
+  <div id="board-container">
+    <div id="board"></div>
+  </div>
+
+  <div id="controls">
+    <button class="btn btn-orange" id="btn-new" onclick="resetGame()">🔀 New Puzzle</button>
+    <button class="btn btn-pink"   id="btn-hint" onclick="showHint()">💡 Hint</button>
+  </div>
+
+  <script>
+    const lang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+    const T = {
+      uz: { vic:"Barakalla!", vicSub:"Siz puzzle-ni yig'dingiz!", vicBtn:"Yana O'ynash 🔄", goal:"Maqsad:", moves:"harakat", newPuzzle:"🔀 Yangi", hint:"💡 Maslahat", hintMsg:"Hayvonlarni tartibga soling!" },
+      ru: { vic:"Молодец!",   vicSub:"Вы собрали пазл!",          vicBtn:"Играть снова 🔄",  goal:"Цель:",    moves:"ходов",    newPuzzle:"🔀 Новый",  hint:"💡 Подсказка", hintMsg:"Расставь животных по порядку!" },
+      en: { vic:"Great job!", vicSub:"You solved the puzzle!",     vicBtn:"Play Again 🔄",    goal:"Goal:",    moves:"moves",    newPuzzle:"🔀 New",    hint:"💡 Hint",       hintMsg:"Arrange animals in order!" },
+    };
+    const t = T[lang] || T.en;
+
+    function applyLang() {
+      document.getElementById('vic-title').textContent  = t.vic;
+      document.getElementById('vic-sub').textContent    = t.vicSub;
+      document.getElementById('vic-btn').textContent    = t.vicBtn;
+      document.getElementById('lbl-goal').textContent   = t.goal;
+      document.getElementById('lbl-moves').textContent  = t.moves;
+      document.getElementById('btn-new').textContent    = t.newPuzzle;
+      document.getElementById('btn-hint').textContent   = t.hint;
+      document.getElementById('hint-text').textContent  = t.hintMsg;
+    }
+
+    const ANIMALS = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼"];
+    let tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+    let moves = 0;
+    let seconds = 0;
+    let timerInterval = null;
+    let isGameActive = false;
+
+    function init() {
+      renderGoal();
+      resetGame();
+    }
+
+    function renderGoal() {
+      const goalDiv = document.getElementById('goal-preview');
+      goalDiv.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const d = document.createElement('div');
+        d.className = 'goal-tile';
+        d.textContent = ANIMALS[i-1];
+        goalDiv.appendChild(d);
+      }
+      const empty = document.createElement('div');
+      empty.className = 'goal-tile';
+      empty.style.background = '#888';
+      goalDiv.appendChild(empty);
+    }
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+      tiles.forEach((t, i) => {
+        const div = document.createElement('div');
+        div.className = 'tile' + (t === 0 ? ' empty' : '');
+        div.textContent = t === 0 ? '' : ANIMALS[t-1];
+        div.onclick = () => move(i);
+        board.appendChild(div);
+      });
+    }
+
+    function move(idx) {
+      if (!isGameActive) return;
+      const emptyIdx = tiles.indexOf(0);
+      const row = Math.floor(idx / 3);
+      const col = idx % 3;
+      const eRow = Math.floor(emptyIdx / 3);
+      const eCol = emptyIdx % 3;
+
+      if (Math.abs(row - eRow) + Math.abs(col - eCol) === 1) {
+        [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+        moves++;
+        document.getElementById('moves').textContent = moves;
+        renderBoard();
+        checkWin();
+      }
+    }
+
+    function checkWin() {
+      const win = tiles.every((t, i) => t === (i === 8 ? 0 : i + 1));
+      if (win) {
+        isGameActive = false;
+        clearInterval(timerInterval);
+        document.getElementById('victory').classList.add('show');
+        if (window.parent && window.parent.onRewardGranted) window.parent.onRewardGranted(50);
+      }
+    }
+
+    function resetGame() {
+      tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+      shuffle();
+      moves = 0;
+      seconds = 0;
+      document.getElementById('moves').textContent = moves;
+      document.getElementById('timer').textContent = '0s';
+      document.getElementById('victory').classList.remove('show');
+      isGameActive = true;
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById('timer').textContent = seconds + 's';
+      }, 1000);
+
+      renderBoard();
+    }
+
+    function shuffle() {
+        for (let i = 0; i < 200; i++) {
+            const emptyIdx = tiles.indexOf(0);
+            const adj = [];
+            const r = Math.floor(emptyIdx / 3);
+            const c = emptyIdx % 3;
+            if (r > 0) adj.push(emptyIdx - 3);
+            if (r < 2) adj.push(emptyIdx + 3);
+            if (c > 0) adj.push(emptyIdx - 1);
+            if (c < 2) adj.push(emptyIdx + 1);
+            const rand = adj[Math.floor(Math.random() * adj.length)];
+            [tiles[emptyIdx], tiles[rand]] = [tiles[rand], tiles[emptyIdx]];
+        }
+    }
+
+    function showHint() {
+      const el = document.getElementById('hint-overlay');
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    }
+
+    applyLang();
+    init();
+  </script>
+</body>
+</html>

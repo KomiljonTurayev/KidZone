@@ -1020,274 +1020,209 @@
 
 <!-- ADMOB BANNER: Java Layout (bannerContainer) tomonidan ko'rsatiladi -->
 
-<script>
-  // ════════════════════════════════════════════════════
-  // 30 TA MINI-GAME MA'LUMOTLARI
-  // ════════════════════════════════════════════════════
-  const GAMES = [
-    // ── LEARN ───────────────────────────────────────
-    {id:"animals",    em:"🐾", name:"Hayvonlar",      cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
-    {id:"colors",     em:"🌈", name:"Rang & Shakl",   cat:"colors", age:"2+", tag:"Ranglar", tc:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:5, plays:"10K", badge:"hot", file:"colors-shapes.html", pts:20},
-    {id:"abc-uz",     em:"🔤", name:"O'zbek Alifbosi", cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-uz.html", pts:25},
-    {id:"abc-ru",     em:"А", name:"Rus Alifbosi",    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-ru.html", pts:25},
-    {id:"abc-en",     em:"🔡", name:"Ingliz ABC",     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-en.html", pts:25},
-    {id:"body",       em:"👁️", name:"Tana A'zolari",  cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"body.html", pts:20},
-    {id:"fruits",     em:"🍎", name:"Meva & Sabzavot",cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#FF5722", bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:5, plays:"11K", badge:"hot", file:"fruits.html", pts:20},
-    {id:"transport",  em:"🚗", name:"Transport",      cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#607D8B", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:4, plays:"5K",  badge:null,  file:"transport.html", pts:20},
+  <script src="main.js"></script>
+  <script>
+    // ════════════════════════════════════════════════════
+    // 30 TA MINI-GAME MA'LUMOTLARI
+    // ════════════════════════════════════════════════════
+    const GAMES = [
+      // ── LEARN ───────────────────────────────────────
+      {id:"animals",    em:"🐾", name:{uz:"Hayvonlar", ru:"Животные", en:"Animals"},      cat:"learn",  age:"2+", tag:{uz:"Ta'lim", ru:"Обучение", en:"Learn"},  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
+      {id:"colors",     em:"🌈", name:{uz:"Rang & Shakl", ru:"Цвета и формы", en:"Colors & Shapes"},   cat:"colors", age:"2+", tag:{uz:"Ranglar", ru:"Цвета", en:"Colors"}, tc:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:5, plays:"10K", badge:"hot", file:"colors-shapes.html", pts:20},
+      {id:"abc-uz",     em:"🔤", name:{uz:"O'zbek Alifbosi", ru:"Узбекский алфавит", en:"Uzbek Alphabet"}, cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-uz.html", pts:25},
+      {id:"abc-ru",     em:"А", name:{uz:"Rus Alifbosi", ru:"Русский алфавит", en:"Russian Alphabet"},    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-ru.html", pts:25},
+      {id:"abc-en",     em:"🔡", name:{uz:"Ingliz ABC", ru:"Английский ABC", en:"English ABC"},     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-en.html", pts:25},
+      {id:"body",       em:"👁️", name:{uz:"Tana A'zolari", ru:"Части тела", en:"Body Parts"},  cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"body.html", pts:20},
+      {id:"fruits",     em:"🍎", name:{uz:"Meva & Sabzavot", ru:"Фрукты и овощи", en:"Fruits & Veggies"},cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#FF5722", bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:5, plays:"11K", badge:"hot", file:"fruits.html", pts:20},
+      {id:"transport",  em:"🚗", name:{uz:"Transport", ru:"Транспорт", en:"Transport"},      cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#607D8B", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:4, plays:"5K",  badge:null,  file:"transport.html", pts:20},
 
-    // ── MATH ─────────────────────────────────────────
-    {id:"math",       em:"🔢", name:"Raqamlar",       cat:"math",   age:"3+", tag:"Matematik",tc:"#9C27B0",bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:5, plays:"9K",  badge:"hot", file:"math-kids.html", pts:30},
-    {id:"counting",   em:"➕", name:"Qo'shish",       cat:"math",   age:"4+", tag:"Matematik",tc:"#00BCD4",bg:"linear-gradient(135deg,#E0F7FA,#B2EBF2)", stars:4, plays:"7K",  badge:null,  file:"math-kids.html", pts:30},
-    {id:"subtract",   em:"➖", name:"Ayirish",         cat:"math",   age:"5+", tag:"Matematik",tc:"#FF5722",bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:4, plays:"5K",  badge:null,  file:"math-kids.html", pts:30},
-    {id:"shapes3d",   em:"🔷", name:"Geometrik Shakllar",cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:"colors-shapes.html", pts:25},
-    {id:"clock",      em:"⏰", name:"Soat O'qish",    cat:"math",   age:"6+", tag:"Matematik",tc:"#795548",bg:"linear-gradient(135deg,#EFEBE9,#D7CCC8)", stars:3, plays:"3K",  badge:"pro", file:"clock.html", pts:35},
-    {id:"money",      em:"💰", name:"Pul Sanoq",      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:"math-kids.html", pts:40},
+      // ── MATH ─────────────────────────────────────────
+      {id:"math",       em:"🔢", name:{uz:"Raqamlar", ru:"Цифры", en:"Numbers"},       cat:"math",   age:"3+", tag:"Matematik",tc:"#9C27B0",bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:5, plays:"9K",  badge:"hot", file:"math-kids.html", pts:30},
+      {id:"counting",   em:"➕", name:{uz:"Qo'shish", ru:"Сложение", en:"Addition"},       cat:"math",   age:"4+", tag:"Matematik",tc:"#00BCD4",bg:"linear-gradient(135deg,#E0F7FA,#B2EBF2)", stars:4, plays:"7K",  badge:null,  file:"math-kids.html", pts:30},
+      {id:"subtract",   em:"➖", name:{uz:"Ayirish", ru:"Вычитание", en:"Subtraction"},         cat:"math",   age:"5+", tag:"Matematik",tc:"#FF5722",bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:4, plays:"5K",  badge:null,  file:"math-kids.html", pts:30},
+      {id:"shapes3d",   em:"🔷", name:{uz:"Geometrik Shakllar", ru:"Геометрические фигуры", en:"Geometric Shapes"},cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:"colors-shapes.html", pts:25},
+      {id:"clock",      em:"⏰", name:{uz:"Soat O'qish", ru:"Учимся определять время", en:"Learn to Read Clock"},    cat:"math",   age:"6+", tag:"Matematik",tc:"#795548",bg:"linear-gradient(135deg,#EFEBE9,#D7CCC8)", stars:3, plays:"3K",  badge:"pro", file:"clock.html", pts:35},
+      {id:"money",      em:"💰", name:{uz:"Pul Sanoq", ru:"Счет денег", en:"Counting Money"},      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:"math-kids.html", pts:40},
 
-    // ── COLORS ──────────────────────────────────────
-    {id:"paint",      em:"🖌️", name:"Bo'yash Kitobi",  cat:"colors", age:"2+", tag:"Ijodkorlik",tc:"#FF9800",bg:"linear-gradient(135deg,#FFF8E1,#FFECB3)", stars:5, plays:"14K",badge:"hot", file:"paint.html", pts:15},
-    {id:"mix-colors", em:"🎨", name:"Rang Aralash",    cat:"colors", age:"3+", tag:"Ranglar", tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"color-rush.html", pts:20},
-    {id:"color-sort", em:"🌀", name:"Rang Saralash",   cat:"colors", age:"4+", tag:"Mantiq",  tc:"#9C27B0", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"5K",  badge:"new", file:"color-rush.html", pts:25},
+      // ── COLORS ──────────────────────────────────────
+      {id:"paint",      em:"🖌️", name:{uz:"Bo'yash Kitobi", ru:"Книжка-раскраска", en:"Coloring Book"},  cat:"colors", age:"2+", tag:"Ijodkorlik",tc:"#FF9800",bg:"linear-gradient(135deg,#FFF8E1,#FFECB3)", stars:5, plays:"14K",badge:"hot", file:"paint.html", pts:15},
+      {id:"mix-colors", em:"🎨", name:{uz:"Rang Aralash", ru:"Смешивание цветов", en:"Color Mixing"},    cat:"colors", age:"3+", tag:"Ranglar", tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"color-rush.html", pts:20},
+      {id:"color-sort", em:"🌀", name:{uz:"Rang Saralash", ru:"Сортировка цветов", en:"Color Sorting"},   cat:"colors", age:"4+", tag:"Mantiq",  tc:"#9C27B0", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"5K",  badge:"new", file:"color-rush.html", pts:25},
 
-    // ── MUSIC ────────────────────────────────────────
-    {id:"piano",      em:"🎹", name:"Mini Piano",      cat:"music",  age:"2+", tag:"Musiqa",  tc:"#1976D2", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"10K", badge:"hot", file:"piano.html", pts:20},
-    {id:"drums",      em:"🥁", name:"Doira Chalish",   cat:"music",  age:"3+", tag:"Musiqa",  tc:"#D32F2F", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:null,  file:"piano.html", pts:20},
-    {id:"sing",       em:"🎤", name:"Qo'shiq Ayting",  cat:"music",  age:"3+", tag:"Musiqa",  tc:"#7B1FA2", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"6K",  badge:"new", file:"sing.html", pts:20},
-    {id:"rhythm",     em:"🎵", name:"Ritm O'yini",     cat:"music",  age:"4+", tag:"Musiqa",  tc:"#00796B", bg:"linear-gradient(135deg,#E0F2F1,#B2DFDB)", stars:4, plays:"5K",  badge:null,  file:"piano.html?id=rhythm", pts:25},
+      // ── MUSIC ────────────────────────────────────────
+      {id:"piano",      em:"🎹", name:{uz:"Mini Piano", ru:"Мини Пианино", en:"Mini Piano"},      cat:"music",  age:"2+", tag:"Musiqa",  tc:"#1976D2", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"10K", badge:"hot", file:"instrument.html", pts:20},
+      {id:"drums",      em:"🥁", name:{uz:"Doira Chalish", ru:"Барабаны", en:"Drums"},   cat:"music",  age:"3+", tag:"Musiqa",  tc:"#D32F2F", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:null,  file:"instrument.html?id=drums", pts:20},
+      {id:"sing",       em:"🎤", name:{uz:"Qo'shiq Ayting", ru:"Пойте песни", en:"Sing Songs"},  cat:"music",  age:"3+", tag:"Musiqa",  tc:"#7B1FA2", bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:4, plays:"6K",  badge:"new", file:"sing.html", pts:20},
+      {id:"rhythm",     em:"🎵", name:{uz:"Ritm O'yini", ru:"Ритм Игры", en:"Rhythm Game"},     cat:"music",  age:"4+", tag:"Musiqa",  tc:"#00796B", bg:"linear-gradient(135deg,#E0F2F1,#B2DFDB)", stars:4, plays:"5K",  badge:null,  file:"instrument.html?id=xylo", pts:25},
 
-    // ── PUZZLE ──────────────────────────────────────
-    {id:"memory",     em:"🧠", name:"Xotira O'yini",   cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#1565C0", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"11K", badge:"hot", file:"memory-game.html", pts:30},
-    {id:"jigsaw",     em:"🧩", name:"Puzzle",          cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#558B2F", bg:"linear-gradient(135deg,#F1F8E9,#DCEDC8)", stars:4, plays:"8K",  badge:null,  file:"jigsaw.html", pts:30},
-    {id:"maze",       em:"🌀", name:"Labirint",        cat:"puzzle", age:"5+", tag:"Mantiq",  tc:"#E65100", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:4, plays:"6K",  badge:"new", file:"maze.html", pts:35},
-    {id:"match",      em:"🔍", name:"Juft Topish",     cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#880E4F", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"7K",  badge:null,  file:"match.html", pts:25},
-    {id:"shadow",     em:"👤", name:"Soya Topish",     cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#37474F", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:3, plays:"4K",  badge:null,  file:"shadow.html", pts:25},
+      // ── PUZZLE ──────────────────────────────────────
+      {id:"memory",     em:"🧠", name:{uz:"Xotira O'yini", ru:"Игра на память", en:"Memory Game"},   cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#1565C0", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:5, plays:"11K", badge:"hot", file:"memory-game.html", pts:30},
+      {id:"jigsaw",     em:"🧩", name:{uz:"Puzzle", ru:"Пазлы", en:"Jigsaw Puzzle"},          cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#558B2F", bg:"linear-gradient(135deg,#F1F8E9,#DCEDC8)", stars:4, plays:"8K",  badge:null,  file:"jigsaw.html", pts:30},
+      {id:"maze",       em:"🌀", name:{uz:"Labirint", ru:"Лабиринт", en:"Maze"},        cat:"puzzle", age:"5+", tag:"Mantiq",  tc:"#E65100", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:4, plays:"6K",  badge:"new", file:"maze.html", pts:35},
+      {id:"match",      em:"🔍", name:{uz:"Juft Topish", ru:"Найди пару", en:"Match Pair"},     cat:"puzzle", age:"3+", tag:"Mantiq",  tc:"#880E4F", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"7K",  badge:null,  file:"match.html", pts:25},
+      {id:"shadow",     em:"👤", name:{uz:"Soya Topish", ru:"Найди тень", en:"Find Shadow"},     cat:"puzzle", age:"4+", tag:"Mantiq",  tc:"#37474F", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:3, plays:"4K",  badge:null,  file:"shadow.html", pts:25},
 
-    // ── SPORT & NATURE ──────────────────────────────
-    {id:"soccer",     em:"⚽", name:"Mini Futbol",     cat:"sport",  age:"4+", tag:"Sport",   tc:"#2E7D32", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"13K", badge:"hot", file:"soccer.html", pts:20},
-    {id:"jump-rope",  em:"🪢", name:"Arqon Sakrash",  cat:"sport",  age:"5+", tag:"Sport",   tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"5K",  badge:null,  file:"bubble-pop.html", pts:20},
-    {id:"plants",     em:"🌱", name:"O'simliklar",    cat:"nature", age:"3+", tag:"Tabiat",  tc:"#388E3C", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"5K",  badge:"new", file:"plants.html", pts:20},
-    {id:"weather",    em:"🌤️", name:"Ob-Havo",        cat:"nature", age:"4+", tag:"Tabiat",  tc:"#0288D1", bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:4, plays:"4K",  badge:null,  file:"weather.html", pts:20},
-    {id:"bubble-pop", em:"🫧", name:"Bubble Pop",     cat:"sport",  age:"2+", tag:"Qiziqarli",tc:"#0288D1",bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:5, plays:"15K", badge:"hot", file:"bubble-pop.html", pts:15},
-  ];
-
-  // ════════════════════════════════════════════════════
-  // TRANSLATIONS (UZ/RU/EN)
-  // ════════════════════════════════════════════════════
-  const T = {
-    uz: {
-      heroH:"O'ynang va<br>O'rganing! 🎯",
-      heroP:"30 ta qiziqarli o'yin<br>3 tilda: UZ · RU · EN",
-      catTitle:"Kategoriyalar",
-      gridTitle:"Barcha O'yinlar",
-      nb:["Bosh","O'ynash","O'rganish","Yutuqlar","Ota-ona"],
-      soon:"⏳ Tez orada chiqadi!",
-      locked:"🔒 Bu o'yin yoshingiz uchun emas",
-      back:"← Orqaga",
-      lvNames:["Yangi O'yinchi","Qiziquvchan","Aqlli Bola","Super Yulduz","Ustaxona","Genius!"],
-    },
-    ru: {
-      heroH:"Играй и Учись! 🎯",
-      heroP:"30 увлекательных игр · 3 языка",
-      catTitle:"Категории",
-      gridTitle:"Все Игры",
-      nb:["Главная","Играть","Учиться","Достижения","Родители"],
-      soon:"⏳ Скоро выйдет!",
-      locked:"🔒 Эта игра не для вашего возраста",
-      back:"← Назад",
-      lvNames:["Новичок","Любопытный","Умный","Суперзвезда","Мастер","Гений!"],
-    },
-    en: {
-      heroH:"Play & Learn! 🎯",
-      heroP:"30 fun games · 3 languages",
-      catTitle:"Categories",
-      gridTitle:"All Games",
-      nb:["Home","Play","Learn","Stars","Parents"],
-      soon:"⏳ Coming soon!",
-      locked:"🔒 This game is for older players",
-      back:"← Back",
-      lvNames:["Newcomer","Curious","Smart Kid","Superstar","Master","Genius!"],
-    },
-  };
-
-  // ════════════════════════════════════════════════════
-  // ADMOB JS BRIDGE
-  // Java → JS callback: window.onRewardGranted(amount)
-  // ════════════════════════════════════════════════════
-  window.onRewardGranted = function(amount) {
-    // Java rewardedAd.show() tugagandan keyin chaqiriladi
-    const bonus = amount || 50;
-    addPts(bonus);
-    showToast("🎁 +" + bonus + " ⭐ Bonus yulduz olindi!");
-    setTimeout(() => showReward(bonus), 400);
-  };
-
-  // Rewarded reklama tugmasi
-  function watchRewardedAd() {
-    if (window.AndroidAdMob && window.AndroidAdMob.showRewarded) {
-      showToast("⏳ Reklama yuklanmoqda...");
-      window.AndroidAdMob.showRewarded();
-    } else {
-      // Brauzerda test: to'g'ridan-to'g'ri mukofot ber
-      window.onRewardGranted(50);
-    }
-  }
-
-  // ════════════════════════════════════════════════════
-  // STATE
-  // ════════════════════════════════════════════════════
-  let lang = localStorage.getItem("kz-lang") || "en";
-  let age  = localStorage.getItem("kz-age")  || "2-4";
-  let pts  = parseInt(localStorage.getItem("kz-pts") || "0");
-  let isMuted = localStorage.getItem("kz-muted") === "true";
-  let cat  = "all";
-  let gameCount = 0;
-
-  // ════════════════════════════════════════════════════
-  // MUSIC CONTROL
-  // ════════════════════════════════════════════════════
-  function toggleMusic() {
-    isMuted = !isMuted;
-    localStorage.setItem("kz-muted", isMuted);
-    updateMusicUI();
-    if (window.AndroidAdMob && window.AndroidAdMob.toggleMusic) {
-      window.AndroidAdMob.toggleMusic(isMuted);
-    }
-  }
-
-  function updateMusicUI() {
-    document.getElementById("music-ic").textContent = isMuted ? "🔇" : "🔊";
-  }
-
-  // ════════════════════════════════════════════════════
-  // LANGUAGE SYSTEM
-  // ════════════════════════════════════════════════════
-    function updateLangUI() {
-      const t = T[lang];
-      document.getElementById("hero-h").innerHTML = t.heroH;
-      document.getElementById("hero-p").innerHTML = t.heroP;
-      document.getElementById("cat-title").textContent = t.catTitle;
-      document.getElementById("grid-title").textContent = t.gridTitle;
-
-      // Update modal titles and static text
-      const ageModalTitle = document.querySelector('#age-modal .modal-title');
-      if (ageModalTitle) ageModalTitle.textContent = lang === 'en' ? '🎂 Age Selection' : lang === 'ru' ? '🎂 Выбор возраста' : '🎂 Yoshni tanlang';
-
-      const langModalTitle = document.querySelector('#lang-modal .modal-title');
-      if (langModalTitle) langModalTitle.textContent = lang === 'en' ? '🌍 Select Language' : lang === 'ru' ? '🌍 Выбор языка' : '🌍 Tilni tanlang';
-
-      // Nav labels
-      for(let i=0; i<5; i++) {
-          const el = document.getElementById("nb"+i);
-          if(el) el.textContent = t.nb[i];
-      }
-
-      // Featured and Grid reload
-      buildFeatured();
-      buildGrid(cat);
-    }
-
-  function setLang(l) {
-    lang = l;
-    localStorage.setItem("kz-lang", l);
-    updateLangUI();
-
-    // Update active visual for language card
-    document.querySelectorAll('#lang-modal .age-card').forEach(c => c.classList.remove('sel'));
-    document.getElementById('lc-' + l)?.classList.add('sel');
-
-    const flags = {en:"🇬🇧 EN", ru:"🇷🇺 RU", uz:"🇺🇿 UZ"};
-    document.getElementById("lang-cur").textContent = flags[l];
-
-    showToast(l === "en" ? "English language selected" : l === "ru" ? "Русский язык выбран" : "O'zbek tili tanlandi");
-  }
-
-  // ════════════════════════════════════════════════════
-  // LEVEL SYSTEM
-  // ════════════════════════════════════════════════════
-  function getLevelData(p) {
-    const t = T[lang];
-    const levels = [
-      {min:0,   max:100,  idx:0, icon:"🌱"},
-      {min:100, max:300,  idx:1, icon:"🌟"},
-      {min:300, max:600,  idx:2, icon:"🏅"},
-      {min:600, max:1000, idx:3, icon:"🥇"},
-      {min:1000,max:2000, idx:4, icon:"👑"},
-      {min:2000,max:9999, idx:5, icon:"🧠"},
+      // ── SPORT & NATURE ──────────────────────────────
+      {id:"soccer",     em:"⚽", name:{uz:"Mini Futbol", ru:"Мини-футбол", en:"Mini Soccer"},     cat:"sport",  age:"4+", tag:"Sport",   tc:"#2E7D32", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"13K", badge:"hot", file:"soccer.html", pts:20},
+      {id:"jump-rope",  em:"🪢", name:{uz:"Arqon Sakrash", ru:"Скакалка", en:"Jump Rope"},  cat:"sport",  age:"5+", tag:"Sport",   tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"5K",  badge:null,  file:"jump-rope.html", pts:20},
+      {id:"plants",     em:"🌱", name:{uz:"O'simliklar", ru:"Растения", en:"Plants"},    cat:"nature", age:"3+", tag:"Tabiat",  tc:"#388E3C", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"5K",  badge:"new", file:"plants.html", pts:20},
+      {id:"weather",    em:"🌤️", name:{uz:"Ob-Havo", ru:"Погода", en:"Weather"},        cat:"nature", age:"4+", tag:"Tabiat",  tc:"#0288D1", bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:4, plays:"4K",  badge:null,  file:"weather.html", pts:20},
+      {id:"bubble-pop", em:"🫧", name:{uz:"Bubble Pop", ru:"Пузырьки", en:"Bubble Pop"},     cat:"sport",  age:"2+", tag:"Qiziqarli",tc:"#0288D1",bg:"linear-gradient(135deg,#E1F5FE,#B3E5FC)", stars:5, plays:"15K", badge:"hot", file:"bubble-pop.html", pts:15},
+      {id:"family-adv", em:"🌈", name:{uz:"Family Adventure", ru:"Семейное приключение", en:"Family Adventure"}, cat:"sport", age:"3+", tag:"Co-op",   tc:"#FF6B35", bg:"linear-gradient(135deg,#FFE8DE,#FF6B35)", stars:5, plays:"1K",  badge:"new", file:"family-adventure.html", pts:30},
+      {id:"coop-draw",  em:"🎨", name:{uz:"Co-op Draw", ru:"Рисуем вместе", en:"Co-op Draw"},      cat:"colors", age:"2+", tag:"Co-op",   tc:"#E71D8E", bg:"linear-gradient(135deg,#FCE4EC,#E71D8E)", stars:5, plays:"1K",  badge:"new", file:"co-op-draw.html", pts:20},
     ];
-    const lv = levels.find(l=>p>=l.min && p<l.max) || levels[levels.length-1];
-    const pct = Math.min(100,((p-lv.min)/(lv.max-lv.min))*100);
-    return {...lv, name:lv.icon+" "+t.lvNames[lv.idx], pct, next:lv.max};
-  }
 
-  function updateLevel() {
-    const lv = getLevelData(pts);
-    document.getElementById("lv-name").textContent = lv.name;
-    document.getElementById("lv-sub").textContent = `${pts} / ${lv.next} ball`;
-    document.getElementById("lv-bar").style.width = lv.pct+"%";
-    document.getElementById("lv-pts").textContent = pts;
-    document.getElementById("stars-val").textContent = pts;
-  }
+    // ════════════════════════════════════════════════════
+    // TRANSLATIONS (UZ/RU/EN)
+    // ════════════════════════════════════════════════════
+    const T = {
+      uz: {
+        heroH:"O'ynang va<br>O'rganing! 🎯",
+        heroP:"30 ta qiziqarli o'yin<br>3 tilda: UZ · RU · EN",
+        catTitle:"Kategoriyalar",
+        gridTitle:"Barcha O'yinlar",
+        featTitle:"Eng Mashhur",
+        nb:["Bosh","O'ynash","O'rganish","Yutuqlar","Ota-ona"],
+        cats: ["Hammasi", "O'rganish", "Matematik", "Ranglar", "Musiqa", "Bosh qotirma", "Sport", "Tabiat"],
+        soon:"⏳ Tez orada chiqadi!",
+        locked:"🔒 Bu o'yin yoshingiz uchun emas",
+        back:"← Orqaga",
+        lvNames:["Yangi O'yinchi","Qiziquvchan","Aqlli Bola","Super Yulduz","Ustaxona","Genius!"],
+        rewardTitle:"Ajoyib!", rewardSub:"Zo'r o'yndingiz!",
+        plays:"o'yin", ageModal:"🎂 Yoshni tanlang", langModal:"🌍 Tilni tanlang",
+      },
+      ru: {
+        heroH:"Играй и Учись! 🎯",
+        heroP:"30 увлекательных игр · 3 языка",
+        catTitle:"Категории",
+        gridTitle:"Все Игры",
+        featTitle:"Самые Популярные",
+        nb:["Главная","Играть","Учиться","Достижения","Родители"],
+        cats: ["Все", "Обучение", "Математика", "Цвета", "Музыка", "Пазлы", "Спорт", "Природа"],
+        soon:"⏳ Скоро выйдет!",
+        locked:"🔒 Эта игра не для вашего возраста",
+        back:"← Назад",
+        lvNames:["Новичок","Любопытный","Умный","Суперзвезда","Мастер","Гений!"],
+        rewardTitle:"Отлично!", rewardSub:"Ты молодец!",
+        plays:"игр", ageModal:"🎂 Выбор возраста", langModal:"🌍 Выбор языка",
+      },
+      en: {
+        heroH:"Play & Learn! 🎯",
+        heroP:"30 fun games · 3 languages",
+        catTitle:"Categories",
+        gridTitle:"All Games",
+        featTitle:"Most Popular",
+        nb:["Home","Play","Learn","Stars","Parents"],
+        cats: ["All", "Learn", "Math", "Colors", "Music", "Puzzles", "Sport", "Nature"],
+        soon:"⏳ Coming soon!",
+        locked:"🔒 This game is for older players",
+        back:"← Back",
+        lvNames:["Newcomer","Curious","Smart Kid","Superstar","Master","Genius!"],
+        rewardTitle:"Great job!", rewardSub:"You played well!",
+        plays:"plays", ageModal:"🎂 Age Selection", langModal:"🌍 Select Language",
+      },
+    };
 
-  function addPts(n) {
-    pts += n;
-    localStorage.setItem("kz-pts", pts);
-    updateLevel();
-  }
+    // Bridge functions for UI interactions
+    function toggleMusic() { app.toggleMusic(); }
+    function openModal(id) { app.ui.openModal(id); }
+    function closeModal(id) { app.ui.closeModal(id); }
+    function setLang(l) { app.setLang(l); }
+    function setAge(a, el) { app.setAge(a, el); }
+    function openGame(g, locked) { app.openGame(g, locked); }
+    function closeGame() { app.closeGame(); }
+    function closeReward() { app.ui.closeModal('reward-screen'); }
+    function navTo(pg) { app.navTo(pg); }
+    function pinTap(v) { app.pinTap(v); }
+    function toggleFS() { app.toggleFS(); }
+    function filterCat(c, el) { app.filterCat(c, el); }
+    function showToast(m) { app.ui.showToast(m); }
 
-  // ════════════════════════════════════════════════════
-  // BUILD UI
-  // ════════════════════════════════════════════════════
-  function buildFeatured() {
-    const row = document.getElementById("featured-row");
-    const top5 = GAMES.filter(g=>g.badge==="hot").slice(0,5);
-    row.innerHTML = "";
-    top5.forEach(g => {
-      const stars = "★".repeat(g.stars) + "☆".repeat(5-g.stars);
-      const div = document.createElement("div");
-      div.className = "feat-card";
-      div.onclick = () => openGame(g);
-      div.innerHTML = `
+    // Legacy sync (will be fully integrated into GameManager)
+    function updateLangUI() {
+        const t = T[app.translator.lang];
+        document.getElementById("hero-h").innerHTML = t.heroH;
+        document.getElementById("hero-p").innerHTML = t.heroP;
+        document.getElementById("cat-title").textContent = t.catTitle;
+        document.getElementById("grid-title").textContent = t.gridTitle;
+
+        const featTitleEl = document.querySelector('.sec-hdr .sec-title');
+        if (featTitleEl) featTitleEl.textContent = t.featTitle;
+
+        // Categories Row
+        const catChips = document.querySelectorAll('.cat-chip');
+        const catIcons = ["🎮", "📚", "🔢", "🎨", "🎵", "🧩", "⚽", "🌿"];
+        catChips.forEach((chip, idx) => {
+            if (t.cats[idx]) {
+                chip.innerHTML = `<span class="ch-em">${catIcons[idx]}</span>${t.cats[idx]}`;
+            }
+        });
+
+        const ageModalTitle = document.querySelector('#age-modal .modal-title');
+        if (ageModalTitle) ageModalTitle.textContent = t.ageModal;
+
+        const langModalTitle = document.querySelector('#lang-modal .modal-title');
+        if (langModalTitle) langModalTitle.textContent = t.langModal;
+
+        for(let i=0; i<5; i++) {
+            const el = document.getElementById("nb"+i);
+            if(el) el.textContent = t.nb[i];
+        }
+
+        buildFeatured();
+        buildGrid(app.cat || 'all');
+    }
+
+    function buildFeatured() {
+        const row = document.getElementById("featured-row");
+        const top5 = GAMES.filter(g=>g.badge==="hot").slice(0,5);
+        row.innerHTML = "";
+        top5.forEach(g => {
+            const div = document.createElement("div");
+            div.className = "feat-card";
+            div.onclick = () => openGame(g);
+            const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
+            div.innerHTML = `
         ${g.badge==="hot"?'<div class="feat-badge-hot">🔥 TOP</div>':''}
-        ${g.badge==="new"?'<div class="feat-badge-new">🆕 NEW</div>':''}
         <div class="feat-art" style="background:${g.bg}">
           <div class="feat-em">${g.em}</div>
         </div>
         <div class="feat-info">
-          <div class="feat-name">${g.name}</div>
+          <div class="feat-name">${localizedName}</div>
           <div class="feat-meta">
             <span class="feat-tag" style="background:${g.tc}22;color:${g.tc}">${g.tag}</span>
             <span class="feat-age">👤 ${g.age}</span>
           </div>
           <div class="feat-stars">
             ${[1,2,3,4,5].map(i=>`<span class="${i<=g.stars?'star-filled':'star-empty'}">★</span>`).join("")}
-            <span class="feat-plays">${g.plays} o'yin</span>
+            <span class="feat-plays">${g.plays} ${app.translator.get('plays')}</span>
           </div>
         </div>`;
-      row.appendChild(div);
-    });
-  }
+            row.appendChild(div);
+        });
+    }
 
-  function buildGrid(filter="all") {
-    const grid = document.getElementById("game-grid");
-    const list = filter==="all" ? GAMES : GAMES.filter(g=>g.cat===filter);
-    grid.innerHTML = "";
-    document.getElementById("grid-count").textContent = list.length+" ta";
-    document.getElementById("grid-title").textContent = T[lang].gridTitle;
+    function buildGrid(filter="all") {
+        const grid = document.getElementById("game-grid");
+        const list = filter==="all" ? GAMES : GAMES.filter(g=>g.cat===filter);
+        grid.innerHTML = "";
+        document.getElementById("grid-count").textContent = list.length+" ta";
+        document.getElementById("grid-title").textContent = T[app.translator.lang].gridTitle;
 
-    list.forEach(g => {
-      // Age check
-      const ageMin = parseInt(g.age);
-      const userAgeMin = parseInt(age.split("-")[0]);
-      const isLocked = ageMin > userAgeMin + 4;
+        list.forEach(g => {
+            const ageMin = parseInt(g.age);
+            const userAgeMin = parseInt(app.age.split("-")[0]);
+            const isLocked = ageMin > userAgeMin + 4;
 
-      const card = document.createElement("div");
-      card.className = "gc";
-      card.onclick = () => openGame(g, isLocked);
+            const card = document.createElement("div");
+            card.className = "gc";
+            card.onclick = () => openGame(g, isLocked);
 
-      // Progress from localStorage
-      const progress = parseInt(localStorage.getItem("kz-prog-"+g.id)||"0");
-      const prog56 = 56.5 - (progress/100)*56.5;
+            const progress = parseInt(localStorage.getItem("kz-prog-"+g.id)||"0");
+            const prog56 = 56.5 - (progress/100)*56.5;
+            const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
 
-      card.innerHTML = `
+            card.innerHTML = `
         <div class="gc-art" style="background:${g.bg}">
           <div class="gc-em">${g.em}</div>
           ${isLocked?'<div class="gc-lock">🔒</div>':''}
@@ -1302,238 +1237,34 @@
           </div>`:''}
         </div>
         <div class="gc-info">
-          <div class="gc-nm">${g.name}</div>
+          <div class="gc-nm">${localizedName}</div>
           <div class="gc-stars">
             ${[1,2,3,4,5].map(i=>`<span class="${i<=g.stars?"gs-f":"gs-e"}">★</span>`).join("")}
           </div>
         </div>`;
-      grid.appendChild(card);
-    });
-  }
-
-  // ════════════════════════════════════════════════════
-  // GAME OPEN / CLOSE
-  // ════════════════════════════════════════════════════
-  function openGame(g, locked=false) {
-    if (locked) { showToast(T[lang].locked); return; }
-
-    if (!g.file) {
-      showToast(T[lang].soon);
-      addPts(5); // Tapping = learning!
-      return;
+            grid.appendChild(card);
+        });
     }
 
-    document.getElementById("gv-title").textContent = g.em+" "+g.name;
-    document.getElementById("gvb-txt").textContent = T[lang].back.replace("← ","");
-
-    // Pass language to the game
-    const gameUrl = g.file.includes("?") ? `${g.file}&lang=${lang}` : `${g.file}?lang=${lang}`;
-    document.getElementById("gv-frame").src = gameUrl;
-    document.getElementById("gv").classList.remove("h");
-
-    gameCount++;
-    // Android AdMob bridge
-    if (window.AndroidAdMob) {
-      window.AndroidAdMob.showInterstitial(); // Java ichida har 3 da chiqadi
-      window.AndroidAdMob.hideBanner();       // O'yin ochilganda bannerni yashir
-      window.AndroidAdMob.gameOpened(g.id);  // Log uchun
-    }
-  }
-
-  function closeGame() {
-    document.getElementById("gv").classList.add("h");
-    document.getElementById("gv-frame").src="";
-
-    // O'yin yopilganda bannerni qayta ko'rsat
-    if (window.AndroidAdMob) {
-      window.AndroidAdMob.showBanner();
-    }
-
-    // Mukofot ko'rsat
-    const game = GAMES.find(g=>document.getElementById("gv-title").textContent.includes(g.em));
-    if (game) {
-      addPts(game.pts || 20);
-      setTimeout(() => showReward(game.pts||20), 300);
-    }
-  }
-
-  function toggleFS() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-    else document.exitFullscreen?.();
-  }
-
-  // ════════════════════════════════════════════════════
-  // REWARD SCREEN
-  // ════════════════════════════════════════════════════
-  function showReward(ptsEarned) {
-    const stars = ptsEarned >= 40 ? "⭐⭐⭐" : ptsEarned >= 25 ? "⭐⭐" : "⭐";
-    const titles = {uz:"Zo'r o'yndingiz!",ru:"Отлично!",en:"Great job!"};
-    document.getElementById("rw-stars").textContent = stars;
-    document.getElementById("rw-title").textContent = titles[lang];
-    document.getElementById("rw-sub").textContent = "Ball yig'dingiz!";
-    document.getElementById("rw-pts").textContent = "+"+ptsEarned+" ⭐";
-    document.getElementById("reward-screen").classList.remove("h");
-
-    // Fireworks
-    for (let i=0;i<8;i++) {
-      setTimeout(()=>{
-        const em = ["🎉","⭐","✨","🌟","🎊"][Math.floor(Math.random()*5)];
-        const el = document.createElement("div");
-        el.style.cssText=`position:fixed;z-index:500;font-size:28px;pointer-events:none;
-          left:${20+Math.random()*60}vw;top:${10+Math.random()*50}vh;
-          animation:fall .8s ease-out forwards`;
-        el.textContent=em;
-        document.body.appendChild(el);
-        setTimeout(()=>el.remove(),800);
-      }, i*100);
-    }
-  }
-
-  function closeReward() {
-    document.getElementById("reward-screen").classList.add("h");
-  }
-
-  // ════════════════════════════════════════════════════
-  // FILTER / NAV
-  // ════════════════════════════════════════════════════
-  function filterCat(c, el) {
-    cat = c;
-    document.querySelectorAll(".cat-chip").forEach(x=>x.classList.remove("active"));
-    el.classList.add("active");
-    buildGrid(c);
-  }
-
-  function navTo(pg) {
-    document.querySelectorAll(".ni").forEach(n=>n.classList.remove("on"));
-    document.getElementById("ni-"+pg)?.classList.add("on");
-    const msgs = {
-      play:"🎮 O'ynash rejimi",
-      learn:"📚 O'rganish rejimi",
-      stars:"⭐ Yutuqlaringiz: "+pts+" ball",
-      home:""
-    };
-    if (msgs[pg]) showToast(msgs[pg]);
-  }
-
-  // ════════════════════════════════════════════════════
-  // MODALS
-  // ════════════════════════════════════════════════════
-  function openModal(id) {
-    document.getElementById(id).classList.remove("h");
-  }
-  function closeModal(id) {
-    document.getElementById(id).classList.add("h");
-  }
-
-  function setAge(a, el) {
-    age = a;
-    localStorage.setItem("kz-age", a);
-    document.querySelectorAll(".age-card").forEach(x=>x.classList.remove("sel"));
-    el.classList.add("sel");
-    document.getElementById("age-btn").textContent = `👶 ${a} ▾`;
-    buildGrid(cat);
-    showToast("✅ Yosh: "+a+" saqlandi");
-  }
-
-  // PIN
-  let pinEntry = "";
-  const PIN = "1234";
-  function pinTap(v) {
-    if (v === "←") {
-      pinEntry = pinEntry.slice(0,-1);
-    } else {
-      if (pinEntry.length >= 4) return;
-      pinEntry += v;
-    }
-    for (let i=1;i<=4;i++) {
-      const d = document.getElementById("pd"+i);
-      d.classList.toggle("filled", i<=pinEntry.length);
-      d.textContent = i<=pinEntry.length ? "●" : "";
-    }
-    if (pinEntry.length === 4) {
-      setTimeout(()=>{
-        if (pinEntry === PIN) {
-          closeModal("parent-modal");
-          showToast("🔓 Ota-ona rejimi ochildi!");
-        } else {
-          showToast("❌ PIN noto'g'ri! (Maslahat: 1234)");
-          pinEntry="";
-          for(let i=1;i<=4;i++){
-            const d=document.getElementById("pd"+i);
-            d.classList.remove("filled");d.textContent="";
-          }
+    // Hero emoji rotation
+    const heroEmojis = ["🎮","🌈","🦋","🎪","🚀","🌟","🎨","🎭","🦄","🐉"];
+    let heroIdx = 0;
+    setInterval(()=>{
+        heroIdx = (heroIdx+1) % heroEmojis.length;
+        const em = document.getElementById("hero-em");
+        if(em) {
+            em.style.transform = "scale(0.5) rotate(180deg)";
+            em.style.opacity = "0";
+            setTimeout(()=>{
+                em.textContent = heroEmojis[heroIdx];
+                em.style.transform = "";
+                em.style.opacity = "";
+                em.style.transition = "all .4s cubic-bezier(.34,1.56,.64,1)";
+            }, 300);
         }
-      }, 300);
-    }
-  }
+    }, 3000);
 
-  // ════════════════════════════════════════════════════
-  // TOAST
-  // ════════════════════════════════════════════════════
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent=msg; t.classList.add("s");
-    setTimeout(()=>t.classList.remove("s"), 2500);
-  }
+  </script>
 
-  // ════════════════════════════════════════════════════
-  // DAILY HEROES (rotate hero emoji)
-  // ════════════════════════════════════════════════════
-  const heroEmojis = ["🎮","🌈","🦋","🎪","🚀","🌟","🎨","🎭","🦄","🐉"];
-  let heroIdx = 0;
-  setInterval(()=>{
-    heroIdx = (heroIdx+1) % heroEmojis.length;
-    const em = document.getElementById("hero-em");
-    em.style.transform = "scale(0.5) rotate(180deg)";
-    em.style.opacity = "0";
-    setTimeout(()=>{
-      em.textContent = heroEmojis[heroIdx];
-      em.style.transform = "";
-      em.style.opacity = "";
-      em.style.transition = "all .4s cubic-bezier(.34,1.56,.64,1)";
-    }, 300);
-  }, 3000);
-
-  // ════════════════════════════════════════════════════
-  // CSS ANIMATION for fireworks
-  // ════════════════════════════════════════════════════
-  const style = document.createElement("style");
-  style.textContent = `
-  @keyframes fall {
-    0%   {transform:translate(0,0) rotate(0) scale(0.5);opacity:1}
-    100% {transform:translate(${Math.random()>0.5?'':'-'}40px,60px) rotate(360deg) scale(1.2);opacity:0}
-  }`;
-  document.head.appendChild(style);
-
-  // ════════════════════════════════════════════════════
-  // INIT
-  // ════════════════════════════════════════════════════
-  window.addEventListener("load", ()=>{
-    updateLevel();
-    updateLangUI(); // Set initial language UI
-    updateMusicUI(); // Set initial music UI
-
-    // Initial sync with Android if needed
-    if (isMuted && window.AndroidAdMob && window.AndroidAdMob.toggleMusic) {
-        window.AndroidAdMob.toggleMusic(true);
-    }
-
-    // Set initial language selector state
-    const currentFlags = {en:"🇬🇧 EN", ru:"🇷🇺 RU", uz:"🇺🇿 UZ"};
-    document.getElementById("lang-cur").textContent = currentFlags[lang];
-    document.getElementById('lc-' + lang)?.classList.add('sel');
-
-    buildFeatured();
-    buildGrid();
-    document.getElementById("age-btn").textContent = `👶 ${age} ▾`;
-
-    // Hide loader
-    setTimeout(()=>{
-      document.getElementById("loader").classList.add("h");
-    }, 1400);
-  });
-
-  window.addEventListener("resize", ()=>buildGrid(cat));
-</script>
 </body>
 </html>
