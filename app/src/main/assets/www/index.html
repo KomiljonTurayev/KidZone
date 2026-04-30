@@ -860,6 +860,9 @@
         <div class="pin-key" onclick="pinTap(0)">0</div>
         <div class="pin-key" onclick="closeModal('parent-modal')">✕</div>
       </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="https://KomiljonTurayev.github.io/KidZone/privacy/kidzone-privacy.html" id="privacy-link" target="_blank" style="color: var(--md-primary); font-size: 13px; font-weight: 800; text-decoration: none;">🔒 Privacy Policy</a>
+      </div>
     </div>
   </div>
 </div>
@@ -1079,17 +1082,17 @@
     // ════════════════════════════════════════════════════
     const T = {
       uz: {
-        heroH:"O'ynang va<br>O'rganing! 🎯",
-        heroP:"30 ta qiziqarli o'yin<br>3 tilda: UZ · RU · EN",
-        catTitle:"Kategoriyalar",
-        gridTitle:"Barcha O'yinlar",
+        heroH:"Oila bilan birga<br>O'ynang! 👨‍👩‍👧",
+        heroP:"Farzandingiz bilan birga o'rganing va yutuqlarga erishing",
+        catTitle:"Birgalikda o'ynaymiz",
+        gridTitle:"Oila uchun o'yinlar",
         featTitle:"Eng Mashhur",
-        nb:["Bosh","O'ynash","O'rganish","Yutuqlar","Ota-ona"],
+        nb:["Asosiy","Oila","O'rganish","Yulduzlar","Ota-ona"],
         cats: ["Hammasi", "O'rganish", "Matematik", "Ranglar", "Musiqa", "Bosh qotirma", "Sport", "Tabiat"],
         soon:"⏳ Tez orada chiqadi!",
         locked:"🔒 Bu o'yin yoshingiz uchun emas",
         back:"← Orqaga",
-        lvNames:["Yangi O'yinchi","Qiziquvchan","Aqlli Bola","Super Yulduz","Ustaxona","Genius!"],
+        lvNames:["Yangi Oila","Hamkorlar","Aqlli Jamoa","Super Jamoa","Oila Ustasi","Genius Oila!"],
         rewardTitle:"Ajoyib!", rewardSub:"Zo'r o'yndingiz!",
         plays:"o'yin", ageModal:"🎂 Yoshni tanlang", langModal:"🌍 Tilni tanlang",
         chTitle:"Bugungi Vazifa!", chSub:"5 ta o'yin o'yna → 100 ⭐ yut!", chBtn:"Boshlash",
@@ -1099,19 +1102,20 @@
         ageSave:"✅ Saqlash", langClose:"✅ Yopish",
         parentTitle:"Ota-ona rejimi", parentDesc:"Farzandingiz o'yin vaqtini va reklamalarni boshqaring",
         rewardBtn:"🎮 Davom etish",
+        privacy:"🔒 Maxfiylik siyosati",
       },
       ru: {
-        heroH:"Играй и Учись! 🎯",
-        heroP:"30 увлекательных игр · 3 языка",
-        catTitle:"Категории",
-        gridTitle:"Все Игры",
+        heroH:"Играйте всей<br>Семьей! 👨‍👩‍👧",
+        heroP:"Учитесь и побеждайте вместе с вашим ребенком",
+        catTitle:"Играем вместе",
+        gridTitle:"Семейные игры",
         featTitle:"Самые Популярные",
-        nb:["Главная","Играть","Учиться","Достижения","Родители"],
+        nb:["Главная","Семья","Учиться","Звезды","Родители"],
         cats: ["Все", "Обучение", "Математика", "Цвета", "Музыка", "Пазлы", "Спорт", "Природа"],
         soon:"⏳ Скоро выйдет!",
         locked:"🔒 Эта игра не для вашего возраста",
         back:"← Назад",
-        lvNames:["Новичок","Любопытный","Умный","Суперзвезда","Мастер","Гений!"],
+        lvNames:["Новая Семья","Партнеры","Умная Команда","Супер Команда","Мастера","Гениальная Семья!"],
         rewardTitle:"Отлично!", rewardSub:"Ты молодец!",
         plays:"игр", ageModal:"🎂 Выбор возраста", langModal:"🌍 Выбор языка",
         chTitle:"Задача дня!", chSub:"Сыграй 5 игр → 100 ⭐!", chBtn:"Начать",
@@ -1121,19 +1125,20 @@
         ageSave:"✅ Сохранить", langClose:"✅ Закрыть",
         parentTitle:"Родительский режим", parentDesc:"Управляйте временем игры и рекламой",
         rewardBtn:"🎮 Продолжить",
+        privacy:"🔒 Политика конфиденциальности",
       },
       en: {
-        heroH:"Play & Learn! 🎯",
-        heroP:"30 fun games · 3 languages",
-        catTitle:"Categories",
-        gridTitle:"All Games",
+        heroH:"Play Together<br>with Family! 👨‍👩‍👧",
+        heroP:"Learn and achieve results together with your child",
+        catTitle:"Co-op Games",
+        gridTitle:"Games for Family",
         featTitle:"Most Popular",
-        nb:["Home","Play","Learn","Stars","Parents"],
+        nb:["Home","Family","Learn","Stars","Parents"],
         cats: ["All", "Learn", "Math", "Colors", "Music", "Puzzles", "Sport", "Nature"],
         soon:"⏳ Coming soon!",
         locked:"🔒 This game is for older players",
         back:"← Back",
-        lvNames:["Newcomer","Curious","Smart Kid","Superstar","Master","Genius!"],
+        lvNames:["New Family","Partners","Smart Team","Super Team","Family Masters","Genius Family!"],
         rewardTitle:"Great job!", rewardSub:"You played well!",
         plays:"plays", ageModal:"🎂 Age Selection", langModal:"🌍 Select Language",
         chTitle:"Today's Challenge!", chSub:"Play 5 games → 100 ⭐!", chBtn:"Start",
@@ -1143,6 +1148,7 @@
         ageSave:"✅ Save", langClose:"✅ Close",
         parentTitle:"Parent Mode", parentDesc:"Manage play time and advertisements",
         rewardBtn:"🎮 Continue",
+        privacy:"🔒 Privacy Policy",
       },
     };
 
@@ -1208,6 +1214,9 @@
         if (langModalTitle) langModalTitle.textContent = t.langModal;
         const langModalBtn = document.querySelector('#lang-modal .btn-primary');
         if (langModalBtn) langModalBtn.textContent = t.langClose;
+
+        const privacyLink = document.getElementById('privacy-link');
+        if (privacyLink) privacyLink.textContent = t.privacy;
 
         const parentModalTitle = document.querySelector('#parent-modal .lock-title');
         const parentModalDesc = document.querySelector('#parent-modal .lock-desc');

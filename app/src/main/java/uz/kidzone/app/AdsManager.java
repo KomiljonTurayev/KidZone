@@ -53,8 +53,12 @@ public class AdsManager implements IAdsManager {
 
     private void configureAdMob() {
         RequestConfiguration config = new RequestConfiguration.Builder()
+                // COPPA compliance: Tag for child-directed treatment
                 .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
+                // Google Play Families Policy: Max ad content rating (G = General)
                 .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+                // GDPR/Underage: Tag for under age of consent
+                .setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE)
                 .build();
         MobileAds.setRequestConfiguration(config);
     }
@@ -155,7 +159,13 @@ public class AdsManager implements IAdsManager {
     }
 
     private AdRequest createAdRequest() {
-        return new AdRequest.Builder().build();
+        // Force Non-Personalized Ads (NPA) for all requests in kids' app
+        android.os.Bundle extras = new android.os.Bundle();
+        extras.putString("npa", "1");
+
+        return new AdRequest.Builder()
+                .addNetworkExtrasBundle(com.google.ads.mediation.admob.AdMobAdapter.class, extras)
+                .build();
     }
 
     @Override
