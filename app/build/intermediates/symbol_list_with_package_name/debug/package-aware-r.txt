@@ -2071,6 +2071,7 @@ color material_timepicker_button_stroke
 color material_timepicker_clock_text_color
 color material_timepicker_clockface
 color material_timepicker_modebutton_tint
+color md_primary
 color mtrl_btn_bg_color_selector
 color mtrl_btn_ripple_color
 color mtrl_btn_stroke_color_selector
@@ -4472,6 +4473,7 @@ style RtlOverlay_Widget_AppCompat_Search_DropDown_Text
 style RtlOverlay_Widget_AppCompat_SearchView_MagIcon
 style RtlUnderlay_Widget_AppCompat_ActionButton
 style RtlUnderlay_Widget_AppCompat_ActionButton_Overflow
+style ShapeAppearance_KidZone_Dialog
 style ShapeAppearance_M3_Comp_Badge_Large_Shape
 style ShapeAppearance_M3_Comp_Badge_Shape
 style ShapeAppearance_M3_Comp_BottomAppBar_Container_Shape
@@ -4684,6 +4686,7 @@ style Theme_Design_Light_NoActionBar
 style Theme_Design_NoActionBar
 style Theme_IAPTheme
 style Theme_KidZone
+style Theme_KidZone_Dialog
 style Theme_KidZone_Splash
 style Theme_Material3_Dark
 style Theme_Material3_Dark_BottomSheetDialog

@@ -39,7 +39,21 @@ public class MainActivity extends AppCompatActivity {
     private void initializeUI() {
         // Keep screen on for games
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
+        // Edge-to-edge support for modern Android
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        
         setContentView(R.layout.activity_main);
+
+        // Apply insets to the main layout to prevent overlap with notches/system bars
+        View mainLayout = findViewById(R.id.main_root);
+        if (mainLayout != null) {
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
+                androidx.core.graphics.Insets bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                return insets;
+            });
+        }
 
         systemUiHelper = new SystemUiHelper(getWindow());
         systemUiHelper.enableImmersiveMode();

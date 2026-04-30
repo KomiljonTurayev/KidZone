@@ -953,6 +953,7 @@
     <color name="material_personalized_color_text_primary_inverse_disable_only">#FFFFFF</color>
     <color name="material_personalized_color_text_secondary_and_tertiary_inverse">#FFFFFF</color>
     <color name="material_personalized_color_text_secondary_and_tertiary_inverse_disabled">#FFFFFF</color>
+    <color name="md_primary">#FF6B35</color>
     <color name="mtrl_btn_text_color_disabled">#61000000</color>
     <color name="mtrl_btn_transparent_bg_color">#00ffffff</color>
     <color name="mtrl_scrim_color">#52000000</color>
@@ -5962,6 +5963,9 @@
         <item name="android:paddingLeft">@dimen/abc_action_bar_overflow_padding_start_material</item>
         <item name="android:paddingRight">@dimen/abc_action_bar_overflow_padding_end_material</item>
     </style>
+    <style name="ShapeAppearance.KidZone.Dialog" parent="">
+        <item name="cornerSize">28dp</item>
+    </style>
     <style name="ShapeAppearance.M3.Comp.Badge.Large.Shape" parent="ShapeAppearance.M3.Sys.Shape.Corner.Full"/>
     <style name="ShapeAppearance.M3.Comp.Badge.Shape" parent="ShapeAppearance.M3.Sys.Shape.Corner.Full"/>
     <style name="ShapeAppearance.M3.Comp.BottomAppBar.Container.Shape" parent="ShapeAppearance.M3.Sys.Shape.Corner.None"/>
@@ -6522,6 +6526,12 @@
         <item name="android:navigationBarColor">#080818</item>
         <item name="android:windowBackground">#FF6B35</item>
         <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="Theme.KidZone.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="backgroundTint">#FFFFFF</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.KidZone.Dialog</item>
+        <item name="colorPrimary">#FF6B35</item>
     </style>
     <style name="Theme.KidZone.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#FF6B35</item>
