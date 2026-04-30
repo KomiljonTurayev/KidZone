@@ -91,15 +91,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showExitConfirmation() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("O'yinni tark etish")
-                .setMessage("Haqiqatan ham o'yindan chiqmoqchimisiz? To'plangan ballaringiz saqlanmasligi mumkin.")
-                .setPositiveButton("Ha", (dialog, which) -> {
-                    // WebView ichidagi JS funksiyasini chaqirib o'yinni yopamiz
-                    webViewManager.evaluateJavascript("if(window.app) app.closeGame();");
-                })
-                .setNegativeButton("Yo'q", null)
-                .show();
+        // Professional Material 3 themed dialog
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.Theme_KidZone_Dialog)
+                .setTitle(getTranslatedString("exit_title", "Exit Game"))
+                .setMessage(getTranslatedString("exit_msg", "Do you really want to exit? Your progress for this session might not be saved."))
+                .setPositiveButton(getTranslatedString("yes", "Yes"), (d, which) -> webViewManager.evaluateJavascript("if(window.app) app.closeGame();"))
+                .setNegativeButton(getTranslatedString("no", "No"), null)
+                .create();
+        
+        dialog.show();
+        
+        // Style buttons after show
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.md_primary, getTheme()));
+    }
+
+    private String getTranslatedString(String key, String defaultVal) {
+        // Dynamic translation based on current web language
+        if (webViewManager == null || webViewManager.getLanguage() == null) return defaultVal;
+        
+        String lang = webViewManager.getLanguage();
+        // This is a simplified mapper. In a larger app, you'd use localized strings.xml
+        if ("uz".equals(lang)) {
+            switch(key) {
+                case "exit_title": return "O'yinni tark etish";
+                case "exit_msg": return "Haqiqatan ham o'yindan chiqmoqchimisiz? To'plangan ballaringiz saqlanmasligi mumkin.";
+                case "yes": return "Ha";
+                case "no": return "Yo'q";
+            }
+        } else if ("ru".equals(lang)) {
+            switch(key) {
+                case "exit_title": return "Выход из игры";
+                case "exit_msg": return "Вы действительно хотите выйти? Ваши баллы могут не сохраниться.";
+                case "yes": return "Да";
+                case "no": return "Нет";
+            }
+        }
+        return defaultVal;
     }
 
     private boolean isTabletDevice() {
@@ -148,6 +175,13 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public void toggleMusic(boolean mute) {
             runOnUiThread(() -> MusicManager.getInstance().setMuted(mute));
+        }
+
+        @JavascriptInterface
+        public void updateLanguage(String lang) {
+            runOnUiThread(() -> {
+                if (webViewManager != null) webViewManager.setLanguage(lang);
+            });
         }
     }
 

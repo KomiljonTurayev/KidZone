@@ -15,9 +15,18 @@ import android.webkit.WebViewClient;
 public class KidWebViewManager {
     private static final String TAG = "KidWebViewManager";
     private final WebView webView;
+    private String currentLanguage = "en";
 
     public KidWebViewManager(WebView webView) {
         this.webView = webView;
+    }
+
+    public void setLanguage(String lang) {
+        this.currentLanguage = lang;
+    }
+
+    public String getLanguage() {
+        return currentLanguage;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
