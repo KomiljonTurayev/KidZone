@@ -110,6 +110,11 @@ class GameManager {
         this.translator.setLanguage(l);
         if (window.updateLangUI) window.updateLangUI();
 
+        // Sync with Native
+        if (window.AndroidAdMob && window.AndroidAdMob.updateLanguage) {
+            window.AndroidAdMob.updateLanguage(l);
+        }
+
         document.querySelectorAll('#lang-modal .age-card').forEach(c => c.classList.remove('sel'));
         document.getElementById('lc-' + l)?.classList.add('sel');
 

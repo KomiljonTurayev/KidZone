@@ -22,4 +22,16 @@
         <item name="postSplashScreenTheme">@style/Theme.KidZone</item>
     </style>
 
+    <!-- Professional Bejirim Dialog -->
+    <style name="Theme.KidZone.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="backgroundTint">#FFFFFF</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.KidZone.Dialog</item>
+        <item name="colorPrimary">#FF6B35</item>
+    </style>
+
+    <style name="ShapeAppearance.KidZone.Dialog" parent="">
+        <item name="cornerSize">28dp</item>
+    </style>
+
 </resources>
