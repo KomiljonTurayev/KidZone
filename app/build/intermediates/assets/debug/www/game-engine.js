@@ -21,6 +21,122 @@ class KidZoneGame {
                 this.onMuteChange(this.isMuted);
             }
         });
+        this._initAudio();
+    }
+
+    _initAudio() {
+        this.audioCtx = null;
+    }
+
+    _ensureAudioCtx() {
+        if (!this.audioCtx) {
+            this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume();
+        }
+    }
+
+    playSound(type) {
+        if (this.isMuted) return;
+        this._ensureAudioCtx();
+
+        const oscillator = this.audioCtx.createOscillator();
+        const gainNode = this.audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioCtx.destination);
+
+        const now = this.audioCtx.currentTime;
+
+        switch(type) {
+            case 'move':
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(400, now);
+                oscillator.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                oscillator.start(now);
+                oscillator.stop(now + 0.1);
+                break;
+            case 'win':
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(523.25, now); // C5
+                oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                oscillator.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0.2, now + 0.4);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                oscillator.start(now);
+                oscillator.stop(now + 0.5);
+                break;
+            case 'lose':
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(300, now);
+                oscillator.frequency.linearRampToValueAtTime(100, now + 0.5);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                oscillator.start(now);
+                oscillator.stop(now + 0.5);
+                break;
+            case 'draw':
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(200, now);
+                oscillator.frequency.setValueAtTime(200, now + 0.2);
+                gainNode.gain.setValueAtTime(0.05, now);
+                gainNode.gain.setValueAtTime(0.05, now + 0.2);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                oscillator.start(now);
+                oscillator.stop(now + 0.3);
+                break;
+        }
+    }
+
+    spawnConfetti() {
+        const colors = ['#ff5757', '#5ce1e6', '#7ed957', '#FFDE59', '#FF9F43'];
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.zIndex = '9999';
+            confetti.style.borderRadius = '2px';
+            document.body.appendChild(confetti);
+
+            const animation = confetti.animate([
+                { transform: `translate3d(0, 0, 0) rotate(0deg)`, opacity: 1 },
+                { transform: `translate3d(${(Math.random() - 0.5) * 200}px, 100vh, 0) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: 2000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
+            });
+
+            animation.onfinish = () => confetti.remove();
+        }
+    }
+
+    screenShake() {
+        const body = document.body;
+        const animation = body.animate([
+            { transform: 'translate(1px, 1px) rotate(0deg)' },
+            { transform: 'translate(-1px, -2px) rotate(-1deg)' },
+            { transform: 'translate(-3px, 0px) rotate(1deg)' },
+            { transform: 'translate(3px, 2px) rotate(0deg)' },
+            { transform: 'translate(1px, -1px) rotate(1deg)' },
+            { transform: 'translate(-1px, 2px) rotate(-1deg)' },
+            { transform: 'translate(-3px, 1px) rotate(0deg)' },
+            { transform: 'translate(3px, 1px) rotate(-1deg)' },
+            { transform: 'translate(-1px, -1px) rotate(1deg)' },
+            { transform: 'translate(1px, 2px) rotate(0deg)' },
+            { transform: 'translate(1px, -2px) rotate(-1deg)' }
+        ], {
+            duration: 500,
+            iterations: 1
+        });
     }
 
     _getQueryParam(name) {
