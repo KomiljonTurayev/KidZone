@@ -9,6 +9,7 @@ class KidZoneGame {
         this.onScoreUpdate = config.onScoreUpdate || null;
         this.isMuted = localStorage.getItem("kz-muted") === "true";
         this.lang = this._getQueryParam('lang') || localStorage.getItem("kz-lang") || 'en';
+        this.adCounter = parseInt(localStorage.getItem('kz-ad-cnt') || '0');
 
         this._initListeners();
     }
@@ -35,7 +36,14 @@ class KidZoneGame {
         console.log(`[GameEngine] ${this.id} reported score: ${score}`);
         const currentPts = parseInt(localStorage.getItem('kz-pts') || '0');
         localStorage.setItem('kz-pts', currentPts + score);
-        localStorage.setItem(`kz-prog-${this.id}`, '100'); // Mark as completed/played
+        
+        // High score logic
+        const highScore = this.getHighScore();
+        if (score > highScore) {
+            localStorage.setItem(`kz-hs-${this.id}`, score);
+        }
+
+        localStorage.setItem(`kz-prog-${this.id}`, '100'); 
 
         if (this.onScoreUpdate) {
             this.onScoreUpdate(score);
@@ -43,11 +51,55 @@ class KidZoneGame {
     }
 
     /**
+     * Returns high score for current game
+     */
+    getHighScore() {
+        return parseInt(localStorage.getItem(`kz-hs-${this.id}`) || '0');
+    }
+
+    /**
+     * Vibration feedback
+     * @param {number} ms 
+     */
+    vibrate(ms = 50) {
+        if (this.isMuted) return;
+        if (navigator.vibrate) {
+            navigator.vibrate(ms);
+        }
+    }
+
+    /**
+     * Comprehensive Game Over handling
+     * @param {number} finalScore 
+     */
+    gameOver(finalScore) {
+        this.reportScore(finalScore);
+        this.adCounter++;
+        localStorage.setItem('kz-ad-cnt', this.adCounter);
+
+        // Show ad every 3rd game over to maintain UX
+        if (this.adCounter % 3 === 0) {
+            this.showAd();
+        }
+    }
+
+    /**
      * Shows interstitial ad via Android Bridge
      */
     showAd() {
-        if (window.parent && window.parent.AndroidAdMob) {
-            window.parent.AndroidAdMob.showInterstitial();
+        try {
+            // Check standard WebView interface
+            if (window.AndroidAdMob && window.AndroidAdMob.showInterstitial) {
+                window.AndroidAdMob.showInterstitial();
+            } 
+            // Fallback for iframe setups
+            else if (window.parent && window.parent.AndroidAdMob) {
+                window.parent.AndroidAdMob.showInterstitial();
+            } else {
+                console.warn("[GameEngine] Android Bridge not found");
+            }
+        } catch (e) {
+            console.error("[GameEngine] Ad show error:", e);
         }
     }
 

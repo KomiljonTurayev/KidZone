@@ -25,17 +25,13 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="false">
 
-        <!-- ✅ ADMOB APP ID — BU YERNI O'ZGARTIRING! -->
+        <!-- ✅ ADMOB APP ID — PASTE YOUR ACTUAL ID BELOW -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3291187691091325~8541921370"/>
-<!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
+            android:value="ca-app-pub-_____________________________~_______________"/>
         <!--
-            ☝️ HOZIR TEST ID TURIBDI
-            O'Z ID INGIZNI QUYIDAGIGA ALMASHTIRING:
-            android:value="ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
-
-            BOLALAR O'YINI UCHUN COPPA (MAJBURIY):
+            ☝️ O'Z ID INGIZNI YUQORIGA QO'YING:
+            Masalan: android:value="ca-app-pub-3291187691091325~8541921370"
         -->
         <meta-data
             android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"

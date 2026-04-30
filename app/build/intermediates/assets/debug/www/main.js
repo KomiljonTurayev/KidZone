@@ -49,7 +49,7 @@ class UIManager {
         const valEl = document.getElementById("stars-val");
 
         if (nameEl) nameEl.textContent = lv.name;
-        if (subEl) subEl.textContent = `${pts} / ${lv.next} ball`;
+        if (subEl) subEl.textContent = lv.sub || `${pts} / ${lv.next} ball`;
         if (barEl) barEl.style.width = lv.pct + "%";
         if (ptsEl) ptsEl.textContent = pts;
         if (valEl) valEl.textContent = pts;
@@ -86,6 +86,8 @@ class GameManager {
 
     updateProgress() {
         const lv = this.getLevelData(this.pts);
+        const lvNextText = this.translator.get('lvNext');
+        lv.sub = `${this.pts} / ${lv.next} ${lvNextText}`;
         this.ui.updateLevelUI(this.pts, lv);
     }
 

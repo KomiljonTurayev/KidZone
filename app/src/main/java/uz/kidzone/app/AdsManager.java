@@ -32,6 +32,7 @@ public class AdsManager implements IAdsManager {
     private final Activity activity;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     
+    private BannerListener bannerListener;
     private AdView bannerAdView;
     private InterstitialAd interstitialAd;
     private RewardedAd rewardedAd;
@@ -60,21 +61,29 @@ public class AdsManager implements IAdsManager {
 
     @Override
     public void loadBanner(ViewGroup container, boolean isTablet) {
-        cleanupBanner(container);
+        loadBanner(container, isTablet, null);
+    }
 
+    public void loadBanner(ViewGroup container, boolean isTablet, BannerListener listener) {
+        cleanupBanner(container);
+        this.bannerListener = listener;
+        
         bannerAdView = new AdView(activity);
-        bannerAdView.setAdSize(isTablet ? AdSize.LEADERBOARD : AdSize.BANNER);
+        AdSize adSize = isTablet ? AdSize.LEADERBOARD : AdSize.BANNER;
+        bannerAdView.setAdSize(adSize);
         bannerAdView.setAdUnitId(activity.getString(R.string.banner_ad_unit_id));
 
         bannerAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 container.setVisibility(View.VISIBLE);
+                if (bannerListener != null) bannerListener.onBannerLoaded(adSize.getHeight());
             }
 
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError e) {
                 Log.e(TAG, "Banner failed: " + e.getMessage());
+                if (bannerListener != null) bannerListener.onBannerFailed();
                 mainHandler.postDelayed(() -> loadBanner(container, isTablet), BANNER_RETRY_DELAY_MS);
             }
         });

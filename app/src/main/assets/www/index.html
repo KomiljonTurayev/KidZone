@@ -48,7 +48,7 @@
       --gap:  12px;
       --pad:  16px;
       --hh:   64px;
-      --bh:   56px;
+      --bh:   0px; /* Initially 0 until ad loads */
       --fn:   11px;
     }
     @media(min-width:480px){:root{--cols:4;--card:110px;--gap:14px}}
@@ -174,6 +174,7 @@
       flex:1;overflow-y:auto;overflow-x:hidden;
       padding:20px var(--pad) calc(var(--bh)+80px);
       scroll-behavior:smooth;
+      transition: padding-bottom 0.6s var(--ease-bounce);
     }
     #main::-webkit-scrollbar{display:none}
 
@@ -514,6 +515,7 @@
       display:flex;align-items:stretch;
       box-shadow:0 -2px 12px rgba(0,0,0,.06);
       z-index:20;
+      transition: bottom 0.6s var(--ease-bounce);
     }
     .ni{
       flex:1;display:flex;flex-direction:column;
@@ -1158,6 +1160,11 @@
     function toggleFS() { app.toggleFS(); }
     function filterCat(c, el) { app.filterCat(c, el); }
     function showToast(m) { app.ui.showToast(m); }
+
+    // Dynamic Banner Offset handler
+    window.updateBannerOffset = function(height) {
+        document.documentElement.style.setProperty('--bh', height + 'px');
+    };
 
     // Legacy sync (will be fully integrated into GameManager)
     function updateLangUI() {

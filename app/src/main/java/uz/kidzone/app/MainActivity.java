@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private KidWebViewManager webViewManager;
     private IAdsManager adsManager;
     private SystemUiHelper systemUiHelper;
+    private int lastBannerHeight = 0;
     private int gameLaunchCount = 0;
 
     @Override
@@ -48,7 +49,20 @@ public class MainActivity extends AppCompatActivity {
         // Ads Management
         adsManager = new AdsManager(this);
         adsManager.initialize();
-        adsManager.loadBanner(findViewById(R.id.bannerContainer), isTabletDevice());
+        
+        ((AdsManager) adsManager).loadBanner(findViewById(R.id.bannerContainer), isTabletDevice(), new IAdsManager.BannerListener() {
+            @Override
+            public void onBannerLoaded(int heightDp) {
+                lastBannerHeight = heightDp;
+                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(" + heightDp + ");");
+            }
+
+            @Override
+            public void onBannerFailed() {
+                lastBannerHeight = 0;
+                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
+            }
+        });
 
         // WebView Management
         webViewManager = new KidWebViewManager(findViewById(R.id.webView));
@@ -62,7 +76,11 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (webViewManager.canGoBack()) {
+                // Agar reklama banneri yashirin bo'lsa, demak foydalanuvchi o'yin ichida
+                View banner = findViewById(R.id.bannerContainer);
+                if (banner != null && banner.getVisibility() == View.GONE) {
+                    showExitConfirmation();
+                } else if (webViewManager != null && webViewManager.canGoBack()) {
                     webViewManager.goBack();
                 } else {
                     setEnabled(false);
@@ -70,6 +88,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void showExitConfirmation() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("O'yinni tark etish")
+                .setMessage("Haqiqatan ham o'yindan chiqmoqchimisiz? To'plangan ballaringiz saqlanmasligi mumkin.")
+                .setPositiveButton("Ha", (dialog, which) -> {
+                    // WebView ichidagi JS funksiyasini chaqirib o'yinni yopamiz
+                    webViewManager.evaluateJavascript("if(window.app) app.closeGame();");
+                })
+                .setNegativeButton("Yo'q", null)
+                .show();
     }
 
     private boolean isTabletDevice() {
@@ -84,12 +114,20 @@ public class MainActivity extends AppCompatActivity {
     private class AdMobBridge {
         @JavascriptInterface
         public void showBanner() {
-            runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE));
+            runOnUiThread(() -> {
+                findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE);
+                // Bannerni qayta ko'rsatganda oxirgi olingan balandlikni qo'llaymiz
+                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(" + lastBannerHeight + ");");
+            });
         }
 
         @JavascriptInterface
         public void hideBanner() {
-            runOnUiThread(() -> findViewById(R.id.bannerContainer).setVisibility(View.GONE));
+            runOnUiThread(() -> {
+                findViewById(R.id.bannerContainer).setVisibility(View.GONE);
+                // UI pastga tushishi uchun offsetni 0 qilamiz
+                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
+            });
         }
 
         @JavascriptInterface

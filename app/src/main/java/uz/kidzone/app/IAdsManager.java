@@ -27,4 +27,12 @@ public interface IAdsManager {
     interface OnRewardListener {
         void onReward(int amount);
     }
+
+    /**
+     * Listener for banner visibility and height updates.
+     */
+    interface BannerListener {
+        void onBannerLoaded(int heightDp);
+        void onBannerFailed();
+    }
 }

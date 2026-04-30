@@ -3,66 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Ob-Havo 🌤️</title>
+<title>Weather 🌤️</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
-body {
-  min-height:100vh; background:#87CEEB;
-  font-family:'Arial Rounded MT Bold',Arial,sans-serif;
-  overflow:hidden; display:flex; flex-direction:column; align-items:center; color:white;
-}
+body { min-height:100vh; background:#87CEEB; font-family:'Arial Rounded MT Bold',Arial,sans-serif; overflow:hidden; display:flex; flex-direction:column; align-items:center; color:white; }
 #topbar { width:100%; padding:20px; display:flex; justify-content:space-between; align-items:center; }
 .pill { background:rgba(255,255,255,0.2); border-radius:20px; padding:8px 16px; font-weight:900; }
-
-#game-card {
-  background:white; border-radius:32px; padding:30px 20px; width:90%; max-width:400px;
-  text-align:center; margin-top:20px; box-shadow:0 15px 35px rgba(0,0,0,0.1);
-  color:#333;
-}
+#game-card { background:white; border-radius:32px; padding:30px 20px; width:90%; max-width:400px; text-align:center; margin-top:20px; box-shadow:0 15px 35px rgba(0,0,0,0.1); color:#333; }
 #q-emoji { font-size:100px; margin-bottom:10px; }
-#q-text { font-size:24px; font-weight:900; }
-
+#q-text  { font-size:24px; font-weight:900; }
 #choices { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:400px; margin-top:30px; }
-.ans-btn {
-  background:white; border:none; border-radius:22px; padding:20px;
-  font-size:18px; font-weight:900; color:#333; cursor:pointer;
-  box-shadow:0 6px 15px rgba(0,0,0,0.08); transition:transform 0.1s;
-}
+.ans-btn { background:white; border:none; border-radius:22px; padding:20px; font-size:18px; font-weight:900; color:#333; cursor:pointer; box-shadow:0 6px 15px rgba(0,0,0,0.08); transition:transform 0.1s; }
 .ans-btn:active { transform:scale(0.92); }
 .correct { background:#10B981 !important; color:white; }
-.wrong { background:#EF4444 !important; color:white; }
+.wrong   { background:#EF4444 !important; color:white; }
 </style>
 </head>
 <body>
 <div id="topbar">
-  <div class="pill">🌤️ OB-HAVO</div>
-  <div class="pill">BALL: <span id="score">0</span></div>
+  <div class="pill" id="lbl-title">🌤️ OB-HAVO</div>
+  <div class="pill"><span id="lbl-score">BALL</span>: <span id="score">0</span></div>
 </div>
-
 <div id="game-card">
   <div id="q-emoji">☀️</div>
   <div id="q-text">Bu qanday ob-havo?</div>
 </div>
-
 <div id="choices"></div>
 
+<script src="game-engine.js"></script>
 <script>
+const game = new KidZoneGame({ id: 'weather' });
+const lang = game.lang;
+
+const T = {
+  uz: { title:"🌤️ OB-HAVO", score:"BALL", quest:"Bu qanday ob-havo?" },
+  ru: { title:"🌤️ ПОГОДА",  score:"ОЧКИ", quest:"Какая погода?" },
+  en: { title:"🌤️ WEATHER", score:"SCORE",quest:"What is the weather?" },
+};
+
 const DATA = [
-  {e:"☀️", n:"Quyoshli"}, {e:"☁️", n:"Bulutli"}, {e:"🌧️", n:"Yomg'ir"},
-  {e:"❄️", n:"Qor"}, {e:"⚡", n:"Momaqaldiroq"}, {e:"🌬️", n:"Shamol"},
-  {e:"🌈", n:"Kamalak"}, {e:"🌫️", n:"Tuman"}
+  { e:"☀️", name:{ uz:"Quyoshli",     ru:"Солнечно",  en:"Sunny" } },
+  { e:"☁️", name:{ uz:"Bulutli",      ru:"Облачно",   en:"Cloudy" } },
+  { e:"🌧️", name:{ uz:"Yomg'irli",   ru:"Дождливо",  en:"Rainy" } },
+  { e:"❄️", name:{ uz:"Qorli",        ru:"Снежно",    en:"Snowy" } },
+  { e:"⚡", name:{ uz:"Momaqaldiroq", ru:"Гроза",     en:"Thunder" } },
+  { e:"🌬️", name:{ uz:"Shamollik",   ru:"Ветрено",   en:"Windy" } },
+  { e:"🌈", name:{ uz:"Kamalak",      ru:"Радуга",    en:"Rainbow" } },
+  { e:"🌫️", name:{ uz:"Tumanli",     ru:"Туман",     en:"Foggy" } },
 ];
 
+const t = T[lang] || T.en;
 let score = 0;
+
+function applyLang() {
+  document.getElementById('lbl-title').textContent = t.title;
+  document.getElementById('lbl-score').textContent = t.score;
+  document.getElementById('q-text').textContent    = t.quest;
+}
 
 function next() {
   const q = DATA[Math.floor(Math.random() * DATA.length)];
   document.getElementById('q-emoji').textContent = q.e;
 
   const options = [q];
-  while(options.length < 4) {
+  while (options.length < 4) {
     const r = DATA[Math.floor(Math.random() * DATA.length)];
-    if(!options.find(o => o.n === r.n)) options.push(r);
+    if (!options.find(o => o.e === r.e)) options.push(r);
   }
 
   const grid = document.getElementById('choices');
@@ -70,9 +76,9 @@ function next() {
   options.sort(() => Math.random() - 0.5).forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'ans-btn';
-    btn.textContent = opt.n;
+    btn.textContent = opt.name[lang] || opt.name.en;
     btn.onclick = () => {
-      if(opt.n === q.n) {
+      if (opt.e === q.e) {
         btn.classList.add('correct');
         score += 10;
         document.getElementById('score').textContent = score;
@@ -85,11 +91,11 @@ function next() {
   });
 }
 
+applyLang();
 next();
 
 window.addEventListener('beforeunload', () => {
-  const currentPts = parseInt(localStorage.getItem('kz-pts') || '0');
-  localStorage.setItem('kz-pts', currentPts + Math.floor(score/2));
+  game.reportScore(Math.floor(score / 2));
   localStorage.setItem('kz-prog-weather', '100');
 });
 </script>
