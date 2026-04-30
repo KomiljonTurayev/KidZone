@@ -48,7 +48,7 @@
       --gap:  12px;
       --pad:  16px;
       --hh:   64px;
-      --bh:   56px;
+      --bh:   0px; /* Initially 0 until ad loads */
       --fn:   11px;
     }
     @media(min-width:480px){:root{--cols:4;--card:110px;--gap:14px}}
@@ -860,6 +860,9 @@
         <div class="pin-key" onclick="pinTap(0)">0</div>
         <div class="pin-key" onclick="closeModal('parent-modal')">✕</div>
       </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="https://KomiljonTurayev.github.io/KidZone/privacy/kidzone-privacy.html" id="privacy-link" target="_blank" style="color: var(--md-primary); font-size: 13px; font-weight: 800; text-decoration: none;">🔒 Privacy Policy</a>
+      </div>
     </div>
   </div>
 </div>
@@ -1078,51 +1081,95 @@
     // TRANSLATIONS (UZ/RU/EN)
     // ════════════════════════════════════════════════════
     const T = {
+      const T = {
       uz: {
-        heroH:"O'ynang va<br>O'rganing! 🎯",
-        heroP:"30 ta qiziqarli o'yin<br>3 tilda: UZ · RU · EN",
-        catTitle:"Kategoriyalar",
-        gridTitle:"Barcha O'yinlar",
+        heroH:"Oila bilan birga<br>O'ynang! 👨‍👩‍👧",
+        heroP:"Farzandingiz bilan birga o'rganing va yutuqlarga erishing",
+        catTitle:"Birgalikda o'ynaymiz",
+        gridTitle:"Oila uchun o'yinlar",
         featTitle:"Eng Mashhur",
-        nb:["Bosh","O'ynash","O'rganish","Yutuqlar","Ota-ona"],
+        nb:["Asosiy","Oila","O'rganish","Yulduzlar","Ota-ona"],
         cats: ["Hammasi", "O'rganish", "Matematik", "Ranglar", "Musiqa", "Bosh qotirma", "Sport", "Tabiat"],
         soon:"⏳ Tez orada chiqadi!",
         locked:"🔒 Bu o'yin yoshingiz uchun emas",
         back:"← Orqaga",
-        lvNames:["Yangi O'yinchi","Qiziquvchan","Aqlli Bola","Super Yulduz","Ustaxona","Genius!"],
+        lvNames:["Yangi Oila","Hamkorlar","Aqlli Jamoa","Super Jamoa","Oila Ustasi","Genius Oila!"],
         rewardTitle:"Ajoyib!", rewardSub:"Zo'r o'yndingiz!",
         plays:"o'yin", ageModal:"🎂 Yoshni tanlang", langModal:"🌍 Tilni tanlang",
+        chTitle:"Bugungi Vazifa!", chSub:"5 ta o'yin o'yna → 100 ⭐ yut!", chBtn:"Boshlash",
+        lvBall:"BALL", lvNext:"ball yig'ing",
+        pbTitle:"Ota-ona Boshqaruvi", pbSub:"O'yin vaqti · Reklamalar · Statistika", pbBtn:"Kirish 🔐",
+        ageCards:["2–4 yosh", "Ranglar, shakllar", "4–6 yosh", "Raqamlar, harflar", "6–8 yosh", "Matematika, mantiq", "8+ yosh", "Hammasi ochiq"],
+        ageSave:"✅ Saqlash", langClose:"✅ Yopish",
+        parentTitle:"Ota-ona rejimi", parentDesc:"Farzandingiz o'yin vaqtini va reklamalarni boshqaring",
+        rewardBtn:"🎮 Davom etish",
+        privacy:"🔒 Maxfiylik siyosati",
+        langSelected: "O'zbek tili tanlandi",
+        playMode: "O'ynash rejimi",
+        learnMode: "O'rganish rejimi",
+        yourStars: "Yutuqlaringiz",
+        parentModeUnlocked: "Ota-ona rejimi ochildi!",
+        wrongPin: "PIN noto'g'ri! (Maslahat: 1234)",
       },
       ru: {
-        heroH:"Играй и Учись! 🎯",
-        heroP:"30 увлекательных игр · 3 языка",
-        catTitle:"Категории",
-        gridTitle:"Все Игры",
+        heroH:"Играйте всей<br>Семьей! 👨‍👩‍👧",
+        heroP:"Учитесь и побеждайте вместе с вашим ребенком",
+        catTitle:"Играем вместе",
+        gridTitle:"Семейные игры",
         featTitle:"Самые Популярные",
-        nb:["Главная","Играть","Учиться","Достижения","Родители"],
+        nb:["Главная","Семья","Учиться","Звезды","Родители"],
         cats: ["Все", "Обучение", "Математика", "Цвета", "Музыка", "Пазлы", "Спорт", "Природа"],
         soon:"⏳ Скоро выйдет!",
         locked:"🔒 Эта игра не для вашего возраста",
         back:"← Назад",
-        lvNames:["Новичок","Любопытный","Умный","Суперзвезда","Мастер","Гений!"],
+        lvNames:["Новая Семья","Партнеры","Умная Команда","Супер Команда","Мастера","Гениальная Семья!"],
         rewardTitle:"Отлично!", rewardSub:"Ты молодец!",
         plays:"игр", ageModal:"🎂 Выбор возраста", langModal:"🌍 Выбор языка",
+        chTitle:"Задача дня!", chSub:"Сыграй 5 игр → 100 ⭐!", chBtn:"Начать",
+        lvBall:"БАЛЛ", lvNext:"соберите баллы",
+        pbTitle:"Родительский контроль", pbSub:"Время игры · Реклама · Статистика", pbBtn:"Войти 🔐",
+        ageCards:["2–4 года", "Цвета, формы", "4–6 лет", "Цифры, буквы", "6–8 лет", "Математика, логика", "8+ лет", "Все открыто"],
+        ageSave:"✅ Сохранить", langClose:"✅ Закрыть",
+        parentTitle:"Родительский режим", parentDesc:"Управляйте временем игры и рекламой",
+        rewardBtn:"🎮 Продолжить",
+        privacy:"🔒 Политика конфиденциальности",
+        langSelected: "Русский язык выбран",
+        playMode: "Режим игры",
+        learnMode: "Режим обучения",
+        yourStars: "Ваши звезды",
+        parentModeUnlocked: "Родительский режим разблокирован!",
+        wrongPin: "Неверный PIN! (Подсказка: 1234)",
       },
       en: {
-        heroH:"Play & Learn! 🎯",
-        heroP:"30 fun games · 3 languages",
-        catTitle:"Categories",
-        gridTitle:"All Games",
+        heroH:"Play Together<br>with Family! 👨‍👩‍👧",
+        heroP:"Learn and achieve results together with your child",
+        catTitle:"Co-op Games",
+        gridTitle:"Games for Family",
         featTitle:"Most Popular",
-        nb:["Home","Play","Learn","Stars","Parents"],
+        nb:["Home","Family","Learn","Stars","Parents"],
         cats: ["All", "Learn", "Math", "Colors", "Music", "Puzzles", "Sport", "Nature"],
         soon:"⏳ Coming soon!",
         locked:"🔒 This game is for older players",
         back:"← Back",
-        lvNames:["Newcomer","Curious","Smart Kid","Superstar","Master","Genius!"],
+        lvNames:["New Family","Partners","Smart Team","Super Team","Family Masters","Genius Family!"],
         rewardTitle:"Great job!", rewardSub:"You played well!",
         plays:"plays", ageModal:"🎂 Age Selection", langModal:"🌍 Select Language",
+        chTitle:"Today's Challenge!", chSub:"Play 5 games → 100 ⭐!", chBtn:"Start",
+        lvBall:"POINTS", lvNext:"collect points",
+        pbTitle:"Parental Control", pbSub:"Play time · Ads · Stats", pbBtn:"Enter 🔐",
+        ageCards:["2–4 years", "Colors, shapes", "4–6 years", "Numbers, letters", "6–8 years", "Math, logic", "8+ years", "All unlocked"],
+        ageSave:"✅ Save", langClose:"✅ Close",
+        parentTitle:"Parent Mode", parentDesc:"Manage play time and advertisements",
+        rewardBtn:"🎮 Continue",
+        privacy:"🔒 Privacy Policy",
+        langSelected: "English language selected",
+        playMode: "Play mode",
+        learnMode: "Learn mode",
+        yourStars: "Your stars",
+        parentModeUnlocked: "Parent mode unlocked!",
+        wrongPin: "Wrong PIN! (Hint: 1234)",
       },
+    };
     };
 
     // Bridge functions for UI interactions
@@ -1140,6 +1187,11 @@
     function filterCat(c, el) { app.filterCat(c, el); }
     function showToast(m) { app.ui.showToast(m); }
 
+    // Dynamic Banner Offset handler
+    window.updateBannerOffset = function(height) {
+        document.documentElement.style.setProperty('--bh', height + 'px');
+    };
+
     // Legacy sync (will be fully integrated into GameManager)
     function updateLangUI() {
         const t = T[app.translator.lang];
@@ -1151,6 +1203,56 @@
         const featTitleEl = document.querySelector('.sec-hdr .sec-title');
         if (featTitleEl) featTitleEl.textContent = t.featTitle;
 
+        // Challenge Bar
+        const chTitle = document.querySelector('#challenge-bar .ch-title');
+        const chSub = document.querySelector('#challenge-bar .ch-sub');
+        const chBtn = document.querySelector('#challenge-bar .ch-btn');
+        if (chTitle) chTitle.textContent = t.chTitle;
+        if (chSub) chSub.textContent = t.chSub;
+        if (chBtn) chBtn.textContent = t.chBtn;
+
+        // Level Card
+        const lvL = document.querySelector('#level-card .pts-l');
+        if (lvL) lvL.textContent = t.lvBall;
+        app.updateProgress(); // This updates lv-name and lv-sub dynamically
+
+        // Parent Banner
+        const pbT = document.querySelector('#parent-banner .pb-title');
+        const pbS = document.querySelector('#parent-banner .pb-sub');
+        const pbB = document.querySelector('#parent-banner .pb-btn');
+        if (pbT) pbT.textContent = t.pbTitle;
+        if (pbS) pbS.textContent = t.pbSub;
+        if (pbB) pbB.textContent = t.pbBtn;
+
+        // Modals
+        const ageModalTitle = document.querySelector('#age-modal .modal-title');
+        if (ageModalTitle) ageModalTitle.textContent = t.ageModal;
+        const ageModalBtn = document.querySelector('#age-modal .btn-primary');
+        if (ageModalBtn) ageModalBtn.textContent = t.ageSave;
+
+        const langModalTitle = document.querySelector('#lang-modal .modal-title');
+        if (langModalTitle) langModalTitle.textContent = t.langModal;
+        const langModalBtn = document.querySelector('#lang-modal .btn-primary');
+        if (langModalBtn) langModalBtn.textContent = t.langClose;
+
+        const privacyLink = document.getElementById('privacy-link');
+        if (privacyLink) privacyLink.textContent = t.privacy;
+
+        const parentModalTitle = document.querySelector('#parent-modal .lock-title');
+        const parentModalDesc = document.querySelector('#parent-modal .lock-desc');
+        if (parentModalTitle) parentModalTitle.textContent = t.parentTitle;
+        if (parentModalDesc) parentModalDesc.textContent = t.parentDesc;
+
+        // Age cards
+        const acRange = document.querySelectorAll('.age-card .ac-range');
+        const acDesc = document.querySelectorAll('.age-card .ac-desc');
+        acRange.forEach((el, i) => { if(t.ageCards[i*2]) el.textContent = t.ageCards[i*2]; });
+        acDesc.forEach((el, i) => { if(t.ageCards[i*2+1]) el.textContent = t.ageCards[i*2+1]; });
+
+        // Reward Screen
+        const rwBtn = document.querySelector('#reward-screen .btn-primary');
+        if (rwBtn) rwBtn.textContent = t.rewardBtn;
+
         // Categories Row
         const catChips = document.querySelectorAll('.cat-chip');
         const catIcons = ["🎮", "📚", "🔢", "🎨", "🎵", "🧩", "⚽", "🌿"];
@@ -1159,12 +1261,6 @@
                 chip.innerHTML = `<span class="ch-em">${catIcons[idx]}</span>${t.cats[idx]}`;
             }
         });
-
-        const ageModalTitle = document.querySelector('#age-modal .modal-title');
-        if (ageModalTitle) ageModalTitle.textContent = t.ageModal;
-
-        const langModalTitle = document.querySelector('#lang-modal .modal-title');
-        if (langModalTitle) langModalTitle.textContent = t.langModal;
 
         for(let i=0; i<5; i++) {
             const el = document.getElementById("nb"+i);

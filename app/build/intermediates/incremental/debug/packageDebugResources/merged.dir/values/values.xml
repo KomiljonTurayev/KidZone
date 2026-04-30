@@ -6,9 +6,9 @@
     <color name="primary_dark">#E55A25</color>
     <color name="white">#FFFFFF</color>
     <string name="app_name">KidZone</string>
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
-    <string name="rewarded_ad_unit_id">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="banner_ad_unit_id">ca-app-pub-_____________________________/_______________</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-_____________________________/_______________</string>
+    <string name="rewarded_ad_unit_id">ca-app-pub-_____________________________/_______________</string>
     <style name="Theme.KidZone" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">#FF6B35</item>
         <item name="colorPrimaryVariant">#E55A25</item>
