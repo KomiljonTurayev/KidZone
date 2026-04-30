@@ -33,9 +33,10 @@
         <!-- ✅ ADMOB APP ID — PASTE YOUR ACTUAL ID BELOW -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-_____________________________~_______________"/>
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         <!--
-            ☝️ O'Z ID INGIZNI YUQORIGA QO'YING:
+            ☝️ HOZIR TEST ID TURIBDI (Deploy qilish uchun)
+            O'Z ID INGIZNI YUQORIGA QO'YING:
             Masalan: android:value="ca-app-pub-3291187691091325~8541921370"
         -->
         <meta-data
