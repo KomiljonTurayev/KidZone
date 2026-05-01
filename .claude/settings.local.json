@@ -10,7 +10,15 @@
       "Bash(where claude *)",
       "Bash(./gradlew assembleDebug)",
       "Bash(cmd /c \"gradlew.bat assembleDebug 2>&1\")",
-      "WebFetch(domain:www.youtube.com)"
+      "WebFetch(domain:www.youtube.com)",
+      "Bash(android --version)",
+      "Bash(where android *)",
+      "Bash(wsl --status)",
+      "Bash(wsl --list --verbose)",
+      "Bash(wsl --list --online)",
+      "Bash(where git *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\bin\\\\bash.exe\" --version)",
+      "Bash(C:\\\\Program Files\\\\Git\\\\bin\\\\bash.exe *)"
     ]
   }
 }

@@ -1290,6 +1290,7 @@
             div.className = "feat-card";
             div.onclick = () => openGame(g);
             const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
+            const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
             div.innerHTML = `
         ${g.badge==="hot"?'<div class="feat-badge-hot">🔥 TOP</div>':''}
         <div class="feat-art" style="background:${g.bg}">
@@ -1298,7 +1299,7 @@
         <div class="feat-info">
           <div class="feat-name">${localizedName}</div>
           <div class="feat-meta">
-            <span class="feat-tag" style="background:${g.tc}22;color:${g.tc}">${g.tag}</span>
+            <span class="feat-tag" style="background:${g.tc}22;color:${g.tc}">${localizedTag}</span>
             <span class="feat-age">👤 ${g.age}</span>
           </div>
           <div class="feat-stars">
@@ -1329,6 +1330,7 @@
             const progress = parseInt(localStorage.getItem("kz-prog-"+g.id)||"0");
             const prog56 = 56.5 - (progress/100)*56.5;
             const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
+            const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
 
             card.innerHTML = `
         <div class="gc-art" style="background:${g.bg}">
