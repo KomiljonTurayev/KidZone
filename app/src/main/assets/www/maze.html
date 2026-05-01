@@ -158,9 +158,9 @@ function draw() {
     container.appendChild(wall);
   });
   const p = document.getElementById('player');
-  p.style.cssText += `width:${cellSize}px;height:${cellSize}px;left:${playerPos.x * cellSize}px;top:${playerPos.y * cellSize}px`;
+  p.style.cssText = `width:${cellSize}px;height:${cellSize}px;left:${playerPos.x * cellSize}px;top:${playerPos.y * cellSize}px;position:absolute;font-size:24px;display:flex;align-items:center;justify-content:center;transition:all 0.1s ease;z-index:5`;
   const g = document.getElementById('goal');
-  g.style.cssText += `width:${cellSize}px;height:${cellSize}px;left:${goalPos.x * cellSize}px;top:${goalPos.y * cellSize}px`;
+  g.style.cssText = `width:${cellSize}px;height:${cellSize}px;left:${goalPos.x * cellSize}px;top:${goalPos.y * cellSize}px;position:absolute;font-size:24px;display:flex;align-items:center;justify-content:center;z-index:4`;
 }
 
 function move(dx, dy) {

@@ -659,9 +659,9 @@ function beep(freq, dur=0.15, type="sine") {
   } catch(e) {}
 }
 const sndFlip   = ()  => beep(440, 0.1, "sine");
-const sndMatch  = ()  => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,"triangle",0.18),i*60));
+const sndMatch  = ()  => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.18,"triangle"),i*60));
 const sndWrong  = ()  => beep(200, 0.25, "sawtooth");
-const sndWin    = ()  => [523,587,659,698,784,880,988,1047].forEach((f,i)=>setTimeout(()=>beep(f,"triangle",0.2),i*80));
+const sndWin    = ()  => [523,587,659,698,784,880,988,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.2,"triangle"),i*80));
 
 // SHUFFLE
 function shuffle(arr) {

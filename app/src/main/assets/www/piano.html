@@ -131,8 +131,9 @@ window.onload = () => {
 
 document.querySelectorAll('.key').forEach(key => {
   const play = () => {
+    const color = getComputedStyle(key).backgroundColor;
     key.classList.add('active');
-    playNote(parseFloat(key.dataset.freq), getComputedStyle(key).backgroundColor);
+    playNote(parseFloat(key.dataset.freq), color);
     setTimeout(() => key.classList.remove('active'), 100);
   };
   key.addEventListener('touchstart', (e) => { e.preventDefault(); play(); });
