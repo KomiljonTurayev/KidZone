@@ -32,8 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
             gameOver: "O'yin tugadi!",
             playAgain: "Qaytadan o'ynash",
             youWin: "Siz yutdingiz!"
+        },
+        ru: {
+            score: "Очки",
+            lives: "Жизни",
+            startGame: "Начать игру",
+            go: "Поехали!",
+            gameOver: "Игра окончена!",
+            playAgain: "Играть снова",
+            youWin: "Ты победил!"
         }
-        // Add other languages as needed
     };
     const t = gameEngine.getTranslations(translations); // Get current language translations
 
