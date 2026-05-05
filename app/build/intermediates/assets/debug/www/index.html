@@ -1289,7 +1289,7 @@
             const div = document.createElement("div");
             div.className = "feat-card";
             div.onclick = () => openGame(g);
-            const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
+            const localizedName = typeof g.name === 'object' ? (g.name[app.translator.lang] || g.name.en) : g.name;
             const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
             div.innerHTML = `
         ${g.badge==="hot"?'<div class="feat-badge-hot">🔥 TOP</div>':''}
@@ -1329,8 +1329,7 @@
 
             const progress = parseInt(localStorage.getItem("kz-prog-"+g.id)||"0");
             const prog56 = 56.5 - (progress/100)*56.5;
-            const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
-            const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
+            const localizedName = typeof g.name === 'object' ? (g.name[app.translator.lang] || g.name.en) : g.name;
 
             card.innerHTML = `
         <div class="gc-art" style="background:${g.bg}">

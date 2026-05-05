@@ -530,7 +530,7 @@ function endGame() {
   // Update progress
   localStorage.setItem('kz-prog-colors', '100');
 
-  if (pct>=0.8) confetti(); confetti();
+  if (pct>=0.8) { confetti(); confetti(); }
   document.getElementById("result-screen").classList.remove("hidden");
 }
 function goHome() {

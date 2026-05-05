@@ -4,87 +4,446 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>O'simliklar 🌱</title>
+<script src="kz-ui.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
-body {
-  min-height:100vh; background:#E8F5E9;
-  font-family:'Arial Rounded MT Bold',Arial,sans-serif;
-  overflow:hidden; display:flex; flex-direction:column; align-items:center;
-}
-#topbar { width:100%; padding:20px; display:flex; justify-content:space-between; align-items:center; }
-.pill { background:white; border-radius:20px; padding:8px 16px; font-weight:900; color:#2E7D32; }
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
+body{min-height:100vh;background:#E8F5E9;font-family:'Arial Rounded MT Bold',Arial,sans-serif;
+  display:flex;flex-direction:column;align-items:center;overflow-x:hidden;}
 
-#game-card {
-  background:white; border-radius:32px; padding:30px 20px; width:90%; max-width:400px;
-  text-align:center; margin-top:20px; box-shadow:0 15px 35px rgba(0,0,0,0.05);
-}
-#q-emoji { font-size:100px; line-height:1; margin-bottom:10px; }
-#q-text { font-size:24px; font-weight:900; color:#333; }
+/* ── header ── */
+#topbar{width:100%;background:linear-gradient(135deg,#1B5E20,#388E3C);
+  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
+  box-shadow:0 3px 12px rgba(0,0,0,.25);}
+#back-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;
+  width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#title-text{flex:1;color:#fff;font-size:16px;font-weight:900;}
+#level-badge{background:rgba(255,255,255,.25);color:#fff;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;}
+#score-pill{background:#fff;color:#1B5E20;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;}
 
-#choices { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:400px; margin-top:30px; }
-.ans-btn {
-  background:white; border:none; border-radius:22px; padding:20px;
-  font-size:18px; font-weight:900; color:#333; cursor:pointer;
-  box-shadow:0 6px 15px rgba(0,0,0,0.08); transition:transform 0.1s;
-}
-.ans-btn:active { transform:scale(0.92); }
-.correct { background:#10B981 !important; color:white; }
-.wrong { background:#EF4444 !important; color:white; }
+/* ── tools row ── */
+#tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:10px 16px 0;flex-wrap:wrap;}
+
+/* ── question card ── */
+#game-card{background:#fff;border-radius:28px;width:92%;max-width:420px;
+  margin:14px auto 0;padding:28px 20px 22px;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.09);}
+#q-emoji{font-size:96px;line-height:1.1;margin-bottom:8px;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.15));
+  transition:transform .2s;}
+#q-text{font-size:18px;font-weight:700;color:#555;}
+
+/* ── choices ── */
+#choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  width:92%;max-width:420px;margin:14px auto 0;}
+.ans-btn{background:#fff;border:2px solid #C8E6C9;border-radius:20px;padding:16px 10px;
+  font-size:16px;font-weight:900;color:#1B5E20;cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.07);transition:transform .1s,opacity .25s;}
+.ans-btn:active{transform:scale(.92);}
+.ans-btn.correct{background:#4CAF50!important;color:#fff!important;border-color:#4CAF50;}
+.ans-btn.wrong{background:#EF5350!important;color:#fff!important;border-color:#EF5350;}
+
+/* ── progress dots ── */
+#dots-row{display:flex;justify-content:center;gap:7px;margin:14px auto 6px;flex-wrap:wrap;max-width:300px;}
+.dot{width:12px;height:12px;border-radius:50%;background:#C8E6C9;transition:background .3s;}
+.dot.done{background:#4CAF50;}
+.dot.active{background:#1B5E20;transform:scale(1.25);}
+
+/* ── level selector overlay ── */
+#lvl-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;
+  align-items:center;justify-content:center;}
+#lvl-overlay.open{display:flex;}
+#lvl-box{background:#fff;border-radius:28px;padding:24px 18px;width:92%;max-width:420px;max-height:88vh;overflow-y:auto;}
+#lvl-box h2{text-align:center;color:#1B5E20;margin-bottom:16px;font-size:18px;}
+#lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.lvl-btn{background:#E8F5E9;border:2px solid #C8E6C9;border-radius:14px;padding:10px 4px;
+  font-size:13px;font-weight:900;color:#1B5E20;cursor:pointer;text-align:center;}
+.lvl-btn.current{background:#4CAF50;color:#fff;border-color:#4CAF50;}
+.lvl-btn.locked{opacity:.4;cursor:default;}
+#lvl-close{display:block;margin:16px auto 0;background:#1B5E20;color:#fff;border:none;
+  border-radius:20px;padding:10px 32px;font-size:15px;font-weight:900;cursor:pointer;}
+
+/* ── game-over / level-up overlay (shared) ── */
+#end-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:95;
+  align-items:center;justify-content:center;}
+#end-overlay.open{display:flex;}
+#end-box{background:#fff;border-radius:28px;padding:32px 24px;width:88%;max-width:360px;text-align:center;}
+#end-icon{font-size:64px;margin-bottom:8px;}
+#end-title{font-size:22px;font-weight:900;color:#1B5E20;margin-bottom:6px;}
+#end-msg{font-size:15px;color:#555;margin-bottom:20px;}
+#end-btn{background:#4CAF50;color:#fff;border:none;border-radius:20px;
+  padding:12px 36px;font-size:16px;font-weight:900;cursor:pointer;}
 </style>
 </head>
 <body>
+
+<!-- ── TOP BAR ── -->
 <div id="topbar">
-  <div class="pill">🌱 O'SIMLIKLAR</div>
-  <div class="pill">BALL: <span id="score">0</span></div>
+  <button id="back-btn" onclick="history.back()">←</button>
+  <div id="title-text">🌱 <span id="t-title"></span></div>
+  <div id="level-badge" onclick="openLevelSelector()" style="cursor:pointer">LVL <span id="t-lvl">1</span></div>
+  <div id="score-pill">⭐ <span id="t-score">0</span></div>
 </div>
 
+<!-- ── TOOLS ROW ── -->
+<div id="tools-row">
+  <div id="hint-wrap"></div>
+  <div id="lives-wrap"></div>
+  <div id="timer-wrap"></div>
+</div>
+
+<!-- ── QUESTION CARD ── -->
 <div id="game-card">
-  <div id="q-emoji">🌳</div>
-  <div id="q-text">Bu nima?</div>
+  <div id="q-emoji">🌱</div>
+  <div id="q-text"></div>
 </div>
 
+<!-- ── CHOICES ── -->
 <div id="choices"></div>
 
+<!-- ── PROGRESS DOTS ── -->
+<div id="dots-row"></div>
+
+<!-- ── LEVEL SELECTOR ── -->
+<div id="lvl-overlay">
+  <div id="lvl-box">
+    <h2 id="lvl-title-text"></h2>
+    <div id="lvl-grid"></div>
+    <button id="lvl-close" onclick="closeLevelSelector()">✕</button>
+  </div>
+</div>
+
+<!-- ── END OVERLAY ── -->
+<div id="end-overlay">
+  <div id="end-box">
+    <div id="end-icon">🌟</div>
+    <div id="end-title"></div>
+    <div id="end-msg"></div>
+    <button id="end-btn" onclick="onEndBtn()"></button>
+  </div>
+</div>
+
 <script>
+/* ═══════════════════════════════════════════════
+   DATA — 30 plants, easy → expert
+═══════════════════════════════════════════════ */
 const DATA = [
-  {e:"🌳", n:"Daraxt"}, {e:"🌹", n:"Gul"}, {e:"🌿", n:"O't"},
-  {e:"🌵", n:"Kaktus"}, {e:"🍄", n:"Qo'ziqorin"}, {e:"🌻", n:"Aybi-quyosh"},
-  {e:"🌲", n:"Archa"}, {e:"🌴", n:"Palma"}
+  /* easy */
+  {e:"🌳", uz:"Daraxt",        ru:"Дерево",         en:"Tree"},
+  {e:"🌹", uz:"Atirgul",       ru:"Роза",            en:"Rose"},
+  {e:"🌻", uz:"Kungaboqar",    ru:"Подсолнух",       en:"Sunflower"},
+  {e:"🌵", uz:"Kaktus",        ru:"Кактус",          en:"Cactus"},
+  {e:"🍄", uz:"Qo'ziqorin",    ru:"Гриб",            en:"Mushroom"},
+  {e:"🌲", uz:"Qarag'ay",      ru:"Ель",             en:"Pine"},
+  {e:"🌴", uz:"Palma",         ru:"Пальма",          en:"Palm"},
+  {e:"🌷", uz:"Lola",          ru:"Тюльпан",         en:"Tulip"},
+  /* medium */
+  {e:"🌼", uz:"Margaritka",    ru:"Маргаритка",      en:"Daisy"},
+  {e:"🌸", uz:"Olcha guli",    ru:"Сакура",          en:"Cherry Blossom"},
+  {e:"🌺", uz:"Gulxayri",      ru:"Гибискус",        en:"Hibiscus"},
+  {e:"🎋", uz:"Bambu",         ru:"Бамбук",          en:"Bamboo"},
+  {e:"🌾", uz:"Bug'doy",       ru:"Пшеница",         en:"Wheat"},
+  {e:"🌿", uz:"O't",           ru:"Трава",           en:"Grass"},
+  {e:"🍀", uz:"Sebarga",       ru:"Клевер",          en:"Clover"},
+  {e:"🪴", uz:"Uy o'simligi",  ru:"Комнатный цветок",en:"Houseplant"},
+  /* hard */
+  {e:"🌱", uz:"Ko'chat",       ru:"Росток",          en:"Seedling"},
+  {e:"🍃", uz:"Yashil barg",   ru:"Листок",          en:"Leaf"},
+  {e:"🍂", uz:"Sariq barg",    ru:"Жёлтый лист",     en:"Autumn Leaf"},
+  {e:"🍁", uz:"Zarang bargi",  ru:"Кленовый лист",   en:"Maple Leaf"},
+  {e:"🪷", uz:"Nilufar",       ru:"Лотос",           en:"Lotus"},
+  {e:"💐", uz:"Guldasta",      ru:"Букет",           en:"Bouquet"},
+  {e:"☘️",uz:"Yoʻngʻichqa",   ru:"Трилистник",      en:"Shamrock"},
+  {e:"🎄", uz:"Archa daraxti", ru:"Новогодняя ёлка", en:"Christmas Tree"},
+  /* expert */
+  {e:"🎍", uz:"Shoxcha",       ru:"Сосновая ветка",  en:"Pine Branch"},
+  {e:"🫛", uz:"No'xat dukkagi",ru:"Стручок гороха",  en:"Pea Pod"},
+  {e:"🫘", uz:"Loviya",        ru:"Фасоль",          en:"Bean"},
+  {e:"🥬", uz:"Salat",         ru:"Салат",           en:"Lettuce"},
+  {e:"🌰", uz:"Kashtan",       ru:"Каштан",          en:"Chestnut"},
+  {e:"🥦", uz:"Brokkoli",      ru:"Брокколи",        en:"Broccoli"},
 ];
 
-let score = 0;
+/* ═══════════════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════════════ */
+const LANG = navigator.language.startsWith('ru') ? 'ru'
+           : navigator.language.startsWith('en') ? 'en' : 'uz';
 
-function next() {
-  const q = DATA[Math.floor(Math.random() * DATA.length)];
-  document.getElementById('q-emoji').textContent = q.e;
+const T = {
+  title:     {uz:"O'simliklar",           ru:"Растения",            en:"Plants"},
+  question:  {uz:"Bu qaysi o'simlik?",    ru:"Что это за растение?",en:"Which plant is this?"},
+  selectLvl: {uz:"Daraja tanlang",        ru:"Выберите уровень",    en:"Select Level"},
+  levelUp:   {uz:"Daraja oshdi!",         ru:"Уровень пройден!",    en:"Level Up!"},
+  nextLvl:   {uz:"Keyingi daraja →",      ru:"Следующий уровень →", en:"Next Level →"},
+  retry:     {uz:"Qayta urinish",         ru:"Попробовать снова",   en:"Try Again"},
+  gameOver:  {uz:"O'yin tugadi",          ru:"Игра окончена",       en:"Game Over"},
+  tryAgain:  {uz:"Yana o'ynash",          ru:"Играть снова",        en:"Play Again"},
+  great:     {uz:"Ajoyib! 🌟",            ru:"Отлично! 🌟",         en:"Great! 🌟"},
+  almostThere:{uz:"Deyarli!",             ru:"Почти!",              en:"Almost there!"},
+  howTitle:  {uz:"Qanday o'ynash kerak?", ru:"Как играть?",         en:"How to play?"},
+  howSteps:  {
+    uz:["Ekranda o'simlik emojisi chiqadi","To'g'ri nomni tanlang","💡 Ko'mak uchun yordam tugmasini bosing","❤️ 3 ta hayotingiz bor — ehtiyot bo'ling!","20 darajani bosib o'ting!"],
+    ru:["На экране появится эмодзи растения","Выберите правильное название","💡 Нажмите кнопку подсказки для помощи","❤️ У вас 3 жизни — будьте осторожны!","Пройдите все 20 уровней!"],
+    en:["An plant emoji appears on screen","Choose the correct name","💡 Tap the hint button for help","❤️ You have 3 lives — be careful!","Complete all 20 levels!"],
+  },
+};
+function t(key){ return T[key][LANG] || T[key]['uz']; }
+function tn(item){ return item[LANG] || item['uz']; }
 
-  const options = [q];
-  while(options.length < 4) {
-    const r = DATA[Math.floor(Math.random() * DATA.length)];
-    if(!options.find(o => o.n === r.n)) options.push(r);
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+const GAME_ID = 'plants';
+let _level, _cfg, _pool, _questions, _qi, _score, _total;
+let _hint, _lives, _timer, _answered, _endAction;
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  _level = KZL.getLevel(GAME_ID);
+  _cfg   = KZL.cfg(GAME_ID);
+  _pool  = KZL.slicePool(DATA, _level);
+  _total = _cfg.q;
+  _qi    = 0;
+  _score = 0;
+
+  document.getElementById('t-title').textContent = t('title');
+  document.getElementById('t-lvl').textContent   = _level;
+  document.getElementById('t-score').textContent = 0;
+  document.getElementById('lvl-title-text').textContent = t('selectLvl');
+
+  /* tools */
+  const hw = document.getElementById('hint-wrap');
+  const lw = document.getElementById('lives-wrap');
+  const tw = document.getElementById('timer-wrap');
+  hw.innerHTML = ''; lw.innerHTML = ''; tw.innerHTML = '';
+
+  _hint = KZL.createHints(_cfg.hints);
+  hw.appendChild(_hint.el);
+
+  _lives = KZL.createLives(3);
+  lw.appendChild(_lives.el);
+
+  _timer = null;
+  if (_cfg.timer > 0) {
+    _timer = KZL.createTimer(_cfg.timer, null, onTimeUp);
+    tw.appendChild(_timer.el);
   }
 
-  const grid = document.getElementById('choices');
-  grid.innerHTML = '';
-  options.sort(() => Math.random() - 0.5).forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'ans-btn';
-    btn.textContent = opt.n;
-    btn.onclick = () => {
-      if(opt.n === q.n) {
-        btn.classList.add('correct');
-        score += 10;
-        document.getElementById('score').textContent = score;
-        setTimeout(next, 800);
-      } else {
-        btn.classList.add('wrong');
-      }
-    };
-    grid.appendChild(btn);
+  buildQuestions();
+  buildDots();
+  renderQuestion();
+
+  /* how-to-play: auto on first visit */
+  KZL.howToPlay({
+    id: GAME_ID, lang: LANG,
+    title: t('howTitle'),
+    steps: T.howSteps[LANG] || T.howSteps['uz'],
+    accentColor: '#4CAF50',
   });
 }
 
-next();
+/* ═══════════════════════════════════════════════
+   QUESTIONS
+═══════════════════════════════════════════════ */
+function buildQuestions() {
+  const shuffled = [..._pool].sort(() => Math.random() - .5);
+  _questions = shuffled.slice(0, Math.min(_total, shuffled.length));
+  /* pad if pool smaller than total */
+  while (_questions.length < _total) {
+    _questions.push(_pool[Math.floor(Math.random() * _pool.length)]);
+  }
+}
+
+function renderQuestion() {
+  _answered = false;
+  const q = _questions[_qi];
+
+  /* emoji pop */
+  const emojiEl = document.getElementById('q-emoji');
+  emojiEl.textContent = q.e;
+  emojiEl.style.transform = 'scale(1.18)';
+  setTimeout(() => emojiEl.style.transform = 'scale(1)', 200);
+
+  document.getElementById('q-text').textContent = t('question');
+  document.getElementById('t-score').textContent = _score;
+
+  /* active dot */
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    d.className = 'dot' + (i < _qi ? ' done' : i === _qi ? ' active' : '');
+  });
+
+  /* choices */
+  const numChoices = _cfg.c;
+  const wrongs = DATA.filter(x => x.en !== q.en)
+                     .sort(() => Math.random() - .5)
+                     .slice(0, numChoices - 1);
+  const opts = [...wrongs, q].sort(() => Math.random() - .5);
+
+  const grid = document.getElementById('choices');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = numChoices <= 2 ? '1fr 1fr' : '1fr 1fr';
+
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = tn(opt);
+    btn.dataset.key = opt.en;
+    btn.onclick = () => answer(opt, q, btn);
+    grid.appendChild(btn);
+  });
+
+  /* hint reset per question */
+  _hint.reset(_cfg.hints);
+
+  /* wire hint button to hide a wrong choice */
+  _hint.use(() => {
+    const wrongBtns = [...grid.querySelectorAll('.ans-btn')]
+      .filter(b => b.dataset.key !== q.en && b.style.opacity !== '0.2');
+    if (wrongBtns.length > 0) {
+      const pick = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+      pick.style.opacity = '0.2';
+      pick.style.pointerEvents = 'none';
+    }
+  });
+
+  /* timer */
+  if (_timer) _timer.start();
+}
+
+/* ═══════════════════════════════════════════════
+   ANSWER / FLOW
+═══════════════════════════════════════════════ */
+function answer(opt, q, btn) {
+  if (_answered) return;
+  _answered = true;
+  if (_timer) _timer.stop();
+
+  if (opt.en === q.en) {
+    btn.classList.add('correct');
+    _score++;
+    document.getElementById('t-score').textContent = _score;
+    setTimeout(advance, 750);
+  } else {
+    btn.classList.add('wrong');
+    /* reveal correct */
+    document.querySelectorAll('.ans-btn').forEach(b => {
+      if (b.dataset.key === q.en) b.classList.add('correct');
+    });
+    _lives.lose();
+    if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+    setTimeout(advance, 1100);
+  }
+}
+
+function onTimeUp() {
+  if (_answered) return;
+  _answered = true;
+  const q = _questions[_qi];
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    if (b.dataset.key === q.en) b.classList.add('correct');
+  });
+  _lives.lose();
+  if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+  setTimeout(advance, 1100);
+}
+
+function advance() {
+  _qi++;
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    if (i < _qi) d.className = 'dot done';
+  });
+  if (_qi >= _total) { levelDone(); return; }
+  renderQuestion();
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL DONE / GAME OVER
+═══════════════════════════════════════════════ */
+function levelDone() {
+  const pct = _score / _total;
+  const passed = pct >= 0.6;
+
+  if (passed && KZL.getLevel(GAME_ID) === _level) {
+    KZL.nextLevel(GAME_ID);
+  }
+
+  const nextL = KZL.getLevel(GAME_ID);
+  const isNew = passed && nextL > _level;
+
+  showEnd({
+    icon:  isNew ? '🌟' : (passed ? '✅' : '🌱'),
+    title: isNew ? t('levelUp') : (passed ? t('great') : t('almostThere')),
+    msg:   `${_score} / ${_total}`,
+    btn:   isNew ? t('nextLvl') : (passed ? t('retry') : t('retry')),
+    action: () => { _level = KZL.getLevel(GAME_ID); init(); },
+  });
+}
+
+function showGameOver() {
+  showEnd({
+    icon: '💔', title: t('gameOver'),
+    msg: `${_score} / ${_total}`,
+    btn: t('tryAgain'),
+    action: () => init(),
+  });
+}
+
+function showEnd({icon, title, msg, btn, action}) {
+  document.getElementById('end-icon').textContent  = icon;
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-msg').textContent   = msg;
+  document.getElementById('end-btn').textContent   = btn;
+  _endAction = action;
+  document.getElementById('end-overlay').classList.add('open');
+}
+
+function onEndBtn() {
+  document.getElementById('end-overlay').classList.remove('open');
+  if (_endAction) _endAction();
+}
+
+/* ═══════════════════════════════════════════════
+   PROGRESS DOTS
+═══════════════════════════════════════════════ */
+function buildDots() {
+  const row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (let i = 0; i < _total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    row.appendChild(d);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL SELECTOR
+═══════════════════════════════════════════════ */
+function openLevelSelector() {
+  const max = KZL.getLevel(GAME_ID);
+  const grid = document.getElementById('lvl-grid');
+  grid.innerHTML = '';
+  for (let n = 1; n <= 20; n++) {
+    const btn = document.createElement('button');
+    const cfg = KZL.CONFIGS[n - 1];
+    btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
+    btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small>`;
+    if (n <= max) btn.onclick = () => { _level = n; KZL.setLevel(GAME_ID, n); closeLevelSelector(); init(); };
+    grid.appendChild(btn);
+  }
+  document.getElementById('lvl-overlay').classList.add('open');
+}
+
+function closeLevelSelector() {
+  document.getElementById('lvl-overlay').classList.remove('open');
+}
+
+/* ── start ── */
+init();
 
 window.addEventListener('beforeunload', () => {
   localStorage.setItem('kz-prog-plants', '100');
