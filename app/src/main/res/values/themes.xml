@@ -34,4 +34,14 @@
         <item name="cornerSize">28dp</item>
     </style>
 
+    <!-- Bottom Sheet dialog — transparent background so custom shape shows -->
+    <style name="Theme.KidZone.BottomSheet" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.KidZone.BottomSheet</item>
+    </style>
+
+    <style name="Widget.KidZone.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
 </resources>

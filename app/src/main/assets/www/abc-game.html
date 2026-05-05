@@ -4,150 +4,475 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ABC Alphabet 🔤</title>
+<script src="kz-ui.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
-body {
-  min-height:100vh; background: linear-gradient(135deg, #FF6B35 0%, #FF9F1C 100%);
-  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-  overflow: hidden; user-select: none;
-  display: flex; flex-direction: column; align-items: center; color: white;
-}
-#topbar { width:100%; max-width:440px; padding:16px 20px 8px; display:flex; justify-content:space-between; align-items:center; }
-.pill { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:20px; padding:8px 16px; font-weight: 800; }
-.pill-sm { font-size:10px; color:rgba(255,255,255,0.7); display:block; text-transform: uppercase; }
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
+body{min-height:100vh;background:linear-gradient(135deg,#FF6B35 0%,#FF9F1C 100%);
+  font-family:'Arial Rounded MT Bold',Arial,sans-serif;
+  display:flex;flex-direction:column;align-items:center;color:white;overflow-x:hidden;}
 
-#prog-wrap { width:90%; max-width:400px; height:8px; background:rgba(255,255,255,0.15); border-radius:4px; margin:10px 0; overflow: hidden; }
-#prog-bar { height:100%; background:white; width:0%; transition:width 0.4s; }
+/* ── header ── */
+#topbar{width:100%;background:rgba(0,0,0,.2);
+  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
+  box-shadow:0 3px 12px rgba(0,0,0,.2);}
+#back-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;
+  width:40px;height:40px;font-size:20px;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;}
+#title-text{flex:1;font-size:16px;font-weight:900;}
+#level-badge{background:rgba(255,255,255,.25);border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
+#score-pill{background:#fff;color:#FF6B35;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;}
 
-#q-card {
-  background:white; color: #333; border-radius:32px; padding:30px 20px; width:90%; max-width:400px;
-  text-align:center; margin:20px 0; box-shadow:0 15px 35px rgba(0,0,0,0.15);
-}
-#q-emoji { font-size:100px; line-height:1; margin-bottom:15px; animation:bounce 2s infinite; }
-@keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-#q-word { font-size:36px; font-weight:900; color:#FF6B35; letter-spacing:2px; }
+/* ── tools ── */
+#tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:10px 16px 0;flex-wrap:wrap;}
 
-#answers { display:grid; grid-template-columns:1fr 1fr; gap:15px; width:90%; max-width:400px; }
-.ans-btn {
-  background:white; border:none; border-radius:22px; padding:20px;
-  font-size:40px; font-weight:900; color:#333; cursor:pointer;
-  box-shadow:0 6px 15px rgba(0,0,0,0.1); transition:transform 0.1s;
-}
-.ans-btn:active { transform:scale(0.92); }
-.correct { background:#10B981 !important; color:white !important; }
-.wrong { background:#EF4444 !important; color:white !important; }
+/* ── progress bar ── */
+#prog-wrap{width:90%;max-width:400px;height:8px;background:rgba(255,255,255,.2);
+  border-radius:4px;margin:12px 0 0;overflow:hidden;}
+#prog-bar{height:100%;background:#fff;width:0%;transition:width .4s;}
 
-#result { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(5px); }
-.h { display:none !important; }
-#result-card { background:white; color:#333; border-radius:32px; padding:40px 30px; text-align:center; width:min(340px,90vw); }
-.btn-p { background:#FF6B35; color:white; border:none; border-radius:50px; padding:18px 44px; font-size:18px; font-weight:900; cursor:pointer; width:100%; margin-top:20px; }
+/* ── question card ── */
+#q-card{background:#fff;color:#333;border-radius:32px;padding:28px 20px;
+  width:90%;max-width:420px;text-align:center;margin:16px 0 0;
+  box-shadow:0 15px 35px rgba(0,0,0,.15);}
+#q-emoji{font-size:100px;line-height:1.1;margin-bottom:12px;
+  animation:bounce 2s infinite;}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+#q-word{font-size:32px;font-weight:900;color:#FF6B35;letter-spacing:2px;}
+
+/* ── choices ── */
+#answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  width:90%;max-width:420px;margin:16px 0 0;}
+.ans-btn{background:#fff;border:none;border-radius:22px;padding:22px;
+  font-size:40px;font-weight:900;color:#333;cursor:pointer;
+  box-shadow:0 6px 15px rgba(0,0,0,.12);transition:transform .1s,opacity .25s;}
+.ans-btn:active{transform:scale(.92);}
+.ans-btn.correct{background:#10B981!important;color:#fff!important;}
+.ans-btn.wrong{background:#EF4444!important;color:#fff!important;}
+
+/* ── dots ── */
+#dots-row{display:flex;justify-content:center;gap:7px;margin:14px auto 6px;flex-wrap:wrap;max-width:300px;}
+.dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.35);transition:background .3s;}
+.dot.done{background:rgba(255,255,255,.9);}
+.dot.active{background:#fff;transform:scale(1.25);}
+
+/* ── level selector ── */
+#lvl-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;
+  align-items:center;justify-content:center;}
+#lvl-overlay.open{display:flex;}
+#lvl-box{background:#fff;color:#333;border-radius:28px;padding:24px 18px;
+  width:92%;max-width:420px;max-height:88vh;overflow-y:auto;}
+#lvl-box h2{text-align:center;color:#FF6B35;margin-bottom:16px;font-size:18px;}
+#lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.lvl-btn{background:#FFF3E0;border:2px solid #FFE0B2;border-radius:14px;padding:10px 4px;
+  font-size:12px;font-weight:900;color:#FF6B35;cursor:pointer;text-align:center;}
+.lvl-btn.current{background:#FF6B35;color:#fff;border-color:#FF6B35;}
+.lvl-btn.locked{opacity:.4;cursor:default;}
+#lvl-close{display:block;margin:16px auto 0;background:#FF6B35;color:#fff;border:none;
+  border-radius:20px;padding:10px 32px;font-size:15px;font-weight:900;cursor:pointer;}
+
+/* ── end overlay ── */
+#end-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:95;
+  align-items:center;justify-content:center;}
+#end-overlay.open{display:flex;}
+#end-box{background:#fff;border-radius:28px;padding:32px 24px;
+  width:88%;max-width:360px;text-align:center;}
+#end-icon{font-size:64px;margin-bottom:8px;}
+#end-title{font-size:22px;font-weight:900;color:#FF6B35;margin-bottom:6px;}
+#end-msg{font-size:15px;color:#666;margin-bottom:20px;}
+#end-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;
+  padding:12px 36px;font-size:16px;font-weight:900;cursor:pointer;}
 </style>
 </head>
 <body>
 
+<!-- ── TOP BAR ── -->
 <div id="topbar">
-  <div class="pill"><span class="pill-sm" id="lbl-score">SCORE</span><span id="score">0</span></div>
-  <div style="font-weight:900; font-size:20px;">🔤 <span id="lbl-title">ABC</span></div>
-  <div class="pill"><span class="pill-sm" id="lbl-quest">QUEST</span><span id="q-num">1/10</span></div>
+  <button id="back-btn" onclick="history.back()">←</button>
+  <div id="title-text">🔤 <span id="t-title">ABC</span></div>
+  <div id="level-badge" onclick="openLevelSelector()">LVL <span id="t-lvl">1</span></div>
+  <div id="score-pill">⭐ <span id="t-score">0</span></div>
 </div>
 
+<!-- ── TOOLS ── -->
+<div id="tools-row">
+  <div id="hint-wrap"></div>
+  <div id="lives-wrap"></div>
+  <div id="timer-wrap"></div>
+</div>
+
+<!-- ── PROGRESS BAR ── -->
 <div id="prog-wrap"><div id="prog-bar"></div></div>
 
+<!-- ── QUESTION CARD ── -->
 <div id="q-card">
   <div id="q-emoji">🍎</div>
   <div id="q-word">APPLE</div>
 </div>
 
-<div id="answers">
-  <button class="ans-btn" id="btn0" onclick="check(0)"></button>
-  <button class="ans-btn" id="btn1" onclick="check(1)"></button>
-  <button class="ans-btn" id="btn2" onclick="check(2)"></button>
-  <button class="ans-btn" id="btn3" onclick="check(3)"></button>
+<!-- ── CHOICES ── -->
+<div id="answers"></div>
+
+<!-- ── DOTS ── -->
+<div id="dots-row"></div>
+
+<!-- ── LEVEL SELECTOR ── -->
+<div id="lvl-overlay">
+  <div id="lvl-box">
+    <h2 id="lvl-title-text">Select Level</h2>
+    <div id="lvl-grid"></div>
+    <button id="lvl-close" onclick="closeLevelSelector()">✕</button>
+  </div>
 </div>
 
-<div id="result" class="h">
-  <div id="result-card">
-    <div style="font-size:80px;">🎉</div>
-    <h1 id="res-ttl">Great!</h1>
-    <p id="res-sc" style="font-size:20px; margin:10px 0;"></p>
-    <button class="btn-p" id="btn-again" onclick="start()">PLAY AGAIN</button>
+<!-- ── END OVERLAY ── -->
+<div id="end-overlay">
+  <div id="end-box">
+    <div id="end-icon">🌟</div>
+    <div id="end-title"></div>
+    <div id="end-msg"></div>
+    <button id="end-btn" onclick="onEndBtn()"></button>
   </div>
 </div>
 
 <script src="game-engine.js"></script>
 <script>
-const TRANSLATIONS = {
-  en: { title:"ABC", score:"SCORE", quest:"SAVOL", start:"START", great:"Great job!", again:"PLAY AGAIN" },
-  uz: { title:"Alifbo", score:"BALL", quest:"SAVOL", start:"BOSHLASH", great:"Barakalla!", again:"QAYTA O'YNASH" },
-  ru: { title:"Алфавит", score:"СЧЕТ", quest:"ВОПРОС", start:"ИГРАТЬ", great:"Молодец!", again:"ИГРАТЬ СНОВА" }
-};
-
+/* ═══════════════════════════════════════════════
+   DATA — 26 items per language, A→Z order for pool slicing
+═══════════════════════════════════════════════ */
 const DATA = {
-  en: [ {e:"🍎", l:"A", w:"APPLE"}, {e:"🐻", l:"B", w:"BEAR"}, {e:"🐱", l:"C", w:"CAT"}, {e:"🐶", l:"D", w:"DOG"}, {e:"🐘", l:"E", w:"ELEPHANT"}, {e:"🐟", l:"F", w:"FISH"}, {e:"🦒", l:"G", w:"GIRAFFE"}, {e:"🏠", l:"H", w:"HOUSE"}, {e:"🍦", l:"I", w:"ICE CREAM"}, {e:"🦓", l:"Z", w:"ZEBRA"} ],
-  uz: [ {e:"🍎", l:"O", w:"OLMA"}, {e:"🐻", l:"A", w:"AYIQ"}, {e:"🐱", l:"M", w:"MUSHUK"}, {e:"🐶", l:"I", w:"IT"}, {e:"🐘", l:"F", w:"FIL"}, {e:"🍇", l:"U", w:"UZUM"}, {e:"🍍", l:"A", w:"ANANAS"}, {e:"🍒", l:"G", w:"GOLOS"}, {e:"🍌", l:"B", w:"BANAN"}, {e:"🦁", l:"S", w:"SHER"} ],
-  ru: [ {e:"🍎", l:"Я", w:"ЯБЛОКО"}, {e:"🐻", l:"М", w:"МЕДВЕДЬ"}, {e:"🐱", l:"К", w:"КОШКА"}, {e:"🐶", l:"С", w:"СОБАКА"}, {e:"🐘", l:"С", w:"СЛОН"}, {e:"🍓", l:"К", w:"КЛУБНИКА"}, {e:"🐧", l:"П", w:"ПИНГВИН"}, {e:"🐺", l:"В", w:"ВОЛК"}, {e:"🦁", l:"Л", w:"ЛЕВ"}, {e:"🎈", l:"Ш", w:"ШАРИК"} ]
+  en: [
+    {e:"🍎",l:"A",w:"APPLE"},   {e:"🐻",l:"B",w:"BEAR"},
+    {e:"🐱",l:"C",w:"CAT"},     {e:"🐶",l:"D",w:"DOG"},
+    {e:"🐘",l:"E",w:"ELEPHANT"},{e:"🐟",l:"F",w:"FISH"},
+    {e:"🦒",l:"G",w:"GIRAFFE"}, {e:"🏠",l:"H",w:"HOUSE"},
+    {e:"🍦",l:"I",w:"ICE CREAM"},{e:"🪼",l:"J",w:"JELLYFISH"},
+    {e:"🦘",l:"K",w:"KANGAROO"},{e:"🦁",l:"L",w:"LION"},
+    {e:"🐒",l:"M",w:"MONKEY"},  {e:"👃",l:"N",w:"NOSE"},
+    {e:"🐙",l:"O",w:"OCTOPUS"}, {e:"🐧",l:"P",w:"PENGUIN"},
+    {e:"👸",l:"Q",w:"QUEEN"},   {e:"🐰",l:"R",w:"RABBIT"},
+    {e:"🐍",l:"S",w:"SNAKE"},   {e:"🐯",l:"T",w:"TIGER"},
+    {e:"☂️",l:"U",w:"UMBRELLA"},{e:"🎻",l:"V",w:"VIOLIN"},
+    {e:"🐺",l:"W",w:"WOLF"},    {e:"🩻",l:"X",w:"X-RAY"},
+    {e:"🧶",l:"Y",w:"YARN"},    {e:"🦓",l:"Z",w:"ZEBRA"},
+  ],
+  uz: [
+    {e:"🍎",l:"O",w:"OLMA"},    {e:"🐻",l:"A",w:"AYIQ"},
+    {e:"🐱",l:"M",w:"MUSHUK"},  {e:"🐶",l:"I",w:"IT"},
+    {e:"🐘",l:"F",w:"FIL"},     {e:"🦊",l:"T",w:"TULKI"},
+    {e:"🦒",l:"Z",w:"ZAROFON"}, {e:"🏠",l:"U",w:"UY"},
+    {e:"🍇",l:"U",w:"UZUM"},    {e:"🦁",l:"S",w:"SHER"},
+    {e:"🦋",l:"K",w:"KAPALAK"}, {e:"🌺",l:"G",w:"GUL"},
+    {e:"🐒",l:"M",w:"MAYMUN"},  {e:"🌙",l:"O",w:"OY"},
+    {e:"🐙",l:"A",w:"AHTAPOT"}, {e:"🐧",l:"P",w:"PINGVIN"},
+    {e:"🌹",l:"A",w:"ATIRGUL"}, {e:"🐴",l:"O",w:"OT"},
+    {e:"🐍",l:"I",w:"ILON"},    {e:"🐯",l:"Y",w:"YO'LBARS"},
+    {e:"☂️",l:"S",w:"SOYABON"}, {e:"⭐",l:"Y",w:"YULDUZ"},
+    {e:"🐺",l:"B",w:"BO'RI"},   {e:"🍌",l:"B",w:"BANAN"},
+    {e:"🌻",l:"K",w:"KUNGABOQAR"},{e:"🦓",l:"Z",w:"ZEBRA"},
+  ],
+  ru: [
+    {e:"🍎",l:"Я",w:"ЯБЛОКО"},  {e:"🐻",l:"М",w:"МЕДВЕДЬ"},
+    {e:"🐱",l:"К",w:"КОШКА"},   {e:"🐶",l:"С",w:"СОБАКА"},
+    {e:"🐘",l:"С",w:"СЛОН"},    {e:"🦋",l:"Б",w:"БАБОЧКА"},
+    {e:"🦒",l:"Ж",w:"ЖИРАФ"},   {e:"🏠",l:"Д",w:"ДОМ"},
+    {e:"🍦",l:"М",w:"МОРОЖЕНОЕ"},{e:"🪼",l:"М",w:"МЕДУЗА"},
+    {e:"🦁",l:"Л",w:"ЛЕВ"},     {e:"🐒",l:"О",w:"ОБЕЗЬЯНА"},
+    {e:"🌙",l:"Л",w:"ЛУНА"},    {e:"🦆",l:"У",w:"УТКА"},
+    {e:"🐙",l:"О",w:"ОСЬМИНОГ"},{e:"🐧",l:"П",w:"ПИНГВИН"},
+    {e:"🌹",l:"Р",w:"РОЗА"},    {e:"🐰",l:"З",w:"ЗАЯЦ"},
+    {e:"🐍",l:"З",w:"ЗМЕЯ"},    {e:"🐯",l:"Т",w:"ТИГР"},
+    {e:"☂️",l:"З",w:"ЗОНТИК"},  {e:"🎵",l:"П",w:"ПЕСНЯ"},
+    {e:"🐺",l:"В",w:"ВОЛК"},    {e:"🍓",l:"К",w:"КЛУБНИКА"},
+    {e:"⭐",l:"З",w:"ЗВЕЗДА"},  {e:"🦓",l:"З",w:"ЗЕБРА"},
+  ],
 };
 
-const engine = new KidZoneGame({ id: 'abc' });
-const t = engine.getTranslations(TRANSLATIONS);
-const pool = DATA[engine.lang] || DATA.en;
-let score = 0, qIdx = 0, current = null;
+/* ═══════════════════════════════════════════════
+   LANG / TRANSLATIONS
+═══════════════════════════════════════════════ */
+const engine = new KidZoneGame({id:'abc'});
+const LANG = engine.lang || 'en';
 
-function updateUI() {
-  document.getElementById('lbl-title').textContent = t.title;
-  document.getElementById('lbl-score').textContent = t.score;
-  document.getElementById('lbl-quest').textContent = t.quest;
-  document.getElementById('res-ttl').textContent = t.great;
-  document.getElementById('btn-again').textContent = t.again;
-}
+const T = {
+  title:    {uz:"Alifbo",            ru:"Алфавит",           en:"ABC"},
+  question: {uz:"Birinchi harf?",    ru:"Первая буква?",     en:"First letter?"},
+  levelUp:  {uz:"Daraja oshdi!",     ru:"Уровень пройден!",  en:"Level Up!"},
+  nextLvl:  {uz:"Keyingi daraja →",  ru:"Следующий уровень →",en:"Next Level →"},
+  retry:    {uz:"Qayta urinish",     ru:"Попробовать снова", en:"Try Again"},
+  gameOver: {uz:"O'yin tugadi",      ru:"Игра окончена",     en:"Game Over"},
+  tryAgain: {uz:"Yana o'ynash",      ru:"Играть снова",      en:"Play Again"},
+  great:    {uz:"Barakalla! 🌟",     ru:"Отлично! 🌟",       en:"Great! 🌟"},
+  almost:   {uz:"Deyarli!",          ru:"Почти!",            en:"Almost!"},
+  selectLvl:{uz:"Daraja tanlang",    ru:"Выберите уровень",  en:"Select Level"},
+  howTitle: {uz:"Qanday o'ynash?",   ru:"Как играть?",       en:"How to play?"},
+  howSteps: {
+    uz:["Ekranda emoji va so'z chiqadi","So'zning BIRINCHI HARFINI tanlang","💡 Ko'mak — noto'g'ri harfni olib tashlaydi","❤️ 3 ta hayotingiz bor!","Daraja oshgan sari harflar ko'payadi","20 darajani bosib o'ting!"],
+    ru:["На экране появится эмодзи и слово","Выберите ПЕРВУЮ БУКВУ слова","💡 Подсказка убирает неверную букву","❤️ У вас 3 жизни!","С уровнем букв становится больше","Пройдите все 20 уровней!"],
+    en:["An emoji and word appear on screen","Choose the FIRST LETTER of the word","💡 Hint removes a wrong letter","❤️ You have 3 lives!","More letters unlock as you level up","Complete all 20 levels!"],
+  },
+};
+function t(k){ return T[k][LANG] || T[k]['en']; }
 
-function start() {
-  score = 0; qIdx = 0;
-  document.getElementById('score').textContent = "0";
-  document.getElementById('result').classList.add('h');
-  next();
-}
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+const GAME_ID = 'abc';
+const POOL = DATA[LANG] || DATA.en;
 
-function next() {
-  if (qIdx >= 10) {
-    document.getElementById('res-sc').textContent = `${t.score}: ${score}`;
-    document.getElementById('result').classList.remove('h');
-    engine.gameOver(Math.round(score/2));
-    return;
+/* all unique letters in pool (for building wrong choices) */
+const ALL_LETTERS = LANG === 'ru'
+  ? "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".split('')
+  : LANG === 'uz'
+    ? "ABDEFGHIJKLMNOQRSTUVXYZ".split('')
+    : "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+
+let _level, _cfg, _activePool, _questions, _qi, _score, _total;
+let _hint, _lives, _timer, _answered, _endAction;
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  _level      = KZL.getLevel(GAME_ID);
+  _cfg        = KZL.cfg(GAME_ID);
+  _activePool = KZL.slicePool(POOL, _level);
+  _total      = _cfg.q;
+  _qi         = 0;
+  _score      = 0;
+
+  document.getElementById('t-title').textContent = t('title');
+  document.getElementById('t-lvl').textContent   = _level;
+  document.getElementById('t-score').textContent = 0;
+  document.getElementById('lvl-title-text').textContent = t('selectLvl');
+
+  const hw = document.getElementById('hint-wrap');
+  const lw = document.getElementById('lives-wrap');
+  const tw = document.getElementById('timer-wrap');
+  hw.innerHTML = ''; lw.innerHTML = ''; tw.innerHTML = '';
+
+  _hint = KZL.createHints(_cfg.hints);
+  hw.appendChild(_hint.el);
+
+  _lives = KZL.createLives(3);
+  lw.appendChild(_lives.el);
+
+  _timer = null;
+  if (_cfg.timer > 0) {
+    _timer = KZL.createTimer(_cfg.timer, null, onTimeUp);
+    tw.appendChild(_timer.el);
   }
-  current = pool[qIdx];
-  document.getElementById('q-emoji').textContent = current.e;
-  document.getElementById('q-word').textContent = current.w;
-  document.getElementById('q-num').textContent = `${qIdx+1}/10`;
-  document.getElementById('prog-bar').style.width = `${(qIdx/10)*100}%`;
 
-  const options = [current.l];
-  const chars = engine.lang === 'ru' ? "АБВГДЕЁЖЗИЙКLMNOPQRSTUVWXYZ" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  while (options.length < 4) {
-    const r = chars[Math.floor(Math.random() * chars.length)];
-    if (!options.includes(r)) options.push(r);
-  }
-  options.sort(() => Math.random() - 0.5).forEach((v, i) => {
-    const btn = document.getElementById('btn' + i);
-    btn.textContent = v; btn.className = 'ans-btn';
+  buildQuestions();
+  buildDots();
+  renderQuestion();
+
+  KZL.howToPlay({
+    id: GAME_ID, lang: LANG,
+    title: t('howTitle'),
+    steps: T.howSteps[LANG] || T.howSteps['en'],
+    accentColor: '#FF6B35',
   });
 }
 
-function check(i) {
-  const btn = document.getElementById('btn' + i);
-  if (btn.textContent === current.l) {
-    btn.classList.add('correct'); score += 10;
-    document.getElementById('score').textContent = score;
-    engine.playSound('win');
-    qIdx++; setTimeout(next, 800);
-  } else {
-    btn.classList.add('wrong');
-    engine.playSound('lose');
-    engine.vibrate(50);
+/* ═══════════════════════════════════════════════
+   QUESTIONS
+═══════════════════════════════════════════════ */
+function buildQuestions() {
+  const shuffled = [..._activePool].sort(() => Math.random() - .5);
+  _questions = shuffled.slice(0, Math.min(_total, shuffled.length));
+  while (_questions.length < _total) {
+    _questions.push(_activePool[Math.floor(Math.random() * _activePool.length)]);
   }
 }
 
-window.onload = () => { updateUI(); start(); };
+function renderQuestion() {
+  _answered = false;
+  const q = _questions[_qi];
+
+  document.getElementById('q-emoji').textContent = q.e;
+  document.getElementById('q-word').textContent  = q.w;
+  document.getElementById('t-score').textContent  = _score;
+
+  /* progress bar */
+  document.getElementById('prog-bar').style.width = `${(_qi / _total) * 100}%`;
+
+  /* dots */
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    d.className = 'dot' + (i < _qi ? ' done' : i === _qi ? ' active' : '');
+  });
+
+  /* choices: pick letters from active pool letters */
+  const numChoices = _cfg.c;
+  const poolLetters = [...new Set(_activePool.map(x => x.l))];
+  const wrongs = poolLetters.filter(l => l !== q.l)
+                             .sort(() => Math.random() - .5)
+                             .slice(0, numChoices - 1);
+  /* if pool doesn't have enough unique letters, fill from ALL_LETTERS */
+  while (wrongs.length < numChoices - 1) {
+    const r = ALL_LETTERS[Math.floor(Math.random() * ALL_LETTERS.length)];
+    if (r !== q.l && !wrongs.includes(r)) wrongs.push(r);
+  }
+  const opts = [...wrongs, q.l].sort(() => Math.random() - .5);
+
+  const grid = document.getElementById('answers');
+  grid.innerHTML = '';
+  opts.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = letter;
+    btn.dataset.letter = letter;
+    btn.onclick = () => answer(letter, q, btn);
+    grid.appendChild(btn);
+  });
+
+  _hint.reset(_cfg.hints);
+  _hint.use(() => {
+    const wrongBtns = [...grid.querySelectorAll('.ans-btn')]
+      .filter(b => b.dataset.letter !== q.l && b.style.opacity !== '0.2');
+    if (wrongBtns.length > 0) {
+      const pick = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+      pick.style.opacity = '0.2';
+      pick.style.pointerEvents = 'none';
+    }
+  });
+
+  if (_timer) _timer.start();
+}
+
+/* ═══════════════════════════════════════════════
+   ANSWER / FLOW
+═══════════════════════════════════════════════ */
+function answer(letter, q, btn) {
+  if (_answered) return;
+  _answered = true;
+  if (_timer) _timer.stop();
+
+  if (letter === q.l) {
+    btn.classList.add('correct');
+    _score++;
+    document.getElementById('t-score').textContent = _score;
+    engine.playSound('win');
+    setTimeout(advance, 750);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.ans-btn').forEach(b => {
+      if (b.dataset.letter === q.l) b.classList.add('correct');
+    });
+    engine.playSound('lose');
+    _lives.lose();
+    if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+    setTimeout(advance, 1100);
+  }
+}
+
+function onTimeUp() {
+  if (_answered) return;
+  _answered = true;
+  const q = _questions[_qi];
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    if (b.dataset.letter === q.l) b.classList.add('correct');
+  });
+  _lives.lose();
+  if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+  setTimeout(advance, 1100);
+}
+
+function advance() {
+  _qi++;
+  document.querySelectorAll('.dot').forEach((d,i) => { if (i < _qi) d.className = 'dot done'; });
+  if (_qi >= _total) { levelDone(); return; }
+  renderQuestion();
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL DONE / GAME OVER
+═══════════════════════════════════════════════ */
+function levelDone() {
+  const pct = _score / _total;
+  const passed = pct >= 0.6;
+
+  if (passed && KZL.getLevel(GAME_ID) === _level) {
+    KZL.nextLevel(GAME_ID);
+    engine.gameOver(Math.round(_score * 2));
+  }
+
+  const nextL = KZL.getLevel(GAME_ID);
+  const isNew = passed && nextL > _level;
+
+  showEnd({
+    icon:   isNew ? '🌟' : (passed ? '✅' : '🔤'),
+    title:  isNew ? t('levelUp') : (passed ? t('great') : t('almost')),
+    msg:    `${_score} / ${_total}`,
+    btn:    isNew ? t('nextLvl') : t('retry'),
+    action: () => { _level = KZL.getLevel(GAME_ID); init(); },
+  });
+}
+
+function showGameOver() {
+  showEnd({
+    icon:'💔', title:t('gameOver'),
+    msg:`${_score} / ${_total}`,
+    btn:t('tryAgain'),
+    action: () => init(),
+  });
+}
+
+function showEnd({icon, title, msg, btn, action}) {
+  document.getElementById('end-icon').textContent  = icon;
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-msg').textContent   = msg;
+  document.getElementById('end-btn').textContent   = btn;
+  _endAction = action;
+  document.getElementById('end-overlay').classList.add('open');
+}
+
+function onEndBtn() {
+  document.getElementById('end-overlay').classList.remove('open');
+  if (_endAction) _endAction();
+}
+
+/* ═══════════════════════════════════════════════
+   DOTS / LEVEL SELECTOR
+═══════════════════════════════════════════════ */
+function buildDots() {
+  const row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (let i = 0; i < _total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    row.appendChild(d);
+  }
+}
+
+function openLevelSelector() {
+  const max = KZL.getLevel(GAME_ID);
+  const grid = document.getElementById('lvl-grid');
+  grid.innerHTML = '';
+  for (let n = 1; n <= 20; n++) {
+    const cfg = KZL.CONFIGS[n - 1];
+    const poolSize = Math.max(2, Math.floor(POOL.length * cfg.pool));
+    const btn = document.createElement('button');
+    btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
+    btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small><br><small style="font-size:9px;opacity:.7">${poolSize} items</small>`;
+    if (n <= max) btn.onclick = () => { _level = n; KZL.setLevel(GAME_ID, n); closeLevelSelector(); init(); };
+    grid.appendChild(btn);
+  }
+  document.getElementById('lvl-overlay').classList.add('open');
+}
+
+function closeLevelSelector() {
+  document.getElementById('lvl-overlay').classList.remove('open');
+}
+
+/* ── start ── */
+init();
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('kz-prog-abc', '100');
+});
 </script>
 </body>
 </html>

@@ -242,12 +242,14 @@ body {
   100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(1); }
 }
 </style>
+<script src="kz-ui.js"></script>
 <script src="admob.js"></script>
 <script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 </head>
 <body>
 
 <div id="header">
+  <button onclick="history.back()" style="background:#1a1a1a;border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;color:#fff;flex-shrink:0">←</button>
   <div class="stat-box">
     <div class="stat-label">BALL</div>
     <div class="stat-value" id="score-val">0</div>
@@ -364,13 +366,21 @@ const COLORS = [
   { name: 'SARIQ',  hex: '#ffd700', dark: '#cc9f00' },
 ];
 
+const _CR_LANG = navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('en') ? 'en' : 'uz';
+const _CR_HOW = {
+  uz:["Ekranda rang nomi yoziladi","Shu rangdagi tugmani toping va bosing!","Tez bosgan sari ko'proq ball olasiz","Ketma-ket to'g'ri javoblar bonus beradi 🔥","❤️ 3 ta hayotingiz bor — ehtiyot bo'ling!"],
+  ru:["На экране появляется название цвета","Нажмите кнопку этого цвета!","Чем быстрее — тем больше очков","Серия правильных ответов даёт бонус 🔥","❤️ У вас 3 жизни — будьте осторожны!"],
+  en:["A color name appears on screen","Tap the button of that color!","The faster you tap, the more points","Streak bonuses for consecutive correct answers 🔥","❤️ You have 3 lives — be careful!"],
+};
+
+let crLevel = KZL.getLevel('color-rush');
 let score = 0;
 let best = parseInt(localStorage.getItem('colorBest') || '0');
 let lives = 3;
 let gameOn = false;
 let currentAnswer = 0;
 let buttonColors = [];
-let timePerQ = 3000;
+let timePerQ = Math.max(900, 3500 - (crLevel - 1) * 100);
 let timer = null;
 let barAnim = null;
 let barStart = 0;
@@ -390,11 +400,19 @@ function startGame() {
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('over-screen').classList.add('hidden');
 
+  crLevel = KZL.getLevel('color-rush');
   score = 0;
   lives = 3;
   streak = 0;
   gameOn = true;
-  timePerQ = 3000;
+  timePerQ = Math.max(900, 3500 - (crLevel - 1) * 100);
+
+  KZL.howToPlay({
+    id:'color-rush', lang:_CR_LANG,
+    title:_CR_LANG==='ru'?'Как играть?':_CR_LANG==='en'?'How to play?':'Qanday o\'ynash?',
+    steps:_CR_HOW[_CR_LANG]||_CR_HOW['uz'],
+    accentColor:'#ff453a',
+  });
 
   updateScore();
   updateHearts();
@@ -545,6 +563,12 @@ function endGame() {
   // Update total points in the main app
   const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
   localStorage.setItem('kz-pts', currentTotal + Math.round(score / 5));
+
+  // KZL level up every 100 score
+  if (score >= crLevel * 80 && KZL.getLevel('color-rush') === crLevel) {
+    KZL.nextLevel('color-rush');
+    crLevel = KZL.getLevel('color-rush');
+  }
 
   // Update progress
   localStorage.setItem('kz-prog-color-sort', '100');

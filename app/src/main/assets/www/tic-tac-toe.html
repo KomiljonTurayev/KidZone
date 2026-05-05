@@ -93,7 +93,35 @@
     </div>
     <div class="board" id="board"></div>
     <div class="controls"><button onclick="resetGame()">Qaytadan boshlash</button></div>
+    <script src="kz-ui.js"></script>
     <script src="game-engine.js"></script>
     <script src="tic-tac-toe.js"></script>
+    <script>
+    (function() {
+      /* back button */
+      const b = document.createElement('button');
+      b.textContent = '←';
+      Object.assign(b.style, {
+        position:'fixed',top:'10px',left:'10px',zIndex:'50',
+        background:'rgba(0,0,0,.2)',border:'none',borderRadius:'50%',
+        width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#333',
+      });
+      b.onclick = () => history.back();
+      document.body.appendChild(b);
+
+      const _L = navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('en') ? 'en' : 'uz';
+      const _H = {
+        uz:["Katakchani bosib belgi qo'ying (✕)","Raqib belgisi (○) qo'yadi","3 ta ketma-ket belgi — g'alaba!","Gorizontal, vertikal yoki diagonal","Barcha katakcha to'lsa — durang"],
+        ru:["Нажмите клетку чтобы поставить ✕","Соперник ставит ○","3 в ряд — победа!","Горизонталь, вертикаль или диагональ","Все клетки заполнены — ничья"],
+        en:["Tap a cell to place your ✕","The bot plays ○","3 in a row wins!","Horizontal, vertical, or diagonal","All cells filled — draw"],
+      };
+      KZL.howToPlay({
+        id:'tic-tac-toe', lang:_L,
+        title:_L==='ru'?'Как играть?':_L==='en'?'How to play?':'Qanday o\'ynash?',
+        steps:_H[_L]||_H['uz'],
+        accentColor:'#5ce1e6',
+      });
+    })();
+    </script>
 </body>
 </html>

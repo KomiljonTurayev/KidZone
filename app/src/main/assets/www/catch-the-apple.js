@@ -71,7 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameActive = false;
     let requestID;
     let appleSpawnInterval;
-    let appleSpeed = 2; // Initial apple falling speed
+    const _CA_KZL_ID = 'catch-the-apple';
+    let _caLevel = (window.KZL ? KZL.getLevel(_CA_KZL_ID) : 1);
+    let appleSpeed = 2 + (_caLevel - 1) * 0.15; // Initial apple falling speed
     const APPLE_RADIUS = 15;
     // const MAX_APPLES = 10; // Max number of apples on screen at once - controlled by spawn interval
 
@@ -82,7 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
         score = 0;
         lives = 3;
         gameActive = false;
-        appleSpeed = 2;
+        _caLevel = (window.KZL ? KZL.getLevel(_CA_KZL_ID) : 1);
+        appleSpeed = 2 + (_caLevel - 1) * 0.15;
         player.width = 60; // Reset size to normal
         if (player.powerUpTimer) clearTimeout(player.powerUpTimer);
         player.isFlashing = false;
@@ -284,8 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
         startButton.style.display = 'block';
 
         if (score > 10) {
+            if (window.KZL) _caLevel = KZL.nextLevel(_CA_KZL_ID);
             gameEngine.spawnConfetti();
-            gameEngine.screenShake(500, canvas); // Celebrate on the game area
+            gameEngine.screenShake(500, canvas);
         }
 
         gameEngine.gameOver(score); // Report final score and trigger ad logic

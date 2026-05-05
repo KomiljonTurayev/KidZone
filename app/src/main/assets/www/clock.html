@@ -4,66 +4,115 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Learn Clock ⏰</title>
+<script src="kz-ui.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
-body {
-  min-height:100vh; background:#f0f4f8;
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
+body{min-height:100vh;background:#f0f4f8;
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
-  display:flex; flex-direction:column; align-items:center;
-}
-#topbar { width:100%; padding:20px; display:flex; justify-content:space-between; }
-.badge { background:white; border-radius:20px; padding:10px 20px; box-shadow:0 4px 10px rgba(0,0,0,0.05); font-weight: 800; color: #FF6B35; }
+  display:flex;flex-direction:column;align-items:center;overflow-x:hidden;}
 
-#clock-card {
-  width:90%; max-width:360px; background:white; border-radius:32px;
-  padding:30px; box-shadow:0 15px 40px rgba(0,0,0,0.1);
-  display:flex; flex-direction:column; align-items:center; margin-top:20px;
-}
-#instruction { font-size:18px; color:#2c3e50; margin-bottom:20px; text-align:center; font-weight:bold; }
+/* ── header ── */
+#topbar{width:100%;background:linear-gradient(135deg,#FF6B35,#FF9F43);
+  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
+  box-shadow:0 3px 12px rgba(0,0,0,.2);}
+#back-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;
+  width:40px;height:40px;font-size:20px;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;}
+#title-text{flex:1;color:#fff;font-size:16px;font-weight:900;}
+#level-badge{background:rgba(255,255,255,.25);color:#fff;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
+#score-pill{background:#fff;color:#FF6B35;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;}
 
-#clock-face {
-  width:260px; height:260px; border-radius:50%; border:12px solid #2d3436;
-  position:relative; background:white; box-shadow:inset 0 0 20px rgba(0,0,0,0.1);
-}
-.number {
-  position:absolute; width:100%; height:100%; text-align:center;
-  font-size:24px; font-weight:900; color:#2d3436; padding:12px;
-}
-/* Center numbers upright */
-.number span { display: inline-block; }
+/* ── tools ── */
+#tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:10px 16px 0;flex-wrap:wrap;}
 
-.hand {
-  position:absolute; bottom:50%; left:50%; transform-origin:bottom;
-  border-radius:10px; transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
-}
-#hour-hand { width:8px; height:65px; background:#2d3436; z-index:2; margin-left: -4px; }
-#min-hand  { width:6px; height:95px; background:#FF9F43; z-index:1; margin-left: -3px; }
-#center-pin {
-  position:absolute; top:50%; left:50%; width:18px; height:16px;
-  background:#2d3436; border-radius:50%; transform:translate(-50%,-50%); z-index:3;
-}
+/* ── clock card ── */
+#clock-card{width:90%;max-width:380px;background:#fff;border-radius:32px;
+  padding:24px 20px;box-shadow:0 15px 40px rgba(0,0,0,.1);
+  display:flex;flex-direction:column;align-items:center;margin-top:16px;}
+#instruction{font-size:17px;color:#2c3e50;margin-bottom:18px;text-align:center;font-weight:bold;}
+#level-hint{font-size:12px;color:#FF9F43;margin-bottom:10px;font-weight:700;letter-spacing:1px;}
 
-#choices {
-  display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:30px; width:90%; max-width:360px;
-}
-.choice-btn {
-  background:white; border:none; border-radius:20px; padding:15px;
-  font-size:24px; font-weight:900; box-shadow:0 6px 15px rgba(0,0,0,0.08);
-  cursor:pointer; transition:all 0.15s; color: #2d3436;
-}
-.choice-btn:active { transform:scale(0.92); }
-.correct { background:#10B981 !important; color:white; }
-.wrong { background:#EF4444 !important; color:white; }
+/* ── clock face ── */
+#clock-face{width:240px;height:240px;border-radius:50%;border:12px solid #2d3436;
+  position:relative;background:#fff;box-shadow:inset 0 0 20px rgba(0,0,0,.08);}
+.num-mark{position:absolute;width:100%;height:100%;text-align:center;
+  font-size:20px;font-weight:900;color:#2d3436;padding:14px;}
+.num-mark span{display:inline-block;}
+.hand{position:absolute;bottom:50%;left:50%;transform-origin:bottom;
+  border-radius:10px;transition:transform .6s cubic-bezier(.34,1.56,.64,1);}
+#hour-hand{width:8px;height:60px;background:#2d3436;z-index:2;margin-left:-4px;}
+#min-hand{width:6px;height:85px;background:#FF9F43;z-index:1;margin-left:-3px;}
+#center-pin{position:absolute;top:50%;left:50%;width:16px;height:16px;
+  background:#2d3436;border-radius:50%;transform:translate(-50%,-50%);z-index:3;}
+
+/* ── choices ── */
+#choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  margin-top:20px;width:90%;max-width:380px;}
+.choice-btn{background:#fff;border:2px solid #FFE0B2;border-radius:20px;padding:16px;
+  font-size:22px;font-weight:900;box-shadow:0 6px 15px rgba(0,0,0,.07);
+  cursor:pointer;transition:transform .1s,opacity .25s;color:#2d3436;}
+.choice-btn:active{transform:scale(.92);}
+.choice-btn.correct{background:#10B981!important;color:#fff!important;border-color:#10B981;}
+.choice-btn.wrong{background:#EF4444!important;color:#fff!important;border-color:#EF4444;}
+
+/* ── dots ── */
+#dots-row{display:flex;justify-content:center;gap:7px;margin:14px auto 6px;flex-wrap:wrap;max-width:300px;}
+.dot{width:12px;height:12px;border-radius:50%;background:#FFE0B2;transition:background .3s;}
+.dot.done{background:#FF9F43;}
+.dot.active{background:#FF6B35;transform:scale(1.25);}
+
+/* ── level selector ── */
+#lvl-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;
+  align-items:center;justify-content:center;}
+#lvl-overlay.open{display:flex;}
+#lvl-box{background:#fff;border-radius:28px;padding:24px 18px;
+  width:92%;max-width:420px;max-height:88vh;overflow-y:auto;}
+#lvl-box h2{text-align:center;color:#FF6B35;margin-bottom:16px;font-size:18px;}
+#lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.lvl-btn{background:#FFF3E0;border:2px solid #FFE0B2;border-radius:14px;
+  padding:10px 4px;font-size:12px;font-weight:900;color:#FF6B35;cursor:pointer;text-align:center;}
+.lvl-btn.current{background:#FF6B35;color:#fff;border-color:#FF6B35;}
+.lvl-btn.locked{opacity:.4;cursor:default;}
+#lvl-close{display:block;margin:16px auto 0;background:#FF6B35;color:#fff;border:none;
+  border-radius:20px;padding:10px 32px;font-size:15px;font-weight:900;cursor:pointer;}
+
+/* ── end overlay ── */
+#end-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:95;
+  align-items:center;justify-content:center;}
+#end-overlay.open{display:flex;}
+#end-box{background:#fff;border-radius:28px;padding:32px 24px;
+  width:88%;max-width:360px;text-align:center;}
+#end-icon{font-size:64px;margin-bottom:8px;}
+#end-title{font-size:22px;font-weight:900;color:#FF6B35;margin-bottom:6px;}
+#end-msg{font-size:15px;color:#666;margin-bottom:20px;}
+#end-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;
+  padding:12px 36px;font-size:16px;font-weight:900;cursor:pointer;}
 </style>
 </head>
 <body>
+
+<!-- ── TOP BAR ── -->
 <div id="topbar">
-  <div class="badge"><span id="ui-score-label">⭐ SCORE</span>: <span id="score">0</span></div>
-  <div class="badge"><span id="ui-lvl-label">LEVEL</span>: <span id="lvl">1</span></div>
+  <button id="back-btn" onclick="history.back()">←</button>
+  <div id="title-text">⏰ <span id="t-title">Clock</span></div>
+  <div id="level-badge" onclick="openLevelSelector()">LVL <span id="t-lvl">1</span></div>
+  <div id="score-pill">⭐ <span id="t-score">0</span></div>
 </div>
 
+<!-- ── TOOLS ── -->
+<div id="tools-row">
+  <div id="hint-wrap"></div>
+  <div id="lives-wrap"></div>
+  <div id="timer-wrap"></div>
+</div>
+
+<!-- ── CLOCK CARD ── -->
 <div id="clock-card">
-  <div id="instruction">What time is it?</div>
+  <div id="level-hint"></div>
+  <div id="instruction"></div>
   <div id="clock-face">
     <div id="center-pin"></div>
     <div class="hand" id="hour-hand"></div>
@@ -71,31 +120,89 @@ body {
   </div>
 </div>
 
+<!-- ── CHOICES ── -->
 <div id="choices"></div>
+
+<!-- ── DOTS ── -->
+<div id="dots-row"></div>
+
+<!-- ── LEVEL SELECTOR ── -->
+<div id="lvl-overlay">
+  <div id="lvl-box">
+    <h2 id="lvl-title-text"></h2>
+    <div id="lvl-grid"></div>
+    <button id="lvl-close" onclick="closeLevelSelector()">✕</button>
+  </div>
+</div>
+
+<!-- ── END OVERLAY ── -->
+<div id="end-overlay">
+  <div id="end-box">
+    <div id="end-icon">🌟</div>
+    <div id="end-title"></div>
+    <div id="end-msg"></div>
+    <button id="end-btn" onclick="onEndBtn()"></button>
+  </div>
+</div>
 
 <script src="game-engine.js"></script>
 <script>
-const translations = {
-    en: { quest: "What time is it?", score: "SCORE", lvl: "LEVEL" },
-    uz: { quest: "Bu soat nechini ko'rsatyapti?", score: "BALL", lvl: "DARAJA" },
-    ru: { quest: "Который час?", score: "СЧЕТ", lvl: "УРОВЕНЬ" }
+/* ═══════════════════════════════════════════════
+   LANG / TRANSLATIONS
+═══════════════════════════════════════════════ */
+const engine = new KidZoneGame({id:'clock'});
+const LANG = engine.lang || 'uz';
+
+const T = {
+  title:     {uz:"Soat o'rganish",      ru:"Учим время",           en:"Learn Clock"},
+  question:  {uz:"Bu soat nechini ko'rsatyapti?", ru:"Который час?", en:"What time is it?"},
+  levelUp:   {uz:"Daraja oshdi!",       ru:"Уровень пройден!",     en:"Level Up!"},
+  nextLvl:   {uz:"Keyingi daraja →",    ru:"Следующий уровень →",  en:"Next Level →"},
+  retry:     {uz:"Qayta urinish",       ru:"Попробовать снова",    en:"Try Again"},
+  gameOver:  {uz:"O'yin tugadi",        ru:"Игра окончена",        en:"Game Over"},
+  tryAgain:  {uz:"Yana o'ynash",        ru:"Играть снова",         en:"Play Again"},
+  great:     {uz:"Ajoyib! 🌟",          ru:"Отлично! 🌟",          en:"Great! 🌟"},
+  almost:    {uz:"Deyarli!",            ru:"Почти!",               en:"Almost!"},
+  selectLvl: {uz:"Daraja tanlang",      ru:"Выберите уровень",     en:"Select Level"},
+  howTitle:  {uz:"Qanday o'ynash?",     ru:"Как играть?",          en:"How to play?"},
+  howSteps: {
+    uz:["Soat millarini ko'ring","To'g'ri vaqtni tanlang","Qisqa mil — soat, uzun mil — daqiqa","Daraja oshgan sari vaqt aniqroq bo'ladi","💡 Ko'mak noto'g'ri javobni olib tashlaydi","❤️ 3 ta hayotingiz bor!"],
+    ru:["Посмотрите на стрелки часов","Выберите правильное время","Короткая стрелка — часы, длинная — минуты","С уровнем время становится точнее","💡 Подсказка убирает неверный ответ","❤️ У вас 3 жизни!"],
+    en:["Look at the clock hands","Choose the correct time","Short hand = hours, long hand = minutes","Times get more precise as you level up","💡 Hint removes a wrong answer","❤️ You have 3 lives!"],
+  },
+  hints: {
+    uz:["Butun soatlar (1:00 – 12:00)","Butun soatlar","Yarim soatlar (X:00, X:30)","Yarim soatlar","Chorak soatlar (X:00, X:15, X:30, X:45)","Chorak soatlar","5-daqiqalik oraliqlar","5-daqiqalik oraliqlar","5-daqiqalik oraliqlar","5-daqiqalik oraliqlar","Har qanday daqiqa","Har qanday daqiqa","Har qanday daqiqa","Har qanday daqiqa","Har qanday daqiqa","Har qanday daqiqa","Ekspert: har qanday vaqt","Ekspert: har qanday vaqt","Ekspert: har qanday vaqt","Ekspert: har qanday vaqt"],
+    ru:["Целые часы (1:00 – 12:00)","Целые часы","Полчаса (X:00, X:30)","Полчаса","Четверти часа","Четверти часа","5-минутные интервалы","5-минутные интервалы","5-минутные интервалы","5-минутные интервалы","Любая минута","Любая минута","Любая минута","Любая минута","Любая минута","Любая минута","Эксперт","Эксперт","Эксперт","Эксперт"],
+    en:["Whole hours (1:00 – 12:00)","Whole hours","Half hours (X:00, X:30)","Half hours","Quarter hours","Quarter hours","5-minute intervals","5-minute intervals","5-minute intervals","5-minute intervals","Any minute","Any minute","Any minute","Any minute","Any minute","Any minute","Expert: any time","Expert: any time","Expert: any time","Expert: any time"],
+  },
 };
+function t(k){ return T[k][LANG] || T[k]['en']; }
 
-let score = 0, level = 1, currentH = 12, currentM = 0;
-const engine = new KidZoneGame({ id: 'clock' });
-const t = engine.getTranslations(translations);
-
-function updateUI() {
-    document.getElementById('instruction').textContent = t.quest;
-    document.getElementById('ui-score-label').textContent = t.score;
-    document.getElementById('ui-lvl-label').textContent = t.lvl;
+/* ── minute sets by level group ── */
+function minutesForLevel(lv) {
+  if (lv <= 2)  return [0];
+  if (lv <= 4)  return [0, 30];
+  if (lv <= 6)  return [0, 15, 30, 45];
+  if (lv <= 10) return [0,5,10,15,20,25,30,35,40,45,50,55];
+  return Array.from({length:60},(_,i)=>i); /* any minute */
 }
 
-function buildClock() {
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+const GAME_ID = 'clock';
+let _level, _cfg, _questions, _qi, _score, _total;
+let _hint, _lives, _timer, _answered, _endAction;
+
+/* ═══════════════════════════════════════════════
+   CLOCK FACE
+═══════════════════════════════════════════════ */
+function buildClockFace() {
   const face = document.getElementById('clock-face');
-  for(let i=1; i<=12; i++) {
+  face.querySelectorAll('.num-mark').forEach(n=>n.remove());
+  for (let i = 1; i <= 12; i++) {
     const num = document.createElement('div');
-    num.className = 'number';
+    num.className = 'num-mark';
     const angle = i * 30;
     num.style.transform = `rotate(${angle}deg)`;
     num.innerHTML = `<span style="transform:rotate(-${angle}deg)">${i}</span>`;
@@ -103,59 +210,262 @@ function buildClock() {
   }
 }
 
-function nextQ() {
-  currentH = 1 + Math.floor(Math.random() * 12);
-  currentM = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
-
-  // Hour hand moves slightly as minutes progress: (H * 30) + (M / 60 * 30)
-  const hourDeg = (currentH * 30) + (currentM * 0.5);
-  const minDeg = currentM * 6;
-
+function setClockHands(h, m) {
+  const hourDeg = (h * 30) + (m * 0.5);
+  const minDeg  = m * 6;
   document.getElementById('hour-hand').style.transform = `rotate(${hourDeg}deg)`;
-  document.getElementById('min-hand').style.transform = `rotate(${minDeg}deg)`;
+  document.getElementById('min-hand').style.transform  = `rotate(${minDeg}deg)`;
+}
 
-  const correctTime = `${currentH}:${currentM === 0 ? '00' : currentM}`;
-  const options = [correctTime];
-  while(options.length < 4) {
-    const h = 1 + Math.floor(Math.random() * 12);
-    const m = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
-    const time = `${h}:${m === 0 ? '00' : m}`;
-    if(!options.includes(time)) options.push(time);
+function formatTime(h, m) {
+  return `${h}:${m === 0 ? '00' : (m < 10 ? '0' + m : m)}`;
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  _level = KZL.getLevel(GAME_ID);
+  _cfg   = KZL.cfg(GAME_ID);
+  _total = _cfg.q;
+  _qi    = 0;
+  _score = 0;
+
+  document.getElementById('t-title').textContent = t('title');
+  document.getElementById('t-lvl').textContent   = _level;
+  document.getElementById('t-score').textContent = 0;
+  document.getElementById('instruction').textContent = t('question');
+  document.getElementById('level-hint').textContent  =
+    (T.hints[LANG] || T.hints['en'])[_level - 1] || '';
+  document.getElementById('lvl-title-text').textContent = t('selectLvl');
+
+  const hw = document.getElementById('hint-wrap');
+  const lw = document.getElementById('lives-wrap');
+  const tw = document.getElementById('timer-wrap');
+  hw.innerHTML = ''; lw.innerHTML = ''; tw.innerHTML = '';
+
+  _hint = KZL.createHints(_cfg.hints);
+  hw.appendChild(_hint.el);
+
+  _lives = KZL.createLives(3);
+  lw.appendChild(_lives.el);
+
+  _timer = null;
+  if (_cfg.timer > 0) {
+    _timer = KZL.createTimer(_cfg.timer, null, onTimeUp);
+    tw.appendChild(_timer.el);
   }
 
-  const grid = document.getElementById('choices');
-  grid.innerHTML = '';
-  options.sort(() => Math.random() - 0.5).forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = opt;
-    btn.onclick = () => check(opt, btn, correctTime);
-    grid.appendChild(btn);
+  buildQuestions();
+  buildDots();
+  renderQuestion();
+
+  KZL.howToPlay({
+    id: GAME_ID, lang: LANG,
+    title: t('howTitle'),
+    steps: T.howSteps[LANG] || T.howSteps['en'],
+    accentColor: '#FF6B35',
   });
 }
 
-function check(val, btn, correct) {
-  if(val === correct) {
-    btn.classList.add('correct');
-    score += 10;
-    document.getElementById('score').textContent = score;
-    engine.playSound('win');
-    if (score % 50 === 0) {
-        level++;
-        document.getElementById('lvl').textContent = level;
+/* ═══════════════════════════════════════════════
+   QUESTIONS
+═══════════════════════════════════════════════ */
+function genTime() {
+  const mins = minutesForLevel(_level);
+  const h = 1 + Math.floor(Math.random() * 12);
+  const m = mins[Math.floor(Math.random() * mins.length)];
+  return {h, m, text: formatTime(h, m)};
+}
+
+function buildQuestions() {
+  _questions = [];
+  const seen = new Set();
+  let tries = 0;
+  while (_questions.length < _total && tries++ < 200) {
+    const q = genTime();
+    if (!seen.has(q.text)) { seen.add(q.text); _questions.push(q); }
+  }
+  while (_questions.length < _total) _questions.push(genTime());
+}
+
+function renderQuestion() {
+  _answered = false;
+  const q = _questions[_qi];
+
+  setClockHands(q.h, q.m);
+  document.getElementById('t-score').textContent = _score;
+
+  /* dots */
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    d.className = 'dot' + (i < _qi ? ' done' : i === _qi ? ' active' : '');
+  });
+
+  /* build wrong options */
+  const numChoices = _cfg.c;
+  const wrongs = new Set();
+  let safe = 0;
+  while (wrongs.size < numChoices - 1 && safe++ < 200) {
+    const w = genTime();
+    if (w.text !== q.text && !wrongs.has(w.text)) wrongs.add(w.text);
+  }
+  const opts = [...wrongs, q.text].sort(() => Math.random() - .5);
+
+  const grid = document.getElementById('choices');
+  grid.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt;
+    btn.dataset.val = opt;
+    btn.onclick = () => answer(opt, q, btn);
+    grid.appendChild(btn);
+  });
+
+  _hint.reset(_cfg.hints);
+  _hint.use(() => {
+    const wrongBtns = [...grid.querySelectorAll('.choice-btn')]
+      .filter(b => b.dataset.val !== q.text && b.style.opacity !== '0.2');
+    if (wrongBtns.length > 0) {
+      const pick = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+      pick.style.opacity = '0.2';
+      pick.style.pointerEvents = 'none';
     }
-    setTimeout(nextQ, 1000);
+  });
+
+  if (_timer) _timer.start();
+}
+
+/* ═══════════════════════════════════════════════
+   ANSWER / FLOW
+═══════════════════════════════════════════════ */
+function answer(val, q, btn) {
+  if (_answered) return;
+  _answered = true;
+  if (_timer) _timer.stop();
+
+  if (val === q.text) {
+    btn.classList.add('correct');
+    _score++;
+    document.getElementById('t-score').textContent = _score;
+    engine.playSound('win');
+    setTimeout(advance, 800);
   } else {
     btn.classList.add('wrong');
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.dataset.val === q.text) b.classList.add('correct');
+    });
     engine.playSound('lose');
-    engine.vibrate(50);
+    _lives.lose();
+    if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+    setTimeout(advance, 1100);
   }
 }
 
-window.onload = () => { buildClock(); updateUI(); nextQ(); };
+function onTimeUp() {
+  if (_answered) return;
+  _answered = true;
+  const q = _questions[_qi];
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    if (b.dataset.val === q.text) b.classList.add('correct');
+  });
+  _lives.lose();
+  if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+  setTimeout(advance, 1100);
+}
+
+function advance() {
+  _qi++;
+  document.querySelectorAll('.dot').forEach((d,i) => { if (i < _qi) d.className = 'dot done'; });
+  if (_qi >= _total) { levelDone(); return; }
+  renderQuestion();
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL DONE / GAME OVER
+═══════════════════════════════════════════════ */
+function levelDone() {
+  const pct = _score / _total;
+  const passed = pct >= 0.6;
+
+  if (passed && KZL.getLevel(GAME_ID) === _level) {
+    KZL.nextLevel(GAME_ID);
+    engine.gameOver(Math.round(_score * 3));
+  }
+
+  const nextL = KZL.getLevel(GAME_ID);
+  const isNew = passed && nextL > _level;
+
+  showEnd({
+    icon:  isNew ? '🌟' : (passed ? '✅' : '⏰'),
+    title: isNew ? t('levelUp') : (passed ? t('great') : t('almost')),
+    msg:   `${_score} / ${_total}`,
+    btn:   isNew ? t('nextLvl') : t('retry'),
+    action: () => { _level = KZL.getLevel(GAME_ID); init(); },
+  });
+}
+
+function showGameOver() {
+  showEnd({
+    icon:'💔', title:t('gameOver'),
+    msg:`${_score} / ${_total}`,
+    btn:t('tryAgain'),
+    action: () => init(),
+  });
+}
+
+function showEnd({icon, title, msg, btn, action}) {
+  document.getElementById('end-icon').textContent  = icon;
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-msg').textContent   = msg;
+  document.getElementById('end-btn').textContent   = btn;
+  _endAction = action;
+  document.getElementById('end-overlay').classList.add('open');
+}
+
+function onEndBtn() {
+  document.getElementById('end-overlay').classList.remove('open');
+  if (_endAction) _endAction();
+}
+
+/* ═══════════════════════════════════════════════
+   DOTS / LEVEL SELECTOR
+═══════════════════════════════════════════════ */
+function buildDots() {
+  const row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (let i = 0; i < _total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    row.appendChild(d);
+  }
+}
+
+function openLevelSelector() {
+  const max = KZL.getLevel(GAME_ID);
+  const grid = document.getElementById('lvl-grid');
+  grid.innerHTML = '';
+  for (let n = 1; n <= 20; n++) {
+    const cfg = KZL.CONFIGS[n - 1];
+    const btn = document.createElement('button');
+    btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
+    btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small>`;
+    if (n <= max) btn.onclick = () => { _level = n; KZL.setLevel(GAME_ID, n); closeLevelSelector(); init(); };
+    grid.appendChild(btn);
+  }
+  document.getElementById('lvl-overlay').classList.add('open');
+}
+
+function closeLevelSelector() {
+  document.getElementById('lvl-overlay').classList.remove('open');
+}
+
+/* ── start ── */
+buildClockFace();
+init();
 
 window.addEventListener('beforeunload', () => {
-  engine.gameOver(Math.round(score/3));
+  localStorage.setItem('kz-prog-clock', '100');
 });
 </script>
 </body>
