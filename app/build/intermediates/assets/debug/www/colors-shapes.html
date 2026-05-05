@@ -214,8 +214,8 @@ body {
   100% { transform: translate(var(--tx), 100vh) rotate(360deg); opacity: 0; }
 }
 </style>
-<script src="admob.js">window.addEventListener('load', () => window.AdMobMgr?.init('colors-shapes'));
-</script>
+<script src="admob.js"></script>
+<script>window.addEventListener('load', () => window.AdMobMgr?.init('colors-shapes'));</script>
 <script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 </head>
 <body>
@@ -358,8 +358,8 @@ function beep(f, d=0.15, t="sine") {
     o.start();o.stop(audioCtx.currentTime+d);
   } catch(e){}
 }
-const playOk   = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,"triangle"),i*60));
-const playFail = () => { beep(200,"sawtooth",0.3); };
+const playOk   = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.15,"triangle"),i*60));
+const playFail = () => { beep(200,0.3,"sawtooth"); };
 
 function setMode(m) {
   gameMode = m;

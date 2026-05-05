@@ -53,11 +53,11 @@ const T = {
   ru: { title:"Математика", desc:"Решай простые примеры!", start:"ИГРАТЬ", finish:"Конец!", score:"Счет", again:"ЕЩЕ РАЗ", label:"МАТЕМАТИКА" }
 };
 
-let lang = new URLSearchParams(window.location.search).get('lang') || 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
 let score = 0, current = 0, qNum = 0, total = 5;
 
 function updateUI() {
-  const t = T[lang];
+  const t = T[lang] || T.en;
   document.getElementById('ui-start-t').textContent = t.title;
   document.getElementById('ui-start-d').textContent = t.desc;
   document.querySelector('#start-screen .btn-p').textContent = t.start;

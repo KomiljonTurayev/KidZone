@@ -29,6 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
             win: "Yutdingiz!",
             over: "Vaqt tugadi!",
             again: "Qayta o'ynash"
+        },
+        ru: {
+            score: "Очки",
+            timer: "Время",
+            start: "Начать",
+            win: "Ты выиграл!",
+            over: "Время вышло!",
+            again: "Ещё раз"
         }
     };
     const t = game.getTranslations(translations);
@@ -80,34 +88,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     font-size: 22px; cursor: pointer;
                     display: flex; align-items: center; justify-content: center;
                     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                    animation: mutePopIn 0.5s ease-out;
                 }
                 #global-mute-btn:active { transform: scale(0.85); }
-                #global-mute-btn.is-muted { 
-                    background: rgba(200, 200, 200, 0.9); 
+                #global-mute-btn.is-muted {
+                    background: rgba(200, 200, 200, 0.9);
                     box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
                 }
-                @keyframes mutePopIn {
-                    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-                    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+                .glow-effect {
+                    animation: kzGlow 0.6s ease-out;
                 }
-                @keyframes mutePulse {
-                    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-                    70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-                    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+                @keyframes kzGlow {
+                    0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+                    70% { box-shadow: 0 0 0 15px rgba(76,175,80,0); }
+                    100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
                 }
-                #global-mute-btn:not(.is-muted) { animation: mutePulse 2s infinite; }
+                .timer-warning {
+                    color: #E53935 !important;
+                    animation: timerPulse 0.5s ease-in-out infinite alternate;
+                }
+                @keyframes timerPulse {
+                    from { opacity: 1; } to { opacity: 0.5; }
+                }
             `;
             document.head.appendChild(style);
         }
-        
+
         // Add Global Mute Button if not exists
         if (!document.getElementById('global-mute-btn')) {
             const muteBtn = document.createElement('button');
             muteBtn.id = 'global-mute-btn';
-            muteBtn.onclick = () => AdMobMgr.toggleMute();
+            muteBtn.textContent = game.isMuted ? '🔇' : '🔊';
+            muteBtn.classList.toggle('is-muted', game.isMuted);
+            muteBtn.onclick = () => {
+                game.isMuted = !game.isMuted;
+                localStorage.setItem('kz-muted', game.isMuted);
+                muteBtn.textContent = game.isMuted ? '🔇' : '🔊';
+                muteBtn.classList.toggle('is-muted', game.isMuted);
+            };
             document.body.appendChild(muteBtn);
-            AdMobMgr.updateMuteUI();
         }
 
         // Select a subset of emojis for the current game
@@ -151,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.add('flipped');
         flippedCards.push(card);
         game.vibrate(20); // Short vibration on flip
-        if (!AdMobMgr.isMuted) game.playSound('flip');
+        game.playSound('flip');
 
         if (flippedCards.length === 2) {
             setTimeout(checkForMatch, 800);
@@ -172,18 +190,18 @@ document.addEventListener('DOMContentLoaded', () => {
             matchedPairs++;
             score += 100; // Award points for a match
             game.vibrate(100); // Longer vibration for a match
-            if (!AdMobMgr.isMuted) game.playSound('match');
+            game.playSound('match');
             updateScoreDisplay();
 
             if (matchedPairs === numPairs) {
-                if (!AdMobMgr.isMuted) game.playSound('win');
+                game.playSound('win');
                 endGame(true); // All cards matched
             }
         } else {
             // Mismatch
             card1.classList.remove('flipped');
             card2.classList.remove('flipped');
-            if (!AdMobMgr.isMuted) game.playSound('mismatch');
+            game.playSound('mismatch');
             game.vibrate(50); // Medium vibration for mismatch
         }
         flippedCards = [];
@@ -226,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             game.screenShake();
         } else {
             messageDisplay.textContent = `${t.over} ${t.score}: ${score}`;
-            if (!AdMobMgr.isMuted) game.playSound('gameover');
+            game.playSound('gameover');
         }
         game.gameOver(score); // Report final score and trigger ad logic
         startButton.textContent = t.again;

@@ -18,7 +18,24 @@
       "Bash(wsl --list --online)",
       "Bash(where git *)",
       "Bash(\"C:\\\\Program Files\\\\Git\\\\bin\\\\bash.exe\" --version)",
-      "Bash(C:\\\\Program Files\\\\Git\\\\bin\\\\bash.exe *)"
+      "Bash(C:\\\\Program Files\\\\Git\\\\bin\\\\bash.exe *)",
+      "Bash(adb devices *)",
+      "PowerShell(adb devices *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell($adb = \"C:\\\\Users\\\\Komiljon\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb devices)",
+      "PowerShell(head *)",
+      "Bash(cmd /c \"cd /d D:\\\\android_projects\\\\KidZone && gradlew.bat assembleDebug\")",
+      "Read(//c/Users/Komiljon/AppData/Local/Android/Sdk/**)",
+      "Read(//c/Users/Komiljon/.gradle/wrapper/dists//**)",
+      "Bash(/c/Users/Komiljon/.gradle/wrapper/dists/gradle-8.7-bin/bhs2wmbdwecv87pi65oeuq5iu/gradle-8.7/bin/gradle --version)",
+      "Bash($ADB install *)",
+      "Bash($ADB shell *)",
+      "Bash(/c/Users/Komiljon/AppData/Local/Android/Sdk/platform-tools/adb shell *)",
+      "Bash(/c/Users/Komiljon/AppData/Local/Android/Sdk/platform-tools/adb logcat *)",
+      "Bash(/c/Users/Komiljon/AppData/Local/Android/Sdk/platform-tools/adb install *)",
+      "Bash(Get-ChildItem *)",
+      "Bash(\"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug)",
+      "PowerShell(& \"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug 2>&1 | Select-Object -Last 20)"
     ]
   }
 }
