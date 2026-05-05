@@ -1034,9 +1034,9 @@
       // ── LEARN ───────────────────────────────────────
       {id:"animals",    em:"🐾", name:{uz:"Hayvonlar", ru:"Животные", en:"Animals"},      cat:"learn",  age:"2+", tag:{uz:"Ta'lim", ru:"Обучение", en:"Learn"},  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
       {id:"colors",     em:"🌈", name:{uz:"Rang & Shakl", ru:"Цвета и формы", en:"Colors & Shapes"},   cat:"colors", age:"2+", tag:{uz:"Ranglar", ru:"Цвета", en:"Colors"}, tc:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:5, plays:"10K", badge:"hot", file:"colors-shapes.html", pts:20},
-      {id:"abc-uz",     em:"🔤", name:{uz:"O'zbek Alifbosi", ru:"Узбекский алфавит", en:"Uzbek Alphabet"}, cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-uz.html", pts:25},
-      {id:"abc-ru",     em:"А", name:{uz:"Rus Alifbosi", ru:"Русский алфавит", en:"Russian Alphabet"},    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-ru.html", pts:25},
-      {id:"abc-en",     em:"🔡", name:{uz:"Ingliz ABC", ru:"Английский ABC", en:"English ABC"},     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-en.html", pts:25},
+      {id:"abc-uz",     em:"🔤", name:{uz:"O'zbek Alifbosi", ru:"Узбекский алфавит", en:"Uzbek Alphabet"}, cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-game.html", pts:25},
+      {id:"abc-ru",     em:"А", name:{uz:"Rus Alifbosi", ru:"Русский алфавит", en:"Russian Alphabet"},    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-game.html", pts:25},
+      {id:"abc-en",     em:"🔡", name:{uz:"Ingliz ABC", ru:"Английский ABC", en:"English ABC"},     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-game.html", pts:25},
       {id:"body",       em:"👁️", name:{uz:"Tana A'zolari", ru:"Части тела", en:"Body Parts"},  cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"body.html", pts:20},
       {id:"fruits",     em:"🍎", name:{uz:"Meva & Sabzavot", ru:"Фрукты и овощи", en:"Fruits & Veggies"},cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#FF5722", bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:5, plays:"11K", badge:"hot", file:"fruits.html", pts:20},
       {id:"transport",  em:"🚗", name:{uz:"Transport", ru:"Транспорт", en:"Transport"},      cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#607D8B", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:4, plays:"5K",  badge:null,  file:"transport.html", pts:20},
@@ -1289,7 +1289,7 @@
             const div = document.createElement("div");
             div.className = "feat-card";
             div.onclick = () => openGame(g);
-            const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
+            const localizedName = typeof g.name === 'object' ? (g.name[app.translator.lang] || g.name.en) : g.name;
             const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
             div.innerHTML = `
         ${g.badge==="hot"?'<div class="feat-badge-hot">🔥 TOP</div>':''}
@@ -1329,8 +1329,7 @@
 
             const progress = parseInt(localStorage.getItem("kz-prog-"+g.id)||"0");
             const prog56 = 56.5 - (progress/100)*56.5;
-            const localizedName = typeof g.name === 'object' ? g.name[app.translator.lang] : g.name;
-            const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
+            const localizedName = typeof g.name === 'object' ? (g.name[app.translator.lang] || g.name.en) : g.name;
 
             card.innerHTML = `
         <div class="gc-art" style="background:${g.bg}">

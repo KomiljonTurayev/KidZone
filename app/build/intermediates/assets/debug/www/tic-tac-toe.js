@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
             win: "Siz yutdingiz! 🎉",
             draw: "Durang! 🤝",
             lose: "Robot yutdi! 🤖"
+        },
+        ru: {
+            thinking: "Робот думает...",
+            yourTurn: "Ваш ход!",
+            win: "Вы выиграли! 🎉",
+            draw: "Ничья! 🤝",
+            lose: "Робот выиграл! 🤖"
         }
     };
     const t = engine.getTranslations(translations);

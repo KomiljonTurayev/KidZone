@@ -10,6 +10,9 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 /**
  * Main Activity of the KidZone application.
  * Manages the lifecycle of WebView and Advertisements.
@@ -90,52 +93,81 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // Agar reklama banneri yashirin bo'lsa, demak foydalanuvchi o'yin ichida
                 View banner = findViewById(R.id.bannerContainer);
                 if (banner != null && banner.getVisibility() == View.GONE) {
-                    showExitConfirmation();
+                    // Foydalanuvchi o'yin ichida — o'yindan chiqishni so'raymiz
+                    showExitDialog(true);
                 } else if (webViewManager != null && webViewManager.canGoBack()) {
                     webViewManager.goBack();
                 } else {
-                    setEnabled(false);
-                    MainActivity.super.onBackPressed();
+                    // Foydalanuvchi asosiy menyuda — dasturdan chiqishni so'raymiz
+                    showExitDialog(false);
                 }
             }
         });
     }
 
-    private void showExitConfirmation() {
-        // Professional Material 3 themed dialog
-        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.Theme_KidZone_Dialog)
-                .setTitle(getTranslatedString("exit_title", "Exit Game"))
-                .setMessage(getTranslatedString("exit_msg", "Do you really want to exit? Your progress for this session might not be saved."))
-                .setPositiveButton(getTranslatedString("yes", "Yes"), (d, which) -> webViewManager.evaluateJavascript("if(window.app) app.closeGame();"))
-                .setNegativeButton(getTranslatedString("no", "No"), null)
+    /**
+     * Professional va trenddagi chiroyli chiqish dialogi.
+     * @param isInGame Agar rost bo'lsa o'yindan chiqishni, aks holda dasturdan chiqishni so'raydi.
+     */
+    private void showExitDialog(boolean isInGame) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_exit, null);
+        
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.Theme_KidZone_Dialog)
+                .setView(dialogView)
+                .setCancelable(true)
                 .create();
+
+        android.widget.TextView title = dialogView.findViewById(R.id.dialog_title);
+        android.widget.TextView msg = dialogView.findViewById(R.id.dialog_message);
+        MaterialButton btnYes = dialogView.findViewById(R.id.btn_yes);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btn_no);
+
+        if (isInGame) {
+            title.setText(getTranslatedString("exit_title", "Exit Game?"));
+            msg.setText(getTranslatedString("exit_msg", "Return to menu? Your progress might not be saved."));
+        } else {
+            title.setText(getTranslatedString("app_exit_title", "Exit KidZone?"));
+            msg.setText(getTranslatedString("app_exit_msg", "Are you sure you want to leave? We will miss you!"));
+        }
+
+        btnYes.setText(getTranslatedString("yes", "Yes"));
+        btnNo.setText(getTranslatedString("no", "No"));
+
+        btnYes.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (isInGame) {
+                webViewManager.evaluateJavascript("if(window.app) app.closeGame();");
+            } else {
+                finishAffinity(); // Dasturni butunlay yopish
+            }
+        });
+        
+        btnNo.setOnClickListener(v -> dialog.dismiss());
         
         dialog.show();
-        
-        // Style buttons after show
-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.md_primary, getTheme()));
     }
 
     private String getTranslatedString(String key, String defaultVal) {
-        // Dynamic translation based on current web language
         if (webViewManager == null || webViewManager.getLanguage() == null) return defaultVal;
         
         String lang = webViewManager.getLanguage();
-        // This is a simplified mapper. In a larger app, you'd use localized strings.xml
         if ("uz".equals(lang)) {
             switch(key) {
-                case "exit_title": return "O'yinni tark etish";
-                case "exit_msg": return "Haqiqatan ham o'yindan chiqmoqchimisiz? To'plangan ballaringiz saqlanmasligi mumkin.";
+                case "exit_title": return "O'yindan chiqish?";
+                case "exit_msg": return "Menyuga qaytmoqchimisiz? Ballaringiz saqlanmasligi mumkin.";
+                case "app_exit_title": return "KidZone'dan chiqish?";
+                case "app_exit_msg": return "Haqiqatan ham chiqib ketmoqchimisiz? Sizni sog'inib qolamiz!";
                 case "yes": return "Ha";
                 case "no": return "Yo'q";
             }
         } else if ("ru".equals(lang)) {
             switch(key) {
-                case "exit_title": return "Выход из игры";
-                case "exit_msg": return "Вы действительно хотите выйти? Ваши баллы могут не сохраниться.";
+                case "exit_title": return "Выйти из игры?";
+                case "exit_msg": return "Вернуться в меню? Ваши баллы могут не сохраниться.";
+                case "app_exit_title": return "Выйти из KidZone?";
+                case "app_exit_msg": return "Вы действительно хотите выйти? Мы будем скучать!";
                 case "yes": return "Да";
                 case "no": return "Нет";
             }
@@ -157,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         public void showBanner() {
             runOnUiThread(() -> {
                 findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE);
-                // Bannerni qayta ko'rsatganda oxirgi olingan balandlikni qo'llaymiz
                 webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(" + lastBannerHeight + ");");
             });
         }
@@ -166,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
         public void hideBanner() {
             runOnUiThread(() -> {
                 findViewById(R.id.bannerContainer).setVisibility(View.GONE);
-                // UI pastga tushishi uchun offsetni 0 qilamiz
                 webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
             });
         }

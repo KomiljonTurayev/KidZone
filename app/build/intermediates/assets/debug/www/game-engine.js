@@ -90,6 +90,81 @@ class KidZoneGame {
                 oscillator.start(now);
                 oscillator.stop(now + 0.3);
                 break;
+            case 'flip':
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(500, now);
+                oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+                gainNode.gain.setValueAtTime(0.08, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                oscillator.start(now);
+                oscillator.stop(now + 0.08);
+                break;
+            case 'match':
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(440, now);
+                oscillator.frequency.setValueAtTime(660, now + 0.1);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.linearRampToValueAtTime(0.15, now + 0.15);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                oscillator.start(now);
+                oscillator.stop(now + 0.3);
+                break;
+            case 'mismatch':
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(200, now);
+                oscillator.frequency.linearRampToValueAtTime(150, now + 0.2);
+                gainNode.gain.setValueAtTime(0.08, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                oscillator.start(now);
+                oscillator.stop(now + 0.2);
+                break;
+            case 'catch':
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, now);
+                oscillator.frequency.exponentialRampToValueAtTime(900, now + 0.12);
+                gainNode.gain.setValueAtTime(0.12, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                oscillator.start(now);
+                oscillator.stop(now + 0.12);
+                break;
+            case 'bomb':
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(120, now);
+                oscillator.frequency.linearRampToValueAtTime(40, now + 0.4);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                oscillator.start(now);
+                oscillator.stop(now + 0.4);
+                break;
+            case 'miss':
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(300, now);
+                oscillator.frequency.linearRampToValueAtTime(200, now + 0.15);
+                gainNode.gain.setValueAtTime(0.06, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                oscillator.start(now);
+                oscillator.stop(now + 0.15);
+                break;
+            case 'gameover':
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(400, now);
+                oscillator.frequency.setValueAtTime(300, now + 0.15);
+                oscillator.frequency.setValueAtTime(200, now + 0.3);
+                oscillator.frequency.linearRampToValueAtTime(100, now + 0.6);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                oscillator.start(now);
+                oscillator.stop(now + 0.6);
+                break;
+            case 'pop':
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, now);
+                oscillator.frequency.exponentialRampToValueAtTime(400, now + 0.06);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+                oscillator.start(now);
+                oscillator.stop(now + 0.06);
+                break;
         }
     }
 

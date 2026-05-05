@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -7,8 +7,7 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body {
-  min-height:100vh; min-height:100dvh;
-  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  min-height:100vh; background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
   font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
   overflow: hidden; user-select: none;
   display: flex; flex-direction: column; align-items: center; color: white;
@@ -20,7 +19,6 @@ body {
 #prog-wrap { width:88%; max-width:400px; height:6px; background:rgba(255,255,255,0.12); border-radius:3px; margin:4px auto 12px; }
 #prog-bar { height:100%; background:linear-gradient(90deg,#FFD54F,#FF6B35); border-radius:3px; transition:width 0.4s; width:0%; }
 
-/* Vehicle showcase */
 #vehicle-card {
   background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
   border-radius:26px; padding:20px; width:90%; max-width:400px; text-align:center; margin-bottom:16px;
@@ -30,7 +28,6 @@ body {
 #veh-q    { font-size:13px; color:rgba(255,255,255,0.65); margin-top:4px; }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
-/* Categories */
 #cats { display:flex; gap:10px; width:90%; max-width:400px; margin-bottom:12px; }
 .cat-btn {
   flex:1; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2);
@@ -40,115 +37,135 @@ body {
 .cat-btn:active { transform:scale(0.92); }
 .cat-em  { font-size:28px; display:block; }
 .cat-nm  { font-size:11px; color:rgba(255,255,255,0.8); margin-top:4px; display:block; }
-.cat-btn.correct { background:rgba(76,175,80,0.5); border-color:#4CAF50; }
-.cat-btn.wrong   { background:rgba(244,67,54,0.4); border-color:#F44336; }
+.correct { background:rgba(76,175,80,0.5) !important; border-color:#4CAF50 !important; }
+.wrong   { background:rgba(244,67,54,0.4) !important; border-color:#F44336 !important; }
 
 #feedback { font-size:14px; min-height:22px; text-align:center; color:rgba(255,255,255,0.8); }
 
-/* Result */
 #result { position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
-#result.h { display:none; }
+.h { display:none !important; }
 #result-card { background:linear-gradient(135deg,#2c3e50,#3498db); border:1px solid rgba(255,255,255,0.2); border-radius:28px; padding:32px 24px; text-align:center; width:min(320px,90vw); }
-.result-em  { font-size:60px; margin-bottom:10px; }
-.result-ttl { font-size:22px; font-weight:900; margin-bottom:6px; }
-.result-sc  { font-size:15px; color:rgba(255,255,255,0.7); margin-bottom:20px; }
-.btn-r { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.35); border-radius:20px; padding:14px; color:white; font-size:16px; font-weight:900; cursor:pointer; width:100%; }
-.btn-r:active { transform:scale(0.96); }
+.btn-r { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.35); border-radius:20px; padding:14px; color:white; font-size:16px; font-weight:900; cursor:pointer; width:100%; margin-top: 15px; }
 </style>
 </head>
 <body>
 
 <div id="topbar">
-  <div class="pill"><span class="pill-sm">BALL</span><span class="pill-val" id="sv">0</span></div>
-  <div style="font-size:16px;font-weight:900;">🚗 Transport</div>
-  <div class="pill"><span class="pill-sm">SAVOL</span><span class="pill-val" id="qn">1/12</span></div>
+  <div class="pill"><span class="pill-sm" id="lbl-score">SCORE</span><span class="pill-val" id="sv">0</span></div>
+  <div style="font-size:16px;font-weight:900;"><span id="lbl-title">🚗 Transport</span></div>
+  <div class="pill"><span class="pill-sm" id="lbl-quest">QUEST</span><span class="pill-val" id="qn">1/10</span></div>
 </div>
 <div id="prog-wrap"><div id="prog-bar"></div></div>
 
 <div id="vehicle-card">
   <div id="veh-em">🚗</div>
-  <div id="veh-name">Avtomobil</div>
-  <div id="veh-q">Bu qaysi toifaga kiradi?</div>
+  <div id="veh-name">Car</div>
+  <div id="veh-q">Where does it belong?</div>
 </div>
 
 <div id="cats">
-  <div class="cat-btn" id="cat0" onclick="answer(0)"><span class="cat-em">🛣️</span><span class="cat-nm">Quruqlik</span></div>
-  <div class="cat-btn" id="cat1" onclick="answer(1)"><span class="cat-em">🌊</span><span class="cat-nm">Dengiz</span></div>
-  <div class="cat-btn" id="cat2" onclick="answer(2)"><span class="cat-em">✈️</span><span class="cat-nm">Havo</span></div>
+  <div class="cat-btn" id="cat0" onclick="answer(0)"><span class="cat-em">🛣️</span><span class="cat-nm" id="c0n">Land</span></div>
+  <div class="cat-btn" id="cat1" onclick="answer(1)"><span class="cat-em">🌊</span><span class="cat-nm" id="c1n">Water</span></div>
+  <div class="cat-btn" id="cat2" onclick="answer(2)"><span class="cat-em">✈️</span><span class="cat-nm" id="c2n">Air</span></div>
 </div>
 
 <div id="feedback"></div>
 
 <div id="result" class="h">
   <div id="result-card">
-    <div class="result-em" id="rem">🏆</div>
-    <div class="result-ttl" id="rttl">Ajoyib!</div>
-    <div class="result-sc" id="rsc"></div>
-    <button class="btn-r" onclick="restart()">🔄 Qayta o'ynash</button>
+    <div style="font-size:60px;" id="rem">🏆</div>
+    <div style="font-size:22px; font-weight:900;" id="rttl">Great!</div>
+    <div style="font-size:15px; color:rgba(255,255,255,0.7);" id="rsc"></div>
+    <button class="btn-r" id="btn-restart" onclick="restart()">PLAY AGAIN</button>
   </div>
 </div>
 
+<script src="game-engine.js"></script>
 <script>
+const TRANSLATIONS = {
+  en: { title:"Transport", score:"SCORE", quest:"SAVOL", where:"Where does it belong?", land:"Land", water:"Water", air:"Air", correct:"✅ Correct!", wrong:"❌ Wrong!", great:"Great!", good:"Good!", try:"Try again!", again:"PLAY AGAIN" },
+  uz: { title:"Transport", score:"BALL",  quest:"SAVOL", where:"Bu qaysi toifaga kiradi?", land:"Quruqlik", water:"Dengiz", air:"Havo", correct:"✅ To'g'ri!", wrong:"❌ Noto'g'ri!", great:"Ajoyib!", good:"Yaxshi!", try:"Harakat qiling!", again:"QAYTA O'YNASH" },
+  ru: { title:"Транспорт", score:"СЧЕТ",  quest:"ВОПРОС",where:"К какой категории относится?", land:"Земля", water:"Вода", air:"Воздух", correct:"✅ Верно!", wrong:"❌ Неверно!", great:"Отлично!", good:"Хорошо!", try:"Попробуй еще!", again:"ИГРАТЬ СНОВА" }
+};
+
 const VEHICLES = [
-  {em:"🚗",name:"Avtomobil",cat:0},{em:"🚕",name:"Taksi",cat:0},{em:"🚌",name:"Avtobus",cat:0},
-  {em:"🚂",name:"Poyezd",cat:0},  {em:"🚲",name:"Velosiped",cat:0},{em:"🏍️",name:"Mototsikl",cat:0},
-  {em:"🚀",name:"Raketa",cat:2},  {em:"✈️",name:"Samolyot",cat:2},{em:"🚁",name:"Vertolyot",cat:2},
-  {em:"🛸",name:"UFO",cat:2},     {em:"🎈",name:"Havo shari",cat:2},
-  {em:"⛵",name:"Qayiq",cat:1},   {em:"🚢",name:"Kema",cat:1},  {em:"🛳️",name:"Kruiz kemasi",cat:1},
-  {em:"⛴️",name:"Parom",cat:1},   {em:"🚤",name:"Motorli qayiq",cat:1},
+  {em:"🚗", name:{en:"Car", uz:"Avtomobil", ru:"Машина"}, cat:0},
+  {em:"🚌", name:{en:"Bus", uz:"Avtobus", ru:"Автобус"}, cat:0},
+  {em:"🚂", name:{en:"Train", uz:"Poyezd", ru:"Поезд"}, cat:0},
+  {em:"🚲", name:{en:"Bicycle", uz:"Velosiped", ru:"Велосипед"}, cat:0},
+  {em:"✈️", name:{en:"Airplane", uz:"Samolyot", ru:"Самолет"}, cat:2},
+  {em:"🚁", name:{en:"Helicopter", uz:"Vertolyot", ru:"Вертолет"}, cat:2},
+  {em:"🚀", name:{en:"Rocket", uz:"Raketa", ru:"Ракета"}, cat:2},
+  {em:"⛵", name:{en:"Boat", uz:"Qayiq", ru:"Лодка"}, cat:1},
+  {em:"🚢", name:{en:"Ship", uz:"Kema", ru:"Корабль"}, cat:1},
+  {em:"🚤", name:{en:"Speedboat", uz:"Motorli qayiq", ru:"Катер"}, cat:1}
 ];
-const TOTAL=12; let score=0,qIdx=0,answered=false,questions=[];
 
-function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
-function buildQ(){questions=shuffle(VEHICLES).slice(0,TOTAL);}
+const engine = new KidZoneGame({ id: 'transport' });
+const t = engine.getTranslations(TRANSLATIONS);
+let score=0, qIdx=0, answered=false, questions=[];
 
-function loadQ(){
-  if(qIdx>=TOTAL){showResult();return;}
-  answered=false;
-  const q=questions[qIdx];
-  document.getElementById("veh-em").textContent=q.em;
-  document.getElementById("veh-name").textContent=q.name;
-  document.getElementById("qn").textContent=`${qIdx+1}/${TOTAL}`;
-  document.getElementById("prog-bar").style.width=`${(qIdx/TOTAL)*100}%`;
-  document.getElementById("feedback").textContent="";
-  [0,1,2].forEach(i=>document.getElementById("cat"+i).className="cat-btn");
+function updateUI() {
+    document.getElementById('lbl-title').textContent = "🚗 " + t.title;
+    document.getElementById('lbl-score').textContent = t.score;
+    document.getElementById('lbl-quest').textContent = t.quest;
+    document.getElementById('veh-q').textContent = t.where;
+    document.getElementById('c0n').textContent = t.land;
+    document.getElementById('c1n').textContent = t.water;
+    document.getElementById('c2n').textContent = t.air;
+    document.getElementById('btn-restart').textContent = t.again;
 }
 
-function answer(catIdx){
-  if(answered)return; answered=true;
-  const q=questions[qIdx];
-  const btn=document.getElementById("cat"+catIdx);
-  if(catIdx===q.cat){
-    btn.classList.add("correct"); score+=10;
-    document.getElementById("sv").textContent=score;
-    document.getElementById("feedback").textContent="✅ To'g'ri!";
-    const prev=parseInt(localStorage.getItem("kz-prog-transport")||"0");
-    localStorage.setItem("kz-prog-transport",Math.max(prev,Math.round((qIdx+1)/TOTAL*100)));
+function init() {
+  questions = [...VEHICLES].sort(() => Math.random() - 0.5).slice(0, 10);
+  score = 0; qIdx = 0;
+  document.getElementById('sv').textContent = "0";
+  document.getElementById('result').classList.add('h');
+  loadQ();
+}
+
+function loadQ() {
+  if(qIdx >= questions.length){ showResult(); return; }
+  answered = false;
+  const q = questions[qIdx];
+  document.getElementById("veh-em").textContent = q.em;
+  document.getElementById("veh-name").textContent = q.name[engine.lang] || q.name.en;
+  document.getElementById("qn").textContent = `${qIdx+1}/${questions.length}`;
+  document.getElementById("prog-bar").style.width = `${(qIdx/questions.length)*100}%`;
+  document.getElementById("feedback").textContent = "";
+  [0,1,2].forEach(i => document.getElementById("cat"+i).className = "cat-btn");
+}
+
+function answer(catIdx) {
+  if(answered) return; answered = true;
+  const q = questions[qIdx];
+  const btn = document.getElementById("cat"+catIdx);
+  if(catIdx === q.cat) {
+    btn.classList.add("correct"); score += 10;
+    document.getElementById("sv").textContent = score;
+    document.getElementById("feedback").textContent = t.correct;
+    engine.playSound('match');
   } else {
     btn.classList.add("wrong");
     document.getElementById("cat"+q.cat).classList.add("correct");
-    document.getElementById("feedback").textContent="❌ Noto'g'ri. Qayta urining!";
+    document.getElementById("feedback").textContent = t.wrong;
+    engine.playSound('mismatch');
   }
-  setTimeout(()=>{qIdx++;loadQ();},1000);
+  setTimeout(() => { qIdx++; loadQ(); }, 1000);
 }
 
-function showResult(){
-  const pct=score/(TOTAL*10)*100;
-  document.getElementById("rem").textContent=pct>=80?"🏆":pct>=50?"⭐":"💪";
-  document.getElementById("rttl").textContent=pct>=80?"Ajoyib!":pct>=50?"Yaxshi!":"Harakat qiling!";
-  document.getElementById("rsc").textContent=`Natija: ${score}/${TOTAL*10} ball`;
+function showResult() {
+  const pct = score / 100 * 100;
+  document.getElementById("rem").textContent = pct >= 80 ? "🏆" : pct >= 50 ? "⭐" : "💪";
+  document.getElementById("rttl").textContent = pct >= 80 ? t.great : pct >= 50 ? t.good : t.try;
+  document.getElementById("rsc").textContent = `${t.score}: ${score}/100`;
   document.getElementById("result").classList.remove("h");
-  localStorage.setItem("kz-pts",(parseInt(localStorage.getItem("kz-pts")||"0"))+Math.round(score/2));
+  engine.gameOver(Math.round(score/2));
 }
 
-function restart(){
-  score=0;qIdx=0;
-  document.getElementById("sv").textContent="0";
-  document.getElementById("result").classList.add("h");
-  buildQ();loadQ();
-}
+function restart() { init(); }
 
-buildQ();loadQ();
+window.onload = () => { updateUI(); init(); };
 </script>
 </body>
 </html>
