@@ -158,13 +158,27 @@ class GameManager {
         document.querySelectorAll(".ni").forEach(n => n.classList.remove("on"));
         const niEl = document.getElementById("ni-" + pg);
         if (niEl) niEl.classList.add("on");
-        const msgs = {
-            play: "🎮 " + this.translator.get('playMode'),
-            learn: "📚 " + this.translator.get('learnMode'),
-            stars: "⭐ " + this.translator.get('yourStars') + ": " + this.pts,
-            home: ""
-        };
-        if (msgs[pg]) this.ui.showToast(msgs[pg]);
+
+        const chips = document.querySelectorAll('.cat-chip');
+        if (pg === 'home') {
+            const main = document.getElementById('main');
+            if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+            this.filterCat('all', chips[0]);
+        } else if (pg === 'play') {
+            this.filterCat('all', chips[0]);
+            const featured = document.getElementById('featured-row');
+            if (featured) featured.scrollIntoView({ behavior: 'smooth' });
+            this.ui.showToast("🎮 " + this.translator.get('playMode'));
+        } else if (pg === 'learn') {
+            this.filterCat('learn', chips[1]);
+            const grid = document.getElementById('game-grid');
+            if (grid) grid.scrollIntoView({ behavior: 'smooth' });
+            this.ui.showToast("📚 " + this.translator.get('learnMode'));
+        } else if (pg === 'stars') {
+            const lc = document.getElementById('level-card');
+            if (lc) lc.scrollIntoView({ behavior: 'smooth' });
+            this.ui.showToast("⭐ " + this.translator.get('yourStars') + ": " + this.pts);
+        }
     }
 
     openGame(g, locked = false) {

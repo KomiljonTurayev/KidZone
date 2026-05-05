@@ -85,11 +85,14 @@ function next() {
 
   const grid = document.getElementById('answers');
   grid.innerHTML = '';
+  let answered = false;
   options.sort(() => Math.random() - 0.5).forEach(v => {
     const btn = document.createElement('button');
     btn.className = 'ans-btn';
     btn.textContent = v;
     btn.onclick = () => {
+      if (answered) return;
+      answered = true;
       if (v === current) {
         btn.classList.add('correct'); score += 20;
         document.getElementById('score').textContent = score;

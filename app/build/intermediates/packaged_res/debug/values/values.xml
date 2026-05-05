@@ -24,6 +24,9 @@
         <item name="android:windowBackground">#FF6B35</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+    <style name="Theme.KidZone.BottomSheet" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.KidZone.BottomSheet</item>
+    </style>
     <style name="Theme.KidZone.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="backgroundTint">#FFFFFF</item>
@@ -35,5 +38,9 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
         <item name="windowSplashScreenAnimationDuration">1000</item>
         <item name="postSplashScreenTheme">@style/Theme.KidZone</item>
+    </style>
+    <style name="Widget.KidZone.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
     </style>
 </resources>

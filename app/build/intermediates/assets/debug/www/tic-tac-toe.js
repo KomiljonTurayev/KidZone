@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         makeMove(index, playerSign);
         
         if (checkWin(playerSign)) {
+            engine.playSound('win');
             endGame(t.win, 50);
         } else if (board.every(cell => cell !== '')) {
             endGame(t.draw, 20);
@@ -98,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         return winPatterns.some(pattern => {
             if (pattern.every(index => board[index] === sign)) {
-                engine.playSound('win');
                 pattern.forEach(idx => boardElement.children[idx].classList.add('win'));
                 return true;
             }

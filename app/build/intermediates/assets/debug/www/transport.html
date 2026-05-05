@@ -80,8 +80,10 @@ body {
   </div>
 </div>
 
+<script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
 <script>
+const GAME_ID = 'transport';
 const TRANSLATIONS = {
   en: { title:"Transport", score:"SCORE", quest:"SAVOL", where:"Where does it belong?", land:"Land", water:"Water", air:"Air", correct:"✅ Correct!", wrong:"❌ Wrong!", great:"Great!", good:"Good!", try:"Try again!", again:"PLAY AGAIN" },
   uz: { title:"Transport", score:"BALL",  quest:"SAVOL", where:"Bu qaysi toifaga kiradi?", land:"Quruqlik", water:"Dengiz", air:"Havo", correct:"✅ To'g'ri!", wrong:"❌ Noto'g'ri!", great:"Ajoyib!", good:"Yaxshi!", try:"Harakat qiling!", again:"QAYTA O'YNASH" },
@@ -89,83 +91,160 @@ const TRANSLATIONS = {
 };
 
 const VEHICLES = [
-  {em:"🚗", name:{en:"Car", uz:"Avtomobil", ru:"Машина"}, cat:0},
-  {em:"🚌", name:{en:"Bus", uz:"Avtobus", ru:"Автобус"}, cat:0},
-  {em:"🚂", name:{en:"Train", uz:"Poyezd", ru:"Поезд"}, cat:0},
-  {em:"🚲", name:{en:"Bicycle", uz:"Velosiped", ru:"Велосипед"}, cat:0},
-  {em:"✈️", name:{en:"Airplane", uz:"Samolyot", ru:"Самолет"}, cat:2},
-  {em:"🚁", name:{en:"Helicopter", uz:"Vertolyot", ru:"Вертолет"}, cat:2},
-  {em:"🚀", name:{en:"Rocket", uz:"Raketa", ru:"Ракета"}, cat:2},
-  {em:"⛵", name:{en:"Boat", uz:"Qayiq", ru:"Лодка"}, cat:1},
-  {em:"🚢", name:{en:"Ship", uz:"Kema", ru:"Корабль"}, cat:1},
-  {em:"🚤", name:{en:"Speedboat", uz:"Motorli qayiq", ru:"Катер"}, cat:1}
+  /* Easy (1-8) */
+  {em:"🚗",  name:{en:"Car",        uz:"Avtomobil",     ru:"Машина"},       cat:0},
+  {em:"🚌",  name:{en:"Bus",        uz:"Avtobus",       ru:"Автобус"},      cat:0},
+  {em:"✈️",  name:{en:"Airplane",   uz:"Samolyot",      ru:"Самолёт"},      cat:2},
+  {em:"⛵",  name:{en:"Sailboat",   uz:"Qayiq",         ru:"Лодка"},        cat:1},
+  {em:"🚂",  name:{en:"Train",      uz:"Poyezd",        ru:"Поезд"},        cat:0},
+  {em:"🚁",  name:{en:"Helicopter", uz:"Vertolyot",     ru:"Вертолёт"},     cat:2},
+  {em:"🚢",  name:{en:"Ship",       uz:"Kema",          ru:"Корабль"},      cat:1},
+  {em:"🚲",  name:{en:"Bicycle",    uz:"Velosiped",     ru:"Велосипед"},    cat:0},
+  /* Medium (9-16) */
+  {em:"🚀",  name:{en:"Rocket",     uz:"Raketa",        ru:"Ракета"},       cat:2},
+  {em:"🚤",  name:{en:"Speedboat",  uz:"Motorli qayiq", ru:"Катер"},        cat:1},
+  {em:"🚛",  name:{en:"Truck",      uz:"Yuk mashinasi", ru:"Грузовик"},     cat:0},
+  {em:"🏍️",  name:{en:"Motorcycle", uz:"Mototsikl",     ru:"Мотоцикл"},     cat:0},
+  {em:"🛩️",  name:{en:"Small plane",uz:"Kichik samolyot",ru:"Самолётик"},  cat:2},
+  {em:"🚣",  name:{en:"Rowboat",    uz:"Eshkakli qayiq",ru:"Вёсельная лодка"},cat:1},
+  {em:"🛸",  name:{en:"UFO",        uz:"UFO",           ru:"НЛО"},          cat:2},
+  {em:"⛴️",  name:{en:"Ferry",      uz:"Parom",         ru:"Паром"},        cat:1},
+  /* Hard (17-24) */
+  {em:"🚑",  name:{en:"Ambulance",  uz:"Tez yordam",    ru:"Скорая помощь"},cat:0},
+  {em:"🚒",  name:{en:"Fire truck", uz:"O't o'chirish", ru:"Пожарная машина"},cat:0},
+  {em:"🚓",  name:{en:"Police car", uz:"Politsiya",     ru:"Полицейская машина"},cat:0},
+  {em:"🛺",  name:{en:"Rickshaw",   uz:"Riksha",        ru:"Рикша"},        cat:0},
+  {em:"🛵",  name:{en:"Scooter",    uz:"Skuter",        ru:"Скутер"},       cat:0},
+  {em:"🚠",  name:{en:"Cable car",  uz:"Kanatli vagon", ru:"Канатная дорога"},cat:2},
+  {em:"🛥️",  name:{en:"Motor boat", uz:"Motor qayiq",   ru:"Моторная лодка"},cat:1},
+  {em:"🛶",  name:{en:"Canoe",      uz:"Kanoe",         ru:"Каноэ"},        cat:1},
+  /* Expert (25-30) */
+  {em:"🚟",  name:{en:"Monorail",   uz:"Monorel",       ru:"Монорельс"},    cat:0},
+  {em:"🛻",  name:{en:"Pickup",     uz:"Pikap",         ru:"Пикап"},        cat:0},
+  {em:"🚡",  name:{en:"Aerial tram",uz:"Havo tramvayi", ru:"Воздушный трамвай"},cat:2},
+  {em:"🛳️",  name:{en:"Cruise ship",uz:"Kruiz kemasi",  ru:"Круизный лайнер"},cat:1},
+  {em:"🚐",  name:{en:"Minibus",    uz:"Minibus",       ru:"Маршрутка"},    cat:0},
+  {em:"🛬",  name:{en:"Landing",    uz:"Qo'nayotgan samolyot",ru:"Самолёт приземляется"},cat:2},
 ];
 
-const engine = new KidZoneGame({ id: 'transport' });
+const engine = new KidZoneGame({ id: GAME_ID });
 const t = engine.getTranslations(TRANSLATIONS);
-let score=0, qIdx=0, answered=false, questions=[];
+let score=0, qIdx=0, answered=false, questions=[], _level, _cfg, _pool, _hintsObj, _livesObj;
 
 function updateUI() {
-    document.getElementById('lbl-title').textContent = "🚗 " + t.title;
-    document.getElementById('lbl-score').textContent = t.score;
-    document.getElementById('lbl-quest').textContent = t.quest;
-    document.getElementById('veh-q').textContent = t.where;
-    document.getElementById('c0n').textContent = t.land;
-    document.getElementById('c1n').textContent = t.water;
-    document.getElementById('c2n').textContent = t.air;
-    document.getElementById('btn-restart').textContent = t.again;
+  document.getElementById('lbl-title').textContent = "🚗 " + t.title;
+  document.getElementById('lbl-score').textContent = t.score;
+  document.getElementById('lbl-quest').textContent = t.quest;
+  document.getElementById('veh-q').textContent = t.where;
+  document.getElementById('c0n').textContent = t.land;
+  document.getElementById('c1n').textContent = t.water;
+  document.getElementById('c2n').textContent = t.air;
+  document.getElementById('btn-restart').textContent = t.again;
 }
 
 function init() {
-  questions = [...VEHICLES].sort(() => Math.random() - 0.5).slice(0, 10);
-  score = 0; qIdx = 0;
-  document.getElementById('sv').textContent = "0";
+  _level = KZL.getLevel(GAME_ID);
+  _cfg   = KZL.cfg(GAME_ID);
+  _pool  = KZL.slicePool(VEHICLES, _level);
+  questions = [..._pool].sort(()=>Math.random()-.5).slice(0, _cfg.q);
+  score=0; qIdx=0;
+  document.getElementById('sv').textContent='0';
   document.getElementById('result').classList.add('h');
+
+  // Tools row
+  let tr = document.getElementById('kz-tr');
+  if (!tr) {
+    tr = document.createElement('div');
+    tr.id='kz-tr';
+    tr.style.cssText='display:flex;align-items:center;gap:10px;width:90%;max-width:400px;margin:8px auto;flex-wrap:wrap;';
+    document.getElementById('cats').before(tr);
+  }
+  tr.innerHTML='';
+  _hintsObj = KZL.createHints(_cfg.hints);
+  _hintsObj.el.onclick = ()=>{
+    if(answered)return;
+    _hintsObj.use(()=>{
+      // hide one wrong category button
+      const catBtns=[0,1,2].map(i=>document.getElementById('cat'+i));
+      const wrongs=catBtns.filter(b=>!b.classList.contains('correct')&&b.dataset.cat!=questions[qIdx]?.cat);
+      if(wrongs.length){const r=wrongs[Math.floor(Math.random()*wrongs.length)];r.style.opacity='0.2';r.style.pointerEvents='none';}
+    });
+  };
+  tr.appendChild(_hintsObj.el);
+  _livesObj = KZL.createLives(3);
+  tr.appendChild(_livesObj.el);
+  const lv=document.createElement('div');
+  lv.style.cssText='margin-left:auto;background:rgba(255,255,255,.15);border-radius:12px;padding:5px 12px;font-size:12px;font-weight:900;color:#fff;';
+  lv.textContent='LV '+_level+' / 20'; tr.appendChild(lv);
+
+  // Set data-cat on buttons
+  [0,1,2].forEach(i=>{
+    const b=document.getElementById('cat'+i);
+    if(b) b.dataset.cat=i;
+  });
   loadQ();
 }
 
 function loadQ() {
-  if(qIdx >= questions.length){ showResult(); return; }
-  answered = false;
-  const q = questions[qIdx];
-  document.getElementById("veh-em").textContent = q.em;
-  document.getElementById("veh-name").textContent = q.name[engine.lang] || q.name.en;
-  document.getElementById("qn").textContent = `${qIdx+1}/${questions.length}`;
-  document.getElementById("prog-bar").style.width = `${(qIdx/questions.length)*100}%`;
-  document.getElementById("feedback").textContent = "";
-  [0,1,2].forEach(i => document.getElementById("cat"+i).className = "cat-btn");
+  if(qIdx>=questions.length){showResult();return;}
+  answered=false;
+  [0,1,2].forEach(i=>{
+    const b=document.getElementById('cat'+i);
+    if(b){b.className='cat-btn';b.style.opacity='1';b.style.pointerEvents='';}
+  });
+  const q=questions[qIdx];
+  document.getElementById("veh-em").textContent=q.em;
+  document.getElementById("veh-name").textContent=q.name[engine.lang]||q.name.en;
+  document.getElementById("qn").textContent=`${qIdx+1}/${questions.length}`;
+  document.getElementById("prog-bar").style.width=`${(qIdx/questions.length)*100}%`;
+  document.getElementById("feedback").textContent="";
 }
 
 function answer(catIdx) {
-  if(answered) return; answered = true;
-  const q = questions[qIdx];
-  const btn = document.getElementById("cat"+catIdx);
-  if(catIdx === q.cat) {
-    btn.classList.add("correct"); score += 10;
-    document.getElementById("sv").textContent = score;
-    document.getElementById("feedback").textContent = t.correct;
+  if(answered)return; answered=true;
+  const q=questions[qIdx];
+  const btn=document.getElementById("cat"+catIdx);
+  if(catIdx===q.cat){
+    btn.classList.add("correct"); score+=10;
+    document.getElementById("sv").textContent=score;
+    document.getElementById("feedback").textContent=t.correct;
     engine.playSound('match');
   } else {
     btn.classList.add("wrong");
     document.getElementById("cat"+q.cat).classList.add("correct");
-    document.getElementById("feedback").textContent = t.wrong;
+    document.getElementById("feedback").textContent=t.wrong;
     engine.playSound('mismatch');
+    const dead=_livesObj.lose();
+    if(dead){setTimeout(showResult,900);return;}
   }
-  setTimeout(() => { qIdx++; loadQ(); }, 1000);
+  setTimeout(()=>{qIdx++;loadQ();},1000);
 }
 
 function showResult() {
-  const pct = score / 100 * 100;
-  document.getElementById("rem").textContent = pct >= 80 ? "🏆" : pct >= 50 ? "⭐" : "💪";
-  document.getElementById("rttl").textContent = pct >= 80 ? t.great : pct >= 50 ? t.good : t.try;
-  document.getElementById("rsc").textContent = `${t.score}: ${score}/100`;
+  const max=questions.length*10, pct=score/max;
+  document.getElementById("rem").textContent=pct>=.8?"🏆":pct>=.6?"⭐":"💪";
+  document.getElementById("rttl").textContent=pct>=.8?t.great:pct>=.6?t.good:t.try;
+  document.getElementById("rsc").textContent=`${t.score}: ${score}/${max}`;
   document.getElementById("result").classList.remove("h");
   engine.gameOver(Math.round(score/2));
+  if(pct>=.6&&engine.spawnConfetti){engine.spawnConfetti();}
+  if(pct>=.6&&KZL.getLevel(GAME_ID)===_level&&_level<20){
+    const nl=KZL.nextLevel(GAME_ID);
+    setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,engine.lang),500);
+  }
 }
 
-function restart() { init(); }
+function restart(){init();}
 
-window.onload = () => { updateUI(); init(); };
+window.onload=()=>{
+  updateUI();
+  KZL.howToPlay({id:GAME_ID,steps:{
+    uz:[{icon:'🚗',text:'Transport vositasini ko\'rasan'},{icon:'👆',text:'Quruqlik, Dengiz yoki Havo — to\'g\'risini tanlang'},{icon:'💡',text:'Hint noto\'g\'ri bir variantni o\'chiradi'},{icon:'❤️',text:'3 ta hayot — xato qilsang kamayadi'},{icon:'🏆',text:'60% ball to\'plab keyingi darajaga o\'t!'}],
+    ru:[{icon:'🚗',text:'Видишь транспортное средство'},{icon:'👆',text:'Выбери: Земля, Вода или Воздух'},{icon:'💡',text:'Подсказка убирает неверный вариант'},{icon:'❤️',text:'3 жизни — теряются при ошибке'},{icon:'🏆',text:'Набери 60% для следующего уровня!'}],
+    en:[{icon:'🚗',text:'You see a vehicle'},{icon:'👆',text:'Choose: Land, Water, or Air'},{icon:'💡',text:'Hint removes one wrong option'},{icon:'❤️',text:'3 lives — lost on mistake'},{icon:'🏆',text:'Score 60% to advance to next level!'}],
+  }});
+  init();
+};
 </script>
 </body>
 </html>

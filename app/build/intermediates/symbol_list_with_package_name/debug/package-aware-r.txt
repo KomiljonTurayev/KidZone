@@ -3050,6 +3050,8 @@ drawable admob_close_button_white_circle_black_cross
 drawable admob_close_button_white_cross
 drawable avd_hide_password
 drawable avd_show_password
+drawable bg_dialog_header
+drawable bg_exit_sheet
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
@@ -3181,6 +3183,7 @@ drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable offline_dialog_background
 drawable offline_dialog_default_icon_42dp
+drawable shape_circle_light
 drawable splash_icon
 drawable test_level_drawable
 drawable tooltip_frame_dark
@@ -3294,6 +3297,8 @@ id browser_actions_menu_item_icon
 id browser_actions_menu_item_text
 id browser_actions_menu_items
 id browser_actions_menu_view
+id btn_no
+id btn_yes
 id buttonPanel
 id cache_measures
 id callMeasure
@@ -3347,6 +3352,9 @@ id design_menu_item_action_area_stub
 id design_menu_item_text
 id design_navigation_view
 id dialog_button
+id dialog_emoji
+id dialog_message
+id dialog_title
 id dimensions
 id direct
 id disableHome
@@ -3844,6 +3852,7 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_end_icon
 layout design_text_input_start_icon
+layout dialog_exit
 layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
 layout m3_alert_dialog
@@ -4687,6 +4696,7 @@ style Theme_Design_Light_NoActionBar
 style Theme_Design_NoActionBar
 style Theme_IAPTheme
 style Theme_KidZone
+style Theme_KidZone_BottomSheet
 style Theme_KidZone_Dialog
 style Theme_KidZone_Splash
 style Theme_Material3_Dark
@@ -4969,6 +4979,7 @@ style Widget_Design_Snackbar
 style Widget_Design_TabLayout
 style Widget_Design_TextInputEditText
 style Widget_Design_TextInputLayout
+style Widget_KidZone_BottomSheet
 style Widget_Material3_ActionBar_Solid
 style Widget_Material3_ActionMode
 style Widget_Material3_AppBarLayout

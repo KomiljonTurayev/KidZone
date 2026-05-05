@@ -3049,6 +3049,8 @@ int drawable admob_close_button_white_circle_black_cross 0x7f070078
 int drawable admob_close_button_white_cross 0x7f070079
 int drawable avd_hide_password 0x7f07007a
 int drawable avd_show_password 0x7f07007b
+int drawable bg_dialog_header 0x7f070103
+int drawable bg_exit_sheet 0x7f070104
 int drawable btn_checkbox_checked_mtrl 0x7f07007c
 int drawable btn_checkbox_checked_to_unchecked_mtrl_animation 0x7f07007d
 int drawable btn_checkbox_unchecked_mtrl 0x7f07007e
@@ -3180,6 +3182,7 @@ int drawable notification_tile_bg 0x7f0700fb
 int drawable notify_panel_notification_icon_bg 0x7f0700fc
 int drawable offline_dialog_background 0x7f0700fd
 int drawable offline_dialog_default_icon_42dp 0x7f0700fe
+int drawable shape_circle_light 0x7f070105
 int drawable splash_icon 0x7f0700ff
 int drawable test_level_drawable 0x7f070100
 int drawable tooltip_frame_dark 0x7f070101
@@ -3293,6 +3296,8 @@ int id browser_actions_menu_item_icon 0x7f080069
 int id browser_actions_menu_item_text 0x7f08006a
 int id browser_actions_menu_items 0x7f08006b
 int id browser_actions_menu_view 0x7f08006c
+int id btn_no 0x7f08020b
+int id btn_yes 0x7f08020c
 int id buttonPanel 0x7f08006d
 int id cache_measures 0x7f08006e
 int id callMeasure 0x7f08006f
@@ -3346,6 +3351,9 @@ int id design_menu_item_action_area_stub 0x7f08009e
 int id design_menu_item_text 0x7f08009f
 int id design_navigation_view 0x7f0800a0
 int id dialog_button 0x7f0800a1
+int id dialog_emoji 0x7f08020d
+int id dialog_message 0x7f08020e
+int id dialog_title 0x7f08020f
 int id dimensions 0x7f0800a2
 int id direct 0x7f0800a3
 int id disableHome 0x7f0800a4
@@ -3843,6 +3851,7 @@ int layout design_navigation_menu 0x7f0b002c
 int layout design_navigation_menu_item 0x7f0b002d
 int layout design_text_input_end_icon 0x7f0b002e
 int layout design_text_input_start_icon 0x7f0b002f
+int layout dialog_exit 0x7f0b0071
 int layout ime_base_split_test_activity 0x7f0b0030
 int layout ime_secondary_split_test_activity 0x7f0b0031
 int layout m3_alert_dialog 0x7f0b0032
@@ -4686,6 +4695,7 @@ int style Theme_Design_Light_NoActionBar 0x7f10022d
 int style Theme_Design_NoActionBar 0x7f10022e
 int style Theme_IAPTheme 0x7f10022f
 int style Theme_KidZone 0x7f100230
+int style Theme_KidZone_BottomSheet 0x7f100475
 int style Theme_KidZone_Dialog 0x7f100231
 int style Theme_KidZone_Splash 0x7f100232
 int style Theme_Material3_Dark 0x7f100233
@@ -4968,6 +4978,7 @@ int style Widget_Design_Snackbar 0x7f100347
 int style Widget_Design_TabLayout 0x7f100348
 int style Widget_Design_TextInputEditText 0x7f100349
 int style Widget_Design_TextInputLayout 0x7f10034a
+int style Widget_KidZone_BottomSheet 0x7f100476
 int style Widget_Material3_ActionBar_Solid 0x7f10034b
 int style Widget_Material3_ActionMode 0x7f10034c
 int style Widget_Material3_AppBarLayout 0x7f10034d

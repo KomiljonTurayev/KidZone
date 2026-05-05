@@ -35,7 +35,8 @@
       "Bash(/c/Users/Komiljon/AppData/Local/Android/Sdk/platform-tools/adb install *)",
       "Bash(Get-ChildItem *)",
       "Bash(\"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug)",
-      "PowerShell(& \"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug 2>&1 | Select-Object -Last 20)"
+      "PowerShell(& \"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug 2>&1 | Select-Object -Last 20)",
+      "Bash(node *)"
     ]
   }
 }
