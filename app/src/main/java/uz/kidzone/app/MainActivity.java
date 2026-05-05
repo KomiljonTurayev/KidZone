@@ -107,69 +107,84 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Professional va trenddagi chiroyli chiqish dialogi.
-     * @param isInGame Agar rost bo'lsa o'yindan chiqishni, aks holda dasturdan chiqishni so'raydi.
-     */
     private void showExitDialog(boolean isInGame) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_exit, null);
-        
+
         androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.Theme_KidZone_Dialog)
                 .setView(dialogView)
                 .setCancelable(true)
                 .create();
+        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         android.widget.TextView title = dialogView.findViewById(R.id.dialog_title);
-        android.widget.TextView msg = dialogView.findViewById(R.id.dialog_message);
+        android.widget.TextView msg   = dialogView.findViewById(R.id.dialog_message);
+        android.widget.TextView emoji = dialogView.findViewById(R.id.dialog_emoji);
         MaterialButton btnYes = dialogView.findViewById(R.id.btn_yes);
-        MaterialButton btnNo = dialogView.findViewById(R.id.btn_no);
+        MaterialButton btnNo  = dialogView.findViewById(R.id.btn_no);
 
         if (isInGame) {
-            title.setText(getTranslatedString("exit_title", "Exit Game?"));
-            msg.setText(getTranslatedString("exit_msg", "Return to menu? Your progress might not be saved."));
+            title.setText(getTranslatedString("exit_title",   "Exit Game?"));
+            msg.setText(getTranslatedString("exit_msg",       "Return to menu? Your progress might not be saved."));
+            btnYes.setText(getTranslatedString("yes_menu",    "Yes, menu"));
         } else {
             title.setText(getTranslatedString("app_exit_title", "Exit KidZone?"));
-            msg.setText(getTranslatedString("app_exit_msg", "Are you sure you want to leave? We will miss you!"));
+            msg.setText(getTranslatedString("app_exit_msg",     "Are you sure? We will miss you!"));
+            btnYes.setText(getTranslatedString("yes_exit",      "Yes, exit"));
         }
+        btnNo.setText(getTranslatedString("no_stay", "No, stay"));
 
-        btnYes.setText(getTranslatedString("yes", "Yes"));
-        btnNo.setText(getTranslatedString("no", "No"));
+        // Emoji bounce animation on dialog open
+        emoji.setScaleX(0.2f);
+        emoji.setScaleY(0.2f);
+        emoji.setAlpha(0f);
+        emoji.animate()
+                .scaleX(1f).scaleY(1f).alpha(1f)
+                .setDuration(480)
+                .setInterpolator(new android.view.animation.OvershootInterpolator(2.8f))
+                .start();
 
         btnYes.setOnClickListener(v -> {
             dialog.dismiss();
             if (isInGame) {
                 webViewManager.evaluateJavascript("if(window.app) app.closeGame();");
             } else {
-                finishAffinity(); // Dasturni butunlay yopish
+                finishAffinity();
             }
         });
-        
         btnNo.setOnClickListener(v -> dialog.dismiss());
-        
+
         dialog.show();
     }
 
     private String getTranslatedString(String key, String defaultVal) {
         if (webViewManager == null || webViewManager.getLanguage() == null) return defaultVal;
-        
+
         String lang = webViewManager.getLanguage();
         if ("uz".equals(lang)) {
-            switch(key) {
-                case "exit_title": return "O'yindan chiqish?";
-                case "exit_msg": return "Menyuga qaytmoqchimisiz? Ballaringiz saqlanmasligi mumkin.";
+            switch (key) {
+                case "exit_title":     return "O'yindan chiqish?";
+                case "exit_msg":       return "Menyuga qaytmoqchimisiz? Ballaringiz saqlanmasligi mumkin.";
                 case "app_exit_title": return "KidZone'dan chiqish?";
-                case "app_exit_msg": return "Haqiqatan ham chiqib ketmoqchimisiz? Sizni sog'inib qolamiz!";
-                case "yes": return "Ha";
-                case "no": return "Yo'q";
+                case "app_exit_msg":   return "Haqiqatan ham chiqib ketmoqchimisiz? Sizni sog'inib qolamiz!";
+                case "yes_exit":       return "Ha, chiqish";
+                case "yes_menu":       return "Ha, menyuga";
+                case "no_stay":        return "Yo'q, qolish";
             }
         } else if ("ru".equals(lang)) {
-            switch(key) {
-                case "exit_title": return "Выйти из игры?";
-                case "exit_msg": return "Вернуться в меню? Ваши баллы могут не сохраниться.";
+            switch (key) {
+                case "exit_title":     return "Выйти из игры?";
+                case "exit_msg":       return "Вернуться в меню? Ваши баллы могут не сохраниться.";
                 case "app_exit_title": return "Выйти из KidZone?";
-                case "app_exit_msg": return "Вы действительно хотите выйти? Мы будем скучать!";
-                case "yes": return "Да";
-                case "no": return "Нет";
+                case "app_exit_msg":   return "Вы действительно хотите уйти? Мы будем скучать!";
+                case "yes_exit":       return "Да, выйти";
+                case "yes_menu":       return "Да, в меню";
+                case "no_stay":        return "Нет, остаться";
+            }
+        } else {
+            switch (key) {
+                case "yes_exit":  return "Yes, exit";
+                case "yes_menu":  return "Yes, menu";
+                case "no_stay":   return "No, stay";
             }
         }
         return defaultVal;

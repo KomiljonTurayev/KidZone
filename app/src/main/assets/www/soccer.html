@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Mini Futbol ⚽</title>
+<script src="kz-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
 body {
@@ -46,7 +47,9 @@ body {
 </head>
 <body>
 <div id="topbar">
+  <button onclick="history.back()" style="background:rgba(0,0,0,.2);border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;color:#fff">←</button>
   <div class="pill">⚽ GOLLAR: <span id="goals">0</span></div>
+  <div class="pill">DARAJA: <span id="soc-lvl">1</span></div>
   <div class="pill">REKORD: <span id="best">0</span></div>
 </div>
 
@@ -59,14 +62,31 @@ body {
 <div id="feedback">GOOOL! 🎉</div>
 
 <script>
+const _SOC_LANG = navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('en') ? 'en' : 'uz';
+const _SOC_HOW = {
+  uz:["⚽ Futbolni bosing, to'p tepiladi","Darvozabonga tegmay gol uring","Gol kiritganda darvozabon tezlashadi","Ko'proq gol uring — daraja oshadi!","REKORD — eng ko'p gollaringiz"],
+  ru:["⚽ Нажмите на мяч для удара","Не попадите в вратаря — забейте гол!","После каждого гола вратарь ускоряется","Забивайте больше голов — уровень растёт!","РЕКОРД — ваш лучший результат"],
+  en:["⚽ Tap the ball to kick it","Avoid the goalkeeper and score!","After each goal the keeper speeds up","Score more goals to level up!","BEST — your highest score"],
+};
+
 let goals = 0;
+let socLevel = KZL.getLevel('soccer');
 let best = parseInt(localStorage.getItem('soccerBest') || '0');
 let ballMoving = false;
-let keeperSpeed = 2;
+let keeperSpeed = 1.5 + (socLevel - 1) * 0.3;
 let keeperDir = 1;
 let keeperX = 50;
 
 document.getElementById('best').textContent = best;
+document.getElementById('soc-lvl').textContent = socLevel;
+
+/* Show how-to-play on first visit */
+KZL.howToPlay({
+  id:'soccer', lang:_SOC_LANG,
+  title:_SOC_LANG==='ru'?'Как играть?':_SOC_LANG==='en'?'How to play?':'Qanday o\'ynash?',
+  steps:_SOC_HOW[_SOC_LANG]||_SOC_HOW['uz'],
+  accentColor:'#2ecc71',
+});
 
 function moveKeeper() {
   keeperX += keeperSpeed * keeperDir;
@@ -102,7 +122,13 @@ function kick() {
         localStorage.setItem('soccerBest', best);
         document.getElementById('best').textContent = best;
       }
-      keeperSpeed += 0.2;
+      keeperSpeed += 0.25;
+      /* level up every 5 goals */
+      if (goals % 5 === 0 && KZL.getLevel('soccer') === socLevel) {
+        KZL.nextLevel('soccer');
+        socLevel = KZL.getLevel('soccer');
+        document.getElementById('soc-lvl').textContent = socLevel;
+      }
       resetBall();
     } else {
       // MISS

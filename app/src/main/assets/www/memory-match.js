@@ -238,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameActive = false;
         clearInterval(timer);
         if (win) {
+            if (window.KZL) KZL.nextLevel('memory-match');
             score += timeLeft * 10; // Bonus for remaining time
             messageDisplay.textContent = `${t.win} ${t.score}: ${score}`;
             game.spawnConfetti();

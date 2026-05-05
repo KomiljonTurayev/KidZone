@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Bubble Pop!</title>
+<script src="kz-ui.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
   body {
@@ -44,6 +45,7 @@
 <body>
 
 <div id="topbar">
+  <button onclick="history.back()" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;color:#fff;flex-shrink:0">←</button>
   <div class="stat-box">
     <div class="stat-label" id="lbl-score">BALL</div>
     <div id="score" class="stat-value">0</div>
@@ -112,6 +114,8 @@ const gameArea = document.getElementById('game-area');
 
 let bubbles = [], score = 0, level = 1, timeLeft = 30, gameRunning = false, isZen = false;
 let bestScore = parseInt(localStorage.getItem('bubbleBest') || '0');
+const _BP_KZL_ID = 'bubble-pop';
+let _bpPersistentLevel = KZL.getLevel(_BP_KZL_ID);
 document.getElementById('best').textContent = bestScore;
 
 function resize() { canvas.width = gameArea.clientWidth; canvas.height = gameArea.clientHeight; }
@@ -123,7 +127,7 @@ class Bubble {
         this.r = 30 + Math.random() * 30;
         this.x = this.r + Math.random() * (canvas.width - this.r * 2);
         this.y = canvas.height + this.r;
-        this.speed = 1 + Math.random() * 1.5 + (isZen ? 0 : level * 0.2);
+        this.speed = 1 + Math.random() * 1.5 + (isZen ? 0 : level * 0.2) + (_bpPersistentLevel - 1) * 0.08;
         this.color = ['#ff6b9d', '#64ffb4', '#00cfff', '#ffd700'][Math.floor(Math.random() * 4)];
         this.alive = true;
         this.popping = false;
@@ -186,6 +190,13 @@ function handleTap(e) {
     }
 }
 
+const _BP_LANG = navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('en') ? 'en' : 'uz';
+const _BP_HOW = {
+  uz:["Ekranda pufaklar paydo bo'ladi","Pufaklarni bosib yorting!","Yuqori darajalarda pufaklar tezroq uchadi","Vaqt tugamasdan imkon qadar ko'p pufak yoring","REKORD — eng yaxshi natijangiz"],
+  ru:["На экране появляются пузыри","Нажимайте на пузыри, чтобы лопнуть!","На высоких уровнях пузыри летят быстрее","Лопните как можно больше до конца времени","РЕКОРД — ваш лучший результат"],
+  en:["Bubbles appear on screen","Tap bubbles to pop them!","At higher levels bubbles move faster","Pop as many as you can before time runs out","BEST — your highest score"],
+};
+
 function startGame(zen) {
     isZen = zen;
     gameRunning = true;
@@ -194,6 +205,12 @@ function startGame(zen) {
     document.getElementById('gameover-screen').classList.add('hidden');
     document.getElementById('timer-wrap').style.display = zen ? 'none' : 'block';
     document.getElementById('level-box').style.display = zen ? 'none' : 'block';
+    KZL.howToPlay({
+      id:'bubble-pop', lang:_BP_LANG,
+      title:_BP_LANG==='ru'?'Как играть?':_BP_LANG==='en'?'How to play?':'Qanday o\'ynash?',
+      steps:_BP_HOW[_BP_LANG]||_BP_HOW['uz'],
+      accentColor:'#64ffb4',
+    });
     if (!zen) startTimer();
     spawnBubble();
     gameLoop();
@@ -219,6 +236,7 @@ function endGame() {
         localStorage.setItem('bubbleBest', bestScore);
         document.getElementById('best').textContent = bestScore;
     }
+    if (score >= 50) { _bpPersistentLevel = KZL.nextLevel(_BP_KZL_ID); }
     game.reportScore(Math.floor(score / 10));
 }
 

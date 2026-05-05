@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Ranglar va Shakllar 🎨</title>
+<script src="kz-ui.js"></script>
+<style>
+/* ── KZL back button ── */
+#kz-toprow{width:100%;max-width:480px;display:flex;align-items:center;
+  gap:8px;padding:10px 16px 0;}
+#kz-back{background:#fff;border:none;border-radius:50%;width:36px;height:36px;
+  font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);
+  display:flex;align-items:center;justify-content:center;}
+#kz-lvl-badge{background:linear-gradient(135deg,#FF6B6B,#FF9F43);color:#fff;
+  border-radius:16px;padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
+#kz-tools{display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:6px 16px 0;flex-wrap:wrap;}
+</style>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 
@@ -222,6 +235,18 @@ body {
 
 <div id="rainbow"></div>
 
+<!-- ── KZL top row ── -->
+<div id="kz-toprow">
+  <button id="kz-back" onclick="history.back()">←</button>
+  <div style="flex:1;font-weight:900;font-size:15px;color:#FF6B6B">🎨 Ranglar & Shakllar</div>
+  <div id="kz-lvl-badge" onclick="openLvlSel()">LVL <span id="kz-lvl">1</span></div>
+</div>
+<div id="kz-tools">
+  <div id="kz-hint-wrap"></div>
+  <div id="kz-lives-wrap"></div>
+  <div id="kz-timer-wrap"></div>
+</div>
+
 <div id="app">
   <div id="topbar">
     <div class="badge">
@@ -340,6 +365,84 @@ function drawShape(svgEl, type, color, size=56) {
   svgEl.innerHTML = path;
 }
 
+// ── KZL INTEGRATION ──────────────────────────────────────────────────────────
+const GAME_ID_CS = 'colors-shapes';
+const CS_LANG = navigator.language.startsWith('ru') ? 'ru'
+              : navigator.language.startsWith('en') ? 'en' : 'uz';
+let _kzLevel = 1, _kzCfg = null, _kzHint = null, _kzLives = null, _kzTimer = null;
+
+function modeForLevel(lv) {
+  if (lv <= 6)  return 'color';
+  if (lv <= 13) return 'shape';
+  return 'mix';
+}
+
+function initKZL() {
+  _kzLevel = KZL.getLevel(GAME_ID_CS);
+  _kzCfg   = KZL.cfg(GAME_ID_CS);
+  document.getElementById('kz-lvl').textContent = _kzLevel;
+
+  const hw = document.getElementById('kz-hint-wrap');
+  const lw = document.getElementById('kz-lives-wrap');
+  const tw = document.getElementById('kz-timer-wrap');
+  hw.innerHTML = ''; lw.innerHTML = ''; tw.innerHTML = '';
+
+  _kzHint  = KZL.createHints(_kzCfg.hints);
+  hw.appendChild(_kzHint.el);
+
+  _kzLives = KZL.createLives(3);
+  lw.appendChild(_kzLives.el);
+
+  _kzTimer = null;
+  if (_kzCfg.timer > 0) {
+    _kzTimer = KZL.createTimer(_kzCfg.timer, null, onKZLTimeUp);
+    tw.appendChild(_kzTimer.el);
+  }
+
+  /* wire hint to remove a wrong choice */
+  _kzHint.use(() => {
+    const btns = [...document.querySelectorAll('.choice')]
+      .filter(b => !b.classList.contains('correct') && !b.classList.contains('wrong'));
+    const wrongBtns = btns.filter((_,i) => choiceItems[i]?.name !== currentItem?.name);
+    if (wrongBtns.length > 0) {
+      const pick = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+      pick.style.opacity = '0.2';
+      pick.style.pointerEvents = 'none';
+    }
+  });
+}
+
+function onKZLTimeUp() {
+  if (answered) return;
+  answered = true;
+  /* reveal correct */
+  document.querySelectorAll('.choice').forEach((b,i) => {
+    if (choiceItems[i]?.name === currentItem?.name) b.classList.add('correct');
+  });
+  _kzLives.lose();
+  if (_kzLives.left <= 0) { setTimeout(endGame, 900); return; }
+  qNum++;
+  setTimeout(nextQ, 1100);
+}
+
+const CS_HOW = {
+  uz:["Ekranda rang yoki shakl ko'rsatiladi","To'g'ri rangni yoki shaklni tanlang","💡 Ko'mak — noto'g'ri javobni olib tashlaydi","❤️ 3 ta hayotingiz bor!","Daraja oshgan sari qiyinlashadi"],
+  ru:["Показывается цвет или фигура","Выберите правильный цвет или фигуру","💡 Подсказка убирает неверный ответ","❤️ У вас 3 жизни!","С уровнем сложность растёт"],
+  en:["A color or shape is shown","Choose the correct color or shape","💡 Hint removes a wrong answer","❤️ You have 3 lives!","Gets harder as you level up"],
+};
+
+/* level selector for colors-shapes */
+function openLvlSel() {
+  /* simple alert-style selector */
+  const max = KZL.getLevel(GAME_ID_CS);
+  const chosen = parseInt(prompt(`Level (1-${max}):`, _kzLevel));
+  if (chosen >= 1 && chosen <= max) {
+    _kzLevel = chosen;
+    KZL.setLevel(GAME_ID_CS, chosen);
+    document.getElementById('kz-lvl').textContent = _kzLevel;
+  }
+}
+
 // ── STATE ────────────────────────────────────────────────────────────────────
 let gameMode = "color", score = 0, qNum = 0, correctCount = 0;
 let totalQ = 10, answered = false;
@@ -404,7 +507,8 @@ function nextQ() {
 
   const pool = shuffle(getPool());
   currentItem = pool[0];
-  const wrong = pool.slice(1,4);
+  const numChoices = Math.max(2, _kzCfg?.c || 4);
+  const wrong = pool.slice(1, numChoices);
   choiceItems = shuffle([currentItem, ...wrong]);
 
   const emojiEl = document.getElementById("q-target");
@@ -432,6 +536,10 @@ function nextQ() {
     cardEl.style.background = currentItem.color.light;
   }
   document.getElementById("q-instruction").textContent = `${qNum+1} / ${totalQ} — TOPISH KERAK`;
+
+  /* reset hint and start timer */
+  if (_kzHint) _kzHint.reset(_kzCfg?.hints||0);
+  if (_kzTimer) _kzTimer.start();
 
   // Build choices
   const grid = document.getElementById("choices-grid");
@@ -464,6 +572,7 @@ function nextQ() {
 function checkChoice(item, btn) {
   if (answered) return;
   answered = true;
+  if (_kzTimer) _kzTimer.stop();
   const isOk = item.name === currentItem.name;
   if (isOk) {
     btn.classList.add("correct");
@@ -477,6 +586,10 @@ function checkChoice(item, btn) {
       if (choiceItems[i].name === currentItem.name) b.classList.add("correct");
     });
     playFail();
+    if (_kzLives) {
+      _kzLives.lose();
+      if (_kzLives.left <= 0) { setTimeout(endGame, 900); return; }
+    }
   }
   qNum++;
   setTimeout(nextQ, 900);
@@ -499,11 +612,20 @@ function confetti() {
 }
 
 function startGame() {
+  initKZL();
+  totalQ = _kzCfg.q;
+  setMode(modeForLevel(_kzLevel));
   score=0; qNum=0; correctCount=0;
   document.getElementById("score").textContent="0";
   document.getElementById("prog-inner").style.width="0%";
   document.getElementById("start-screen").classList.add("hidden");
   document.getElementById("result-screen").classList.add("hidden");
+  KZL.howToPlay({
+    id: GAME_ID_CS, lang: CS_LANG,
+    title: CS_LANG==='ru'?'Как играть?':CS_LANG==='en'?'How to play?':'Qanday o\'ynash?',
+    steps: CS_HOW[CS_LANG]||CS_HOW['uz'],
+    accentColor: '#FF6B6B',
+  });
   nextQ();
 }
 
@@ -527,10 +649,15 @@ function endGame() {
   const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
   localStorage.setItem('kz-pts', currentTotal + Math.round(score / 2));
 
+  // KZL level advancement
+  if (pct >= 0.6 && KZL.getLevel(GAME_ID_CS) === _kzLevel) {
+    KZL.nextLevel(GAME_ID_CS);
+  }
+
   // Update progress
   localStorage.setItem('kz-prog-colors', '100');
 
-  if (pct>=0.8) confetti(); confetti();
+  if (pct>=0.8) { confetti(); confetti(); }
   document.getElementById("result-screen").classList.remove("hidden");
 }
 function goHome() {
@@ -539,7 +666,10 @@ function goHome() {
 }
 
 setMode("color");
-window.addEventListener('load', () => window.AdMobMgr?.init('colors-shapes'));
+window.addEventListener('load', () => {
+  window.AdMobMgr?.init('colors-shapes');
+  initKZL();
+});
 </script>
 </body>
 </html>

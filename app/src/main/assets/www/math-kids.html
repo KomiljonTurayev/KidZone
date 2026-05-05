@@ -4,116 +4,471 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Math Kids 🔢</title>
+<script src="kz-ui.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
-body {
-  min-height:100vh; background: #1a1a2e;
-  font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
-  overflow: hidden; display: flex; flex-direction: column; align-items: center; color: white;
-}
-#app { width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-#q-card { background: rgba(255,255,255,0.1); border-radius: 28px; padding: 30px; width: 100%; text-align: center; margin: 20px 0; border: 1px solid rgba(255,255,255,0.2); }
-#q-text { font-size: 48px; font-weight: 900; margin: 20px 0; }
-#answers { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-.ans-btn { background: #4ECDC4; border: none; border-radius: 20px; padding: 25px; font-size: 32px; font-weight: 900; color: white; cursor: pointer; box-shadow: 0 6px 0 #36b3a8; }
-.ans-btn:active { transform: translateY(6px); box-shadow: none; }
-.correct { background: #10B981 !important; box-shadow: 0 6px 0 #0d8a61 !important; }
-.wrong { background: #EF4444 !important; box-shadow: 0 6px 0 #c43333 !important; }
-.screen { position: fixed; inset: 0; z-index: 100; background: #1a1a2e; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
-.hidden { display: none !important; }
-.btn-p { background: #4ECDC4; color: white; border: none; border-radius: 50px; padding: 18px 44px; font-size: 18px; font-weight: 900; cursor: pointer; }
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
+body{min-height:100vh;background:#1a1a2e;
+  font-family:'Arial Rounded MT Bold',Arial,sans-serif;
+  display:flex;flex-direction:column;align-items:center;color:white;overflow-x:hidden;}
+
+/* ── header ── */
+#topbar{width:100%;background:linear-gradient(135deg,#0f3460,#16213e);
+  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
+  box-shadow:0 3px 12px rgba(0,0,0,.4);}
+#back-btn{background:rgba(255,255,255,.15);border:none;border-radius:50%;
+  width:40px;height:40px;font-size:20px;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;}
+#title-text{flex:1;color:#fff;font-size:16px;font-weight:900;}
+#level-badge{background:rgba(255,255,255,.18);color:#fff;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
+#score-pill{background:#4ECDC4;color:#fff;border-radius:16px;
+  padding:4px 12px;font-size:13px;font-weight:900;}
+
+/* ── tools row ── */
+#tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:10px 16px 0;flex-wrap:wrap;}
+
+/* ── question card ── */
+#game-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  border-radius:28px;width:92%;max-width:440px;
+  margin:18px auto 0;padding:32px 20px 26px;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);}
+#level-label{font-size:11px;letter-spacing:2px;opacity:.55;margin-bottom:10px;}
+#q-text{font-size:52px;font-weight:900;color:#fff;margin:8px 0 4px;
+  text-shadow:0 0 24px rgba(78,205,196,.4);}
+#op-hint{font-size:13px;opacity:.5;margin-bottom:4px;}
+
+/* ── answers ── */
+#answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  width:92%;max-width:440px;margin:16px auto 0;}
+.ans-btn{background:#4ECDC4;border:none;border-radius:20px;padding:22px 10px;
+  font-size:30px;font-weight:900;color:#fff;cursor:pointer;
+  box-shadow:0 6px 0 #36b3a8;transition:transform .1s,opacity .25s;}
+.ans-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #36b3a8;}
+.ans-btn.correct{background:#10B981!important;box-shadow:0 6px 0 #0d8a61!important;}
+.ans-btn.wrong{background:#EF4444!important;box-shadow:0 6px 0 #c43333!important;}
+
+/* ── dots ── */
+#dots-row{display:flex;justify-content:center;gap:7px;margin:14px auto 6px;flex-wrap:wrap;max-width:300px;}
+.dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s;}
+.dot.done{background:#4ECDC4;}
+.dot.active{background:#fff;transform:scale(1.25);}
+
+/* ── level selector ── */
+#lvl-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:90;
+  align-items:center;justify-content:center;}
+#lvl-overlay.open{display:flex;}
+#lvl-box{background:#16213e;border:1px solid rgba(255,255,255,.15);border-radius:28px;
+  padding:24px 18px;width:92%;max-width:420px;max-height:88vh;overflow-y:auto;}
+#lvl-box h2{text-align:center;color:#4ECDC4;margin-bottom:16px;font-size:18px;}
+#lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.lvl-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;padding:10px 4px;font-size:12px;font-weight:900;
+  color:rgba(255,255,255,.7);cursor:pointer;text-align:center;}
+.lvl-btn.current{background:#4ECDC4;color:#fff;border-color:#4ECDC4;}
+.lvl-btn.locked{opacity:.35;cursor:default;}
+#lvl-close{display:block;margin:16px auto 0;background:#4ECDC4;color:#fff;border:none;
+  border-radius:20px;padding:10px 32px;font-size:15px;font-weight:900;cursor:pointer;}
+
+/* ── end overlay ── */
+#end-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:95;
+  align-items:center;justify-content:center;}
+#end-overlay.open{display:flex;}
+#end-box{background:#16213e;border:1px solid rgba(255,255,255,.18);border-radius:28px;
+  padding:32px 24px;width:88%;max-width:360px;text-align:center;}
+#end-icon{font-size:64px;margin-bottom:8px;}
+#end-title{font-size:22px;font-weight:900;color:#4ECDC4;margin-bottom:6px;}
+#end-msg{font-size:15px;color:rgba(255,255,255,.6);margin-bottom:20px;}
+#end-btn{background:#4ECDC4;color:#fff;border:none;border-radius:20px;
+  padding:12px 36px;font-size:16px;font-weight:900;cursor:pointer;}
 </style>
 </head>
 <body>
-<div id="app">
-  <div id="score-area" style="font-size: 20px;">⭐ <span id="score">0</span></div>
-  <div id="q-card">
-    <div id="ui-label" style="opacity: 0.6;">MATH CHALLENGE</div>
-    <div id="q-text">2 + 3 = ?</div>
+
+<!-- ── TOP BAR ── -->
+<div id="topbar">
+  <button id="back-btn" onclick="history.back()">←</button>
+  <div id="title-text">🔢 <span id="t-title">Math Kids</span></div>
+  <div id="level-badge" onclick="openLevelSelector()">LVL <span id="t-lvl">1</span></div>
+  <div id="score-pill">⭐ <span id="t-score">0</span></div>
+</div>
+
+<!-- ── TOOLS ── -->
+<div id="tools-row">
+  <div id="hint-wrap"></div>
+  <div id="lives-wrap"></div>
+  <div id="timer-wrap"></div>
+</div>
+
+<!-- ── QUESTION CARD ── -->
+<div id="game-card">
+  <div id="level-label">MATH CHALLENGE</div>
+  <div id="q-text">2 + 3 = ?</div>
+  <div id="op-hint"></div>
+</div>
+
+<!-- ── ANSWERS ── -->
+<div id="answers"></div>
+
+<!-- ── DOTS ── -->
+<div id="dots-row"></div>
+
+<!-- ── LEVEL SELECTOR ── -->
+<div id="lvl-overlay">
+  <div id="lvl-box">
+    <h2 id="lvl-title-text">Select Level</h2>
+    <div id="lvl-grid"></div>
+    <button id="lvl-close" onclick="closeLevelSelector()">✕</button>
   </div>
-  <div id="answers"></div>
 </div>
 
-<div id="start-screen" class="screen">
-  <h1 id="ui-start-t">Math Kids</h1>
-  <p id="ui-start-d">Solve simple math problems!</p>
-  <button class="btn-p" onclick="start()">START</button>
-</div>
-
-<div id="result-screen" class="screen hidden">
-  <h1 id="ui-res-t">Finish!</h1>
-  <div id="ui-res-s" style="font-size: 32px; margin: 20px 0;">Score: 100</div>
-  <button class="btn-p" onclick="start()">AGAIN</button>
+<!-- ── END OVERLAY ── -->
+<div id="end-overlay">
+  <div id="end-box">
+    <div id="end-icon">🌟</div>
+    <div id="end-title"></div>
+    <div id="end-msg"></div>
+    <button id="end-btn" onclick="onEndBtn()"></button>
+  </div>
 </div>
 
 <script>
+/* ═══════════════════════════════════════════════
+   LANG
+═══════════════════════════════════════════════ */
+const LANG = navigator.language.startsWith('ru') ? 'ru'
+           : navigator.language.startsWith('en') ? 'en' : 'uz';
+
 const T = {
-  en: { title:"Math Kids", desc:"Solve simple math problems!", start:"START", finish:"Finish!", score:"Score", again:"AGAIN", label:"MATH CHALLENGE" },
-  uz: { title:"Matematika", desc:"Oddiy misollarni yeching!", start:"BOSHLASH", finish:"Tamom!", score:"Ball", again:"QAYTA", label:"MATEMATIKA" },
-  ru: { title:"Математика", desc:"Решай простые примеры!", start:"ИГРАТЬ", finish:"Конец!", score:"Счет", again:"ЕЩЕ РАЗ", label:"МАТЕМАТИКА" }
+  title:    {uz:"Matematika",         ru:"Математика",          en:"Math Kids"},
+  label:    {uz:"MATEMATIKA",         ru:"МАТЕМАТИКА",          en:"MATH CHALLENGE"},
+  levelUp:  {uz:"Daraja oshdi!",      ru:"Уровень пройден!",    en:"Level Up!"},
+  nextLvl:  {uz:"Keyingi daraja →",   ru:"Следующий уровень →", en:"Next Level →"},
+  retry:    {uz:"Qayta urinish",      ru:"Попробовать снова",   en:"Try Again"},
+  gameOver: {uz:"O'yin tugadi",       ru:"Игра окончена",       en:"Game Over"},
+  tryAgain: {uz:"Yana o'ynash",       ru:"Играть снова",        en:"Play Again"},
+  great:    {uz:"Ajoyib! 🌟",         ru:"Отлично! 🌟",         en:"Great! 🌟"},
+  almost:   {uz:"Deyarli!",           ru:"Почти!",              en:"Almost there!"},
+  selectLvl:{uz:"Daraja tanlang",     ru:"Выберите уровень",    en:"Select Level"},
+  howTitle: {uz:"Qanday o'ynash?",    ru:"Как играть?",         en:"How to play?"},
+  howSteps: {
+    uz:["Ekranda matematik misol chiqadi","To'g'ri javobni tanlang","Daraja oshgan sari misollar qiyinlashadi","➕➖✖️➗ operatsiyalar qo'shiladi","💡 Ko'mak — noto'g'ri javobni olib tashlaydi","❤️ 3 ta hayotingiz bor!"],
+    ru:["На экране появится математический пример","Выберите правильный ответ","С уровнем задачи усложняются","Добавляются ➕➖✖️➗ операции","💡 Подсказка убирает неверный ответ","❤️ У вас 3 жизни!"],
+    en:["A math problem appears on screen","Choose the correct answer","Problems get harder each level","Operations ➕➖✖️➗ are added","💡 Hint removes a wrong answer","❤️ You have 3 lives!"],
+  },
 };
+function t(k){ return T[k][LANG] || T[k]['en']; }
 
-let lang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
-let score = 0, current = 0, qNum = 0, total = 5;
+/* ═══════════════════════════════════════════════
+   MATH LEVEL CONFIG
+   On top of KZL's generic config (q/c/hints/timer)
+═══════════════════════════════════════════════ */
+const MATH_CFG = [
+  /* lv  ops          maxA  maxB  distractRange */
+  {ops:['+'],        maxA:5,  maxB:5,  dr:5},   // 1
+  {ops:['+'],        maxA:8,  maxB:8,  dr:6},   // 2
+  {ops:['+'],        maxA:10, maxB:10, dr:8},   // 3
+  {ops:['+','-'],    maxA:10, maxB:10, dr:8},   // 4
+  {ops:['+','-'],    maxA:12, maxB:12, dr:10},  // 5
+  {ops:['+','-'],    maxA:15, maxB:15, dr:10},  // 6
+  {ops:['+','-','×'],maxA:10, maxB:5,  dr:12},  // 7
+  {ops:['+','-','×'],maxA:12, maxB:6,  dr:12},  // 8
+  {ops:['+','-','×'],maxA:15, maxB:8,  dr:15},  // 9
+  {ops:['+','-','×'],maxA:20, maxB:9,  dr:15},  // 10
+  {ops:['+','-','×','÷'],maxA:20, maxB:5, dr:18},// 11
+  {ops:['+','-','×','÷'],maxA:20, maxB:6, dr:18},// 12
+  {ops:['+','-','×','÷'],maxA:25, maxB:8, dr:20},// 13
+  {ops:['+','-','×','÷'],maxA:30, maxB:9, dr:20},// 14
+  {ops:['+','-','×','÷'],maxA:30, maxB:10,dr:25},// 15
+  {ops:['+','-','×','÷'],maxA:40, maxB:10,dr:25},// 16
+  {ops:['+','-','×','÷'],maxA:40, maxB:12,dr:30},// 17
+  {ops:['+','-','×','÷'],maxA:50, maxB:12,dr:30},// 18
+  {ops:['+','-','×','÷'],maxA:50, maxB:15,dr:40},// 19
+  {ops:['+','-','×','÷'],maxA:60, maxB:15,dr:50},// 20
+];
 
-function updateUI() {
-  const t = T[lang] || T.en;
-  document.getElementById('ui-start-t').textContent = t.title;
-  document.getElementById('ui-start-d').textContent = t.desc;
-  document.querySelector('#start-screen .btn-p').textContent = t.start;
-  document.getElementById('ui-label').textContent = t.label;
-  document.getElementById('ui-res-t').textContent = t.finish;
-  document.querySelector('#result-screen .btn-p').textContent = t.again;
+/* ═══════════════════════════════════════════════
+   QUESTION GENERATOR
+═══════════════════════════════════════════════ */
+function genQuestion(mcfg) {
+  const op = mcfg.ops[Math.floor(Math.random() * mcfg.ops.length)];
+  let a, b, ans, text;
+
+  if (op === '+') {
+    a = rand(1, mcfg.maxA); b = rand(1, mcfg.maxB);
+    ans = a + b; text = `${a} + ${b} = ?`;
+  } else if (op === '-') {
+    a = rand(2, mcfg.maxA); b = rand(1, Math.min(a, mcfg.maxB));
+    ans = a - b; text = `${a} − ${b} = ?`;
+  } else if (op === '×') {
+    a = rand(2, Math.min(mcfg.maxA, 12)); b = rand(2, Math.min(mcfg.maxB, 9));
+    ans = a * b; text = `${a} × ${b} = ?`;
+  } else { /* ÷ */
+    b = rand(2, Math.min(mcfg.maxB, 10));
+    ans = rand(2, Math.floor(mcfg.maxA / b));
+    a = ans * b;
+    text = `${a} ÷ ${b} = ?`;
+  }
+  return { text, ans, op };
 }
 
-function next() {
-  if (qNum >= total) {
-    document.getElementById('ui-res-s').textContent = `${T[lang].score}: ${score}`;
-    document.getElementById('result-screen').classList.remove('hidden');
-    return;
-  }
-  const a = Math.floor(Math.random() * 5) + 1;
-  const b = Math.floor(Math.random() * 5) + 1;
-  current = a + b;
-  document.getElementById('q-text').textContent = `${a} + ${b} = ?`;
+function rand(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-  const options = [current];
-  while(options.length < 4) {
-    const r = Math.floor(Math.random() * 10) + 1;
-    if (!options.includes(r)) options.push(r);
+function buildOptions(ans, dr, count) {
+  const opts = new Set([ans]);
+  let safety = 0;
+  while (opts.size < count && safety++ < 200) {
+    let v = ans + (Math.random() < .5 ? 1 : -1) * rand(1, Math.max(dr, 2));
+    if (v > 0 && v !== ans) opts.add(v);
   }
+  /* fallback if set still not full */
+  let fb = 1;
+  while (opts.size < count) { if (!opts.has(fb)) opts.add(fb); fb++; }
+  return [...opts].sort(() => Math.random() - .5);
+}
+
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+const GAME_ID = 'math';
+let _level, _cfg, _mcfg, _questions, _qi, _score, _total;
+let _hint, _lives, _timer, _answered, _endAction;
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  _level = KZL.getLevel(GAME_ID);
+  _cfg   = KZL.cfg(GAME_ID);
+  _mcfg  = MATH_CFG[_level - 1];
+  _total = _cfg.q;
+  _qi    = 0;
+  _score = 0;
+
+  document.getElementById('t-title').textContent = t('title');
+  document.getElementById('t-lvl').textContent   = _level;
+  document.getElementById('t-score').textContent = 0;
+  document.getElementById('level-label').textContent = t('label') + ' · LV' + _level;
+  document.getElementById('lvl-title-text').textContent = t('selectLvl');
+
+  const hw = document.getElementById('hint-wrap');
+  const lw = document.getElementById('lives-wrap');
+  const tw = document.getElementById('timer-wrap');
+  hw.innerHTML = ''; lw.innerHTML = ''; tw.innerHTML = '';
+
+  _hint = KZL.createHints(_cfg.hints);
+  hw.appendChild(_hint.el);
+
+  _lives = KZL.createLives(3);
+  lw.appendChild(_lives.el);
+
+  _timer = null;
+  if (_cfg.timer > 0) {
+    _timer = KZL.createTimer(_cfg.timer, null, onTimeUp);
+    tw.appendChild(_timer.el);
+  }
+
+  buildQuestions();
+  buildDots();
+  renderQuestion();
+
+  KZL.howToPlay({
+    id: GAME_ID, lang: LANG,
+    title: t('howTitle'),
+    steps: T.howSteps[LANG] || T.howSteps['en'],
+    accentColor: '#4ECDC4',
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   QUESTIONS
+═══════════════════════════════════════════════ */
+function buildQuestions() {
+  _questions = [];
+  for (let i = 0; i < _total; i++) {
+    _questions.push(genQuestion(_mcfg));
+  }
+}
+
+function renderQuestion() {
+  _answered = false;
+  const q = _questions[_qi];
+
+  document.getElementById('q-text').textContent  = q.text;
+  document.getElementById('t-score').textContent  = _score;
+
+  const opNames = {'+':'Addition ➕', '-':'Subtraction ➖', '×':'Multiplication ✖️', '÷':'Division ➗'};
+  const opNamesUz = {'+':'Qo\'shish ➕', '-':'Ayirish ➖', '×':'Ko\'paytirish ✖️', '÷':'Bo\'lish ➗'};
+  const opNamesRu = {'+':'Сложение ➕', '-':'Вычитание ➖', '×':'Умножение ✖️', '÷':'Деление ➗'};
+  const nameMap = LANG === 'ru' ? opNamesRu : LANG === 'uz' ? opNamesUz : opNames;
+  document.getElementById('op-hint').textContent = nameMap[q.op] || '';
+
+  /* active dot */
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    d.className = 'dot' + (i < _qi ? ' done' : i === _qi ? ' active' : '');
+  });
+
+  /* choices */
+  const numChoices = _cfg.c;
+  const opts = buildOptions(q.ans, _mcfg.dr, numChoices);
 
   const grid = document.getElementById('answers');
   grid.innerHTML = '';
-  options.sort(() => Math.random() - 0.5).forEach(v => {
+
+  opts.forEach(v => {
     const btn = document.createElement('button');
     btn.className = 'ans-btn';
     btn.textContent = v;
-    btn.onclick = () => {
-      if (v === current) {
-        btn.classList.add('correct'); score += 20;
-        document.getElementById('score').textContent = score;
-        setTimeout(next, 800);
-      } else {
-        btn.classList.add('wrong');
-      }
-    };
+    btn.dataset.val = v;
+    btn.onclick = () => answer(v, q, btn);
     grid.appendChild(btn);
   });
-  qNum++;
+
+  _hint.reset(_cfg.hints);
+  _hint.use(() => {
+    const wrongBtns = [...grid.querySelectorAll('.ans-btn')]
+      .filter(b => parseInt(b.dataset.val) !== q.ans && b.style.opacity !== '0.2');
+    if (wrongBtns.length > 0) {
+      const pick = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+      pick.style.opacity = '0.2';
+      pick.style.pointerEvents = 'none';
+    }
+  });
+
+  if (_timer) _timer.start();
 }
 
-function start() {
-  score = 0; qNum = 0;
-  document.getElementById('score').textContent = "0";
-  document.getElementById('start-screen').classList.add('hidden');
-  document.getElementById('result-screen').classList.add('hidden');
-  next();
+/* ═══════════════════════════════════════════════
+   ANSWER / FLOW
+═══════════════════════════════════════════════ */
+function answer(v, q, btn) {
+  if (_answered) return;
+  _answered = true;
+  if (_timer) _timer.stop();
+
+  if (v === q.ans) {
+    btn.classList.add('correct');
+    _score++;
+    document.getElementById('t-score').textContent = _score;
+    setTimeout(advance, 750);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.ans-btn').forEach(b => {
+      if (parseInt(b.dataset.val) === q.ans) b.classList.add('correct');
+    });
+    _lives.lose();
+    if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+    setTimeout(advance, 1100);
+  }
 }
 
-window.onload = () => {
-  updateUI();
-};
+function onTimeUp() {
+  if (_answered) return;
+  _answered = true;
+  const q = _questions[_qi];
+  document.querySelectorAll('.ans-btn').forEach(b => {
+    if (parseInt(b.dataset.val) === q.ans) b.classList.add('correct');
+  });
+  _lives.lose();
+  if (_lives.left <= 0) { setTimeout(showGameOver, 900); return; }
+  setTimeout(advance, 1100);
+}
+
+function advance() {
+  _qi++;
+  document.querySelectorAll('.dot').forEach((d,i) => {
+    if (i < _qi) d.className = 'dot done';
+  });
+  if (_qi >= _total) { levelDone(); return; }
+  renderQuestion();
+}
+
+/* ═══════════════════════════════════════════════
+   LEVEL DONE / GAME OVER
+═══════════════════════════════════════════════ */
+function levelDone() {
+  const pct = _score / _total;
+  const passed = pct >= 0.6;
+
+  if (passed && KZL.getLevel(GAME_ID) === _level) {
+    KZL.nextLevel(GAME_ID);
+  }
+
+  const nextL = KZL.getLevel(GAME_ID);
+  const isNew = passed && nextL > _level;
+
+  showEnd({
+    icon:   isNew ? '🌟' : (passed ? '✅' : '🔢'),
+    title:  isNew ? t('levelUp') : (passed ? t('great') : t('almost')),
+    msg:    `${_score} / ${_total}`,
+    btn:    isNew ? t('nextLvl') : t('retry'),
+    action: () => { _level = KZL.getLevel(GAME_ID); init(); },
+  });
+}
+
+function showGameOver() {
+  showEnd({
+    icon:'💔', title:t('gameOver'),
+    msg:`${_score} / ${_total}`,
+    btn:t('tryAgain'),
+    action: () => init(),
+  });
+}
+
+function showEnd({icon, title, msg, btn, action}) {
+  document.getElementById('end-icon').textContent  = icon;
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-msg').textContent   = msg;
+  document.getElementById('end-btn').textContent   = btn;
+  _endAction = action;
+  document.getElementById('end-overlay').classList.add('open');
+}
+
+function onEndBtn() {
+  document.getElementById('end-overlay').classList.remove('open');
+  if (_endAction) _endAction();
+}
+
+/* ═══════════════════════════════════════════════
+   DOTS / LEVEL SELECTOR
+═══════════════════════════════════════════════ */
+function buildDots() {
+  const row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (let i = 0; i < _total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    row.appendChild(d);
+  }
+}
+
+function openLevelSelector() {
+  const max = KZL.getLevel(GAME_ID);
+  const grid = document.getElementById('lvl-grid');
+  grid.innerHTML = '';
+  for (let n = 1; n <= 20; n++) {
+    const cfg = KZL.CONFIGS[n - 1];
+    const mc  = MATH_CFG[n - 1];
+    const btn = document.createElement('button');
+    btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
+    const opsStr = mc.ops.join('');
+    btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small><br><small style="font-size:9px;opacity:.7">${opsStr}</small>`;
+    if (n <= max) btn.onclick = () => { _level = n; KZL.setLevel(GAME_ID, n); closeLevelSelector(); init(); };
+    grid.appendChild(btn);
+  }
+  document.getElementById('lvl-overlay').classList.add('open');
+}
+
+function closeLevelSelector() {
+  document.getElementById('lvl-overlay').classList.remove('open');
+}
+
+/* ── start ── */
+init();
+
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('kz-prog-math', '100');
+});
 </script>
 </body>
 </html>

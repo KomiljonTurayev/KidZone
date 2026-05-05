@@ -408,6 +408,7 @@ body {
   100% { transform: translateX(-50%) translateY(-50px) scale(1); opacity:0; }
 }
 </style>
+<script src="kz-ui.js"></script>
 <script src="admob.js"></script>
 <script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 </head>
@@ -889,6 +890,15 @@ function startWithDiff(d) {
   document.getElementById("start-screen").classList.add("hidden");
   changeDiff(d);
   initGame();
+  const _L = navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
+  const _H = {
+    uz:["Kartalarni ikkita bosib juft toping","Ikki karta mos kelmasa, ular yopiladi","Xotirangiz yaxshi bo'lsa tezroq topasiz","Kamroq urinish — ko'proq ball","Barcha juftlarni toping — g'alaba!"],
+    ru:["Откройте две карты для поиска пары","Если не совпадают — закрываются снова","Хорошая память = быстрее находите","Меньше попыток — больше очков","Найдите все пары — победа!"],
+    en:["Flip two cards to find a pair","Non-matching cards flip back","Good memory = find pairs faster","Fewer tries = higher score","Find all pairs to win!"],
+  };
+  KZL.howToPlay({id:'memory-game',lang:_L,
+    title:_L==='ru'?'Как играть?':_L==='en'?'How to play?':'Qanday o\'ynash?',
+    steps:_H[_L]||_H['uz'],accentColor:'#8B5CF6'});
 }
 
 function restartGame() {

@@ -11,26 +11,32 @@ body {
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   overflow:hidden; display:flex; flex-direction:column; align-items:center;
 }
-#topbar { width:100%; padding:20px; display:flex; justify-content:space-between; align-items:center; }
-.pill { background:white; border-radius:20px; padding:8px 16px; font-weight:900; color:#558B2F; }
+#topbar { width:100%; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.pill { background:white; border-radius:20px; padding:7px 14px; font-weight:900; color:#558B2F; font-size:14px; }
+#lv-badge { background:#558B2F; color:white; border-radius:20px; padding:7px 14px; font-weight:900; font-size:14px; }
+
 #puzzle-board {
-  display:grid; grid-template-columns:repeat(3, 100px); grid-template-rows:repeat(3, 100px);
-  gap:5px; background:#DCEDC8; padding:5px; border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.1); margin-top:20px;
+  display:grid; gap:5px; background:#DCEDC8; padding:5px; border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1); margin-top:10px;
 }
 .tile {
-  width:100px; height:100px; background:#fff; border-radius:8px;
+  background:#fff; border-radius:8px;
   display:flex; align-items:center; justify-content:center;
-  font-size:40px; cursor:pointer; font-weight:bold; color:#558B2F;
+  cursor:pointer; font-weight:bold; color:#558B2F;
+  transition:transform 0.1s;
+  user-select:none;
 }
-.tile.empty { background:transparent; box-shadow:none; cursor:default; }
+.tile:active:not(.empty) { transform:scale(0.93); }
+.tile.empty { background:rgba(0,0,0,0.06); cursor:default; }
 
 /* Win overlay */
 #win-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
 #win-overlay.h { display:none; }
-#win-card { background:linear-gradient(135deg,#558B2F,#8BC34A); border-radius:28px; padding:36px 28px; text-align:center; width:min(280px,85vw); color:white; }
-#win-em  { font-size:64px; margin-bottom:10px; }
-#win-msg { font-size:22px; font-weight:900; margin-bottom:18px; }
+#win-card { background:linear-gradient(135deg,#558B2F,#8BC34A); border-radius:28px; padding:36px 28px; text-align:center; width:min(280px,85vw); color:white; animation:kzlPop .4s cubic-bezier(.34,1.56,.64,1); }
+@keyframes kzlPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}
+#win-em  { font-size:60px; margin-bottom:8px; }
+#win-level { font-size:42px; font-weight:900; line-height:1.1; margin-bottom:6px; }
+#win-msg { font-size:18px; font-weight:900; margin-bottom:18px; opacity:0.9; }
 #btn-win-play { background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.4); border-radius:20px; padding:14px 32px; color:white; font-size:16px; font-weight:900; cursor:pointer; width:100%; }
 #btn-win-play:active { transform:scale(0.96); }
 </style>
@@ -38,101 +44,158 @@ body {
 <body>
 
 <div id="topbar">
+  <button class="pill" onclick="history.back()" style="color:#333;cursor:pointer;">←</button>
   <div class="pill" id="lbl-title">🧩 PUZZLE</div>
-  <button class="pill" id="btn-shuffle" onclick="shuffle()">🔄 Aralashtirish</button>
+  <div id="lv-badge">LV 1</div>
+  <button class="pill" id="btn-shuffle" onclick="newGame()">🔄</button>
 </div>
 
 <div id="puzzle-board"></div>
 
-<!-- Win overlay (replaces alert) -->
 <div id="win-overlay" class="h">
   <div id="win-card">
     <div id="win-em">🏆</div>
+    <div id="win-level">LV 2</div>
     <div id="win-msg">Barakalla!</div>
-    <button id="btn-win-play" onclick="newGame()">🔄 Qayta</button>
+    <button id="btn-win-play" onclick="newGame()">▶ Davom et</button>
   </div>
 </div>
 
+<script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
 <script>
-const game = new KidZoneGame({ id: 'jigsaw' });
-const lang = game.lang;
+const GAME_ID = 'jigsaw';
+const game = new KidZoneGame({ id: GAME_ID });
+const LANG = game.lang;
 
 const T = {
-  uz: { title:"🧩 PUZZLE", shuffle:"🔄 Aralashtirish", win:"Barakalla! Puzzle yig'ildi!", again:"🔄 Qayta" },
-  ru: { title:"🧩 ПАЗЛ",   shuffle:"🔄 Перемешать",    win:"Молодец! Пазл собран!",       again:"🔄 Ещё раз" },
-  en: { title:"🧩 PUZZLE", shuffle:"🔄 Shuffle",        win:"Great! Puzzle solved!",        again:"🔄 Play Again" },
+  uz: { title:"🧩 PUZZLE", win:"Barakalla! Puzzle yig'ildi!", cont:"▶ Davom et", lv:"LV" },
+  ru: { title:"🧩 ПАЗЛ",   win:"Молодец! Пазл собран!",       cont:"▶ Продолжить", lv:"УР" },
+  en: { title:"🧩 PUZZLE", win:"Great! Puzzle solved!",        cont:"▶ Continue", lv:"LV" },
 };
+const t = T[LANG] || T.en;
 
-const t = T[lang] || T.en;
+// Emoji pools: 8 for 3×3, 15 for 4×4, 24 for 5×5
+const EMOJIS_3 = ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼"];
+const EMOJIS_4 = ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵"];
+const EMOJIS_5 = ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵",
+                  "🦋","🐝","🦎","🐢","🦕","🦖","🐬","🦈","🦜"];
 
-function applyLang() {
-  document.getElementById('lbl-title').textContent    = t.title;
-  document.getElementById('btn-shuffle').textContent  = t.shuffle;
-  document.getElementById('win-msg').textContent      = t.win;
-  document.getElementById('btn-win-play').textContent = t.again;
+let _level, gridN, tiles;
+
+function gridForLevel(lv){
+  if(lv <= 6)  return 3;
+  if(lv <= 13) return 4;
+  return 5;
 }
 
-let tiles = [1, 2, 3, 4, 5, 6, 7, 8, 0];
-const emojis = ["", "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼"];
+function emojisForGrid(n){
+  if(n===3) return EMOJIS_3;
+  if(n===4) return EMOJIS_4;
+  return EMOJIS_5;
+}
 
-function draw() {
+function shuffleMoves(lv){ return 80 + lv * 12; }
+
+function initGame(){
+  _level = KZL.getLevel(GAME_ID);
+  gridN  = gridForLevel(_level);
+  const total = gridN * gridN;
+  tiles = Array.from({length:total-1},(_,i)=>i+1);
+  tiles.push(0);
+  doShuffle();
+  applyLang();
+  updateBadge();
+  draw();
+}
+
+function applyLang(){
+  document.getElementById('lbl-title').textContent    = t.title;
+  document.getElementById('win-msg').textContent      = t.win;
+  document.getElementById('btn-win-play').textContent = t.cont;
+}
+
+function updateBadge(){
+  document.getElementById('lv-badge').textContent = t.lv+' '+_level;
+}
+
+function draw(){
   const board = document.getElementById('puzzle-board');
+  const maxSide = Math.min(window.innerWidth-20, window.innerHeight*0.78);
+  const cell = Math.floor((maxSide - (gridN-1)*5 - 10) / gridN);
+  board.style.gridTemplateColumns = `repeat(${gridN}, ${cell}px)`;
+  board.style.gridTemplateRows    = `repeat(${gridN}, ${cell}px)`;
+  const emojis = emojisForGrid(gridN);
+  const fs = Math.floor(cell * 0.48);
+
   board.innerHTML = '';
   tiles.forEach((tl, i) => {
     const div = document.createElement('div');
-    div.className = 'tile' + (tl === 0 ? ' empty' : '');
-    div.textContent = tl === 0 ? '' : emojis[tl];
+    div.className = 'tile' + (tl===0?' empty':'');
+    div.style.width = div.style.height = cell+'px';
+    div.style.fontSize = fs+'px';
+    div.textContent = tl===0 ? '' : emojis[tl-1];
     div.onclick = () => move(i);
     board.appendChild(div);
   });
 }
 
-function move(idx) {
+function move(idx){
   const emptyIdx = tiles.indexOf(0);
-  const row = Math.floor(idx / 3);
-  const col = idx % 3;
-  const erow = Math.floor(emptyIdx / 3);
-  const ecol = emptyIdx % 3;
-  if (Math.abs(row - erow) + Math.abs(col - ecol) !== 1) return;
-  [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+  const row=Math.floor(idx/gridN), col=idx%gridN;
+  const erow=Math.floor(emptyIdx/gridN), ecol=emptyIdx%gridN;
+  if(Math.abs(row-erow)+Math.abs(col-ecol)!==1) return;
+  [tiles[idx],tiles[emptyIdx]]=[tiles[emptyIdx],tiles[idx]];
   draw();
-  if (checkWin()) showWin();
+  if(checkWin()) setTimeout(showWin,120);
 }
 
-function checkWin() {
-  for (let i = 0; i < 8; i++) if (tiles[i] !== i + 1) return false;
-  return true;
+function checkWin(){
+  const n=tiles.length;
+  for(let i=0;i<n-1;i++) if(tiles[i]!==i+1) return false;
+  return tiles[n-1]===0;
 }
 
-function showWin() {
+function showWin(){
+  _level = KZL.nextLevel(GAME_ID);
+  document.getElementById('win-level').textContent = t.lv+' '+_level+'!';
   document.getElementById('win-overlay').classList.remove('h');
-  game.reportScore(30);
+  game.reportScore(30 + gridN * 5);
 }
 
-function newGame() {
+function newGame(){
   document.getElementById('win-overlay').classList.add('h');
-  shuffle();
+  initGame();
 }
 
-function shuffle() {
-  for (let i = 0; i < 100; i++) {
-    const adj = [];
-    const emptyIdx = tiles.indexOf(0);
-    const row = Math.floor(emptyIdx / 3);
-    const col = emptyIdx % 3;
-    if (row > 0) adj.push(emptyIdx - 3);
-    if (row < 2) adj.push(emptyIdx + 3);
-    if (col > 0) adj.push(emptyIdx - 1);
-    if (col < 2) adj.push(emptyIdx + 1);
-    const rand = adj[Math.floor(Math.random() * adj.length)];
-    [tiles[rand], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[rand]];
+function doShuffle(){
+  const moves = shuffleMoves(_level);
+  for(let i=0;i<moves;i++){
+    const adj=[];
+    const emptyIdx=tiles.indexOf(0);
+    const row=Math.floor(emptyIdx/gridN), col=emptyIdx%gridN;
+    if(row>0)      adj.push(emptyIdx-gridN);
+    if(row<gridN-1)adj.push(emptyIdx+gridN);
+    if(col>0)      adj.push(emptyIdx-1);
+    if(col<gridN-1)adj.push(emptyIdx+1);
+    const rand=adj[Math.floor(Math.random()*adj.length)];
+    [tiles[emptyIdx],tiles[rand]]=[tiles[rand],tiles[emptyIdx]];
   }
-  draw();
 }
 
-applyLang();
-shuffle();
+window.addEventListener('resize', draw);
+
+KZL.howToPlay({id:GAME_ID,lang:LANG,
+  title:LANG==='ru'?'Как играть?':LANG==='en'?'How to play?':'Qanday o\'ynash?',
+  steps:({
+    uz:["Plitalarni suring va tasvirni yig'ing","Bo'sh katakchaga yonidagi plitani suring","Barcha plitalar tartibda — g'alaba!","Daraja oshganda katroq setka: 3×3→4×4→5×5","Ko'proq daraja — ko'proq plitkalar! 🧩"],
+    ru:["Сдвигайте плитки, чтобы собрать картинку","Двигайте плитку рядом с пустой клеткой","Все плитки по порядку — победа!","Уровни меняют размер: 3×3→4×4→5×5","Больше уровень — больше плиток! 🧩"],
+    en:["Slide tiles to assemble the picture","Move a tile next to the empty space","All tiles in order = you win!","Grid grows per level: 3×3→4×4→5×5","More levels = bigger grid! 🧩"],
+  })[LANG]||["Slide tiles to solve the puzzle","Move tiles next to empty space","Complete order to win!","3×3 → 4×4 → 5×5 grid per levels","Bigger grid = harder! 🧩"],
+  accentColor:'#558B2F',
+});
+
+initGame();
 </script>
 </body>
 </html>
