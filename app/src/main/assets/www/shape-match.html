@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>Shape Match 🔷</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
+    body { background:#F0F4FF; font-family:'Arial Rounded MT Bold',Arial,sans-serif; height:100vh; overflow:hidden; display:flex; flex-direction:column; user-select:none; }
+
+    #header { padding:10px 14px; display:flex; align-items:center; justify-content:space-between; background:white; box-shadow:0 2px 8px rgba(0,0,0,0.06); gap:8px; }
+    #back-btn { background:rgba(0,0,0,.08); border:none; border-radius:50%; width:36px; height:36px; font-size:18px; cursor:pointer; flex-shrink:0; }
+    #lv-badge { background:linear-gradient(135deg,#6C63FF,#A29BFE); color:white; padding:6px 14px; border-radius:20px; font-weight:900; font-size:13px; white-space:nowrap; }
+    #game-title { flex:1; font-weight:900; font-size:15px; color:#6C63FF; text-align:center; }
+
+    #play-area { flex:1; position:relative; overflow:hidden; }
+
+    .slot { position:absolute; border:4px dashed #C8C8D4; border-radius:20px; display:flex; align-items:center; justify-content:center; transition:border-color 0.2s; }
+    .slot.correct-flash { border-color:#4CAF50; border-style:solid; background:rgba(76,175,80,0.12); animation:correctPop 0.35s ease-out; }
+    @keyframes correctPop { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
+    .shape-item { position:absolute; background:white; border-radius:20px; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 18px rgba(0,0,0,0.12); cursor:grab; z-index:10; }
+    .shape-item.dragging { cursor:grabbing; transform:scale(1.14) rotate(-4deg); z-index:100; box-shadow:0 10px 32px rgba(0,0,0,0.22); }
+    .shape-item.wrong-flash { animation:shake 0.38s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+
+    #feedback { position:fixed; top:45%; left:50%; transform:translate(-50%,-50%); font-size:70px; pointer-events:none; display:none; z-index:200; }
+    #feedback.show { display:block; animation:fbPop 0.65s ease-out forwards; }
+    @keyframes fbPop { 0%{transform:translate(-50%,-50%) scale(0.5);opacity:1} 100%{transform:translate(-50%,-50%) scale(2.2);opacity:0} }
+
+    #round-done { position:fixed; inset:0; background:rgba(0,0,0,0.72); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:300; }
+    #round-done.show { display:flex; animation:rdPop .4s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes rdPop { from{transform:scale(.65);opacity:0} to{transform:scale(1);opacity:1} }
+    .rd-card { background:linear-gradient(135deg,#6C63FF,#A29BFE); border-radius:28px; padding:36px 28px; width:min(290px,88vw); text-align:center; color:white; }
+    .rd-em { font-size:58px; margin-bottom:6px; }
+    .rd-title { font-size:30px; font-weight:900; margin-bottom:6px; }
+    .rd-sub { font-size:16px; opacity:0.85; margin-bottom:22px; }
+    .rd-btn { background:white; color:#6C63FF; border:none; border-radius:20px; padding:14px 36px; font-size:17px; font-weight:900; cursor:pointer; width:100%; }
+    .rd-btn:active { transform:scale(0.96); }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <button id="back-btn" onclick="history.back()">←</button>
+    <div id="game-title">🔷 Shape Match</div>
+    <div id="lv-badge">LV 1</div>
+  </div>
+
+  <div id="play-area"></div>
+  <div id="feedback">⭐</div>
+
+  <div id="round-done">
+    <div class="rd-card">
+      <div class="rd-em">🎉</div>
+      <div class="rd-title" id="rd-title">Great job!</div>
+      <div class="rd-sub" id="rd-sub">Level 2!</div>
+      <button class="rd-btn" id="rd-btn" onclick="nextRound()">Continue ▶</button>
+    </div>
+  </div>
+
+  <script src="kz-ui.js"></script>
+  <script>
+    /* PLACEHOLDER — replaced in Task 2 */
+  </script>
+</body>
+</html>
