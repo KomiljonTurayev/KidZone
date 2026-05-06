@@ -111,7 +111,7 @@ function drawShape(svgEl, type, color, size) {
   if (type === 'triangle')
     inner = `<polygon points="${h},8 ${size-8},${size-8} 8,${size-8}" fill="${color}"/>`;
   if (type === 'rectangle')
-    inner = `<rect x="6" y="18" width="${size-12}" height="${size-36}" rx="8" fill="${color}"/>`;
+    inner = `<rect x="${Math.round(size*0.1)}" y="${Math.round(size*0.25)}" width="${Math.round(size*0.8)}" height="${Math.round(size*0.5)}" rx="${Math.round(size*0.1)}" fill="${color}"/>`;
   if (type === 'diamond')
     inner = `<polygon points="${h},8 ${size-8},${h} ${h},${size-8} 8,${h}" fill="${color}"/>`;
   if (type === 'star') {
