@@ -107,7 +107,7 @@ function drawShape(svgEl, type, color, size) {
   if (type === 'circle')
     inner = `<circle cx="${h}" cy="${h}" r="${h-6}" fill="${color}"/>`;
   if (type === 'square')
-    inner = `<rect x="8" y="8" width="${size-16}" height="${size-16}" rx="8" fill="${color}"/>`;
+    inner = `<rect x="8" y="8" width="${size-16}" height="${size-16}" rx="${Math.min(8, Math.floor((size-16)/3))}" fill="${color}"/>`;
   if (type === 'triangle')
     inner = `<polygon points="${h},8 ${size-8},${size-8} 8,${size-8}" fill="${color}"/>`;
   if (type === 'rectangle')
