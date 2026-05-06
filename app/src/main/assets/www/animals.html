@@ -230,13 +230,14 @@ function startGame() {
 
   // Tools
   const toolsRow = document.getElementById('tools-row');
+  const timerWrap = document.getElementById('timer-wrap');
   toolsRow.innerHTML = '';
+  toolsRow.appendChild(timerWrap);
 
   // Timer
-  const timerWrap = document.getElementById('timer-wrap');
   if (cfg.timer > 0) {
     timerWrap.style.display = 'flex';
-    if (timerObj) timerObj.stop();
+    if (timerObj) clearInterval(timerObj);
   } else {
     timerWrap.style.display = 'none';
   }
