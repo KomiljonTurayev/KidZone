@@ -1,0 +1,504 @@
+# Shape Match Game — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Build a single-file drag-and-drop shape matching HTML5 game for KidZone where players drag colored SVG shapes onto matching grey silhouette outline slots across 20 KZL levels.
+
+**Architecture:** Single self-contained `shape-match.html` modelled on `dino-match.html` (drag-and-drop pattern) and `colors-shapes.html` (SVG shape drawing). Colored items live in a row at the bottom; grey outline slots are arranged in a grid above. Level difficulty scales by number of shapes (2–7) from the `ALL_SHAPES` array. KZL integration via `kz-ui.js`.
+
+**Tech Stack:** Vanilla HTML/CSS/JS, inline SVG, KZL API (`kz-ui.js`), touch/pointer events.
+
+---
+
+### Task 1: HTML Skeleton and CSS
+
+**Files:**
+- Create: `app/src/main/assets/www/shape-match.html`
+
+- [ ] **Step 1: Create the file**
+
+Create `app/src/main/assets/www/shape-match.html` with this full content:
+
+```html
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>Shape Match 🔷</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
+    body { background:#F0F4FF; font-family:'Arial Rounded MT Bold',Arial,sans-serif; height:100vh; overflow:hidden; display:flex; flex-direction:column; user-select:none; }
+
+    #header { padding:10px 14px; display:flex; align-items:center; justify-content:space-between; background:white; box-shadow:0 2px 8px rgba(0,0,0,0.06); gap:8px; }
+    #back-btn { background:rgba(0,0,0,.08); border:none; border-radius:50%; width:36px; height:36px; font-size:18px; cursor:pointer; flex-shrink:0; }
+    #lv-badge { background:linear-gradient(135deg,#6C63FF,#A29BFE); color:white; padding:6px 14px; border-radius:20px; font-weight:900; font-size:13px; white-space:nowrap; }
+    #game-title { flex:1; font-weight:900; font-size:15px; color:#6C63FF; text-align:center; }
+
+    #play-area { flex:1; position:relative; overflow:hidden; }
+
+    .slot { position:absolute; border:4px dashed #C8C8D4; border-radius:20px; display:flex; align-items:center; justify-content:center; transition:border-color 0.2s; }
+    .slot.correct-flash { border-color:#4CAF50; border-style:solid; background:rgba(76,175,80,0.12); animation:correctPop 0.35s ease-out; }
+    @keyframes correctPop { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
+    .shape-item { position:absolute; background:white; border-radius:20px; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 18px rgba(0,0,0,0.12); cursor:grab; z-index:10; }
+    .shape-item.dragging { cursor:grabbing; transform:scale(1.14) rotate(-4deg); z-index:100; box-shadow:0 10px 32px rgba(0,0,0,0.22); }
+    .shape-item.wrong-flash { animation:shake 0.38s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+
+    #feedback { position:fixed; top:45%; left:50%; transform:translate(-50%,-50%); font-size:70px; pointer-events:none; display:none; z-index:200; }
+    #feedback.show { display:block; animation:fbPop 0.65s ease-out forwards; }
+    @keyframes fbPop { 0%{transform:translate(-50%,-50%) scale(0.5);opacity:1} 100%{transform:translate(-50%,-50%) scale(2.2);opacity:0} }
+
+    #round-done { position:fixed; inset:0; background:rgba(0,0,0,0.72); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:300; }
+    #round-done.show { display:flex; animation:rdPop .4s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes rdPop { from{transform:scale(.65);opacity:0} to{transform:scale(1);opacity:1} }
+    .rd-card { background:linear-gradient(135deg,#6C63FF,#A29BFE); border-radius:28px; padding:36px 28px; width:min(290px,88vw); text-align:center; color:white; }
+    .rd-em { font-size:58px; margin-bottom:6px; }
+    .rd-title { font-size:30px; font-weight:900; margin-bottom:6px; }
+    .rd-sub { font-size:16px; opacity:0.85; margin-bottom:22px; }
+    .rd-btn { background:white; color:#6C63FF; border:none; border-radius:20px; padding:14px 36px; font-size:17px; font-weight:900; cursor:pointer; width:100%; }
+    .rd-btn:active { transform:scale(0.96); }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <button id="back-btn" onclick="history.back()">←</button>
+    <div id="game-title">🔷 Shape Match</div>
+    <div id="lv-badge">LV 1</div>
+  </div>
+
+  <div id="play-area"></div>
+  <div id="feedback">⭐</div>
+
+  <div id="round-done">
+    <div class="rd-card">
+      <div class="rd-em">🎉</div>
+      <div class="rd-title" id="rd-title">Great job!</div>
+      <div class="rd-sub" id="rd-sub">Level 2!</div>
+      <button class="rd-btn" id="rd-btn" onclick="nextRound()">Continue ▶</button>
+    </div>
+  </div>
+
+  <script src="kz-ui.js"></script>
+  <script>
+    /* PLACEHOLDER — replaced in Task 2 */
+  </script>
+</body>
+</html>
+```
+
+- [ ] **Step 2: Verify**
+
+Open `shape-match.html` in a browser. Expected: purple header with ← back button, "🔷 Shape Match" title, "LV 1" badge. Empty blue-tinted play area. No console errors.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add app/src/main/assets/www/shape-match.html
+git commit -m "feat(shape-match): HTML skeleton and CSS"
+```
+
+---
+
+### Task 2: Shape Data and SVG Drawing
+
+**Files:**
+- Modify: `app/src/main/assets/www/shape-match.html` — replace the `<script>` block content
+
+- [ ] **Step 1: Replace the script block with shape utilities**
+
+Replace `/* PLACEHOLDER — replaced in Task 2 */` with:
+
+```js
+// ── TRANSLATIONS ─────────────────────────────────────────────────────────────
+const T = {
+  uz: {
+    title: '🔷 Shakllarni Moslashtir',
+    win:   'Barakalla!',
+    lv:    'DARAJA',
+    cont:  'Davom et ▶',
+    how:   ['Shakl rasmlarni sudrab, o\'xshash joyga qo\'ying','Doira — doiraga, kvadrat — kvadratga','Noto\'g\'ri joyga qo\'ysangiz — shakl qaytib keladi','Barcha shakllarni to\'g\'ri joylashtiring — g\'alaba!'],
+  },
+  ru: {
+    title: '🔷 Подбери форму',
+    win:   'Молодец!',
+    lv:    'УРОВЕНЬ',
+    cont:  'Продолжить ▶',
+    how:   ['Перетащите фигуру на подходящий контур','Круг — к кругу, квадрат — к квадрату','Неверное место — фигура вернётся обратно','Расставьте все фигуры правильно — победа!'],
+  },
+  en: {
+    title: '🔷 Shape Match',
+    win:   'Great job!',
+    lv:    'LEVEL',
+    cont:  'Continue ▶',
+    how:   ['Drag each shape onto its matching outline','Circle to circle, square to square','Wrong spot — the shape snaps back','Place all shapes correctly to win!'],
+  },
+};
+
+// ── SHAPE DATA ───────────────────────────────────────────────────────────────
+const SHAPE_COLORS = {
+  circle:    '#FF6B6B',
+  square:    '#4ECDC4',
+  triangle:  '#55EFC4',
+  rectangle: '#FF9F43',
+  diamond:   '#A29BFE',
+  heart:     '#FD79A8',
+  star:      '#FECA57',
+};
+const ALL_SHAPES = ['circle','square','triangle','rectangle','diamond','heart','star'];
+
+function drawShape(svgEl, type, color, size) {
+  svgEl.innerHTML = '';
+  svgEl.setAttribute('viewBox', `0 0 ${size} ${size}`);
+  svgEl.setAttribute('width', size);
+  svgEl.setAttribute('height', size);
+  const h = size / 2;
+  let inner = '';
+  if (type === 'circle')
+    inner = `<circle cx="${h}" cy="${h}" r="${h-6}" fill="${color}"/>`;
+  if (type === 'square')
+    inner = `<rect x="8" y="8" width="${size-16}" height="${size-16}" rx="8" fill="${color}"/>`;
+  if (type === 'triangle')
+    inner = `<polygon points="${h},8 ${size-8},${size-8} 8,${size-8}" fill="${color}"/>`;
+  if (type === 'rectangle')
+    inner = `<rect x="6" y="18" width="${size-12}" height="${size-36}" rx="8" fill="${color}"/>`;
+  if (type === 'diamond')
+    inner = `<polygon points="${h},8 ${size-8},${h} ${h},${size-8} 8,${h}" fill="${color}"/>`;
+  if (type === 'star') {
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? h-6 : (h-6)*0.45;
+      const a = (i/10)*Math.PI*2 - Math.PI/2;
+      pts.push(`${h+r*Math.cos(a)},${h+r*Math.sin(a)}`);
+    }
+    inner = `<polygon points="${pts.join(' ')}" fill="${color}"/>`;
+  }
+  if (type === 'heart') {
+    inner = `<path d="M${h} ${size-10} C${h} ${size-10} 8 ${h+6} 8 ${h-6} C8 ${h*0.55} ${h} ${h*0.55} ${h} ${h} C${h} ${h*0.55} ${size-8} ${h*0.55} ${size-8} ${h-6} C${size-8} ${h+6} ${h} ${size-10} ${h} ${size-10}Z" fill="${color}"/>`;
+  }
+  svgEl.innerHTML = inner;
+}
+
+function makeSVG(type, color, size) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  drawShape(svg, type, color, size);
+  return svg;
+}
+
+// ── STATE & KZL ──────────────────────────────────────────────────────────────
+const GAME_ID = 'shape-match';
+const _urlLang = new URLSearchParams(window.location.search).get('lang');
+const _L = _urlLang ||
+  (navigator.language.startsWith('ru') ? 'ru' :
+   navigator.language.startsWith('en') ? 'en' : 'uz');
+
+let _level, placed, roundShapes, activeItem, offsetX, offsetY, audioCtx;
+
+// ── LEVEL CONFIG ─────────────────────────────────────────────────────────────
+function shapesForLevel(lv) {
+  if (lv <= 4)  return ALL_SHAPES.slice(0, 2);
+  if (lv <= 8)  return ALL_SHAPES.slice(0, 3);
+  if (lv <= 12) return ALL_SHAPES.slice(0, 4);
+  if (lv <= 15) return ALL_SHAPES.slice(0, 5);
+  if (lv <= 18) return ALL_SHAPES.slice(0, 6);
+  return ALL_SHAPES.slice();
+}
+
+function updateHeader() {
+  document.getElementById('lv-badge').textContent = 'LV ' + _level;
+}
+
+function startRound() {
+  placed = 0;
+  roundShapes = shapesForLevel(_level).slice().sort(() => Math.random() - 0.5);
+  updateHeader();
+  renderRound();
+}
+
+// ── ROUND RENDERING ──────────────────────────────────────────────────────────
+function renderRound() {
+  const area = document.getElementById('play-area');
+  area.innerHTML = '';
+  const W = area.clientWidth, H = area.clientHeight;
+  const n = roundShapes.length;
+
+  // Cell size: shrinks as n grows, so all items always fit on screen
+  const cell = Math.min(
+    Math.floor((W - 20) / n) - 8,
+    Math.floor((H * 0.42) / 2),
+    88
+  );
+  const slotSize = Math.round(cell * 1.15);
+  const gap = 10;
+
+  // Slots in a grid — shuffled so slot order differs from item order
+  const slotCols = Math.ceil(Math.sqrt(n));
+  const slotRows = Math.ceil(n / slotCols);
+  const slotGridW = slotCols * slotSize + (slotCols - 1) * gap;
+  const slotGridH = slotRows * slotSize + (slotRows - 1) * gap;
+  const slotOx = Math.floor((W - slotGridW) / 2);
+  const slotOy = Math.floor((H * 0.5 - slotGridH) / 2) + 10;
+  const shuffledSlots = roundShapes.slice().sort(() => Math.random() - 0.5);
+
+  shuffledSlots.forEach((type, i) => {
+    const col = i % slotCols, row = Math.floor(i / slotCols);
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.dataset.type = type;
+    slot.style.left   = (slotOx + col * (slotSize + gap)) + 'px';
+    slot.style.top    = (slotOy + row * (slotSize + gap)) + 'px';
+    slot.style.width  = slotSize + 'px';
+    slot.style.height = slotSize + 'px';
+    slot.appendChild(makeSVG(type, '#D0D0D0', slotSize - 16));
+    area.appendChild(slot);
+  });
+
+  // Draggable items in a row at the bottom — independently shuffled
+  const totalItemW = n * cell + (n - 1) * gap;
+  const itemOx = Math.max(8, Math.floor((W - totalItemW) / 2));
+  const itemY  = H - cell - 20;
+  const shuffledItems = roundShapes.slice().sort(() => Math.random() - 0.5);
+
+  shuffledItems.forEach((type, i) => {
+    const item = document.createElement('div');
+    item.className = 'shape-item';
+    item.dataset.type = type;
+    const lx = itemOx + i * (cell + gap);
+    item.style.left   = lx + 'px';
+    item.style.top    = itemY + 'px';
+    item.style.width  = cell + 'px';
+    item.style.height = cell + 'px';
+    item._origLeft = lx;
+    item._origTop  = itemY;
+    item.appendChild(makeSVG(type, SHAPE_COLORS[type], cell - 12));
+    item.addEventListener('touchstart', dragStart, {passive: false});
+    item.addEventListener('mousedown',  dragStart);
+    area.appendChild(item);
+  });
+}
+
+// ── DRAG & DROP ──────────────────────────────────────────────────────────────
+function dragStart(e) {
+  e.preventDefault();
+  activeItem = e.target.closest('.shape-item');
+  if (!activeItem) return;
+  const touch = e.touches ? e.touches[0] : e;
+  const rect  = activeItem.getBoundingClientRect();
+  offsetX = touch.clientX - rect.left;
+  offsetY = touch.clientY - rect.top;
+  activeItem.classList.add('dragging');
+  document.addEventListener('touchmove', dragMove, {passive: false});
+  document.addEventListener('mousemove',  dragMove);
+  document.addEventListener('touchend',   dragEnd);
+  document.addEventListener('mouseup',    dragEnd);
+}
+
+function dragMove(e) {
+  if (!activeItem) return;
+  e.preventDefault();
+  const touch = e.touches ? e.touches[0] : e;
+  const ar = document.getElementById('play-area').getBoundingClientRect();
+  activeItem.style.left = (touch.clientX - offsetX - ar.left) + 'px';
+  activeItem.style.top  = (touch.clientY - offsetY - ar.top)  + 'px';
+}
+
+function dragEnd() {
+  if (!activeItem) return;
+  document.removeEventListener('touchmove', dragMove);
+  document.removeEventListener('mousemove',  dragMove);
+  document.removeEventListener('touchend',   dragEnd);
+  document.removeEventListener('mouseup',    dragEnd);
+
+  activeItem.classList.remove('dragging');
+  const rect = activeItem.getBoundingClientRect();
+  const cx = rect.left + rect.width  / 2;
+  const cy = rect.top  + rect.height / 2;
+  const draggedItem = activeItem;
+  activeItem = null;
+
+  let matched = false;
+  document.querySelectorAll('.slot').forEach(slot => {
+    if (matched || slot.dataset.filled) return;
+    const sr = slot.getBoundingClientRect();
+    if (cx > sr.left && cx < sr.right && cy > sr.top && cy < sr.bottom) {
+      matched = true;
+      if (slot.dataset.type === draggedItem.dataset.type) {
+        // Correct match: hide item, fill slot with colored shape
+        slot.dataset.filled = '1';
+        draggedItem.style.display = 'none';
+        const innerSz = parseInt(slot.style.width) - 16;
+        slot.innerHTML = '';
+        slot.appendChild(makeSVG(slot.dataset.type, SHAPE_COLORS[slot.dataset.type], innerSz));
+        slot.style.border = '4px solid ' + SHAPE_COLORS[slot.dataset.type];
+        slot.classList.add('correct-flash');
+        setTimeout(() => slot.classList.remove('correct-flash'), 400);
+        playOk();
+        showFeedback('⭐');
+        placed++;
+        if (placed >= roundShapes.length) setTimeout(onRoundComplete, 750);
+      } else {
+        // Wrong slot: shake and snap back
+        draggedItem.classList.add('wrong-flash');
+        setTimeout(() => {
+          draggedItem.classList.remove('wrong-flash');
+          resetItemPos(draggedItem);
+        }, 400);
+        playFail();
+      }
+    }
+  });
+
+  if (!matched) resetItemPos(draggedItem);
+}
+
+function resetItemPos(item) {
+  item.style.left = item._origLeft + 'px';
+  item.style.top  = item._origTop  + 'px';
+}
+
+// ── AUDIO & FEEDBACK ─────────────────────────────────────────────────────────
+function beep(f, d = 0.15, t = 'sine') {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = t; o.frequency.value = f;
+    g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+    o.start(); o.stop(audioCtx.currentTime + d);
+  } catch(e) {}
+}
+function playOk()   { [523, 659, 784].forEach((f, i) => setTimeout(() => beep(f, 0.12, 'triangle'), i * 60)); }
+function playFail() { beep(180, 0.25, 'sawtooth'); }
+
+function showFeedback(em) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = em;
+  fb.classList.remove('show');
+  void fb.offsetWidth;
+  fb.classList.add('show');
+  setTimeout(() => fb.classList.remove('show'), 650);
+}
+
+// ── COMPLETION ───────────────────────────────────────────────────────────────
+function onRoundComplete() {
+  _level = KZL.nextLevel(GAME_ID);
+  const t = T[_L] || T.en;
+  document.getElementById('rd-title').textContent = t.win;
+  document.getElementById('rd-sub').textContent   = t.lv + ' ' + _level + '!';
+  document.getElementById('rd-btn').textContent   = t.cont;
+  document.getElementById('round-done').classList.add('show');
+}
+
+function nextRound() {
+  document.getElementById('round-done').classList.remove('show');
+  startRound();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  _level = KZL.getLevel(GAME_ID);
+  const t = T[_L] || T.en;
+  document.getElementById('game-title').textContent = t.title;
+  KZL.howToPlay({
+    id: GAME_ID,
+    lang: _L,
+    title: _L === 'ru' ? 'Как играть?' : _L === 'en' ? 'How to play?' : 'Qanday o\'ynash?',
+    steps: t.how,
+    accentColor: '#6C63FF',
+  });
+  startRound();
+}
+
+init();
+```
+
+- [ ] **Step 2: Verify all 7 shapes render correctly**
+
+Open `shape-match.html` in a browser (serve from a local server so `kz-ui.js` loads). You should see:
+- Grey outline slots in the upper half (shuffled order)
+- Colored shape items in a row at the bottom (different shuffle order)
+- At level 1: exactly 2 items (circle in red, square in teal)
+- No console errors
+
+- [ ] **Step 3: Verify drag-and-drop**
+
+Drag the red circle over its matching grey circle outline — it should snap in, the slot fills with a red circle, and a rising 3-note chime plays. Drag the teal square onto the circle slot — it shakes, snaps back, and a low buzz plays.
+
+- [ ] **Step 4: Verify level completion**
+
+After both shapes are correctly placed, the purple "Great job!" overlay should appear after ~750ms. Tap "Continue ▶" — a new round renders and the overlay disappears. Level badge increments to LV 2.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add app/src/main/assets/www/shape-match.html
+git commit -m "feat(shape-match): complete game logic — shapes, drag-drop, audio, KZL"
+```
+
+---
+
+### Task 3: Register Game in index.html
+
+**Files:**
+- Modify: `app/src/main/assets/www/index.html`
+
+- [ ] **Step 1: Find the insertion point**
+
+Open `app/src/main/assets/www/index.html`. Find this line (around line 1048):
+```js
+{id:"shapes3d",   em:"🔷", name:{uz:"Geometrik Shakllar", ...
+```
+
+- [ ] **Step 2: Add the shape-match entry immediately after that line**
+
+```js
+{id:"shape-match", em:"🔷", name:{uz:"Shakllarni Moslashtir", ru:"Подбери форму", en:"Shape Match"}, cat:"learn", age:"4+", tag:{uz:"Shakllar", ru:"Фигуры", en:"Shapes"}, tc:"#6C63FF", bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)", stars:4, plays:"0", badge:"new", file:"shape-match.html", pts:25},
+```
+
+- [ ] **Step 3: Verify the game card appears**
+
+Open `index.html` in the WebView (build and run on device, or open in browser). The Shape Match game card should appear with a purple gradient and "NEW" badge. Tap it — the game should launch and show the how-to-play dialog, then render 2 shapes for level 1.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add app/src/main/assets/www/index.html
+git commit -m "feat(shape-match): register game card in index.html"
+```
+
+---
+
+### Task 4: Smoke Test Across Levels and Languages
+
+**Files:** No code changes unless bugs are found.
+
+- [ ] **Step 1: Test level progression**
+
+Open the game. Complete 5 rounds. Verify:
+- Rounds 1–4: 2 shapes (circle + square)
+- Round 5: 3 shapes (circle + square + triangle)
+- Level badge increments each round
+
+- [ ] **Step 2: Test wrong-drop feedback**
+
+Drag a circle onto a square outline. Verify: item shakes, snaps to its original position, low buzz plays. The square slot remains empty and the circle is draggable again.
+
+- [ ] **Step 3: Test all three languages**
+
+Reload with query strings. Verify:
+- `shape-match.html?lang=uz` → title "🔷 Shakllarni Moslashtir", completion overlay says "Barakalla!", badge says "DARAJA N"
+- `shape-match.html?lang=ru` → title "🔷 Подбери форму", completion overlay says "Молодец!", badge says "УРОВЕНЬ N"
+- `shape-match.html?lang=en` → title "🔷 Shape Match", completion overlay says "Great job!", badge says "LEVEL N"
+
+- [ ] **Step 4: Test level 19–20 (all 7 shapes)**
+
+In browser console, run `KZL.setLevel('shape-match', 19)` then reload. Verify all 7 shapes appear on the board, all are identifiable and tappable, no layout overflow.
+
+- [ ] **Step 5: Commit any fixes found during smoke testing**
+
+```bash
+git add app/src/main/assets/www/shape-match.html
+git commit -m "fix(shape-match): smoke test corrections"
+```
