@@ -15,13 +15,14 @@
         android:layout_weight="1"
         android:background="#080818"/>
 
-    <!-- AdMob Banner — pastda -->
+    <!-- AdMob Banner — pastda, faqat yuklananda ko'rinadi -->
     <LinearLayout
         android:id="@+id/bannerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:background="#FFFFFF"
-        android:orientation="vertical"/>
+        android:orientation="vertical"
+        android:visibility="gone"/>
 
 </LinearLayout>

@@ -53,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
         if (mainLayout != null) {
             androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
                 androidx.core.graphics.Insets bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
-                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                v.setPadding(bars.left, bars.top, bars.right, 0);
+                View banner = findViewById(R.id.bannerContainer);
+                if (banner != null) banner.setPadding(0, 0, 0, bars.bottom);
                 return insets;
             });
         }
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onBannerFailed() {
                 lastBannerHeight = 0;
+                findViewById(R.id.bannerContainer).setVisibility(View.GONE);
                 webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
             }
         });
