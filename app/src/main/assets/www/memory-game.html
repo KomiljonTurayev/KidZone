@@ -408,9 +408,127 @@ body {
   100% { transform: translateX(-50%) translateY(-50px) scale(1); opacity:0; }
 }
 </style>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
 <script src="kz-ui.js"></script>
 <script src="admob.js"></script>
 <script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
+<script>
+/* ── I18N ── */
+const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+KidUI.init({ title: "Memory Game", icon: "🧠", color: "#8E24AA", gameId: "memory_game", lang: lang });
+const T = {
+  uz: {
+    pairs:      "JUFT",
+    score:      "BALL",
+    level:      "DARAJA",
+    tries:      "URINISH",
+    record:     "REKORD",
+    gameTitle:  "Xotira O'yini!",
+    gameSub:    "Juft kartalarni toping!\nTelefon va planshetda ishlaydi 📱📟",
+    easy:       "OSON",
+    easyDetail: "8 karta (4 juft)",
+    medium:     "O'RTA",
+    medDetail:  "12 karta (6 juft)",
+    hard:       "QIYIN",
+    hardDetail: "16 karta (8 juft)",
+    tablet:     "PLANSHET",
+    tabDetail:  "20 karta (10 juft)",
+    restart:    "🔄 QAYTA",
+    home:       "🏠 BOSH SAHIFA",
+    timeLbl:    "VAQT",
+    diffEasy:   "🟢 Oson",
+    diffMed:    "🟡 O'rta",
+    diffHard:   "🔴 Qiyin",
+    diffTab:    "📱 Planshet",
+    rotateTxt:  "Planshetni tik ushlab o'ynang yoki\nkatta planshet ishlatilsin",
+    pairsFound: (m, total) => `${m}/${total} juft topildi`,
+    resultTitle:(pct, elapsed) => pct >= 1 ? (elapsed < 30 ? "REKORD TEZLIK! ⚡" : "MUKAMMAL! 🏆") : pct >= 0.7 ? "AJOYIB! 🌟" : "VAQT TUGADI!",
+    howTitle:   "Qanday o'ynash?",
+    how: [
+      "Kartalarni ikkita bosib juft toping",
+      "Ikki karta mos kelmasa, ular yopiladi",
+      "Xotirangiz yaxshi bo'lsa tezroq topasiz",
+      "Kamroq urinish — ko'proq ball",
+      "Barcha juftlarni toping — g'alaba!"
+    ],
+    diffLabel: { easy:"🟢 Oson", medium:"🟡 O'rta", hard:"🔴 Qiyin", tablet:"📱 Planshet" }
+  },
+  ru: {
+    pairs:      "ПАРЫ",
+    score:      "ОЧКИ",
+    level:      "УРОВЕНЬ",
+    tries:      "ПОПЫТКИ",
+    record:     "РЕКОРД",
+    gameTitle:  "Игра памяти!",
+    gameSub:    "Найдите парные карточки!\nРаботает на телефоне и планшете 📱📟",
+    easy:       "ЛЕГКО",
+    easyDetail: "8 карт (4 пары)",
+    medium:     "СРЕДНЕ",
+    medDetail:  "12 карт (6 пар)",
+    hard:       "СЛОЖНО",
+    hardDetail: "16 карт (8 пар)",
+    tablet:     "ПЛАНШЕТ",
+    tabDetail:  "20 карт (10 пар)",
+    restart:    "🔄 ЕЩЁ РАЗ",
+    home:       "🏠 ГЛАВНАЯ",
+    timeLbl:    "ВРЕМЯ",
+    diffEasy:   "🟢 Легко",
+    diffMed:    "🟡 Средне",
+    diffHard:   "🔴 Сложно",
+    diffTab:    "📱 Планшет",
+    rotateTxt:  "Держите планшет вертикально\nили используйте большой планшет",
+    pairsFound: (m, total) => `Найдено ${m} из ${total} пар`,
+    resultTitle:(pct, elapsed) => pct >= 1 ? (elapsed < 30 ? "РЕКОРД СКОРОСТИ! ⚡" : "ОТЛИЧНО! 🏆") : pct >= 0.7 ? "ХОРОШО! 🌟" : "ВРЕМЯ ВЫШЛО!",
+    howTitle:   "Как играть?",
+    how: [
+      "Откройте две карты для поиска пары",
+      "Если не совпадают — закрываются снова",
+      "Хорошая память = быстрее находите",
+      "Меньше попыток — больше очков",
+      "Найдите все пары — победа!"
+    ],
+    diffLabel: { easy:"🟢 Легко", medium:"🟡 Средне", hard:"🔴 Сложно", tablet:"📱 Планшет" }
+  },
+  en: {
+    pairs:      "PAIRS",
+    score:      "SCORE",
+    level:      "LEVEL",
+    tries:      "TRIES",
+    record:     "BEST",
+    gameTitle:  "Memory Game!",
+    gameSub:    "Find matching pairs!\nWorks on phone and tablet 📱📟",
+    easy:       "EASY",
+    easyDetail: "8 cards (4 pairs)",
+    medium:     "MEDIUM",
+    medDetail:  "12 cards (6 pairs)",
+    hard:       "HARD",
+    hardDetail: "16 cards (8 pairs)",
+    tablet:     "TABLET",
+    tabDetail:  "20 cards (10 pairs)",
+    restart:    "🔄 PLAY AGAIN",
+    home:       "🏠 HOME",
+    timeLbl:    "TIME",
+    diffEasy:   "🟢 Easy",
+    diffMed:    "🟡 Medium",
+    diffHard:   "🔴 Hard",
+    diffTab:    "📱 Tablet",
+    rotateTxt:  "Hold the tablet upright\nor use a larger tablet",
+    pairsFound: (m, total) => `${m}/${total} pairs found`,
+    resultTitle:(pct, elapsed) => pct >= 1 ? (elapsed < 30 ? "RECORD SPEED! ⚡" : "PERFECT! 🏆") : pct >= 0.7 ? "GREAT! 🌟" : "TIME'S UP!",
+    howTitle:   "How to play?",
+    how: [
+      "Flip two cards to find a pair",
+      "Non-matching cards flip back",
+      "Good memory = find pairs faster",
+      "Fewer tries = higher score",
+      "Find all pairs to win!"
+    ],
+    diffLabel: { easy:"🟢 Easy", medium:"🟡 Medium", hard:"🔴 Hard", tablet:"📱 Tablet" }
+  }
+};
+const t = T[lang] || T.en;
+</script>
 </head>
 <body>
 
@@ -420,30 +538,30 @@ body {
 <!-- ROTATE HINT (small landscape) -->
 <div id="rotate-hint">
   <div class="big">📱</div>
-  <div>Planshetni tik ushlab o'ynang yoki<br>katta planshet ishlatilsin</div>
+  <div id="rotate-txt"></div>
 </div>
 
 <div id="app">
   <!-- TOP BAR -->
   <div id="topbar">
     <div class="stat-card">
-      <div class="lbl">JUFT</div>
+      <div class="lbl" id="lbl-pairs"></div>
       <div class="val" id="pairs-val">0/0</div>
     </div>
     <div class="stat-card">
-      <div class="lbl">BALL</div>
+      <div class="lbl" id="lbl-score"></div>
       <div class="val" id="score-val">0</div>
     </div>
     <div id="level-info">
-      <div id="level-title">DARAJA</div>
-      <div id="level-name">🟢 Oson</div>
+      <div id="level-title"></div>
+      <div id="level-name"></div>
     </div>
     <div class="stat-card">
-      <div class="lbl">URINISH</div>
+      <div class="lbl" id="lbl-tries"></div>
       <div class="val" id="tries-val">0</div>
     </div>
     <div class="stat-card">
-      <div class="lbl">REKORD</div>
+      <div class="lbl" id="lbl-best"></div>
       <div class="val" id="best-val">0</div>
     </div>
   </div>
@@ -453,10 +571,10 @@ body {
 
   <!-- DIFFICULTY TABS -->
   <div id="diff-bar">
-    <button class="diff-btn active" id="d-easy"   onclick="changeDiff('easy')"   style="background:linear-gradient(135deg,#10B981,#059669);border-color:transparent;color:white">🟢 Oson (8)</button>
-    <button class="diff-btn"        id="d-medium" onclick="changeDiff('medium')" >🟡 O'rta (12)</button>
-    <button class="diff-btn"        id="d-hard"   onclick="changeDiff('hard')"   >🔴 Qiyin (16)</button>
-    <button class="diff-btn"        id="d-tablet" onclick="changeDiff('tablet')" >📱 Planshet (20)</button>
+    <button class="diff-btn active" id="d-easy"   onclick="changeDiff('easy')"   style="background:linear-gradient(135deg,#10B981,#059669);border-color:transparent;color:white"></button>
+    <button class="diff-btn"        id="d-medium" onclick="changeDiff('medium')" ></button>
+    <button class="diff-btn"        id="d-hard"   onclick="changeDiff('hard')"   ></button>
+    <button class="diff-btn"        id="d-tablet" onclick="changeDiff('tablet')" ></button>
   </div>
 
   <!-- GAME GRID -->
@@ -502,28 +620,28 @@ body {
 <div class="screen" id="start-screen">
   <div class="modal">
     <div class="big-icon">🧠</div>
-    <div class="modal-title">Xotira O'yini!</div>
-    <div class="modal-sub">Juft kartalarni toping!<br>Telefon va planshetda ishlaydi 📱📟</div>
+    <div class="modal-title" id="start-title"></div>
+    <div class="modal-sub" id="start-sub"></div>
     <div class="diff-grid">
       <button class="diff-card" style="background:linear-gradient(135deg,#10B981,#059669)" onclick="startWithDiff('easy')">
         <span class="dc-emoji">🟢</span>
-        <span class="dc-label">OSON</span>
-        <span class="dc-detail">8 karta (4 juft)</span>
+        <span class="dc-label" id="dc-easy"></span>
+        <span class="dc-detail" id="dc-easy-d"></span>
       </button>
       <button class="diff-card" style="background:linear-gradient(135deg,#F59E0B,#D97706)" onclick="startWithDiff('medium')">
         <span class="dc-emoji">🟡</span>
-        <span class="dc-label">O'RTA</span>
-        <span class="dc-detail">12 karta (6 juft)</span>
+        <span class="dc-label" id="dc-medium"></span>
+        <span class="dc-detail" id="dc-medium-d"></span>
       </button>
       <button class="diff-card" style="background:linear-gradient(135deg,#EF4444,#DC2626)" onclick="startWithDiff('hard')">
         <span class="dc-emoji">🔴</span>
-        <span class="dc-label">QIYIN</span>
-        <span class="dc-detail">16 karta (8 juft)</span>
+        <span class="dc-label" id="dc-hard"></span>
+        <span class="dc-detail" id="dc-hard-d"></span>
       </button>
       <button class="diff-card" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)" onclick="startWithDiff('tablet')">
         <span class="dc-emoji">📱</span>
-        <span class="dc-label">PLANSHET</span>
-        <span class="dc-detail">20 karta (10 juft)</span>
+        <span class="dc-label" id="dc-tablet"></span>
+        <span class="dc-detail" id="dc-tablet-d"></span>
       </button>
     </div>
   </div>
@@ -533,26 +651,26 @@ body {
 <div class="screen hidden" id="win-screen">
   <div class="modal">
     <div class="big-icon" id="win-emoji">🏆</div>
-    <div class="modal-title" id="win-title">Ajoyib!</div>
+    <div class="modal-title" id="win-title"></div>
     <div class="stars" id="win-stars">⭐⭐⭐</div>
     <div class="result-grid">
       <div class="r-stat">
         <div class="big" id="r-score">0</div>
-        <div class="lbl">BALL</div>
+        <div class="lbl" id="r-lbl-score"></div>
       </div>
       <div class="r-stat">
         <div class="big" id="r-time">0s</div>
-        <div class="lbl">VAQT</div>
+        <div class="lbl" id="r-lbl-time"></div>
       </div>
       <div class="r-stat">
         <div class="big" id="r-tries">0</div>
-        <div class="lbl">URINISH</div>
+        <div class="lbl" id="r-lbl-tries"></div>
       </div>
     </div>
     <div class="modal-sub" id="win-msg"></div>
   </div>
-  <button class="play-btn" onclick="restartGame()">🔄 QAYTA</button>
-  <button class="ghost-btn" onclick="goHome()">🏠 BOSH SAHIFA</button>
+  <button class="play-btn" id="btn-restart" onclick="restartGame()"></button>
+  <button class="ghost-btn" id="btn-home" onclick="goHome()"></button>
 </div>
 
 <script>
@@ -612,10 +730,10 @@ const EMOJIS_POOL = [
 ];
 
 const DIFFICULTY = {
-  easy:   { pairs: 4,  time: 60,  cols: 4,  label: "🟢 Oson" },
-  medium: { pairs: 6,  time: 90,  cols: 4,  label: "🟡 O'rta" },
-  hard:   { pairs: 8,  time: 120, cols: 4,  label: "🔴 Qiyin" },
-  tablet: { pairs: 10, time: 150, cols: 5,  label: "📱 Planshet" },
+  easy:   { pairs: 4,  time: 60,  cols: 4,  label: () => t.diffLabel.easy },
+  medium: { pairs: 6,  time: 90,  cols: 4,  label: () => t.diffLabel.medium },
+  hard:   { pairs: 8,  time: 120, cols: 4,  label: () => t.diffLabel.hard },
+  tablet: { pairs: 10, time: 150, cols: 5,  label: () => t.diffLabel.tablet },
 };
 
 let diff = "easy";
@@ -828,9 +946,7 @@ function showResult(won) {
   const pct = matched / DIFFICULTY[diff].pairs;
   const stars = pct >= 1 ? "⭐⭐⭐" : pct >= 0.7 ? "⭐⭐" : "⭐";
   const emoji = pct >= 1 ? "🏆" : pct >= 0.5 ? "🎉" : "💪";
-  const title = pct >= 1
-    ? (elapsed < 30 ? "REKORD TEZLIK! ⚡" : "MUKAMMAL! 🏆")
-    : pct >= 0.7 ? "AJOYIB! 🌟" : won ? "YO'RG'AY!" : "VAQT TUGADI!";
+  const title = t.resultTitle(pct, elapsed);
 
   document.getElementById("win-emoji").textContent = emoji;
   document.getElementById("win-title").textContent = title;
@@ -838,8 +954,7 @@ function showResult(won) {
   document.getElementById("r-score").textContent   = score;
   document.getElementById("r-time").textContent    = elapsed + "s";
   document.getElementById("r-tries").textContent   = tries;
-  document.getElementById("win-msg").textContent   =
-    `${matched}/${DIFFICULTY[diff].pairs} juft topildi`;
+  document.getElementById("win-msg").textContent   = t.pairsFound(matched, DIFFICULTY[diff].pairs);
 
   // Update total points in the main app
   const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
@@ -869,7 +984,7 @@ function changeDiff(d) {
   btn.style.background = `linear-gradient(135deg,${colors[d]})`;
   btn.style.color = "white";
   btn.style.borderColor = "transparent";
-  document.getElementById("level-name").textContent = DIFFICULTY[d].label;
+  document.getElementById("level-name").textContent = DIFFICULTY[d].label();
   initGame();
 }
 
@@ -886,19 +1001,14 @@ function initGame() {
 
 function startWithDiff(d) {
   diff = d;
-  document.getElementById("level-name").textContent = DIFFICULTY[d].label;
+  document.getElementById("level-name").textContent = DIFFICULTY[d].label();
   document.getElementById("start-screen").classList.add("hidden");
   changeDiff(d);
   initGame();
-  const _L = navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
-  const _H = {
-    uz:["Kartalarni ikkita bosib juft toping","Ikki karta mos kelmasa, ular yopiladi","Xotirangiz yaxshi bo'lsa tezroq topasiz","Kamroq urinish — ko'proq ball","Barcha juftlarni toping — g'alaba!"],
-    ru:["Откройте две карты для поиска пары","Если не совпадают — закрываются снова","Хорошая память = быстрее находите","Меньше попыток — больше очков","Найдите все пары — победа!"],
-    en:["Flip two cards to find a pair","Non-matching cards flip back","Good memory = find pairs faster","Fewer tries = higher score","Find all pairs to win!"],
-  };
-  KZL.howToPlay({id:'memory-game',lang:_L,
-    title:_L==='ru'?'Как играть?':_L==='en'?'How to play?':'Qanday o\'ynash?',
-    steps:_H[_L]||_H['uz'],accentColor:'#8B5CF6'});
+  KZL.howToPlay({id:'memory-game', lang:lang,
+    title: t.howTitle,
+    steps: t.how,
+    accentColor:'#8B5CF6'});
 }
 
 function restartGame() {
@@ -928,6 +1038,49 @@ window.addEventListener("resize", () => {
     side.style.display = "none";
   }
 });
+
+// ── APPLY TRANSLATIONS ──
+(function applyTranslations() {
+  // Rotate hint
+  document.getElementById("rotate-txt").innerHTML =
+    t.rotateTxt.replace("\n", "<br>");
+
+  // Top bar labels
+  document.getElementById("lbl-pairs").textContent = t.pairs;
+  document.getElementById("lbl-score").textContent = t.score;
+  document.getElementById("level-title").textContent = t.level;
+  document.getElementById("lbl-tries").textContent = t.tries;
+  document.getElementById("lbl-best").textContent  = t.record;
+
+  // Initial level name
+  document.getElementById("level-name").textContent = t.diffLabel.easy;
+
+  // Diff-bar tab buttons
+  document.getElementById("d-easy").textContent   = t.diffEasy   + " (8)";
+  document.getElementById("d-medium").textContent = t.diffMed    + " (12)";
+  document.getElementById("d-hard").textContent   = t.diffHard   + " (16)";
+  document.getElementById("d-tablet").textContent = t.diffTab    + " (20)";
+
+  // Start screen
+  document.getElementById("start-title").textContent = t.gameTitle;
+  document.getElementById("start-sub").innerHTML =
+    t.gameSub.replace("\n", "<br>");
+  document.getElementById("dc-easy").textContent     = t.easy;
+  document.getElementById("dc-easy-d").textContent   = t.easyDetail;
+  document.getElementById("dc-medium").textContent   = t.medium;
+  document.getElementById("dc-medium-d").textContent = t.medDetail;
+  document.getElementById("dc-hard").textContent     = t.hard;
+  document.getElementById("dc-hard-d").textContent   = t.hardDetail;
+  document.getElementById("dc-tablet").textContent   = t.tablet;
+  document.getElementById("dc-tablet-d").textContent = t.tabDetail;
+
+  // Win screen static labels
+  document.getElementById("r-lbl-score").textContent = t.score;
+  document.getElementById("r-lbl-time").textContent  = t.timeLbl;
+  document.getElementById("r-lbl-tries").textContent = t.tries;
+  document.getElementById("btn-restart").textContent = t.restart;
+  document.getElementById("btn-home").textContent    = t.home;
+})();
 
 // INIT
 initGame();

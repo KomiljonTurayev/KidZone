@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Bubble Pop!</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
 <script src="kz-ui.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
@@ -16,14 +18,6 @@
     font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
     overflow: hidden;
     user-select: none;
-  }
-  #topbar {
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px 8px;
   }
   .stat-box { background: rgba(255,255,255,0.12); border-radius: 16px; padding: 8px 16px; text-align: center; }
   .stat-label { color: #aaa; font-size: 11px; letter-spacing: 1px; }
@@ -43,22 +37,6 @@
 </style>
 </head>
 <body>
-
-<div id="topbar">
-  <button onclick="history.back()" style="background:rgba(255,255,255,.15);border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;color:#fff;flex-shrink:0">←</button>
-  <div class="stat-box">
-    <div class="stat-label" id="lbl-score">BALL</div>
-    <div id="score" class="stat-value">0</div>
-  </div>
-  <div class="stat-box" id="level-box">
-    <div class="stat-label" id="lbl-level">DARAJA</div>
-    <div id="level" class="stat-value">1</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-label" id="lbl-best">REKORD</div>
-    <div id="best" class="stat-value">0</div>
-  </div>
-</div>
 
 <div id="timer-wrap"><div id="timer-bar"></div></div>
 
@@ -87,18 +65,16 @@
 <script src="game-engine.js"></script>
 <script>
 const game = new KidZoneGame({ id: 'bubble-pop' });
+KidUI.init({ title: "Bubble Pop", icon: "🫧", color: "#039BE5", gameId: "bubble_pop", lang: game.lang });
 
 const BUBBLE_LANG = {
-  uz: { score:"BALL",  level:"DARAJA",  best:"REKORD",  hint:"Pufaklarni bosing!", start:"🚀 BOSHLASH",   zen:"👶 ZEN REJIMI",  gameover:"Tamom!",        scoreLabel:"BALL",  again:"🔄 QAYTA" },
-  ru: { score:"ОЧКИ",  level:"УРОВЕНЬ", best:"РЕКОРД",  hint:"Лопай пузыри!",     start:"🚀 СТАРТ",      zen:"👶 ЗЕН РЕЖИМ",   gameover:"Конец игры!",   scoreLabel:"ОЧКИ",  again:"🔄 ЕЩЁ РАЗ" },
-  en: { score:"SCORE", level:"LEVEL",   best:"BEST",    hint:"Pop the bubbles!",   start:"🚀 START",      zen:"👶 ZEN MODE",    gameover:"Game Over!",    scoreLabel:"SCORE", again:"🔄 PLAY AGAIN" },
+  uz: { score:"BALL",  level:"DARAJA",  best:"REKORD",  hint:"Pufaklarni bosing!", start:"🚀 BOSHLASH",   zen:"👶 ZEN REJIMI",  gameover:"Tamom!",        scoreLabel:"BALL",  again:"🔄 QAYTA",  howToPlay:"Qanday o'ynash?" },
+  ru: { score:"ОЧКИ",  level:"УРОВЕНЬ", best:"РЕКОРД",  hint:"Лопай пузыри!",     start:"🚀 СТАРТ",      zen:"👶 ЗЕН РЕЖИМ",   gameover:"Конец игры!",   scoreLabel:"ОЧКИ",  again:"🔄 ЕЩЁ РАЗ", howToPlay:"Как играть?" },
+  en: { score:"SCORE", level:"LEVEL",   best:"BEST",    hint:"Pop the bubbles!",   start:"🚀 START",      zen:"👶 ZEN MODE",    gameover:"Game Over!",    scoreLabel:"SCORE", again:"🔄 PLAY AGAIN", howToPlay:"How to play?" },
 };
 
 function applyLang() {
   const t = BUBBLE_LANG[game.lang] || BUBBLE_LANG.en;
-  document.getElementById('lbl-score').textContent    = t.score;
-  document.getElementById('lbl-level').textContent    = t.level;
-  document.getElementById('lbl-best').textContent     = t.best;
   document.getElementById('lbl-hint').textContent     = t.hint;
   document.getElementById('btn-start').textContent    = t.start;
   document.getElementById('btn-zen').textContent      = t.zen;
@@ -116,7 +92,6 @@ let bubbles = [], score = 0, level = 1, timeLeft = 30, gameRunning = false, isZe
 let bestScore = parseInt(localStorage.getItem('bubbleBest') || '0');
 const _BP_KZL_ID = 'bubble-pop';
 let _bpPersistentLevel = KZL.getLevel(_BP_KZL_ID);
-document.getElementById('best').textContent = bestScore;
 
 function resize() { canvas.width = gameArea.clientWidth; canvas.height = gameArea.clientHeight; }
 window.addEventListener('resize', resize);
@@ -183,7 +158,6 @@ function handleTap(e) {
             if (Math.sqrt(dx*dx + dy*dy) < b.r) {
                 b.popping = true;
                 score += 10;
-                document.getElementById('score').textContent = score;
                 break;
             }
         }
@@ -204,10 +178,9 @@ function startGame(zen) {
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('gameover-screen').classList.add('hidden');
     document.getElementById('timer-wrap').style.display = zen ? 'none' : 'block';
-    document.getElementById('level-box').style.display = zen ? 'none' : 'block';
     KZL.howToPlay({
       id:'bubble-pop', lang:_BP_LANG,
-      title:_BP_LANG==='ru'?'Как играть?':_BP_LANG==='en'?'How to play?':'Qanday o\'ynash?',
+      title:(BUBBLE_LANG[_BP_LANG]||BUBBLE_LANG.en).howToPlay,
       steps:_BP_HOW[_BP_LANG]||_BP_HOW['uz'],
       accentColor:'#64ffb4',
     });
@@ -222,7 +195,6 @@ function startTimer() {
         timeLeft -= 0.1;
         document.getElementById('timer-bar').style.width = (timeLeft / 30 * 100) + '%';
         level = 1 + Math.floor((30 - timeLeft) / 10);
-        document.getElementById('level').textContent = level;
         if (timeLeft <= 0) { clearInterval(itv); endGame(); }
     }, 100);
 }
@@ -234,7 +206,6 @@ function endGame() {
     if (score > bestScore) {
         bestScore = score;
         localStorage.setItem('bubbleBest', bestScore);
-        document.getElementById('best').textContent = bestScore;
     }
     if (score >= 50) { _bpPersistentLevel = KZL.nextLevel(_BP_KZL_ID); }
     game.reportScore(Math.floor(score / 10));
