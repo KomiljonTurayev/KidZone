@@ -4,25 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Math Kids 🔢</title>
+<link rel="stylesheet" href="kids-theme.css">
 <script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
 body{min-height:100vh;background:#1a1a2e;
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   display:flex;flex-direction:column;align-items:center;color:white;overflow-x:hidden;}
-
-/* ── header ── */
-#topbar{width:100%;background:linear-gradient(135deg,#0f3460,#16213e);
-  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
-  box-shadow:0 3px 12px rgba(0,0,0,.4);}
-#back-btn{background:rgba(255,255,255,.15);border:none;border-radius:50%;
-  width:40px;height:40px;font-size:20px;cursor:pointer;color:#fff;
-  display:flex;align-items:center;justify-content:center;}
-#title-text{flex:1;color:#fff;font-size:16px;font-weight:900;}
-#level-badge{background:rgba(255,255,255,.18);color:#fff;border-radius:16px;
-  padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
-#score-pill{background:#4ECDC4;color:#fff;border-radius:16px;
-  padding:4px 12px;font-size:13px;font-weight:900;}
 
 /* ── tools row ── */
 #tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
@@ -85,14 +74,6 @@ body{min-height:100vh;background:#1a1a2e;
 </head>
 <body>
 
-<!-- ── TOP BAR ── -->
-<div id="topbar">
-  <button id="back-btn" onclick="history.back()">←</button>
-  <div id="title-text">🔢 <span id="t-title">Math Kids</span></div>
-  <div id="level-badge" onclick="openLevelSelector()">LVL <span id="t-lvl">1</span></div>
-  <div id="score-pill">⭐ <span id="t-score">0</span></div>
-</div>
-
 <!-- ── TOOLS ── -->
 <div id="tools-row">
   <div id="hint-wrap"></div>
@@ -138,6 +119,7 @@ body{min-height:100vh;background:#1a1a2e;
 ═══════════════════════════════════════════════ */
 const LANG = navigator.language.startsWith('ru') ? 'ru'
            : navigator.language.startsWith('en') ? 'en' : 'uz';
+KidUI.init({ title: "Math Kids", icon: "🔢", color: "#1E88E5", gameId: "math_kids", lang: LANG });
 
 const T = {
   title:    {uz:"Matematika",         ru:"Математика",          en:"Math Kids"},
@@ -245,9 +227,10 @@ function init() {
   _qi    = 0;
   _score = 0;
 
-  document.getElementById('t-title').textContent = t('title');
-  document.getElementById('t-lvl').textContent   = _level;
-  document.getElementById('t-score').textContent = 0;
+  // t-title, t-lvl, t-score were in the old topbar (removed); use optional chaining
+  const _elTitle = document.getElementById('t-title'); if (_elTitle) _elTitle.textContent = t('title');
+  const _elLvl   = document.getElementById('t-lvl');   if (_elLvl)   _elLvl.textContent   = _level;
+  const _elScore = document.getElementById('t-score'); if (_elScore) _elScore.textContent = 0;
   document.getElementById('level-label').textContent = t('label') + ' · LV' + _level;
   document.getElementById('lvl-title-text').textContent = t('selectLvl');
 
@@ -295,7 +278,7 @@ function renderQuestion() {
   const q = _questions[_qi];
 
   document.getElementById('q-text').textContent  = q.text;
-  document.getElementById('t-score').textContent  = _score;
+  const _sc1 = document.getElementById('t-score'); if (_sc1) _sc1.textContent = _score;
 
   const opNames = {'+':'Addition ➕', '-':'Subtraction ➖', '×':'Multiplication ✖️', '÷':'Division ➗'};
   const opNamesUz = {'+':'Qo\'shish ➕', '-':'Ayirish ➖', '×':'Ko\'paytirish ✖️', '÷':'Bo\'lish ➗'};
@@ -349,7 +332,7 @@ function answer(v, q, btn) {
   if (v === q.ans) {
     btn.classList.add('correct');
     _score++;
-    document.getElementById('t-score').textContent = _score;
+    const _sc2 = document.getElementById('t-score'); if (_sc2) _sc2.textContent = _score;
     setTimeout(advance, 750);
   } else {
     btn.classList.add('wrong');

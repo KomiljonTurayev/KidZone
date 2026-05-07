@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Maze 🌀</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
 body {
@@ -11,8 +13,6 @@ body {
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   overflow:hidden; display:flex; flex-direction:column; align-items:center;
 }
-#topbar { width:100%; padding:15px; display:flex; justify-content:space-between; color:white; }
-.pill { background:rgba(255,255,255,0.1); border-radius:20px; padding:8px 16px; font-weight:bold; }
 #maze-container {
   position:relative; background:#ecf0f1; border-radius:15px;
   box-shadow:0 10px 30px rgba(0,0,0,0.3); margin-top:10px;
@@ -67,11 +67,6 @@ body {
 </head>
 <body>
 
-<div id="topbar">
-  <div class="pill" id="lbl-title">🌀 LABIRINT</div>
-  <div class="pill"><span id="lbl-level">DARAJA</span>: <span id="lvl">1</span></div>
-</div>
-
 <div id="maze-container">
   <div id="goal">🧀</div>
   <div id="player">🐭</div>
@@ -99,6 +94,7 @@ body {
 <script>
 const game = new KidZoneGame({ id: 'maze' });
 const lang = game.lang;
+KidUI.init({ title: "Maze", icon: "🌀", color: "#009688", gameId: "maze", lang: lang });
 
 const T = {
   uz: {
@@ -225,13 +221,6 @@ init();
 </script>
 <script>
 (function(){
-  const b=document.createElement('button');
-  b.textContent='←';
-  Object.assign(b.style,{position:'fixed',top:'10px',left:'10px',zIndex:'50',
-    background:'rgba(255,255,255,.3)',border:'none',borderRadius:'50%',
-    width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#333'});
-  b.onclick=()=>history.back();
-  document.body.appendChild(b);
   const _L=navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
   const _H={
     uz:["Labirintdan chiqish yo'lini toping","O'q tugmalar yoki suring harakat qilish","Devorga tegmang — yo'ldan adashmaslik","Tez va kam harakatda chiqsangiz — yaxshiroq","Har daraja qiyinroq labirint! 🌿"],
