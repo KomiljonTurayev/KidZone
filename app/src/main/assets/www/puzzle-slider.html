@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <title>Puzzle Slider 🧩</title>
+  <link rel="stylesheet" href="kids-theme.css">
   <script src="kz-ui.js"></script>
+  <script src="kids-ui.js"></script>
   <style>
     :root {
       --primary: #FF6B8B;
@@ -20,7 +22,6 @@
     }
 
     #header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .back-btn { font-size: 24px; cursor: pointer; }
     .title { font-size: 20px; font-weight: bold; }
     .sound-btn { font-size: 20px; cursor: pointer; }
 
@@ -82,7 +83,6 @@
   <div id="hint-overlay" style="position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:14px 24px;border-radius:20px;font-size:15px;font-weight:bold;z-index:200;display:none;text-align:center;max-width:85vw">💡 <span id="hint-text"></span></div>
 
   <div id="header">
-    <div class="back-btn" onclick="history.back()">⬅️</div>
     <div class="title" id="lbl-title">Puzzle Slider</div>
     <div id="ps-lv-badge" style="background:#FF6B8B;color:white;border-radius:16px;padding:5px 12px;font-weight:900;font-size:13px;">LV 1</div>
   </div>
@@ -108,6 +108,7 @@
 
   <script>
     const lang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+    KidUI.init({ title: "Puzzle Slider", icon: "🧩", color: "#E64A19", gameId: "puzzle_slider", lang: lang });
     const T = {
       uz: { vic:"Barakalla!", vicSub:"Siz puzzle-ni yig'dingiz!", vicBtn:"Yana O'ynash 🔄", goal:"Maqsad:", moves:"harakat", newPuzzle:"🔀 Yangi", hint:"💡 Maslahat", hintMsg:"Hayvonlarni tartibga soling!" },
       ru: { vic:"Молодец!",   vicSub:"Вы собрали пазл!",          vicBtn:"Играть снова 🔄",  goal:"Цель:",    moves:"ходов",    newPuzzle:"🔀 Новый",  hint:"💡 Подсказка", hintMsg:"Расставь животных по порядку!" },
@@ -258,13 +259,6 @@
   </script>
   <script>
   (function(){
-    const b=document.createElement('button');
-    b.textContent='←';
-    Object.assign(b.style,{position:'fixed',top:'10px',left:'10px',zIndex:'50',
-      background:'rgba(0,0,0,.2)',border:'none',borderRadius:'50%',
-      width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#333'});
-    b.onclick=()=>history.back();
-    document.body.appendChild(b);
     const _L=navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
     const _H={
       uz:["Rasm qismlarini siljiting","Bo'sh katakchaga qarab suring","Barcha qismlar to'g'ri kelganda — g'alaba","Kamroq harakat — ko'proq ball","Ko'proq qism — qiyinroq daraja"],

@@ -4,6 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Hayvonlar Orkestri 🎤</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<script>
+const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+const T = {
+  uz: {
+    title:       '🎤 HAYVONLAR ORKESTRI',
+    instruction: 'Hayvonlarni bosing va ular kuylashadi! 🎶',
+    drumsTitle:  '🥁 DOIRA CHALISH',
+    drumsHint:   'Doiralarni bosing va chaling! 🥁',
+  },
+  ru: {
+    title:       '🎤 ОРКЕСТР ЖИВОТНЫХ',
+    instruction: 'Нажимайте на животных, и они запоют! 🎶',
+    drumsTitle:  '🥁 ИГРА НА БАРАБАНАХ',
+    drumsHint:   'Нажимайте на барабаны и играйте! 🥁',
+  },
+  en: {
+    title:       '🎤 ANIMAL ORCHESTRA',
+    instruction: 'Tap the animals and they will sing! 🎶',
+    drumsTitle:  '🥁 DRUM PLAY',
+    drumsHint:   'Tap the drums and play! 🥁',
+  },
+};
+const t = T[lang] || T.en;
+</script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body {
@@ -31,7 +58,7 @@ body {
 </head>
 <body>
 <div id="topbar">
-  <div class="pill">🎤 HAYVONLAR ORKESTRI</div>
+  <div class="pill" id="game-title">🎤 HAYVONLAR ORKESTRI</div>
 </div>
 
 <div id="stage">
@@ -47,6 +74,13 @@ body {
 </div>
 
 <div id="instruction">Hayvonlarni bosing va ular kuylashadi! 🎶</div>
+
+<script>
+// Apply translations on DOM ready
+document.getElementById('game-title').textContent = t.title;
+document.getElementById('instruction').textContent = t.instruction;
+KidUI.init({ title: "Sing Songs", icon: "🎤", color: "#D81B60", gameId: "sing", lang: lang });
+</script>
 
 <script>
 let audioCtx = null;
@@ -82,12 +116,12 @@ window.onload = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
   if (id === 'drums') {
-    document.querySelector('.pill').textContent = '🥁 DOIRA CHALISH';
+    document.getElementById('game-title').textContent = t.drumsTitle;
     document.querySelectorAll('.animal').forEach(el => {
       el.textContent = '🥁';
       el.style.backgroundColor = '#FFEB3B';
     });
-    document.getElementById('instruction').textContent = 'Doiralarni bosing va chaling! 🥁';
+    document.getElementById('instruction').textContent = t.drumsHint;
   }
 };
 
@@ -95,17 +129,9 @@ window.addEventListener('beforeunload', () => {
   localStorage.setItem('kz-prog-sing', '100');
 });
 </script>
-<script src="kz-ui.js"></script>
 <script>
 (function(){
-  const b=document.createElement('button');
-  b.textContent='←';
-  Object.assign(b.style,{position:'fixed',top:'10px',left:'10px',zIndex:'50',
-    background:'rgba(0,0,0,.3)',border:'none',borderRadius:'50%',
-    width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#fff'});
-  b.onclick=()=>history.back();
-  document.body.appendChild(b);
-  const _L=navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
+  const _L = lang;
   const _H={
     uz:["Qo'shiq so'zlarini ko'ring","Nota bilan bir vaqtda qo'shing","Har bir qo'shiq — yangi daraja","Yulduzlar yig'ing ⭐⭐⭐","Musiqa bilan o'rganing!"],
     ru:["Смотрите слова песни","Подпевайте в такт музыке","Каждая песня — новый уровень","Собирайте звёзды ⭐⭐⭐","Учитесь через музыку!"],

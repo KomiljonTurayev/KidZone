@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Family Adventure - KidZone</title>
+    <link rel="stylesheet" href="kids-theme.css">
+    <script src="kz-ui.js"></script>
+    <script src="kids-ui.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Nunito', sans-serif; background: #87CEEB; }
@@ -20,8 +23,8 @@
 <body>
     <canvas id="game"></canvas>
     <div id="ui">
-        <div id="score-box">Stars: <span id="score">0</span></div>
-        <div id="msg">Child: Move & Jump! | Parent: Hold to Build Bridge! 🌈</div>
+        <div id="score-box"><span id="score-label"></span><span id="score">0</span></div>
+        <div id="msg"></div>
         <div id="controls-child">
             <div class="btn" id="btn-left">⬅️</div>
             <div class="btn" id="btn-right">➡️</div>
@@ -32,9 +35,47 @@
         </div>
     </div>
 
-    <script src="kz-ui.js"></script>
     <script src="game-engine.js"></script>
     <script>
+        const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+        KidUI.init({ title: "Family Adventure", icon: "🌈", color: "#FF6D00", gameId: "family_adv", lang: lang });
+
+        const T = {
+            uz: {
+                title:       'Oilaviy Sarguzasht',
+                instruction: 'Bola: Harakat qil & Sakra! | Ota-ona: Ko\'prik qurish uchun ushlab tur! 🌈',
+                scoreLabel:  'Yulduzlar: ',
+                levelLabel:  ' | Daraja ',
+                youWin:      'G\'alabа! 🎉',
+                gameOver:    'O\'yin tugadi!',
+                levelComplete: 'Daraja tugallandi! ⭐',
+            },
+            ru: {
+                title:       'Семейное приключение',
+                instruction: 'Ребенок: Двигайся и прыгай! | Родитель: Держи, чтобы построить мост! 🌈',
+                scoreLabel:  'Звёзды: ',
+                levelLabel:  ' | Ур. ',
+                youWin:      'Победа! 🎉',
+                gameOver:    'Игра окончена!',
+                levelComplete: 'Уровень пройден! ⭐',
+            },
+            en: {
+                title:       'Family Adventure',
+                instruction: 'Child: Move & Jump! | Parent: Hold to Build Bridge! 🌈',
+                scoreLabel:  'Stars: ',
+                levelLabel:  ' | LV',
+                youWin:      'You Win! 🎉',
+                gameOver:    'Game Over!',
+                levelComplete: 'Level Complete! ⭐',
+            },
+        };
+
+        const t = T[lang] || T.en;
+
+        document.title = t.title + ' - KidZone';
+        document.getElementById('msg').textContent = t.instruction;
+        document.getElementById('score-label').textContent = t.scoreLabel;
+
         const game = new KidZoneGame({ id: 'family-adventure' });
         const FA_ID = 'family-adventure';
         let _faLevel = KZL.getLevel(FA_ID);
@@ -73,7 +114,7 @@
         let score = 0;
 
         function updateFaBadge(){
-          document.getElementById('score').textContent = score + ' | LV'+_faLevel;
+          document.getElementById('score').textContent = score + t.levelLabel + _faLevel;
         }
         updateFaBadge();
 
@@ -199,13 +240,6 @@
     </script>
 <script>
 (function(){
-  const b=document.createElement('button');
-  b.textContent='←';
-  Object.assign(b.style,{position:'fixed',top:'10px',left:'10px',zIndex:'50',
-    background:'rgba(255,255,255,.3)',border:'none',borderRadius:'50%',
-    width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#333'});
-  b.onclick=()=>history.back();
-  document.body.appendChild(b);
   const _L=navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
   const _H={
     uz:["Qahramonni boshqaring va yulduzlarni yig'ing","O'ng va chapga bosib yuring","To'siqlardan o'ting va g'animlardan qoching","Ko'proq yulduz — ko'proq ball","Barcha yulduzlarni to'plang va g'alaba qiling! ⭐"],
