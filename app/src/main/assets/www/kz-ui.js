@@ -64,12 +64,12 @@ const CSS = `
 .kzl-timer-txt{position:absolute;font-size:13px;font-weight:900;color:#FFD600;}
 .kzl-level-up{position:fixed;inset:0;z-index:1001;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;}
 .kzl-level-up.h{display:none!important;}
-.kzl-lup-card{background:linear-gradient(135deg,#FF6B35,#FF9F1C);border-radius:32px;padding:36px 30px;text-align:center;color:#fff;width:min(300px,90vw);animation:kzlPop .4s cubic-bezier(.34,1.56,.64,1);}
+.kzl-lup-card{background:#FFFFFF;border-radius:32px;padding:36px 30px;text-align:center;color:#2D2D2D;width:min(300px,90vw);animation:kzlPop .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.14);}
 .kzl-lup-stars{font-size:44px;margin-bottom:4px;}
 .kzl-lup-num{font-size:72px;font-weight:900;line-height:1;}
 .kzl-lup-txt{font-size:18px;font-weight:800;margin:8px 0 22px;}
-.kzl-lup-btn{background:#fff;color:#FF6B35;border:none;border-radius:20px;padding:14px 34px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Arial Rounded MT Bold',Arial,sans-serif;}
-.kzl-lup-btn:active{transform:scale(.95);}
+.kzl-lup-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;padding:14px 34px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Arial Rounded MT Bold',Arial,sans-serif;box-shadow:0 4px 0 #C94F20;transform:translateY(0);transition:transform .08s,box-shadow .08s;}
+.kzl-lup-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #C94F20;}
 `;
 
 /* ══ PUBLIC API ════════════════════════════════════════════════════════ */
