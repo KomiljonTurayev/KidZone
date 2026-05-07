@@ -108,14 +108,18 @@ body {
 #level-up-em  { display: block; text-align: center; margin-bottom: 8px; }
 #level-up-msg { color: var(--kt-accent) !important; }
 #level-up-sub { color: var(--kt-text-dim) !important; }
-#btn-next {
+/* Scoped to maze level-up overlay only — other games (animals, body, shadow, weather)
+   also use #btn-next but must keep their own purple/white styles. */
+#level-up #btn-next {
   background: var(--kt-accent) !important;
   border-color: var(--kt-accent) !important;
   box-shadow: 0 4px 0 var(--kt-accent-dark) !important;
 }
 
 /* ── OVERRIDE: memory-match container ───────────── */
-#game-container {
+/* Scoped via data-game attribute — jump-rope.html also uses #game-container
+   (full-viewport black canvas) and must not be affected. */
+body[data-game="memory-match"] #game-container {
   background: var(--kt-surface) !important;
   box-shadow: 0 6px 0 rgba(0,0,0,0.10) !important;
 }
