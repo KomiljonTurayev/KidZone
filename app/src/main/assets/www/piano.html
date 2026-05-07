@@ -4,6 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Mini Piano 🎹</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
+<script>
+const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+const T = {
+  uz: {
+    title:       '🎹 Mini Piano',
+    score:       'BALL',
+    feedback:    'Yaxshi! 🌟',
+    rhythmTitle: '🎵 Ritm O\'yini',
+    rhythmHint:  'Ritmga rioya qiling! 🎵',
+  },
+  ru: {
+    title:       '🎹 Мини Пианино',
+    score:       'ОЧКИ',
+    feedback:    'Отлично! 🌟',
+    rhythmTitle: '🎵 Ритм-игра',
+    rhythmHint:  'Соблюдайте ритм! 🎵',
+  },
+  en: {
+    title:       '🎹 Mini Piano',
+    score:       'SCORE',
+    feedback:    'Great! 🌟',
+    rhythmTitle: '🎵 Rhythm Game',
+    rhythmHint:  'Keep the rhythm! 🎵',
+  },
+};
+const t = T[lang] || T.en;
+</script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
 body {
@@ -11,9 +40,6 @@ body {
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   overflow:hidden; display:flex; flex-direction:column; align-items:center;
 }
-#topbar { width:100%; padding:15px; display:flex; justify-content:space-between; color:white; z-index:10; }
-.pill { background:rgba(255,255,255,0.1); border-radius:20px; padding:8px 16px; font-weight:bold; }
-
 #piano-container {
   flex:1; width:100%; display:flex; align-items:flex-end; padding:10px; gap:4px;
   background:linear-gradient(to bottom, #1a1a2e, #16213e);
@@ -61,11 +87,7 @@ body {
 </style>
 </head>
 <body>
-<div id="topbar">
-  <div class="pill">🎹 Mini Piano</div>
-  <div class="pill">BALL: <span id="score">0</span></div>
-</div>
-<div id="feedback">Yaxshi! 🌟</div>
+<div id="feedback"></div>
 <div id="viz"></div>
 <div id="piano-container">
   <div class="key" data-note="C" data-freq="261.63"><span class="key-label">DO</span><span class="note-name">C</span></div>
@@ -79,6 +101,8 @@ body {
 </div>
 
 <script>
+KidUI.init({ title: "Mini Piano", icon: "🎹", color: "#5C6BC0", gameId: "piano", lang: lang });
+
 let audioCtx = null;
 let score = 0;
 
@@ -124,11 +148,16 @@ function showFeedback() {
 }
 
 window.onload = () => {
+  // Apply translations
+  document.getElementById('game-title').textContent = t.title;
+  document.getElementById('score-label').textContent = t.score + ': ';
+  document.getElementById('feedback').textContent = t.feedback;
+
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
   if (id === 'rhythm') {
-    document.querySelector('.pill').textContent = '🎵 Ritm O\'yini';
-    document.getElementById('feedback').textContent = 'Ritmga rioya qiling! 🎵';
+    document.getElementById('game-title').textContent = t.rhythmTitle;
+    document.getElementById('feedback').textContent = t.rhythmHint;
   }
 };
 
@@ -153,14 +182,7 @@ window.addEventListener('beforeunload', () => {
 <script src="kz-ui.js"></script>
 <script>
 (function(){
-  const b=document.createElement('button');
-  b.textContent='←';
-  Object.assign(b.style,{position:'fixed',top:'10px',left:'10px',zIndex:'50',
-    background:'rgba(0,0,0,.25)',border:'none',borderRadius:'50%',
-    width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#fff'});
-  b.onclick=()=>history.back();
-  document.body.appendChild(b);
-  const _L=navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
+  const _L = lang;
   const _H={
     uz:["Pianino tugmalarini bosing","Har bir tugma — alohida nota","Chiroyli kuy yarating","Turli tovushlarni kashf eting 🎹","Musiqa bilan o'ynang va o'rganing!"],
     ru:["Нажимайте клавиши пианино","Каждая клавиша — отдельная нота","Создайте красивую мелодию","Открывайте разные звуки 🎹","Играйте и учитесь через музыку!"],
