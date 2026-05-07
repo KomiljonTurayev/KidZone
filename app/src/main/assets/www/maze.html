@@ -114,8 +114,6 @@ const T = {
 const t = T[lang] || T.en;
 
 function applyLang() {
-  document.getElementById('lbl-title').textContent   = t.title;
-  document.getElementById('lbl-level').textContent   = t.level;
   document.getElementById('level-up-msg').textContent = t.congrats;
   document.getElementById('btn-next').textContent    = t.next;
 }
@@ -135,7 +133,6 @@ function init() {
   container.style.width  = (size * cellSize) + 'px';
   container.style.height = (size * cellSize) + 'px';
   goalPos = { x: size-1, y: size-1 };
-  document.getElementById('lvl').textContent = level;
   generateMaze();
   draw();
 }
@@ -180,7 +177,6 @@ function move(dx, dy) {
     level = KZL.nextLevel(MAZE_ID);
     size = mazeSize(level);
     cellSize = Math.min(window.innerWidth - 40, 400) / size;
-    document.getElementById('lvl').textContent = level;
     // Resize maze container
     const container = document.getElementById('maze-container');
     container.style.width  = (size * cellSize) + 'px';
