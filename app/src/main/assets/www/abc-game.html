@@ -4,25 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ABC Alphabet 🔤</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
 <script src="kz-ui.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
 body{min-height:100vh;background:linear-gradient(135deg,#FF6B35 0%,#FF9F1C 100%);
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   display:flex;flex-direction:column;align-items:center;color:white;overflow-x:hidden;}
-
-/* ── header ── */
-#topbar{width:100%;background:rgba(0,0,0,.2);
-  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
-  box-shadow:0 3px 12px rgba(0,0,0,.2);}
-#back-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;
-  width:40px;height:40px;font-size:20px;cursor:pointer;color:#fff;
-  display:flex;align-items:center;justify-content:center;}
-#title-text{flex:1;font-size:16px;font-weight:900;}
-#level-badge{background:rgba(255,255,255,.25);border-radius:16px;
-  padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
-#score-pill{background:#fff;color:#FF6B35;border-radius:16px;
-  padding:4px 12px;font-size:13px;font-weight:900;}
 
 /* ── tools ── */
 #tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
@@ -87,14 +76,6 @@ body{min-height:100vh;background:linear-gradient(135deg,#FF6B35 0%,#FF9F1C 100%)
 </style>
 </head>
 <body>
-
-<!-- ── TOP BAR ── -->
-<div id="topbar">
-  <button id="back-btn" onclick="history.back()">←</button>
-  <div id="title-text">🔤 <span id="t-title">ABC</span></div>
-  <div id="level-badge" onclick="openLevelSelector()">LVL <span id="t-lvl">1</span></div>
-  <div id="score-pill">⭐ <span id="t-score">0</span></div>
-</div>
 
 <!-- ── TOOLS ── -->
 <div id="tools-row">
@@ -195,6 +176,7 @@ const DATA = {
 ═══════════════════════════════════════════════ */
 const engine = new KidZoneGame({id:'abc'});
 const LANG = engine.lang || 'en';
+KidUI.init({ title: "ABC Game", icon: "🔤", color: "#EF5350", gameId: "abc_game", lang: LANG });
 
 const T = {
   title:    {uz:"Alifbo",            ru:"Алфавит",           en:"ABC"},
@@ -243,9 +225,6 @@ function init() {
   _qi         = 0;
   _score      = 0;
 
-  document.getElementById('t-title').textContent = t('title');
-  document.getElementById('t-lvl').textContent   = _level;
-  document.getElementById('t-score').textContent = 0;
   document.getElementById('lvl-title-text').textContent = t('selectLvl');
 
   const hw = document.getElementById('hint-wrap');
@@ -294,7 +273,6 @@ function renderQuestion() {
 
   document.getElementById('q-emoji').textContent = q.e;
   document.getElementById('q-word').textContent  = q.w;
-  document.getElementById('t-score').textContent  = _score;
 
   /* progress bar */
   document.getElementById('prog-bar').style.width = `${(_qi / _total) * 100}%`;
@@ -353,7 +331,6 @@ function answer(letter, q, btn) {
   if (letter === q.l) {
     btn.classList.add('correct');
     _score++;
-    document.getElementById('t-score').textContent = _score;
     engine.playSound('win');
     setTimeout(advance, 750);
   } else {

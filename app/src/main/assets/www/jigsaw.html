@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Puzzle 🧩</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:none; }
 body {
@@ -11,10 +13,6 @@ body {
   font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   overflow:hidden; display:flex; flex-direction:column; align-items:center;
 }
-#topbar { width:100%; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
-.pill { background:white; border-radius:20px; padding:7px 14px; font-weight:900; color:#558B2F; font-size:14px; }
-#lv-badge { background:#558B2F; color:white; border-radius:20px; padding:7px 14px; font-weight:900; font-size:14px; }
-
 #puzzle-board {
   display:grid; gap:5px; background:#DCEDC8; padding:5px; border-radius:12px;
   box-shadow:0 10px 25px rgba(0,0,0,0.1); margin-top:10px;
@@ -43,11 +41,9 @@ body {
 </head>
 <body>
 
-<div id="topbar">
-  <button class="pill" onclick="history.back()" style="color:#333;cursor:pointer;">←</button>
-  <div class="pill" id="lbl-title">🧩 PUZZLE</div>
-  <div id="lv-badge">LV 1</div>
-  <button class="pill" id="btn-shuffle" onclick="newGame()">🔄</button>
+<div style="width:100%;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;">
+  <div id="lv-badge" style="background:#558B2F;color:white;border-radius:20px;padding:7px 14px;font-weight:900;font-size:14px;">LV 1</div>
+  <button id="btn-shuffle" onclick="newGame()" style="background:white;border-radius:20px;padding:7px 14px;font-weight:900;font-size:14px;border:none;cursor:pointer;color:#558B2F;">🔄</button>
 </div>
 
 <div id="puzzle-board"></div>
@@ -67,6 +63,7 @@ body {
 const GAME_ID = 'jigsaw';
 const game = new KidZoneGame({ id: GAME_ID });
 const LANG = game.lang;
+KidUI.init({ title: "Jigsaw", icon: "🧩", color: "#AB47BC", gameId: "jigsaw", lang: LANG });
 
 const T = {
   uz: { title:"🧩 PUZZLE", win:"Barakalla! Puzzle yig'ildi!", cont:"▶ Davom et", lv:"LV" },
@@ -110,7 +107,6 @@ function initGame(){
 }
 
 function applyLang(){
-  document.getElementById('lbl-title').textContent    = t.title;
   document.getElementById('win-msg').textContent      = t.win;
   document.getElementById('btn-win-play').textContent = t.cont;
 }

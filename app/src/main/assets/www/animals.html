@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Animal World 🐾</title>
+<title id="page-title">Animal World 🐾</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body {
@@ -82,7 +84,7 @@ body {
   <p id="ui-start-d" style="font-size:15px;opacity:.85;">Learn animal names and sounds!</p>
   <div id="level-info" style="background:rgba(255,255,255,.15);border-radius:16px;padding:10px 20px;margin:14px 0;font-size:14px;font-weight:900;"></div>
   <button class="btn-p" onclick="startGame()">START</button>
-  <button class="btn-p" style="background:rgba(255,255,255,.2);color:#fff;margin-top:8px;font-size:14px;" onclick="showAllLevels()">📊 Darajalar</button>
+  <button class="btn-p" id="btn-levels" style="background:rgba(255,255,255,.2);color:#fff;margin-top:8px;font-size:14px;" onclick="showAllLevels()">📊 Darajalar</button>
 </div>
 
 <div id="result-screen" class="screen hidden">
@@ -95,9 +97,9 @@ body {
 </div>
 
 <div id="levels-screen" class="screen hidden">
-  <h2 style="margin-bottom:16px;">📊 Barcha Darajalar</h2>
+  <h2 id="ui-all-levels" style="margin-bottom:16px;">📊 Barcha Darajalar</h2>
   <div id="levels-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:360px;"></div>
-  <button class="btn-p" style="margin-top:20px;" onclick="hideLevels()">✕ Yopish</button>
+  <button class="btn-p" id="btn-close-levels" style="margin-top:20px;" onclick="hideLevels()">✕ Yopish</button>
 </div>
 
 <script src="kz-ui.js"></script>
@@ -143,14 +145,15 @@ const ANIMALS = [
 
 /* ════════════ TRANSLATIONS ════════════ */
 const T = {
-  uz:{title:"Hayvonlar 🐾", quest:"Bu qaysi hayvon?", hint:"Ovoz eshitish uchun bosing", start:"BOSHLASH", desc:"Hayvon nomlarini va ovozlarini o'rgan!", great:"Zo'r!", good:"Yaxshi!", tryAgain:"Harakat qil!", again:"QAYTA", next:"KEYINGI DARAJA →", lvLbl:"DARAJA", lvInfo:"ta savol • "},
-  ru:{title:"Животные 🐾",  quest:"Кто это?",          hint:"Нажми, чтобы услышать",     start:"ИГРАТЬ",   desc:"Учи имена и звуки животных!",           great:"Отлично!", good:"Хорошо!", tryAgain:"Ещё раз!",    again:"ЕЩЁ",    next:"СЛЕДУЮЩИЙ УРОВЕНЬ →", lvLbl:"УРОВЕНЬ",lvInfo:"вопросов • "},
-  en:{title:"Animals 🐾",   quest:"Which animal?",     hint:"Tap to hear the sound",      start:"START",    desc:"Learn animal names and sounds!",          great:"Amazing!", good:"Good job!",tryAgain:"Try again!",  again:"AGAIN",  next:"NEXT LEVEL →",       lvLbl:"LEVEL",  lvInfo:"questions • "},
+  uz:{title:"Hayvonlar 🐾", quest:"Bu qaysi hayvon?", hint:"Ovoz eshitish uchun bosing", start:"BOSHLASH", desc:"Hayvon nomlarini va ovozlarini o'rgan!", great:"Zo'r!", good:"Yaxshi!", tryAgain:"Harakat qil!", again:"QAYTA", next:"KEYINGI DARAJA →", lvLbl:"DARAJA", lvInfo:"ta savol • ", levels:"📊 Darajalar", allLevels:"📊 Barcha Darajalar", close:"✕ Yopish"},
+  ru:{title:"Животные 🐾",  quest:"Кто это?",          hint:"Нажми, чтобы услышать",     start:"ИГРАТЬ",   desc:"Учи имена и звуки животных!",           great:"Отлично!", good:"Хорошо!", tryAgain:"Ещё раз!",    again:"ЕЩЁ",    next:"СЛЕДУЮЩИЙ УРОВЕНЬ →", lvLbl:"УРОВЕНЬ",lvInfo:"вопросов • ", levels:"📊 Уровни", allLevels:"📊 Все уровни", close:"✕ Закрыть"},
+  en:{title:"Animals 🐾",   quest:"Which animal?",     hint:"Tap to hear the sound",      start:"START",    desc:"Learn animal names and sounds!",          great:"Amazing!", good:"Good job!",tryAgain:"Try again!",  again:"AGAIN",  next:"NEXT LEVEL →",       lvLbl:"LEVEL",  lvInfo:"questions • ", levels:"📊 Levels", allLevels:"📊 All Levels", close:"✕ Close"},
 };
 
 /* ════════════ STATE ════════════ */
 const engine = new KidZoneGame({ id:'animals' });
 const lang = engine.lang;
+KidUI.init({ title: "Animals", icon: "🐾", color: "#00897B", gameId: "animals", lang: lang });
 const t = T[lang] || T.en;
 const GAME_ID = 'animals';
 
@@ -162,13 +165,17 @@ function init() {
   pool  = KZL.slicePool(ANIMALS, level);
 
   // Apply lang
-  document.getElementById('ui-title').textContent   = t.title;
-  document.getElementById('ui-start-t').textContent = t.title;
-  document.getElementById('ui-start-d').textContent = t.desc;
-  document.getElementById('ui-quest').textContent   = t.quest;
-  document.getElementById('ui-hint').textContent    = t.hint;
-  document.getElementById('lv-val').textContent     = level;
-  document.getElementById('lv-lbl').textContent     = t.lvLbl;
+  document.title = t.title;
+  document.getElementById('ui-title').textContent        = t.title;
+  document.getElementById('ui-start-t').textContent      = t.title;
+  document.getElementById('ui-start-d').textContent      = t.desc;
+  document.getElementById('ui-quest').textContent        = t.quest;
+  document.getElementById('ui-hint').textContent         = t.hint;
+  document.getElementById('lv-val').textContent          = level;
+  document.getElementById('lv-lbl').textContent          = t.lvLbl;
+  document.getElementById('btn-levels').textContent      = t.levels;
+  document.getElementById('ui-all-levels').textContent   = t.allLevels;
+  document.getElementById('btn-close-levels').textContent = t.close;
 
   // Level info on start screen
   const hintsText = cfg.hints > 0 ? `💡${cfg.hints}` : '';

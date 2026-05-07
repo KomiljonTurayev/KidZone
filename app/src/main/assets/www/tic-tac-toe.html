@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Tic-Tac-Toe Kids</title>
+    <link rel="stylesheet" href="kids-theme.css">
+    <script src="kids-ui.js"></script>
     <style>
         body {
             margin: 0;
@@ -88,28 +90,33 @@
 </head>
 <body>
     <div class="header">
-        <h1>Tic-Tac-Toe</h1>
-        <div id="status">Sizning navbatingiz!</div>
+        <h1 id="ttt-title">Tic-Tac-Toe</h1>
+        <div id="status"></div>
     </div>
     <div class="board" id="board"></div>
-    <div class="controls"><button onclick="resetGame()">Qaytadan boshlash</button></div>
+    <div class="controls"><button id="ttt-reset" onclick="resetGame()">Qaytadan boshlash</button></div>
     <script src="kz-ui.js"></script>
     <script src="game-engine.js"></script>
     <script src="tic-tac-toe.js"></script>
     <script>
     (function() {
-      /* back button */
-      const b = document.createElement('button');
-      b.textContent = '←';
-      Object.assign(b.style, {
-        position:'fixed',top:'10px',left:'10px',zIndex:'50',
-        background:'rgba(0,0,0,.2)',border:'none',borderRadius:'50%',
-        width:'38px',height:'38px',fontSize:'18px',cursor:'pointer',color:'#333',
-      });
-      b.onclick = () => history.back();
-      document.body.appendChild(b);
+      const _L = (new URLSearchParams(location.search).get('lang') ||
+                  localStorage.getItem('kz-lang') ||
+                  (navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('en') ? 'en' : 'uz'));
+      KidUI.init({ title: "Tic Tac Toe", icon: "✖️", color: "#F4511E", gameId: "tic_tac_toe", lang: _L });
 
-      const _L = navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('en') ? 'en' : 'uz';
+      /* ── HTML label tarjimalari ── */
+      const _TTT_UI = {
+        uz: { title: 'Tic-Tac-Toe', reset: 'Qaytadan boshlash' },
+        ru: { title: 'Крестики-нолики', reset: 'Играть снова' },
+        en: { title: 'Tic-Tac-Toe', reset: 'Play again' },
+      };
+      const _ui = _TTT_UI[_L] || _TTT_UI.en;
+      document.getElementById('ttt-title').textContent = _ui.title;
+      document.getElementById('ttt-reset').textContent = _ui.reset;
+
+      /* ── How-to-play tarjimalari ── */
+      const _HOW_TITLE = { uz: 'Qanday o\'ynash?', ru: 'Как играть?', en: 'How to play?' };
       const _H = {
         uz:["Katakchani bosib belgi qo'ying (✕)","Raqib belgisi (○) qo'yadi","3 ta ketma-ket belgi — g'alaba!","Gorizontal, vertikal yoki diagonal","Barcha katakcha to'lsa — durang"],
         ru:["Нажмите клетку чтобы поставить ✕","Соперник ставит ○","3 в ряд — победа!","Горизонталь, вертикаль или диагональ","Все клетки заполнены — ничья"],
@@ -117,8 +124,8 @@
       };
       KZL.howToPlay({
         id:'tic-tac-toe', lang:_L,
-        title:_L==='ru'?'Как играть?':_L==='en'?'How to play?':'Qanday o\'ynash?',
-        steps:_H[_L]||_H['uz'],
+        title: _HOW_TITLE[_L] || _HOW_TITLE.en,
+        steps:_H[_L]||_H['en'],
         accentColor:'#5ce1e6',
       });
     })();
