@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ABC Game 🔡</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body { min-height:100vh; background: #FF9F43; font-family: 'Arial Rounded MT Bold', sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; color: white; }
@@ -43,6 +46,7 @@ const T = {
   ru: { quest:"для...?", start:"ИГРАТЬ" }
 };
 let lang = new URLSearchParams(window.location.search).get('lang') || 'en';
+KidUI.init({ title: "English ABC", icon: "🔡", color: "#3F51B5", gameId: "abc_en", lang: lang });
 let score = 0, current = null;
 
 function next() {

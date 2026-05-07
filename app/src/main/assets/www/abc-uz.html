@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>O'zbek Alifbosi 🔤</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body {
@@ -149,6 +152,7 @@ function restart() {
   buildQuestions(); loadQ();
 }
 
+KidUI.init({ title: "Uzbek ABC", icon: "🔤", color: "#FF5722", gameId: "abc_uz", lang: "uz" });
 buildQuestions(); loadQ();
 </script>
 </body>

@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Weather 🌤️</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body { min-height:100vh; background:linear-gradient(180deg,#1565C0 0%,#42A5F5 60%,#87CEEB 100%); font-family:'Arial Rounded MT Bold',Arial,sans-serif; overflow:hidden; display:flex; flex-direction:column; align-items:center; color:#fff; }
@@ -62,7 +65,6 @@ body { min-height:100vh; background:linear-gradient(180deg,#1565C0 0%,#42A5F5 60
   <button class="btn-p" style="background:rgba(255,255,255,.15);color:#fff;margin-top:8px;" onclick="startGame()">↩ Qayta</button>
 </div>
 
-<script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
 <script>
 const GAME_ID = 'weather';
@@ -110,6 +112,7 @@ const DATA = [
 
 const engine = new KidZoneGame({ id: GAME_ID });
 const lang = engine.lang;
+KidUI.init({ title: "Weather", icon: "🌤️", color: "#0288D1", gameId: "weather", lang: lang });
 const t = T[lang] || T.en;
 let _level, _cfg, _pool, _questions, _qIdx, _score, _answered, _hintsObj, _livesObj;
 

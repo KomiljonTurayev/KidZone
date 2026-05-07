@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Transport 🚗</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body {
@@ -80,7 +83,6 @@ body {
   </div>
 </div>
 
-<script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
 <script>
 const GAME_ID = 'transport';
@@ -129,6 +131,7 @@ const VEHICLES = [
 
 const engine = new KidZoneGame({ id: GAME_ID });
 const t = engine.getTranslations(TRANSLATIONS);
+KidUI.init({ title: "Transport", icon: "🚗", color: "#1565C0", gameId: "transport", lang: engine.lang });
 let score=0, qIdx=0, answered=false, questions=[], _level, _cfg, _pool, _hintsObj, _livesObj;
 
 function updateUI() {

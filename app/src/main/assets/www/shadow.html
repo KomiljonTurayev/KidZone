@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Find the Shadow 👤</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body { min-height:100vh; background:linear-gradient(135deg,#263238,#37474F); font-family:'Arial Rounded MT Bold',Arial,sans-serif; overflow:hidden; display:flex; flex-direction:column; align-items:center; color:#fff; }
@@ -49,7 +52,7 @@ body { min-height:100vh; background:linear-gradient(135deg,#263238,#37474F); fon
   <h1 id="ui-start-t" style="font-size:26px;margin:12px 0 8px;">Soya Topish</h1>
   <p  id="ui-start-d" style="font-size:14px;opacity:.8;">Soyani ko'rib asl nusxasini top!</p>
   <div id="level-info" style="background:rgba(255,255,255,.1);border-radius:14px;padding:9px 18px;margin:12px 0;font-size:13px;font-weight:900;"></div>
-  <button class="btn-p" onclick="startGame()">START</button>
+  <button class="btn-p" id="btn-start" onclick="startGame()">START</button>
 </div>
 
 <div id="result-screen" class="screen hidden">
@@ -57,17 +60,16 @@ body { min-height:100vh; background:linear-gradient(135deg,#263238,#37474F); fon
   <h1 id="res-ttl" style="font-size:22px;margin:10px 0 6px;"></h1>
   <div id="res-sc" style="font-size:26px;font-weight:900;margin-bottom:14px;"></div>
   <button class="btn-p" id="btn-next" onclick="onNext()"></button>
-  <button class="btn-p" style="background:rgba(255,255,255,.15);color:#fff;margin-top:8px;" onclick="startGame()">↩ Qayta</button>
+  <button class="btn-p" id="btn-restart" style="background:rgba(255,255,255,.15);color:#fff;margin-top:8px;" onclick="startGame()">↩ Qayta</button>
 </div>
 
-<script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
 <script>
 const GAME_ID = 'shadow';
 const T = {
-  uz:{title:"Soya Topish", quest:"Bu kimning soyasi?", start:"BOSHLASH", desc:"Soyani ko'rib asl nusxasini top!", great:"Zo'r!", good:"Yaxshi!", try:"Harakat qil!", next:"Keyingi →", again:"↩ Qayta"},
-  ru:{title:"Найди тень",  quest:"Чья это тень?",       start:"ИГРАТЬ",  desc:"Угадай существо по тени!",       great:"Отлично!", good:"Хорошо!", try:"Ещё раз!",     next:"Дальше →", again:"↩ Снова"},
-  en:{title:"Find Shadow", quest:"Whose shadow is this?",start:"START",   desc:"Look at the shadow and find the match!", great:"Amazing!", good:"Good job!", try:"Try again!", next:"Next →", again:"↩ Again"},
+  uz:{title:"Soya Topish", quest:"Bu kimning soyasi?", start:"BOSHLASH", desc:"Soyani ko'rib asl nusxasini top!", great:"Zo'r!", good:"Yaxshi!", try:"Harakat qil!", next:"Keyingi →", again:"↩ Qayta", lvInfo:"savol", lvUnit:"ta"},
+  ru:{title:"Найди тень",  quest:"Чья это тень?",       start:"ИГРАТЬ",  desc:"Угадай существо по тени!",       great:"Отлично!", good:"Хорошо!", try:"Ещё раз!",     next:"Дальше →", again:"↩ Снова",  lvInfo:"вопрос", lvUnit:"шт"},
+  en:{title:"Find Shadow", quest:"Whose shadow is this?",start:"START",   desc:"Look at the shadow and find the match!", great:"Amazing!", good:"Good job!", try:"Try again!", next:"Next →", again:"↩ Again",  lvInfo:"q", lvUnit:"items"},
 };
 const DATA = [
   /* 1-8 Easy animals */
@@ -108,6 +110,7 @@ const DATA = [
 
 const engine = new KidZoneGame({ id: GAME_ID });
 const lang = engine.lang;
+KidUI.init({ title: "Find Shadow", icon: "👤", color: "#6A1B9A", gameId: "shadow", lang: lang });
 const t = T[lang] || T.en;
 let _level, _cfg, _pool, _questions, _qIdx, _score, _answered, _hintsObj, _livesObj;
 
@@ -118,8 +121,10 @@ function init() {
   document.getElementById('ui-title').textContent   = t.title;
   document.getElementById('ui-start-t').textContent = t.title;
   document.getElementById('ui-start-d').textContent = t.desc;
+  document.getElementById('btn-start').textContent  = t.start;
+  document.getElementById('btn-restart').textContent= t.again;
   document.getElementById('lv-val').textContent     = _level;
-  document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} savol · 💡${_cfg.hints} · 🎭${_pool.length} ta`;
+  document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.lvInfo} · 💡${_cfg.hints} · 🎭${_pool.length} ${t.lvUnit}`;
   KZL.howToPlay({ id: GAME_ID, steps:{
     uz:[{icon:'👤',text:'Qora soyani diqqat bilan kuzat'},{icon:'👆',text:'4 variantdan to\'g\'ri javobni top'},{icon:'💡',text:'Hint bir noto\'g\'ri variantni o\'chiradi'},{icon:'❤️',text:'3 ta hayot — ehtiyot bo\'l!'},{icon:'🏆',text:'60% ball yig\'ib keyingi darajaga o\'t!'}],
     ru:[{icon:'👤',text:'Внимательно рассмотри тёмный силуэт'},{icon:'👆',text:'Найди правильный ответ из 4 вариантов'},{icon:'💡',text:'Подсказка убирает один неверный вариант'},{icon:'❤️',text:'3 жизни — будь внимателен!'},{icon:'🏆',text:'Набери 60% чтобы перейти на следующий уровень!'}],

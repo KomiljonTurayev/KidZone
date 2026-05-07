@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Body Parts 👁️</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; }
 body { min-height:100vh; background:#FCE4EC; font-family:'Arial Rounded MT Bold',Arial,sans-serif; overflow:hidden; display:flex; flex-direction:column; align-items:center; }
@@ -33,7 +36,7 @@ body { min-height:100vh; background:#FCE4EC; font-family:'Arial Rounded MT Bold'
   <div class="pill">⭐ <span id="score">0</span></div>
   <div class="pill">👁️ <span id="ui-title">Body Parts</span></div>
   <div class="pill" style="flex-direction:column;padding:5px 10px;">
-    <span class="pill-sm">LEVEL</span><span id="lv-val">1</span>
+    <span class="pill-sm" id="lv-lbl">LEVEL</span><span id="lv-val">1</span>
   </div>
 </div>
 
@@ -49,7 +52,7 @@ body { min-height:100vh; background:#FCE4EC; font-family:'Arial Rounded MT Bold'
 <div id="start-screen" class="screen">
   <div style="font-size:80px;">👦</div>
   <h1 id="ui-start-t" style="font-size:26px;margin:12px 0 8px;">Body Parts</h1>
-  <p  id="ui-start-d" style="font-size:14px;opacity:.85;">Learn body parts in 3 languages!</p>
+  <p  id="ui-start-d" style="font-size:14px;opacity:.85;"></p>
   <div id="level-info" style="background:rgba(255,255,255,.2);border-radius:14px;padding:9px 18px;margin:12px 0;font-size:13px;font-weight:900;"></div>
   <button class="btn-p" onclick="startGame()">START</button>
 </div>
@@ -59,17 +62,16 @@ body { min-height:100vh; background:#FCE4EC; font-family:'Arial Rounded MT Bold'
   <h1 id="res-ttl" style="font-size:22px;margin:10px 0 6px;"></h1>
   <div id="res-sc" style="font-size:26px;font-weight:900;margin-bottom:14px;"></div>
   <button class="btn-p" id="btn-next" onclick="onNext()"></button>
-  <button class="btn-p" style="background:rgba(255,255,255,.2);color:#fff;margin-top:8px;" onclick="startGame()">↩ Qayta</button>
+  <button class="btn-p" id="btn-back" style="background:rgba(255,255,255,.2);color:#fff;margin-top:8px;" onclick="startGame()">↩ Qayta</button>
 </div>
 
-<script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
 <script>
 const GAME_ID = 'body';
 const T = {
-  uz:{title:"Tana A'zolari", quest:"qayerda?", start:"BOSHLASH", desc:"Tana a'zolarini 3 tilda o'rgan!", great:"Zo'r!", good:"Yaxshi!", try:"Yana!", next:"Keyingi →", again:"↩ Qayta"},
-  ru:{title:"Части тела",    quest:"где находится?", start:"ИГРАТЬ", desc:"Учи части тела на 3 языках!", great:"Отлично!", good:"Хорошо!", try:"Ещё!", next:"Дальше →", again:"↩ Снова"},
-  en:{title:"Body Parts",    quest:"where is it?",   start:"START",  desc:"Learn body parts in 3 languages!", great:"Amazing!", good:"Good job!", try:"Try again!", next:"Next Level →", again:"↩ Again"},
+  uz:{title:"Tana A'zolari", quest:"qayerda?", start:"BOSHLASH", desc:"Tana a'zolarini 3 tilda o'rgan!", great:"Zo'r!", good:"Yaxshi!", try:"Yana!", next:"Keyingi →", again:"↩ Qayta", back:"↩ Qayta", lvLbl:"DARAJA", qUnit:"savol", pUnit:" ta"},
+  ru:{title:"Части тела",    quest:"где находится?", start:"ИГРАТЬ", desc:"Учи части тела на 3 языках!", great:"Отлично!", good:"Хорошо!", try:"Ещё!", next:"Дальше →", again:"↩ Снова", back:"↩ Назад", lvLbl:"УРОВЕНЬ", qUnit:"вопросов", pUnit:""},
+  en:{title:"Body Parts",    quest:"where is it?",   start:"START",  desc:"Learn body parts in 3 languages!", great:"Amazing!", good:"Good job!", try:"Try again!", next:"Next Level →", again:"↩ Again", back:"↩ Back", lvLbl:"LEVEL", qUnit:"questions", pUnit:""},
 };
 const DATA = [
   /* 1-8 Easy */
@@ -110,6 +112,7 @@ const DATA = [
 
 const engine = new KidZoneGame({ id: GAME_ID });
 const lang = engine.lang;
+KidUI.init({ title: "Body Parts", icon: "👁️", color: "#D84315", gameId: "body", lang: lang });
 const t = T[lang] || T.en;
 let _level, _cfg, _pool, _questions, _qIdx, _score, _answered, _hintsObj, _livesObj;
 
@@ -117,11 +120,14 @@ function init() {
   _level = KZL.getLevel(GAME_ID);
   _cfg   = KZL.cfg(GAME_ID);
   _pool  = KZL.slicePool(DATA, _level);
+  document.title = t.title;
   document.getElementById('ui-title').textContent   = t.title;
   document.getElementById('ui-start-t').textContent = t.title;
   document.getElementById('ui-start-d').textContent = t.desc;
   document.getElementById('lv-val').textContent     = _level;
-  document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} savol · 💡${_cfg.hints} · 🐾${_pool.length} ta`;
+  document.getElementById('lv-lbl').textContent     = t.lvLbl;
+  document.getElementById('btn-back').textContent   = t.back;
+  document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.qUnit} · 💡${_cfg.hints} · 🐾${_pool.length}${t.pUnit}`;
 
   KZL.howToPlay({ id: GAME_ID, steps:{
     uz:[{icon:'👦',text:'Tana a\'zosi nomini ko\'rasan'},{icon:'👆',text:'To\'g\'ri emoji ni top'},{icon:'💡',text:'Hint bir noto\'g\'ri javobni o\'chiradi'},{icon:'❤️',text:'3 ta hayot — ehtiyotkor bo\'l!'},{icon:'🏆',text:'Yangi daraja uchun 60% ball to\'pla!'}],
