@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onBannerLoaded(int heightDp) {
                 lastBannerHeight = heightDp;
-                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(" + heightDp + ");");
+                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
             }
 
             @Override
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         public void showBanner() {
             runOnUiThread(() -> {
                 findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE);
-                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(" + lastBannerHeight + ");");
+                webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
             });
         }
 
