@@ -95,7 +95,7 @@ let size = 15;
 
 function resize() {
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - document.getElementById('topbar').offsetHeight - document.getElementById('controls').offsetHeight;
+  canvas.height = window.innerHeight - (document.getElementById('kt-header')?.offsetHeight || 0) - document.getElementById('controls').offsetHeight;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 }
