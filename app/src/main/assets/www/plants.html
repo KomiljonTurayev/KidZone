@@ -4,23 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>O'simliklar 🌱</title>
+<link rel="stylesheet" href="kids-theme.css">
 <script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;}
 body{min-height:100vh;background:#E8F5E9;font-family:'Arial Rounded MT Bold',Arial,sans-serif;
   display:flex;flex-direction:column;align-items:center;overflow-x:hidden;}
-
-/* ── header ── */
-#topbar{width:100%;background:linear-gradient(135deg,#1B5E20,#388E3C);
-  padding:14px 16px 12px;display:flex;align-items:center;gap:8px;
-  box-shadow:0 3px 12px rgba(0,0,0,.25);}
-#back-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;
-  width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-#title-text{flex:1;color:#fff;font-size:16px;font-weight:900;}
-#level-badge{background:rgba(255,255,255,.25);color:#fff;border-radius:16px;
-  padding:4px 12px;font-size:13px;font-weight:900;}
-#score-pill{background:#fff;color:#1B5E20;border-radius:16px;
-  padding:4px 12px;font-size:13px;font-weight:900;}
 
 /* ── tools row ── */
 #tools-row{display:flex;align-items:center;justify-content:center;gap:12px;
@@ -78,14 +68,6 @@ body{min-height:100vh;background:#E8F5E9;font-family:'Arial Rounded MT Bold',Ari
 </style>
 </head>
 <body>
-
-<!-- ── TOP BAR ── -->
-<div id="topbar">
-  <button id="back-btn" onclick="history.back()">←</button>
-  <div id="title-text">🌱 <span id="t-title"></span></div>
-  <div id="level-badge" onclick="openLevelSelector()" style="cursor:pointer">LVL <span id="t-lvl">1</span></div>
-  <div id="score-pill">⭐ <span id="t-score">0</span></div>
-</div>
 
 <!-- ── TOOLS ROW ── -->
 <div id="tools-row">
@@ -171,6 +153,7 @@ const DATA = [
 ═══════════════════════════════════════════════ */
 const LANG = navigator.language.startsWith('ru') ? 'ru'
            : navigator.language.startsWith('en') ? 'en' : 'uz';
+KidUI.init({ title: "Plants", icon: "🌱", color: "#388E3C", gameId: "plants", lang: LANG });
 
 const T = {
   title:     {uz:"O'simliklar",           ru:"Растения",            en:"Plants"},
@@ -211,9 +194,9 @@ function init() {
   _qi    = 0;
   _score = 0;
 
-  document.getElementById('t-title').textContent = t('title');
-  document.getElementById('t-lvl').textContent   = _level;
-  document.getElementById('t-score').textContent = 0;
+  const _elTitle = document.getElementById('t-title'); if (_elTitle) _elTitle.textContent = t('title');
+  const _elLvl = document.getElementById('t-lvl'); if (_elLvl) _elLvl.textContent = _level;
+  const _elScore = document.getElementById('t-score'); if (_elScore) _elScore.textContent = 0;
   document.getElementById('lvl-title-text').textContent = t('selectLvl');
 
   /* tools */
@@ -270,7 +253,7 @@ function renderQuestion() {
   setTimeout(() => emojiEl.style.transform = 'scale(1)', 200);
 
   document.getElementById('q-text').textContent = t('question');
-  document.getElementById('t-score').textContent = _score;
+  const _rsEl = document.getElementById('t-score'); if (_rsEl) _rsEl.textContent = _score;
 
   /* active dot */
   document.querySelectorAll('.dot').forEach((d,i) => {
@@ -326,7 +309,7 @@ function answer(opt, q, btn) {
   if (opt.en === q.en) {
     btn.classList.add('correct');
     _score++;
-    document.getElementById('t-score').textContent = _score;
+    const _asEl = document.getElementById('t-score'); if (_asEl) _asEl.textContent = _score;
     setTimeout(advance, 750);
   } else {
     btn.classList.add('wrong');
