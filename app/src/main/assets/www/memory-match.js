@@ -18,25 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
             score: "Score",
             timer: "Time",
             start: "Start Game",
-            win: "You Win!",
+            go:   "Go!",
+            win:  "You Win!",
             over: "Time's Up!",
-            again: "Play Again"
+            again:"Play Again"
         },
         uz: {
             score: "Ball",
             timer: "Vaqt",
             start: "Boshlash",
-            win: "Yutdingiz!",
+            go:   "Boshlang!",
+            win:  "Yutdingiz!",
             over: "Vaqt tugadi!",
-            again: "Qayta o'ynash"
+            again:"Qayta o'ynash"
         },
         ru: {
             score: "Очки",
             timer: "Время",
             start: "Начать",
-            win: "Ты выиграл!",
+            go:   "Вперёд!",
+            win:  "Ты выиграл!",
             over: "Время вышло!",
-            again: "Ещё раз"
+            again:"Ещё раз"
         }
     };
     const t = game.getTranslations(translations);
@@ -219,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initGame(); // Reset game state
         gameActive = true;
         startButton.style.display = 'none';
-        messageDisplay.textContent = 'Go!';
+        messageDisplay.textContent = t.go;
 
         timer = setInterval(() => {
             timeLeft--;
