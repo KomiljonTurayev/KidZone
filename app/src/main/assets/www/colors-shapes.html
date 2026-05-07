@@ -4,14 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Ranglar va Shakllar 🎨</title>
+<link rel="stylesheet" href="kids-theme.css">
 <script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
 <style>
-/* ── KZL back button ── */
+/* ── KZL top row ── */
 #kz-toprow{width:100%;max-width:480px;display:flex;align-items:center;
   gap:8px;padding:10px 16px 0;}
-#kz-back{background:#fff;border:none;border-radius:50%;width:36px;height:36px;
-  font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);
-  display:flex;align-items:center;justify-content:center;}
 #kz-lvl-badge{background:linear-gradient(135deg,#FF6B6B,#FF9F43);color:#fff;
   border-radius:16px;padding:4px 12px;font-size:13px;font-weight:900;cursor:pointer;}
 #kz-tools{display:flex;align-items:center;justify-content:center;gap:12px;
@@ -237,8 +236,7 @@ body {
 
 <!-- ── KZL top row ── -->
 <div id="kz-toprow">
-  <button id="kz-back" onclick="history.back()">←</button>
-  <div style="flex:1;font-weight:900;font-size:15px;color:#FF6B6B">🎨 Ranglar & Shakllar</div>
+  <div id="cs-title" style="flex:1;font-weight:900;font-size:15px;color:#FF6B6B">🎨 Ranglar & Shakllar</div>
   <div id="kz-lvl-badge" onclick="openLvlSel()">LVL <span id="kz-lvl">1</span></div>
 </div>
 <div id="kz-tools">
@@ -250,15 +248,15 @@ body {
 <div id="app">
   <div id="topbar">
     <div class="badge">
-      <div class="badge-label">BALL</div>
+      <div class="badge-label" id="lbl-score">BALL</div>
       <div class="badge-val" id="score">0</div>
     </div>
     <div class="badge" style="background:linear-gradient(135deg,#FFECD2,#FCB69F)">
-      <div class="badge-label">DARAJA</div>
+      <div class="badge-label" id="lbl-level">DARAJA</div>
       <div class="badge-val" id="mode-label" style="font-size:14px">🎨 Rang</div>
     </div>
     <div class="badge">
-      <div class="badge-label">REKORD</div>
+      <div class="badge-label" id="lbl-best">REKORD</div>
       <div class="badge-val" id="best">0</div>
     </div>
   </div>
@@ -267,6 +265,7 @@ body {
     <button class="tab active" id="tab-color" style="background:linear-gradient(135deg,#FF6B6B,#FF9F43)" onclick="setMode('color')">🎨 Ranglar</button>
     <button class="tab" id="tab-shape" onclick="setMode('shape')">🔷 Shakllar</button>
     <button class="tab" id="tab-mix" onclick="setMode('mix')">🌈 Aralash</button>
+
   </div>
 
   <div id="prog-outer"><div id="prog-inner" style="width:0%"></div></div>
@@ -369,6 +368,7 @@ function drawShape(svgEl, type, color, size=56) {
 const GAME_ID_CS = 'colors-shapes';
 const CS_LANG = navigator.language.startsWith('ru') ? 'ru'
               : navigator.language.startsWith('en') ? 'en' : 'uz';
+KidUI.init({ title: "Colors & Shapes", icon: "🌈", color: "#F9A825", gameId: "colors_shapes", lang: CS_LANG });
 let _kzLevel = 1, _kzCfg = null, _kzHint = null, _kzLives = null, _kzTimer = null;
 
 function modeForLevel(lv) {
@@ -431,6 +431,135 @@ const CS_HOW = {
   en:["A color or shape is shown","Choose the correct color or shape","💡 Hint removes a wrong answer","❤️ You have 3 lives!","Gets harder as you level up"],
 };
 
+const CS_T = {
+  uz: {
+    title:       "🎨 Ranglar & Shakllar",
+    score:       "BALL",
+    level:       "DARAJA",
+    best:        "REKORD",
+    findIt:      "TOPISH KERAK",
+    hintColor:   "Shu rangni topib bosing 👇",
+    hintShape:   "Shu shaklni topib bosing 👇",
+    tabColor:    "🎨 Ranglar",
+    tabShape:    "🔷 Shakllar",
+    tabMix:      "🌈 Aralash",
+    modeColor:   "🎨 Rang",
+    modeShape:   "🔷 Shakl",
+    modeMix:     "🌈 Aralash",
+    startTitle:  "Ranglar & Shakllar!",
+    startSub:    "Ranglarni va shakllarni\no'yin orqali o'rganing!\n🎨 🔷 ⭐ 🔴",
+    btnStart:    "🎮 BOSHLASH!",
+    btnAgain:    "🔄 QAYTA",
+    btnHome:     "🏠 BOSH SAHIFA",
+    resCorrect:  "TO'G'RI",
+    resBall:     "BALL",
+    resTitleBest:"AQLLI BOLA!",
+    resTitleGood:"ZO'R!",
+    resTitleOk:  "YAXSHI URINISH!",
+    resMsgBest:  "Barcha ranglar va shakllarni bilasiz! 🌟",
+    resMsgGood:  "Deyarli hammasi to'g'ri! Davom eting 💪",
+    resMsgOk:    "Yana bir oz mashq qiling! 📚",
+    howToPlay:   "Qanday o'ynash?",
+    admob:       "📢 AdMob — Bolalar uchun xavfsiz reklama",
+  },
+  ru: {
+    title:       "🎨 Цвета & Фигуры",
+    score:       "ОЧКИ",
+    level:       "УРОВЕНЬ",
+    best:        "РЕКОРД",
+    findIt:      "НАЙДИ",
+    hintColor:   "Найди этот цвет 👇",
+    hintShape:   "Найди эту фигуру 👇",
+    tabColor:    "🎨 Цвета",
+    tabShape:    "🔷 Фигуры",
+    tabMix:      "🌈 Микс",
+    modeColor:   "🎨 Цвет",
+    modeShape:   "🔷 Фигура",
+    modeMix:     "🌈 Микс",
+    startTitle:  "Цвета & Фигуры!",
+    startSub:    "Учи цвета и фигуры\nиграя!\n🎨 🔷 ⭐ 🔴",
+    btnStart:    "🎮 НАЧАТЬ!",
+    btnAgain:    "🔄 ЕЩЁ РАЗ",
+    btnHome:     "🏠 ГЛАВНАЯ",
+    resCorrect:  "ВЕРНО",
+    resBall:     "ОЧКИ",
+    resTitleBest:"УМНИЦА!",
+    resTitleGood:"ОТЛИЧНО!",
+    resTitleOk:  "ХОРОШАЯ ПОПЫТКА!",
+    resMsgBest:  "Ты знаешь все цвета и фигуры! 🌟",
+    resMsgGood:  "Почти всё верно! Продолжай 💪",
+    resMsgOk:    "Ещё немного попрактикуйся! 📚",
+    howToPlay:   "Как играть?",
+    admob:       "📢 AdMob — Безопасная реклама для детей",
+  },
+  en: {
+    title:       "🎨 Colors & Shapes",
+    score:       "SCORE",
+    level:       "LEVEL",
+    best:        "BEST",
+    findIt:      "FIND IT",
+    hintColor:   "Find this color 👇",
+    hintShape:   "Find this shape 👇",
+    tabColor:    "🎨 Colors",
+    tabShape:    "🔷 Shapes",
+    tabMix:      "🌈 Mixed",
+    modeColor:   "🎨 Color",
+    modeShape:   "🔷 Shape",
+    modeMix:     "🌈 Mixed",
+    startTitle:  "Colors & Shapes!",
+    startSub:    "Learn colors and shapes\nthrough play!\n🎨 🔷 ⭐ 🔴",
+    btnStart:    "🎮 START!",
+    btnAgain:    "🔄 PLAY AGAIN",
+    btnHome:     "🏠 HOME",
+    resCorrect:  "CORRECT",
+    resBall:     "SCORE",
+    resTitleBest:"GENIUS!",
+    resTitleGood:"GREAT!",
+    resTitleOk:  "GOOD TRY!",
+    resMsgBest:  "You know all colors and shapes! 🌟",
+    resMsgGood:  "Almost all correct! Keep going 💪",
+    resMsgOk:    "Practice a little more! 📚",
+    howToPlay:   "How to play?",
+    admob:       "📢 AdMob — Safe ads for kids",
+  },
+};
+
+function getT() { return CS_T[CS_LANG] || CS_T.en; }
+
+function applyCSLang() {
+  const t = getT();
+  /* top row title */
+  const titleEl = document.getElementById('cs-title');
+  if (titleEl) titleEl.textContent = t.title;
+  /* topbar badges */
+  const lScore = document.getElementById('lbl-score'); if (lScore) lScore.textContent = t.score;
+  const lLevel = document.getElementById('lbl-level'); if (lLevel) lLevel.textContent = t.level;
+  const lBest  = document.getElementById('lbl-best');  if (lBest)  lBest.textContent  = t.best;
+  /* mode tabs */
+  document.getElementById('tab-color').textContent = t.tabColor;
+  document.getElementById('tab-shape').textContent = t.tabShape;
+  document.getElementById('tab-mix').textContent   = t.tabMix;
+  /* start screen */
+  const startCard = document.querySelector('#start-screen .white-card');
+  if (startCard) {
+    startCard.querySelector('.wc-title').textContent = t.startTitle;
+    startCard.querySelector('.wc-sub').innerHTML = t.startSub.replace(/\n/g,'<br>');
+  }
+  const startBtn = document.querySelector('#start-screen .action-btn');
+  if (startBtn) startBtn.textContent = t.btnStart;
+  /* result screen buttons */
+  const resBtns = document.querySelectorAll('#result-screen button');
+  if (resBtns[0]) resBtns[0].textContent = t.btnAgain;
+  if (resBtns[1]) resBtns[1].textContent = t.btnHome;
+  /* result screen stat labels */
+  const resLabels = document.querySelectorAll('#result-screen [style*="font-size:11px"]');
+  if (resLabels[0]) resLabels[0].textContent = t.resBall;
+  if (resLabels[1]) resLabels[1].textContent = t.resCorrect;
+  /* admob */
+  const admobEl = document.getElementById('admob');
+  if (admobEl) admobEl.textContent = t.admob;
+}
+
 /* level selector for colors-shapes */
 function openLvlSel() {
   /* simple alert-style selector */
@@ -479,7 +608,8 @@ function setMode(m) {
       tab.style.color = "";
     }
   });
-  const labels = {color:"🎨 Rang", shape:"🔷 Shakl", mix:"🌈 Aralash"};
+  const t = getT();
+  const labels = {color:t.modeColor, shape:t.modeShape, mix:t.modeMix};
   document.getElementById("mode-label").textContent = labels[m];
 }
 
@@ -523,7 +653,7 @@ function nextQ() {
     emojiEl.textContent   = currentItem.emoji;
     nameEl.textContent    = currentItem.name.toUpperCase() + " RANG";
     nameEl.style.color    = currentItem.hex;
-    hintEl.textContent    = "Shu rangni topib bosing 👇";
+    hintEl.textContent    = getT().hintColor;
     cardEl.style.background = currentItem.light;
   } else {
     emojiEl.style.display = "none";
@@ -532,10 +662,10 @@ function nextQ() {
     svgEl.setAttribute("width","72"); svgEl.setAttribute("height","72");
     nameEl.textContent  = currentItem.name.toUpperCase();
     nameEl.style.color  = currentItem.color.hex;
-    hintEl.textContent  = "Shu shaklni topib bosing 👇";
+    hintEl.textContent  = getT().hintShape;
     cardEl.style.background = currentItem.color.light;
   }
-  document.getElementById("q-instruction").textContent = `${qNum+1} / ${totalQ} — TOPISH KERAK`;
+  document.getElementById("q-instruction").textContent = `${qNum+1} / ${totalQ} — ${getT().findIt}`;
 
   /* reset hint and start timer */
   if (_kzHint) _kzHint.reset(_kzCfg?.hints||0);
@@ -622,7 +752,7 @@ function startGame() {
   document.getElementById("result-screen").classList.add("hidden");
   KZL.howToPlay({
     id: GAME_ID_CS, lang: CS_LANG,
-    title: CS_LANG==='ru'?'Как играть?':CS_LANG==='en'?'How to play?':'Qanday o\'ynash?',
+    title: getT().howToPlay,
     steps: CS_HOW[CS_LANG]||CS_HOW['uz'],
     accentColor: '#FF6B6B',
   });
@@ -637,13 +767,14 @@ function endGame() {
   }
   const pct = correctCount/totalQ;
   document.getElementById("r-emoji").textContent = pct>=0.9?"🏆":pct>=0.7?"🎉":"⭐";
-  document.getElementById("r-title").textContent = pct>=0.9?"AQLLI BOLA!":pct>=0.7?"ZO'R!":"YAXSHI URINISH!";
+  const rt = getT();
+  document.getElementById("r-title").textContent = pct>=0.9?rt.resTitleBest:pct>=0.7?rt.resTitleGood:rt.resTitleOk;
   document.getElementById("r-score").textContent   = score;
   document.getElementById("r-correct").textContent = `${correctCount}/${totalQ}`;
   document.getElementById("r-msg").textContent = pct>=0.9
-    ? "Barcha ranglar va shakllarni bilasiz! 🌟"
-    : pct>=0.7 ? "Deyarli hammasi to'g'ri! Davom eting 💪"
-    : "Yana bir oz mashq qiling! 📚";
+    ? rt.resMsgBest
+    : pct>=0.7 ? rt.resMsgGood
+    : rt.resMsgOk;
 
   // Update total points in the main app
   const currentTotal = parseInt(localStorage.getItem('kz-pts') || '0');
