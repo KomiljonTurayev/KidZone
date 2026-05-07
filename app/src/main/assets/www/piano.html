@@ -125,7 +125,6 @@ function playNote(freq, color) {
 
   spawnParticle(color);
   score += 1;
-  document.getElementById('score').textContent = score;
   if (score % 10 === 0) {
     showFeedback();
     if (window.KZL) KZL.nextLevel('piano');
@@ -148,15 +147,11 @@ function showFeedback() {
 }
 
 window.onload = () => {
-  // Apply translations
-  document.getElementById('game-title').textContent = t.title;
-  document.getElementById('score-label').textContent = t.score + ': ';
   document.getElementById('feedback').textContent = t.feedback;
 
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
   if (id === 'rhythm') {
-    document.getElementById('game-title').textContent = t.rhythmTitle;
     document.getElementById('feedback').textContent = t.rhythmHint;
   }
 };

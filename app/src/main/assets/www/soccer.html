@@ -98,11 +98,6 @@ const _SOC_HOW = {
   en:["⚽ Tap the ball to kick it","Avoid the goalkeeper and score!","After each goal the keeper speeds up","Score more goals to level up!","BEST — your highest score"],
 };
 
-/* Topbar labellarini tilga qarab qo'yish */
-document.getElementById('lbl-goals').textContent = t.goals;
-document.getElementById('lbl-level').textContent = t.level;
-document.getElementById('lbl-best').textContent  = t.best;
-
 let goals = 0;
 let socLevel = KZL.getLevel('soccer');
 let best = parseInt(localStorage.getItem('soccerBest') || '0');
@@ -111,8 +106,8 @@ let keeperSpeed = 1.5 + (socLevel - 1) * 0.3;
 let keeperDir = 1;
 let keeperX = 50;
 
-document.getElementById('best').textContent = best;
-document.getElementById('soc-lvl').textContent = socLevel;
+const _elBestInit = document.getElementById('best'); if (_elBestInit) _elBestInit.textContent = best;
+const _elLvlInit  = document.getElementById('soc-lvl'); if (_elLvlInit) _elLvlInit.textContent = socLevel;
 
 /* Show how-to-play on first visit */
 KZL.howToPlay({
@@ -149,19 +144,19 @@ function kick() {
     } else if (ballRect.left > goalRect.left && ballRect.right < goalRect.right) {
       // GOAL
       goals++;
-      document.getElementById('goals').textContent = goals;
+      const _elGoals = document.getElementById('goals'); if (_elGoals) _elGoals.textContent = goals;
       showFeedback(t.goal, '#f1c40f');
       if (goals > best) {
         best = goals;
         localStorage.setItem('soccerBest', best);
-        document.getElementById('best').textContent = best;
+        const _elBest = document.getElementById('best'); if (_elBest) _elBest.textContent = best;
       }
       keeperSpeed += 0.25;
       /* level up every 5 goals */
       if (goals % 5 === 0 && KZL.getLevel('soccer') === socLevel) {
         KZL.nextLevel('soccer');
         socLevel = KZL.getLevel('soccer');
-        document.getElementById('soc-lvl').textContent = socLevel;
+        const _elSocLvl = document.getElementById('soc-lvl'); if (_elSocLvl) _elSocLvl.textContent = socLevel;
       }
       resetBall();
     } else {

@@ -227,10 +227,6 @@ function init() {
   _qi    = 0;
   _score = 0;
 
-  // t-title, t-lvl, t-score were in the old topbar (removed); use optional chaining
-  const _elTitle = document.getElementById('t-title'); if (_elTitle) _elTitle.textContent = t('title');
-  const _elLvl   = document.getElementById('t-lvl');   if (_elLvl)   _elLvl.textContent   = _level;
-  const _elScore = document.getElementById('t-score'); if (_elScore) _elScore.textContent = 0;
   document.getElementById('level-label').textContent = t('label') + ' · LV' + _level;
   document.getElementById('lvl-title-text').textContent = t('selectLvl');
 
@@ -278,7 +274,6 @@ function renderQuestion() {
   const q = _questions[_qi];
 
   document.getElementById('q-text').textContent  = q.text;
-  const _sc1 = document.getElementById('t-score'); if (_sc1) _sc1.textContent = _score;
 
   const opNames = {'+':'Addition ➕', '-':'Subtraction ➖', '×':'Multiplication ✖️', '÷':'Division ➗'};
   const opNamesUz = {'+':'Qo\'shish ➕', '-':'Ayirish ➖', '×':'Ko\'paytirish ✖️', '÷':'Bo\'lish ➗'};
@@ -332,7 +327,6 @@ function answer(v, q, btn) {
   if (v === q.ans) {
     btn.classList.add('correct');
     _score++;
-    const _sc2 = document.getElementById('t-score'); if (_sc2) _sc2.textContent = _score;
     setTimeout(advance, 750);
   } else {
     btn.classList.add('wrong');
