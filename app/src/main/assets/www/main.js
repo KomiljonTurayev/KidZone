@@ -64,6 +64,237 @@ class UIManager {
         const el = document.getElementById(id);
         if (el) el.classList.add("h");
     }
+
+    switchTab(tab) {
+        localStorage.setItem('kz-tab', tab);
+        document.querySelectorAll('.kz-tab').forEach(t => t.classList.remove('active'));
+        const tabEl = document.getElementById('tab-' + tab);
+        if (tabEl) tabEl.classList.add('active');
+        ['games', 'stories', 'songs'].forEach(s => {
+            const el = document.getElementById(s + '-section');
+            if (el) el.classList.toggle('h', s !== tab);
+        });
+    }
+}
+
+class AudioPlayer {
+    constructor() {
+        this._audio = null;
+        this._paused = false;
+    }
+
+    play(src, title, onTimeUpdate, onEnded, onError) {
+        if (this._audio) {
+            this._audio.pause();
+            this._audio.src = '';
+        }
+        this._audio = new Audio(src);
+        this._paused = false;
+
+        this._audio.addEventListener('timeupdate', () => {
+            if (onTimeUpdate) onTimeUpdate(this._audio.currentTime, this._audio.duration || 0);
+        });
+        this._audio.addEventListener('ended', () => {
+            this._paused = false;
+            if (onEnded) onEnded();
+        });
+        this._audio.addEventListener('error', () => {
+            this._paused = false;
+            if (onError) onError();
+        });
+
+        this._audio.play().catch(() => { if (onError) onError(); });
+    }
+
+    pause() {
+        if (this._audio && !this._audio.paused) {
+            this._audio.pause();
+            this._paused = true;
+        }
+    }
+
+    resume() {
+        if (this._audio && this._audio.paused) {
+            this._audio.play().catch(() => {});
+            this._paused = false;
+        }
+    }
+
+    stop() {
+        if (this._audio) {
+            this._audio.pause();
+            this._audio.src = '';
+            this._audio = null;
+        }
+        this._paused = false;
+    }
+
+    seek(pct) {
+        if (this._audio && this._audio.duration) {
+            this._audio.currentTime = pct * this._audio.duration / 100;
+        }
+    }
+
+    isPlaying() {
+        return !!(this._audio && !this._audio.paused && !this._paused);
+    }
+
+    isPaused() {
+        return this._paused;
+    }
+}
+
+class ContentManager {
+    constructor(type, player, translator, ui) {
+        this.type = type;
+        this.player = player;
+        this.translator = translator;
+        this.ui = ui;
+        this.items = [];
+        this.filtered = [];
+        this.currentId = null;
+        this._catFilter = 'all';
+        this._searchQuery = '';
+    }
+
+    async load() {
+        try {
+            const res = await fetch('content.json');
+            const data = await res.json();
+            this.items = data[this.type] || [];
+            this.filtered = [...this.items];
+        } catch (e) {
+            this.items = [];
+            this.filtered = [];
+        }
+    }
+
+    filter(query, cat) {
+        this._searchQuery = query;
+        this._catFilter = cat;
+        const lang = this.translator.lang;
+        this.filtered = this.items.filter(item => {
+            const matchCat = cat === 'all' || item.category === cat;
+            const title = (item.title[lang] || item.title.en || '').toLowerCase();
+            const matchQuery = !query || title.includes(query.toLowerCase());
+            return matchCat && matchQuery;
+        });
+    }
+
+    render() {
+        const gridId = this.type === 'stories' ? 'stories-grid' : 'songs-grid';
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        const lang = this.translator.lang;
+        grid.innerHTML = '';
+        this.filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'content-card' + (item.id === this.currentId ? ' playing' : '');
+            const title = item.title[lang] || item.title.en;
+            card.innerHTML =
+                '<div class="cc-art">' + item.emoji + '</div>' +
+                '<div class="cc-title">' + title + '</div>' +
+                '<div class="cc-ic">' + (item.id === this.currentId ? (this.player.isPlaying() ? '⏸' : '▶') : '▶') + '</div>';
+            card.onclick = () => this._play(item);
+            grid.appendChild(card);
+        });
+    }
+
+    _play(item) {
+        const lang = this.translator.lang;
+        const src = item.audio[lang] || item.audio.en;
+        const title = item.title[lang] || item.title.en;
+
+        this.currentId = item.id;
+        this.render();
+        this._showPlayer(item.emoji + ' ' + title);
+
+        this.player.play(
+            src, title,
+            (cur, dur) => this._onTimeUpdate(cur, dur),
+            () => this._onEnded(),
+            () => {
+                this.ui.showToast(this.translator.get('noAudio') || 'Audio unavailable');
+                this._hidePlayer();
+                this.currentId = null;
+                this.render();
+            }
+        );
+        const playBtn = document.getElementById('kzp-play');
+        if (playBtn) playBtn.textContent = '⏸';
+    }
+
+    _onTimeUpdate(cur, dur) {
+        const prog = document.getElementById('kzp-progress');
+        const time = document.getElementById('kzp-time');
+        if (prog && dur) prog.value = (cur / dur) * 100;
+        if (time) time.textContent = this._fmt(cur) + ' / ' + this._fmt(dur);
+    }
+
+    _onEnded() {
+        const btn = document.getElementById('kzp-play');
+        if (btn) btn.textContent = '▶';
+        this.currentId = null;
+        this.render();
+    }
+
+    _showPlayer(title) {
+        const player = document.getElementById('kz-player');
+        const titleEl = document.getElementById('kzp-title');
+        if (player) player.classList.remove('h');
+        if (titleEl) titleEl.textContent = title;
+        const prog = document.getElementById('kzp-progress');
+        const time = document.getElementById('kzp-time');
+        if (prog) prog.value = 0;
+        if (time) time.textContent = '0:00 / 0:00';
+        document.getElementById('main')?.classList.add('with-player');
+    }
+
+    _hidePlayer() {
+        const player = document.getElementById('kz-player');
+        if (player) player.classList.add('h');
+        document.getElementById('main')?.classList.remove('with-player');
+    }
+
+    togglePlay() {
+        if (this.player.isPlaying()) {
+            this.player.pause();
+            const btn = document.getElementById('kzp-play');
+            if (btn) btn.textContent = '▶';
+            this.render();
+        } else if (this.player.isPaused()) {
+            this.player.resume();
+            const btn = document.getElementById('kzp-play');
+            if (btn) btn.textContent = '⏸';
+            this.render();
+        }
+    }
+
+    stop() {
+        this.player.stop();
+        this.currentId = null;
+        this._hidePlayer();
+        this.render();
+    }
+
+    _fmt(s) {
+        if (!s || isNaN(s)) return '0:00';
+        const m = Math.floor(s / 60);
+        const sec = String(Math.floor(s % 60)).padStart(2, '0');
+        return m + ':' + sec;
+    }
+}
+
+class StoryManager extends ContentManager {
+    constructor(player, translator, ui) {
+        super('stories', player, translator, ui);
+    }
+}
+
+class SongManager extends ContentManager {
+    constructor(player, translator, ui) {
+        super('songs', player, translator, ui);
+    }
 }
 
 class GameManager {
@@ -155,6 +386,7 @@ class GameManager {
     }
 
     navTo(pg) {
+        if (window.app?.ui?.switchTab) app.ui.switchTab('games');
         document.querySelectorAll(".ni").forEach(n => n.classList.remove("on"));
         const niEl = document.getElementById("ni-" + pg);
         if (niEl) niEl.classList.add("on");
@@ -297,6 +529,80 @@ class GameManager {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
         else document.exitFullscreen?.();
     }
+
+    // ── AI STUDIO LOGIC ──
+
+    generateAiStory() {
+        const viewer = document.getElementById("ai-viewer");
+        const loading = document.getElementById("aiv-loading");
+        const content = document.getElementById("aiv-content-wrap");
+
+        viewer.classList.remove("h");
+        loading.classList.remove("h");
+        content.classList.add("h");
+
+        // Simulate AI thinking
+        setTimeout(() => {
+            const story = this.getAiStory(this.translator.lang);
+            document.getElementById("aiv-story-title").textContent = story.title;
+            document.getElementById("aiv-content").textContent = story.text;
+
+            loading.classList.add("h");
+            content.classList.remove("h");
+            this.addPoints(10);
+        }, 2000);
+    }
+
+    closeAi() {
+        document.getElementById("ai-viewer").classList.add("h");
+        window.speechSynthesis?.cancel();
+    }
+
+    speakStory() {
+        const text = document.getElementById("aiv-content").textContent;
+        const btn = document.getElementById("ai-read-btn");
+
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            btn.querySelector('span').textContent = "🔊";
+            return;
+        }
+
+        const msg = new SpeechSynthesisUtterance(text);
+        const langMap = { uz: "uz-UZ", ru: "ru-RU", en: "en-US" };
+        msg.lang = langMap[this.translator.lang] || "en-US";
+        msg.onend = () => btn.querySelector('span').textContent = "🔊";
+
+        window.speechSynthesis.speak(msg);
+        btn.querySelector('span').textContent = "⏹️";
+    }
+
+    openAiMusic() {
+        this.ui.showToast(this.translator.get("aiMusicToast"));
+        // For simplicity, we toggle music or open a specific music app game
+        setTimeout(() => {
+            this.openGame({id:"piano", em:"🎹", name:this.translator.get("aiBtnMusic"), file:"instrument.html", pts:15});
+        }, 1000);
+    }
+
+    getAiStory(lang) {
+        const stories = {
+            uz: [
+                { title: "Sehrli O'rmon", text: "Bir bor ekan, bir yo'q ekan, uzoq bir o'lkada sehrli o'rmon bor ekan. Bu o'rmonda daraxtlar shokoladdan, barglar esa shirinliklardan iborat ekan. Bir kuni kichkina filcha o'rmonda sayr qilib yurib, oltin kalit topib olibdi..." },
+                { title: "Koinot sayohati", text: "Jasur ismli bolakay har kecha yulduzlarga qarab uxlashni yaxshi ko'rardi. Bir kuni uning derazasiga kichkina uchuvchi tarelka qo'ndi. Undan chiqqan mitti robot: 'Qani Jasur, ketdik yulduzlar sari!' dedi..." }
+            ],
+            ru: [
+                { title: "Волшебный Лес", text: "Жил-был в далекой стране волшебный лес. В этом лесу деревья были из шоколада, а листья — из конфет. Однажды маленький слоненок гулял по лесу и нашел золотой ключ..." },
+                { title: "Космическое приключение", text: "Мальчик по имени Максим любил смотреть на звезды. Однажды к его окну приземлилась маленькая летающая тарелка. Робот внутри сказал: 'Пойдем, Максим, к звездам!'..." }
+            ],
+            en: [
+                { title: "Magic Forest", text: "Once upon a time, in a faraway land, there was a magic forest. In this forest, trees were made of chocolate and leaves were made of candy. One day, a little elephant was walking and found a golden key..." },
+                { title: "Space Adventure", text: "A boy named Leo loved looking at the stars. One night, a small flying saucer landed on his window. A tiny robot said: 'Come on Leo, let's go to the stars!'..." }
+            ]
+        };
+        const list = stories[lang] || stories.en;
+        return list[Math.floor(Math.random() * list.length)];
+    }
 }
 
 // Initialize application
@@ -306,6 +612,11 @@ window.addEventListener("load", () => {
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);
 
+    const audioPlayer = new AudioPlayer();
+    app.storyManager = new StoryManager(audioPlayer, translator, ui);
+    app.songManager  = new SongManager(audioPlayer, translator, ui);
+    app.audioPlayer  = audioPlayer;
+
     // Initial state
     app.updateProgress();
     if (window.updateLangUI) window.updateLangUI();
@@ -314,6 +625,14 @@ window.addEventListener("load", () => {
     if (app.isMuted && window.AndroidAdMob?.toggleMusic) {
         window.AndroidAdMob.toggleMusic(true);
     }
+
+    // Load content and render
+    app.storyManager.load().then(() => app.storyManager.render());
+    app.songManager.load().then(() => app.songManager.render());
+
+    // Restore last active tab
+    const savedTab = localStorage.getItem('kz-tab') || 'games';
+    ui.switchTab(savedTab);
 
     setTimeout(() => {
         const loader = document.getElementById("loader");
