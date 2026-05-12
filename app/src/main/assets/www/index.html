@@ -152,6 +152,55 @@
     .sec-badge{background:rgba(255,107,53,.12);color:var(--accent);font-size:10px;font-weight:900;border-radius:20px;padding:3px 10px}
     .sec-more{background:none;border:none;color:var(--accent);font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
 
+    /* ── AI STUDIO ── */
+    #ai-studio{
+      background:linear-gradient(135deg, #6C63FF, #3F51B5);
+      border-radius:24px; margin:0 var(--pad) 16px;
+      padding:20px; color:white;
+      box-shadow:0 8px 20px rgba(63, 81, 181, 0.3);
+      position:relative; overflow:hidden;
+    }
+    #ai-studio::before{
+      content:'✨'; position:absolute; right:-10px; top:-10px;
+      font-size:100px; opacity:0.1;
+    }
+    .ai-hdr{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+    .ai-badge{
+      background:rgba(255,255,255,0.2); padding:4px 10px;
+      border-radius:10px; font-size:10px; font-weight:900; text-transform:uppercase;
+    }
+    .ai-title{font-family:'Fredoka One',cursive; font-size:20px}
+    .ai-btns{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .ai-btn{
+      background:white; color:#3F51B5; border:none; border-radius:16px;
+      padding:12px; display:flex; flex-direction:column; align-items:center;
+      gap:6px; cursor:pointer; transition:transform 0.2s var(--spring);
+      box-shadow:0 4px 0 #CBD5E0;
+    }
+    .ai-btn:active{transform:translateY(3px); box-shadow:none}
+    .ai-btn-ic{font-size:24px}
+    .ai-btn-lb{font-size:12px; font-weight:800}
+
+    /* ── AI STORY VIEWER ── */
+    #ai-viewer{
+      position:fixed; inset:0; z-index:350; background:var(--bg);
+      display:flex; flex-direction:column; animation:shUp 0.4s var(--spring);
+    }
+    #ai-viewer.h{display:none}
+    .aiv-hdr{
+      padding:12px var(--pad); background:white; display:flex; align-items:center; gap:12px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    }
+    .aiv-body{flex:1; overflow-y:auto; padding:24px var(--pad); line-height:1.6}
+    .aiv-story-title{font-family:'Fredoka One',cursive; font-size:24px; color:var(--accent); margin-bottom:16px; text-align:center}
+    .aiv-content{font-size:17px; color:var(--text); white-space:pre-wrap}
+    .aiv-actions{padding:16px; background:white; display:flex; gap:10px}
+    .aiv-play-btn{
+      flex:1; background:var(--accent); color:white; border:none; border-radius:16px;
+      padding:14px; font-weight:900; font-family:'Nunito'; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+
     /* ── CATEGORIES ── */
     #cat-row{
       display:flex;gap:8px;overflow-x:auto;padding:0 var(--pad) 12px;
@@ -441,6 +490,46 @@
     #blobs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
     .blob{position:absolute;border-radius:50%;opacity:.04;animation:blobD ease-in-out infinite}
     @keyframes blobD{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-15px) scale(1.04)}66%{transform:translate(-15px,10px) scale(.97)}}
+
+    /* ── TAB BAR ── */
+    #tab-bar{display:flex;background:var(--surface);border-bottom:2px solid rgba(0,0,0,0.06);flex-shrink:0}
+    .kz-tab{flex:1;padding:10px 4px 8px;border:none;background:transparent;font-family:'Fredoka One',cursive;font-size:13px;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-bottom-color .2s;touch-action:manipulation}
+    .kz-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+    /* ── MAIN WITH PLAYER ── */
+    #main.with-player{padding-bottom:calc(var(--bh)+68px+78px+16px)!important}
+
+    /* ── CONTENT SECTIONS ── */
+    #stories-section,#songs-section{padding-top:8px}
+
+    /* ── CONTENT SEARCH ── */
+    .cs-search-wrap{padding:0 var(--pad) 8px}
+    .cs-search{width:100%;background:var(--surface);border:none;border-radius:16px;padding:10px 14px;font-size:14px;font-family:'Nunito',sans-serif;box-shadow:0 3px 0 rgba(0,0,0,0.07);color:var(--text)}
+
+    /* ── CONTENT CATEGORY CHIPS ── */
+    .cc-cats{display:flex;gap:8px;overflow-x:auto;padding:0 var(--pad) 10px;scrollbar-width:none}
+    .cc-cats::-webkit-scrollbar{display:none}
+    .cc-chip{display:flex;align-items:center;gap:4px;background:var(--surface);border:none;border-radius:20px;padding:6px 12px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.10);font-family:'Nunito',sans-serif;color:var(--text);touch-action:manipulation}
+    .cc-chip.active{background:var(--accent);color:white;box-shadow:0 3px 0 var(--accent-dark)}
+
+    /* ── CONTENT GRID ── */
+    .content-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:0 var(--pad) 12px}
+    @media(min-width:480px){.content-grid{grid-template-columns:repeat(4,1fr)}}
+    .content-card{background:var(--surface);border-radius:16px;padding:12px 8px 10px;text-align:center;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,0.10);transition:transform .12s var(--spring);display:flex;flex-direction:column;align-items:center;gap:5px}
+    .content-card:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,0.08)}
+    .content-card.playing{background:rgba(255,107,53,0.08);outline:2px solid var(--accent)}
+    .cc-art{font-size:34px}
+    .cc-title{font-family:'Fredoka One',cursive;font-size:10px;color:var(--text);line-height:1.2}
+    .cc-ic{font-size:13px;color:var(--accent);font-weight:900}
+
+    /* ── KZ AUDIO PLAYER ── */
+    #kz-player{position:fixed;bottom:calc(var(--bh)+64px);left:0;right:0;z-index:19;background:var(--surface);padding:10px var(--pad) 8px;box-shadow:0 -3px 8px rgba(0,0,0,0.10)}
+    .kzp-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    #kzp-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .kzp-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:2px;touch-action:manipulation}
+    #kzp-progress{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,0.10);border-radius:2px;outline:none;cursor:pointer}
+    #kzp-progress::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent)}
+    #kzp-time{font-size:10px;color:var(--dim);font-weight:700;text-align:right;margin-top:3px}
   </style>
 </head>
 <body>
@@ -577,6 +666,45 @@
   <iframe id="gv-frame" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
 </div>
 
+  <!-- AI VIEWER -->
+<div id="ai-viewer" class="h">
+  <div class="aiv-hdr">
+    <button class="ni-pill" style="width:40px;background:#F0F0F0" onclick="closeAi()">✕</button>
+    <div class="ai-title" style="color:var(--text);flex:1;text-align:center" id="aiv-title-text">AI Story</div>
+    <div style="width:40px"></div>
+  </div>
+  <div class="aiv-body">
+    <div id="aiv-loading" class="h" style="text-align:center;padding:40px 0">
+      <div class="ld-logo">🧠</div>
+      <p style="font-weight:800;margin-top:10px;color:var(--dim)" id="ai-loading-text">AI ertak to'qimoqda...</p>
+    </div>
+    <div id="aiv-content-wrap">
+      <div class="aiv-story-title" id="aiv-story-title">Yulduzli Sarguzasht</div>
+      <div class="aiv-content" id="aiv-content">...</div>
+    </div>
+  </div>
+  <div class="aiv-actions">
+    <button class="aiv-play-btn" id="ai-read-btn" onclick="speakStory()">
+      <span>🔊</span> <span id="ai-read-label">Eshittirish</span>
+    </button>
+    <button class="aiv-play-btn" style="background:#4CAF50" onclick="generateAiStory()">
+      <span>🔄</span> <span id="ai-regen-label">Yangi ertak</span>
+    </button>
+  </div>
+</div>
+
+<!-- AUDIO PLAYER (shared for stories and songs) -->
+<div id="kz-player" class="h">
+  <div class="kzp-top">
+    <span id="kzp-title"></span>
+    <button class="kzp-btn" id="kzp-play" onclick="playerToggle()">⏸</button>
+    <button class="kzp-btn" onclick="playerStop()">■</button>
+  </div>
+  <input type="range" id="kzp-progress" value="0" min="0" max="100" step="1"
+         oninput="playerSeek(this.value)">
+  <div id="kzp-time">0:00 / 0:00</div>
+</div>
+
 <!-- MAIN SHELL -->
 <div id="shell">
   <!-- HEADER -->
@@ -615,9 +743,17 @@
     <p id="kt-mascot-msg">Let's play! 🎉</p>
   </div>
 
+  <!-- TAB BAR -->
+  <div id="tab-bar">
+    <button class="kz-tab active" id="tab-games" onclick="switchTab('games')">🎮 <span id="tab-lbl-games">O'yinlar</span></button>
+    <button class="kz-tab" id="tab-stories" onclick="switchTab('stories')">📖 <span id="tab-lbl-stories">Ertaklar</span></button>
+    <button class="kz-tab" id="tab-songs" onclick="switchTab('songs')">🎵 <span id="tab-lbl-songs">Qo'shiqlar</span></button>
+  </div>
+
   <!-- MAIN -->
   <div id="main">
 
+    <div id="games-section">
     <!-- HERO -->
     <div id="hero">
       <div id="hero-text">
@@ -625,6 +761,24 @@
         <div id="hero-p">36 games · 3 languages · UZ · RU · EN</div>
       </div>
       <div id="hero-em">🎮</div>
+    </div>
+
+    <!-- AI STUDIO -->
+    <div id="ai-studio">
+      <div class="ai-hdr">
+        <div class="ai-badge">NEW • AI</div>
+        <div class="ai-title" id="ai-studio-title">AI Bolalar Studiyasi</div>
+      </div>
+      <div class="ai-btns">
+        <button class="ai-btn" onclick="generateAiStory()">
+          <span class="ai-btn-ic">📚</span>
+          <span class="ai-btn-lb" id="ai-btn-story">Ertak To'qish</span>
+        </button>
+        <button class="ai-btn" onclick="openAiMusic()">
+          <span class="ai-btn-ic">🎵</span>
+          <span class="ai-btn-lb" id="ai-btn-music">AI Musiqa</span>
+        </button>
+      </div>
     </div>
 
     <!-- CHALLENGE BAR (hidden via CSS, kept for main.js) -->
@@ -693,6 +847,44 @@
       </div>
       <button class="pb-btn" onclick="openModal('parent-modal')">Enter 🔐</button>
     </div>
+
+    </div><!-- /#games-section -->
+
+    <!-- STORIES SECTION -->
+    <div id="stories-section" class="h">
+      <div class="cs-search-wrap">
+        <input class="cs-search" type="text" id="stories-search"
+               placeholder="🔍 Ertak qidirish..."
+               oninput="storyFilter(this.value, window._storyCat||'all')">
+      </div>
+      <div class="cc-cats" id="stories-cats">
+        <button class="cc-chip active" onclick="storyFilter(document.getElementById('stories-search').value,'all',this)">🎯 <span id="scat-all">Hammasi</span></button>
+        <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'animals',this)">🐾 <span id="scat-animals">Hayvonlar</span></button>
+        <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'nature',this)">🌿 <span id="scat-nature">Tabiat</span></button>
+        <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'heroes',this)">🦸 <span id="scat-heroes">Qahramonlar</span></button>
+        <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'family',this)">👨‍👩‍👧 <span id="scat-family">Oila</span></button>
+        <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'space',this)">🚀 <span id="scat-space">Koinot</span></button>
+      </div>
+      <div class="content-grid" id="stories-grid"></div>
+    </div><!-- /#stories-section -->
+
+    <!-- SONGS SECTION -->
+    <div id="songs-section" class="h">
+      <div class="cs-search-wrap">
+        <input class="cs-search" type="text" id="songs-search"
+               placeholder="🔍 Qo'shiq qidirish..."
+               oninput="songFilter(this.value, window._songCat||'all')">
+      </div>
+      <div class="cc-cats" id="songs-cats">
+        <button class="cc-chip active" onclick="songFilter(document.getElementById('songs-search').value,'all',this)">🎯 <span id="socat-all">Hammasi</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'lullaby',this)">🌙 <span id="socat-lullaby">Allalar</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'alphabet',this)">🔤 <span id="socat-alphabet">Alifbo</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'animals',this)">🐾 <span id="socat-animals">Hayvonlar</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'dance',this)">💃 <span id="socat-dance">Raqs</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'games',this)">🎮 <span id="socat-games">O'yin</span></button>
+      </div>
+      <div class="content-grid" id="songs-grid"></div>
+    </div><!-- /#songs-section -->
 
   </div><!-- /#main -->
 </div><!-- /#shell -->
@@ -806,12 +998,25 @@
         playMode: "O'ynash rejimi",
         learnMode: "O'rganish rejimi",
         yourStars: "Yutuqlaringiz",
+        aiStudioTitle: "✨ AI Bolalar Studiyasi",
+        aiBtnStory: "Ertak To'qish",
+        aiBtnMusic: "AI Musiqa",
+        aiLoading: "AI ertak to'qimoqda...",
+        aiRead: "Eshittirish",
+        aiRegen: "Yangi ertak",
+        aiMusicToast: "AI Musiqa yuklanmoqda... 🎵",
         parentModeUnlocked: "Ota-ona rejimi ochildi!",
         wrongPin: "PIN noto'g'ri! (Maslahat: 1234)",
         exit_title: "O'yinni tark etish",
         exit_msg: "Haqiqatan ham o'yindan chiqmoqchimisiz? To'plangan ballaringiz saqlanmasligi mumkin.",
         yes: "Ha",
-        no: "Yo'q"
+        no: "Yo'q",
+        tabGames:"O'yinlar", tabStories:"Ertaklar", tabSongs:"Qo'shiqlar",
+        searchStory:"Ertak qidirish...", searchSong:"Qo'shiq qidirish...",
+        catAll:"Hammasi", catAnimals:"Hayvonlar", catNature:"Tabiat",
+        catHeroes:"Qahramonlar", catFamily:"Oila", catSpace:"Koinot",
+        catLullaby:"Allalar", catAlphabet:"Alifbo", catDance:"Raqs", catGamesLabel:"O'yin",
+        noAudio:"Audio fayl yo'q 🎵",
       },
       ru: {
         heroH:"Играйте всей<br>Семьей! 👨‍👩‍👧",
@@ -839,12 +1044,25 @@
         playMode: "Режим игры",
         learnMode: "Режим обучения",
         yourStars: "Ваши звезды",
+        aiStudioTitle: "✨ AI Студия",
+        aiBtnStory: "Создать Сказку",
+        aiBtnMusic: "AI Музыка",
+        aiLoading: "AI сочиняет сказку...",
+        aiRead: "Слушать",
+        aiRegen: "Новая сказка",
+        aiMusicToast: "AI Музыка загружается... 🎵",
         parentModeUnlocked: "Родительский режим разблокирован!",
         wrongPin: "Неверный PIN! (Подсказка: 1234)",
         exit_title: "Выход из игры",
         exit_msg: "Вы действительно хотите выйти? Ваши баллы могут не сохраниться.",
         yes: "Да",
-        no: "Нет"
+        no: "Нет",
+        tabGames:"Игры", tabStories:"Сказки", tabSongs:"Песни",
+        searchStory:"Поиск сказки...", searchSong:"Поиск песни...",
+        catAll:"Все", catAnimals:"Животные", catNature:"Природа",
+        catHeroes:"Герои", catFamily:"Семья", catSpace:"Космос",
+        catLullaby:"Колыбельные", catAlphabet:"Азбука", catDance:"Танцы", catGamesLabel:"Игры",
+        noAudio:"Аудио недоступно 🎵",
       },
       en: {
         heroH:"Play Together<br>with Family! 👨‍👩‍👧",
@@ -872,12 +1090,25 @@
         playMode: "Play mode",
         learnMode: "Learn mode",
         yourStars: "Your stars",
+        aiStudioTitle: "✨ AI Kids Studio",
+        aiBtnStory: "Create Story",
+        aiBtnMusic: "AI Music",
+        aiLoading: "AI is creating a story...",
+        aiRead: "Listen",
+        aiRegen: "New Story",
+        aiMusicToast: "Loading AI Music... 🎵",
         parentModeUnlocked: "Parent mode unlocked!",
         wrongPin: "Wrong PIN! (Hint: 1234)",
         exit_title: "Exit Game",
         exit_msg: "Do you really want to exit? Your progress might not be saved.",
         yes: "Yes",
-        no: "No"
+        no: "No",
+        tabGames:"Games", tabStories:"Stories", tabSongs:"Songs",
+        searchStory:"Search story...", searchSong:"Search song...",
+        catAll:"All", catAnimals:"Animals", catNature:"Nature",
+        catHeroes:"Heroes", catFamily:"Family", catSpace:"Space",
+        catLullaby:"Lullabies", catAlphabet:"Alphabet", catDance:"Dance", catGamesLabel:"Games",
+        noAudio:"Audio unavailable 🎵",
       },
     };
 
@@ -895,6 +1126,58 @@
     function toggleFS() { app.toggleFS(); }
     function filterCat(c, el) { app.filterCat(c, el); }
     function showToast(m) { app.ui.showToast(m); }
+    function generateAiStory() { app.generateAiStory(); }
+    function closeAi() { app.closeAi(); }
+    function speakStory() { app.speakStory(); }
+    function openAiMusic() { app.openAiMusic(); }
+
+    function switchTab(tab) {
+      app.ui.switchTab(tab);
+      if (tab === 'stories') app.storyManager?.render();
+      if (tab === 'songs') app.songManager?.render();
+    }
+
+    window._storyCat = 'all';
+    window._songCat  = 'all';
+
+    function storyFilter(query, cat, chipEl) {
+      if (chipEl) {
+        document.querySelectorAll('#stories-cats .cc-chip').forEach(c => c.classList.remove('active'));
+        chipEl.classList.add('active');
+      }
+      if (cat) window._storyCat = cat;
+      app.storyManager?.filter(query || '', window._storyCat);
+      app.storyManager?.render();
+    }
+
+    function songFilter(query, cat, chipEl) {
+      if (chipEl) {
+        document.querySelectorAll('#songs-cats .cc-chip').forEach(c => c.classList.remove('active'));
+        chipEl.classList.add('active');
+      }
+      if (cat) window._songCat = cat;
+      app.songManager?.filter(query || '', window._songCat);
+      app.songManager?.render();
+    }
+
+    function playerToggle() {
+      const active = localStorage.getItem('kz-tab');
+      if (active === 'stories') app.storyManager?.togglePlay();
+      else if (active === 'songs') app.songManager?.togglePlay();
+    }
+
+    function playerStop() {
+      app.storyManager?.stop();
+      app.songManager?.stop();
+      app.audioPlayer?.stop();
+      const player = document.getElementById('kz-player');
+      if (player) player.classList.add('h');
+      document.getElementById('main')?.classList.remove('with-player');
+    }
+
+    function playerSeek(val) {
+      app.audioPlayer?.seek(parseFloat(val));
+    }
 
     // Dynamic Banner Offset handler
     window.updateBannerOffset = function(height) {
@@ -952,6 +1235,14 @@
         if (parentModalTitle) parentModalTitle.textContent = t.parentTitle;
         if (parentModalDesc) parentModalDesc.textContent = t.parentDesc;
 
+        // AI Studio
+        document.getElementById("ai-studio-title").textContent = t.aiStudioTitle;
+        document.getElementById("ai-btn-story").textContent = t.aiBtnStory;
+        document.getElementById("ai-btn-music").textContent = t.aiBtnMusic;
+        document.getElementById("ai-loading-text").textContent = t.aiLoading;
+        document.getElementById("ai-read-label").textContent = t.aiRead;
+        document.getElementById("ai-regen-label").textContent = t.aiRegen;
+
         // Age cards
         const acRange = document.querySelectorAll('.age-card .ac-range');
         const acDesc = document.querySelectorAll('.age-card .ac-desc');
@@ -978,6 +1269,39 @@
 
         buildFeatured();
         buildGrid(app.cat || 'all');
+
+        // Tab labels
+        const t2 = T[app.translator.lang];
+        const tg = document.getElementById('tab-lbl-games');
+        const ts = document.getElementById('tab-lbl-stories');
+        const tso = document.getElementById('tab-lbl-songs');
+        if (tg) tg.textContent = t2.tabGames;
+        if (ts) ts.textContent = t2.tabStories;
+        if (tso) tso.textContent = t2.tabSongs;
+
+        // Search placeholders
+        const ssearch = document.getElementById('stories-search');
+        if (ssearch) ssearch.placeholder = '🔍 ' + t2.searchStory;
+        const sosearch = document.getElementById('songs-search');
+        if (sosearch) sosearch.placeholder = '🔍 ' + t2.searchSong;
+
+        // Story category chip labels
+        const scatMap = {
+          'scat-all':t2.catAll,'scat-animals':t2.catAnimals,'scat-nature':t2.catNature,
+          'scat-heroes':t2.catHeroes,'scat-family':t2.catFamily,'scat-space':t2.catSpace
+        };
+        Object.entries(scatMap).forEach(([id,lbl]) => { const el=document.getElementById(id); if(el) el.textContent=lbl; });
+
+        // Song category chip labels
+        const socatMap = {
+          'socat-all':t2.catAll,'socat-lullaby':t2.catLullaby,'socat-alphabet':t2.catAlphabet,
+          'socat-animals':t2.catAnimals,'socat-dance':t2.catDance,'socat-games':t2.catGamesLabel
+        };
+        Object.entries(socatMap).forEach(([id,lbl]) => { const el=document.getElementById(id); if(el) el.textContent=lbl; });
+
+        // Re-render content grids in new language
+        app.storyManager?.render();
+        app.songManager?.render();
     }
 
     function buildFeatured() {
