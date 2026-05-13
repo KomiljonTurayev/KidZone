@@ -6,26 +6,46 @@ android {
     namespace 'uz.kidzone.app'
     compileSdk 35 // Stable version for production
 
+    // Signing from environment (CI) or local keystore.properties
+    def keystoreProps = new Properties()
+    def keystoreFile = file('keystore.properties')
+    if (keystoreFile.exists()) keystoreProps.load(new FileInputStream(keystoreFile))
+
+    signingConfigs {
+        release {
+            def envKeystore = System.getenv("KEYSTORE_FILE")
+            if (envKeystore) {
+                storeFile     file(envKeystore)
+                storePassword System.getenv("STORE_PASSWORD") ?: ""
+                keyAlias      System.getenv("KEY_ALIAS")      ?: ""
+                keyPassword   System.getenv("KEY_PASSWORD")   ?: ""
+            } else if (keystoreProps['storeFile']) {
+                storeFile     file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias      keystoreProps['keyAlias']
+                keyPassword   keystoreProps['keyPassword']
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "uz.kidzone.app"
         minSdk 26
         targetSdk 35
-        versionCode 9
-        versionName "1.0.3"
+        // CI passes -PversionCode=<run_number>; local default = 9
+        versionCode  project.hasProperty('versionCode')  ? project.versionCode.toInteger()  : 9
+        versionName  project.hasProperty('versionName')  ? project.versionName               : "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            
-            // Optimization for production
-            ndk {
-                debugSymbolLevel 'FULL'
-            }
+            ndk { debugSymbolLevel 'FULL' }
         }
 
         debug {
