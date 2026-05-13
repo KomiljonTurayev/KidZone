@@ -102,8 +102,20 @@ public class KidWebViewManager {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             String url = request.getUrl().toString();
-            // Only allow local file navigation for security
-            return !url.startsWith("file://");
+            if (url.startsWith("file://")) {
+                return false; // local asset — WebView handles it
+            }
+            // External URL (http/https) → open in system browser
+            try {
+                android.content.Intent intent = new android.content.Intent(
+                    android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse(url)
+                );
+                view.getContext().startActivity(intent);
+            } catch (Exception e) {
+                Log.w(TAG, "Cannot open external URL: " + url);
+            }
+            return true;
         }
     }
 }

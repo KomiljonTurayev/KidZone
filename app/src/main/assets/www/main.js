@@ -74,6 +74,12 @@ class UIManager {
             const el = document.getElementById(s + '-section');
             if (el) el.classList.toggle('h', s !== tab);
         });
+        // Mascot only on games tab — free up space on content tabs
+        const mascot = document.getElementById('kt-mascot');
+        if (mascot) mascot.style.display = tab === 'games' ? '' : 'none';
+        // Scroll to top on every tab switch
+        const main = document.getElementById('main');
+        if (main) main.scrollTop = 0;
     }
 }
 
@@ -192,6 +198,19 @@ class ContentManager {
         if (!grid) return;
         const lang = this.translator.lang;
         grid.innerHTML = '';
+        if (this.filtered.length === 0) {
+            const emptyIcon = this.type === 'stories' ? '📖' : '🎵';
+            const emptyMsg = this.translator.get('noAudio') || 'Not found';
+            grid.style.display = 'block';
+            grid.innerHTML =
+                '<div class="empty-state">' +
+                '<div class="empty-state-icon">' + emptyIcon + '</div>' +
+                '<div class="empty-state-title">' + (lang === 'uz' ? 'Hech narsa topilmadi' : lang === 'ru' ? 'Ничего не найдено' : 'Nothing found') + '</div>' +
+                '<div class="empty-state-sub">' + (lang === 'uz' ? 'Boshqa kalit so\'z sinab ko\'ring' : lang === 'ru' ? 'Попробуйте другой запрос' : 'Try a different search') + '</div>' +
+                '</div>';
+            return;
+        }
+        grid.style.display = '';
         this.filtered.forEach(item => {
             const card = document.createElement('div');
             card.className = 'content-card' + (item.id === this.currentId ? ' playing' : '');
