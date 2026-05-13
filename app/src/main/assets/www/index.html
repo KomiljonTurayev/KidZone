@@ -9,11 +9,12 @@
 
   <style>
     /* ── RESET ── */
+    html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
     /* ── TOKENS ── */
     :root{
-      --bg:#FFF8F0; --surface:#FFFFFF; --text:#2D2D2D; --dim:#8A8A8A;
+      --bg:#FFF8F0; --surface:#FFFFFF; --text:#2D2D2D; --dim:#6B6B6B;
       --accent:#FF6B35; --accent-dark:#C94F20;
       --spring:cubic-bezier(0.34,1.56,0.64,1);
       --smooth:cubic-bezier(0.4,0,0.2,1);
@@ -34,7 +35,7 @@
       display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
     }
     #loader.h{display:none}
-    .ld-logo{font-size:80px;animation:ldB 1s ease-in-out infinite}
+    .ld-logo{font-size:80px;animation:ldB 1s ease-in-out infinite;will-change:transform}
     @keyframes ldB{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-15px) scale(1.08)}}
     .ld-name{font-family:'Fredoka One',cursive;font-size:32px;color:white}
     .ld-dots{display:flex;gap:8px}
@@ -106,7 +107,7 @@
       text-align:center;padding:10px var(--pad) 6px;
       display:flex;flex-direction:column;align-items:center;gap:4px;
     }
-    #kt-owl{animation:owlBob 2s ease-in-out infinite}
+    #kt-owl{animation:owlBob 2s ease-in-out infinite;will-change:transform}
     @keyframes owlBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     #kt-mascot-msg{font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)}
 
@@ -134,7 +135,7 @@
       display:flex;align-items:center;gap:12px;
       box-shadow:0 4px 0 rgba(0,0,0,0.08);
     }
-    .lv-icon{font-size:34px;flex-shrink:0;animation:lvRock 3s ease-in-out infinite}
+    .lv-icon{font-size:34px;flex-shrink:0;animation:lvRock 3s ease-in-out infinite;will-change:transform}
     @keyframes lvRock{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
     .lv-text{flex:1}
     .lv-name{font-family:'Fredoka One',cursive;font-size:14px;color:var(--text)}
@@ -191,9 +192,9 @@
       padding:12px var(--pad); background:white; display:flex; align-items:center; gap:12px;
       box-shadow:0 2px 10px rgba(0,0,0,0.05);
     }
-    .aiv-body{flex:1; overflow-y:auto; padding:24px var(--pad); line-height:1.6; -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
-    .aiv-story-title{font-family:'Fredoka One',cursive; font-size:24px; color:var(--accent); margin-bottom:16px; text-align:center}
-    .aiv-content{font-size:17px; color:var(--text); white-space:pre-wrap}
+    .aiv-body{flex:1; overflow-y:auto; padding:20px var(--pad) 24px; line-height:1.8; -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
+    .aiv-story-title{font-family:'Fredoka One',cursive; font-size:22px; color:var(--accent); margin-bottom:20px; text-align:center; padding:0 4px}
+    .aiv-content{font-size:16px; color:var(--text); white-space:pre-wrap; letter-spacing:0.01em}
     .aiv-actions{padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px)); background:white; display:flex; gap:10px; flex-shrink:0}
     .aiv-play-btn{
       flex:1; background:var(--accent); color:white; border:none; border-radius:16px;
@@ -205,6 +206,8 @@
     #cat-row{
       display:flex;gap:8px;overflow-x:auto;padding:0 var(--pad) 12px;
       scrollbar-width:none;
+      -webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent);
+      mask-image:linear-gradient(to right,black calc(100% - 28px),transparent);
     }
     #cat-row::-webkit-scrollbar{display:none}
     .cat-chip{
@@ -222,7 +225,7 @@
     .ch-em{font-size:14px}
 
     /* ── FEATURED ROW ── */
-    #featured-row{display:flex;gap:12px;overflow-x:auto;padding:0 var(--pad) 12px;scrollbar-width:none}
+    #featured-row{display:flex;gap:12px;overflow-x:auto;padding:0 var(--pad) 12px;scrollbar-width:none;-webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent);mask-image:linear-gradient(to right,black calc(100% - 28px),transparent)}
     #featured-row::-webkit-scrollbar{display:none}
     .feat-card{
       flex-shrink:0;width:clamp(130px,36vw,190px);
@@ -236,7 +239,7 @@
       height:100px;display:flex;align-items:center;justify-content:center;
       font-size:52px;position:relative;overflow:hidden;
     }
-    .feat-em{filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));animation:featFloat 3s ease-in-out infinite}
+    .feat-em{filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));animation:featFloat 3s ease-in-out infinite;will-change:transform}
     @keyframes featFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
     .feat-badge-hot{
       position:absolute;top:7px;left:7px;z-index:3;
@@ -280,12 +283,14 @@
     .gc-em{
       font-size:clamp(28px,7vw,44px);position:relative;z-index:1;
       filter:drop-shadow(0 3px 6px rgba(0,0,0,.15));
+      will-change:transform;
       animation:gcFloat 3s ease-in-out infinite;
     }
-    @keyframes gcFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    @keyframes gcFloat{0%,100%{transform:translateY(0) translateZ(0)}50%{transform:translateY(-4px) translateZ(0)}}
     .gc:nth-child(2n) .gc-em{animation-delay:-.6s}
     .gc:nth-child(3n) .gc-em{animation-delay:-1.2s}
     .gc:nth-child(4n) .gc-em{animation-delay:-1.8s}
+    @media(prefers-reduced-motion:reduce){.gc-em,.lv-icon,#kt-owl,.feat-em{animation:none}}
     .gc-lock{
       position:absolute;inset:0;background:rgba(255,248,240,.75);
       display:flex;align-items:center;justify-content:center;
@@ -359,7 +364,7 @@
     }
     .ni.on .ni-pill{background:rgba(255,107,53,0.15)}
     .ni-ic{font-size:20px}
-    .ni-lb{font-size:10px;font-weight:800;color:var(--dim);font-family:'Nunito',sans-serif}
+    .ni-lb{font-size:11px;font-weight:800;color:var(--dim);font-family:'Nunito',sans-serif}
     .ni.on .ni-lb{color:var(--accent)}
 
     /* ── MODALS ── */
@@ -493,8 +498,8 @@
 
     /* ── TAB BAR ── */
     #tab-bar{display:flex;background:var(--surface);border-bottom:2px solid rgba(0,0,0,0.06);flex-shrink:0}
-    .kz-tab{flex:1;padding:10px 4px 8px;border:none;background:transparent;font-family:'Fredoka One',cursive;font-size:13px;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-bottom-color .2s;touch-action:manipulation}
-    .kz-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .kz-tab{flex:1;padding:11px 4px 9px;border:none;background:transparent;font-family:'Fredoka One',cursive;font-size:14px;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-bottom-color .2s;touch-action:manipulation;min-height:48px}
+    .kz-tab.active{color:var(--accent);border-bottom-color:var(--accent);border-bottom-width:3px}
 
     /* ── MAIN WITH PLAYER ── */
     #main.with-player{padding-bottom:calc(var(--bh)+68px+78px+16px)!important}
@@ -515,22 +520,32 @@
     /* ── CONTENT GRID ── */
     .content-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:0 var(--pad) 12px}
     @media(min-width:480px){.content-grid{grid-template-columns:repeat(4,1fr)}}
-    .content-card{background:var(--surface);border-radius:16px;padding:12px 8px 10px;text-align:center;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,0.10);transition:transform .12s var(--spring);display:flex;flex-direction:column;align-items:center;gap:5px}
+    .content-card{background:var(--surface);border-radius:16px;padding:14px 8px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,0.10);transition:transform .12s var(--spring);display:flex;flex-direction:column;align-items:center;gap:6px;min-height:96px}
     .content-card:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,0.08)}
     .content-card.playing{background:rgba(255,107,53,0.08);outline:2px solid var(--accent)}
-    .cc-art{font-size:34px}
-    .cc-title{font-family:'Fredoka One',cursive;font-size:10px;color:var(--text);line-height:1.2}
-    .cc-ic{font-size:13px;color:var(--accent);font-weight:900}
+    .cc-art{font-size:38px;line-height:1}
+    .cc-title{font-family:'Fredoka One',cursive;font-size:12px;color:var(--text);line-height:1.3;word-break:break-word}
+    .cc-ic{font-size:14px;color:var(--accent);font-weight:900}
+
+    /* ── EMPTY STATE ── */
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px var(--pad);gap:12px;text-align:center}
+    .empty-state-icon{font-size:56px;opacity:.6}
+    .empty-state-title{font-family:'Fredoka One',cursive;font-size:17px;color:var(--dim)}
+    .empty-state-sub{font-size:13px;color:var(--dim);font-weight:700;line-height:1.5}
+
+    /* ── CC-CATS SCROLL FADE ── */
+    .cc-cats{-webkit-mask-image:linear-gradient(to right,black calc(100% - 24px),transparent);mask-image:linear-gradient(to right,black calc(100% - 24px),transparent)}
 
     /* ── KZ AUDIO PLAYER ── */
     #kz-player.h{display:none}
     #kz-player{position:fixed;bottom:calc(var(--bh)+64px);left:0;right:0;z-index:19;background:var(--surface);padding:10px var(--pad) 8px;box-shadow:0 -3px 8px rgba(0,0,0,0.10)}
     .kzp-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
     #kzp-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .kzp-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:2px;touch-action:manipulation}
-    #kzp-progress{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,0.10);border-radius:2px;outline:none;cursor:pointer}
-    #kzp-progress::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent)}
-    #kzp-time{font-size:10px;color:var(--dim);font-weight:700;text-align:right;margin-top:3px}
+    .kzp-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:0;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;flex-shrink:0}
+    #kzp-progress{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,0.10);border-radius:2px;outline:none;cursor:pointer;padding:10px 0;box-sizing:content-box}
+    #kzp-progress::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 2px 4px rgba(0,0,0,0.2)}
+    #kzp-progress::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:rgba(0,0,0,0.10)}
+    #kzp-time{font-size:11px;color:var(--dim);font-weight:700;text-align:right;margin-top:2px}
   </style>
 </head>
 <body>
