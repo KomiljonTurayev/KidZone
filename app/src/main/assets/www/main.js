@@ -295,7 +295,7 @@ class StoryManager extends ContentManager {
         const title = item.title[lang] || item.title.en;
         const text = item.text ? (item.text[lang] || item.text.en || '') : '';
 
-        // Show text viewer immediately
+        // Show text viewer immediately and auto-read
         if (text) {
             document.getElementById('aiv-story-title').textContent = item.emoji + ' ' + title;
             document.getElementById('aiv-content').textContent = text;
@@ -303,6 +303,8 @@ class StoryManager extends ContentManager {
             document.getElementById('aiv-loading').classList.add('h');
             document.getElementById('ai-viewer').classList.remove('h');
             document.getElementById('aiv-title-text').textContent = title;
+            // Auto-read aloud after viewer opens
+            setTimeout(() => this._doSpeak(), 500);
         }
 
         // Also try audio; hide player on error
@@ -582,31 +584,45 @@ class GameManager {
             loading.classList.add("h");
             content.classList.remove("h");
             this.addPoints(10);
+
+            // Auto-read the story aloud after a brief pause
+            setTimeout(() => this._doSpeak(), 600);
         }, 2000);
     }
 
     closeAi() {
         document.getElementById("ai-viewer").classList.add("h");
         window.speechSynthesis?.cancel();
+        const btn = document.getElementById("ai-read-btn");
+        if (btn) btn.querySelector('span').textContent = "🔊";
     }
 
     speakStory() {
-        const text = document.getElementById("aiv-content").textContent;
         const btn = document.getElementById("ai-read-btn");
-
-        if (window.speechSynthesis.speaking) {
+        if (window.speechSynthesis?.speaking) {
             window.speechSynthesis.cancel();
-            btn.querySelector('span').textContent = "🔊";
+            if (btn) btn.querySelector('span').textContent = "🔊";
             return;
         }
+        this._doSpeak();
+    }
 
+    _doSpeak() {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const text = document.getElementById("aiv-content")?.textContent;
+        if (!text) return;
+        const btn = document.getElementById("ai-read-btn");
         const msg = new SpeechSynthesisUtterance(text);
         const langMap = { uz: "uz-UZ", ru: "ru-RU", en: "en-US" };
         msg.lang = langMap[this.translator.lang] || "en-US";
-        msg.onend = () => btn.querySelector('span').textContent = "🔊";
-
+        msg.rate = 0.88;
+        msg.pitch = 1.05;
+        msg.volume = 1.0;
+        msg.onstart = () => { if (btn) btn.querySelector('span').textContent = "⏹️"; };
+        msg.onend = () => { if (btn) btn.querySelector('span').textContent = "🔊"; };
+        msg.onerror = () => { if (btn) btn.querySelector('span').textContent = "🔊"; };
         window.speechSynthesis.speak(msg);
-        btn.querySelector('span').textContent = "⏹️";
     }
 
     openAiMusic() {
