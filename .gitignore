@@ -1,15 +1,29 @@
+## Android ##
 *.iml
-.gradle
+.gradle/
 /local.properties
-/.idea/caches
-/.idea/libraries
+/.idea/caches/
+/.idea/libraries/
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+/build/
+app/build/
+app/release/
+/captures/
+.externalNativeBuild/
+.cxx/
 local.properties
+
+## Signing – never commit keystores or secrets ##
+*.jks
+*.keystore
+keystore.properties
+
+## Misc ##
+*.swp
+*.swo
+.idea/caches/
