@@ -289,6 +289,38 @@ class StoryManager extends ContentManager {
     constructor(player, translator, ui) {
         super('stories', player, translator, ui);
     }
+
+    _play(item) {
+        const lang = this.translator.lang;
+        const title = item.title[lang] || item.title.en;
+        const text = item.text ? (item.text[lang] || item.text.en || '') : '';
+
+        // Show text viewer immediately
+        if (text) {
+            document.getElementById('aiv-story-title').textContent = item.emoji + ' ' + title;
+            document.getElementById('aiv-content').textContent = text;
+            document.getElementById('aiv-content-wrap').classList.remove('h');
+            document.getElementById('aiv-loading').classList.add('h');
+            document.getElementById('ai-viewer').classList.remove('h');
+            document.getElementById('aiv-title-text').textContent = title;
+        }
+
+        // Also try audio; hide player on error
+        const src = item.audio ? (item.audio[lang] || item.audio.en) : null;
+        if (src) {
+            this.currentId = item.id;
+            this.render();
+            this._showPlayer(item.emoji + ' ' + title);
+            this.player.play(
+                src, title,
+                (cur, dur) => this._onTimeUpdate(cur, dur),
+                () => this._onEnded(),
+                () => { this._hidePlayer(); this.currentId = null; this.render(); }
+            );
+            const playBtn = document.getElementById('kzp-play');
+            if (playBtn) playBtn.textContent = '⏸';
+        }
+    }
 }
 
 class SongManager extends ContentManager {
@@ -588,16 +620,46 @@ class GameManager {
     getAiStory(lang) {
         const stories = {
             uz: [
-                { title: "Sehrli O'rmon", text: "Bir bor ekan, bir yo'q ekan, uzoq bir o'lkada sehrli o'rmon bor ekan. Bu o'rmonda daraxtlar shokoladdan, barglar esa shirinliklardan iborat ekan. Bir kuni kichkina filcha o'rmonda sayr qilib yurib, oltin kalit topib olibdi..." },
-                { title: "Koinot sayohati", text: "Jasur ismli bolakay har kecha yulduzlarga qarab uxlashni yaxshi ko'rardi. Bir kuni uning derazasiga kichkina uchuvchi tarelka qo'ndi. Undan chiqqan mitti robot: 'Qani Jasur, ketdik yulduzlar sari!' dedi..." }
+                {
+                    title: "Sehrli O'rmon",
+                    text: "Bir bor ekan, bir yo'q ekan, uzoq bir o'lkada sehrli o'rmon bor ekan. Bu o'rmonda daraxtlar shokoladdan, barglar esa shirinliklardan iborat ekan. Gullar qulupnay hidini taratardi, irmoqlar esa limonad bilan oqardi.\n\nBir kuni kichkina filcha o'rmonda sayr qilib yurib, oltin kalit topib olibdi. U qaysi eshikka tegishli ekanini bilmay, uzoq o'yladi. Shunda unga rangli kapalak uchib keldi.\n\n'Men bilaman bu kalit nima uchun,' dedi kapalak. 'Keling, ko'rsataman!' Ular birga yo'lga chiqishdi. Limonad daryosini kechib o'tib, shokolad daraxtlari orasidan o'tib, o'rmon o'rtasiga yetib kelishdi.\n\nU yerda chiroyli kichkina uy turardi. Eshigida qulf bor edi. Filcha kalitni soldi — eshik ochildi! Ichida kitoblar, o'yinchoqlar va shirinliklar to'la edi.\n\n'Bu — Bilim va Baxt uyi,' dedi kapalak. 'Bu yerda mehribon va aqlli bolalar o'ynaydi.' Filcha kitob o'qiy boshladi. Har kuni yangi narsalar o'rgandi.\n\nTez orada uning ko'p do'stlari bo'ldi. Ular birga o'qir, o'ynar va bir-birlariga yordam berishardi. Chunki bilim va do'stlik — sehrli o'rmonning eng katta boyligi."
+                },
+                {
+                    title: "Koinot Sayohati",
+                    text: "Jasur ismli bolakay har kecha yulduzlarga qarab uxlashni yaxshi ko'rardi. U doim orzular qilardi: 'Bir kun yulduzlarga borarman!'\n\nBir kuni uning derazasiga kichkina uchuvchi tarelka qo'ndi. Undan chiqqan mitti robot: 'Qani Jasur, ketdik yulduzlar sari!' dedi. Jasur qo'rqmadi va robotga ergashdi.\n\nUchuvchi tarelkada ular osmonga ko'tarildi. Pastda shahar chiroqlari yulduzlardek yiltirar, yuqorida esa haqiqiy yulduzlar porlardi. Avval Oyga to'xtashdi — u oq kumush kabi yaltirardi.\n\nKeyin Quyash sistemasini aylanib chiqdilar. Saturn sayyorasini ko'rdilar — uning halqalari kamalak ranglarida tovlanardi. 'Qanday go'zal!' deb hayqirdi Jasur. Mars esa qizil rangda, toshlar bilan qoplangan edi.\n\n'Koinot juda katta,' dedi robot. 'Bilim ham xuddi shunday — chegarasiz. Qattiq o'qi, Jasur, va kelajakda haqiqiy kosmonavt bo'larsan.'\n\nErtalab Jasur o'z to'shagida uyg'ondi. Lekin qo'lida Marsdan keltirilgan kichkina qizil tosh bor edi. O'shandan beri Jasur ilm olishga yanada mehr qo'ydi. Hamma aytardi: bu bola albatta yulduzlarga yetib boradi!"
+                },
+                {
+                    title: "Aqlli Toshbaqa",
+                    text: "Bir vaqtlar ko'l yoqasida Sulton ismli toshbaqa yashardi. Sulton juda sekin yurardi, lekin u juda ko'p narsalar bilardi.\n\nBir kuni quyon unga masxara qilib: 'Hey, toshbaqa! Sen shu qadar sekinsan — hayotda hech narsaga ulgurmaysan!' dedi. Sulton jimgina javob berdi: 'Ko'ramiz.'\n\nErtalab ular poyga o'tkazishga qaror qilishdi. Barcha hayvonlar tomosha qilish uchun kelishdi. Poyga boshlandi. Quyon shiddat bilan yugurib ketdi, Sulton esa sekin-sekin yura boshladi.\n\nQuyon o'rtada bir daraxt tagida dam olishga yotdi. 'Men tezman, hali ham yetib olaman,' deb uxlab qoldi. Sulton esa to'xtamay, qadamba qadam oldinga bordi.\n\nQuyosh botayotganda Sulton finishga birinchi bo'lib yetib keldi. Quyon uyg'onib, orqada qolganini ko'rdi. Uyat bo'ldi.\n\nSulton quyonga dedi: 'Do'stim, tezlik emas, matonat muhim. Kim to'xtamay harakat qilsa — u g'alaba qozonadi.' Quyon bu darsni umrga yodida saqladi."
+                }
             ],
             ru: [
-                { title: "Волшебный Лес", text: "Жил-был в далекой стране волшебный лес. В этом лесу деревья были из шоколада, а листья — из конфет. Однажды маленький слоненок гулял по лесу и нашел золотой ключ..." },
-                { title: "Космическое приключение", text: "Мальчик по имени Максим любил смотреть на звезды. Однажды к его окну приземлилась маленькая летающая тарелка. Робот внутри сказал: 'Пойдем, Максим, к звездам!'..." }
+                {
+                    title: "Волшебный Лес",
+                    text: "Жил-был в далёкой стране волшебный лес. В этом лесу деревья были из шоколада, а листья — из конфет. Цветы пахли клубникой, а ручеёк журчал лимонадом.\n\nОднажды маленький слонёнок гулял по лесу и нашёл золотой ключ. Он не знал, к какой двери подходит этот ключ. Вдруг к нему подлетела красивая бабочка.\n\n'Я знаю, что открывает этот ключ,' сказала бабочка. 'Пойдём, я покажу!' Они пошли вместе — через реку из лимонада, мимо деревьев из шоколада.\n\nВ центре леса стоял красивый домик. На двери был замок. Слонёнок вставил ключ — и дверь открылась! Внутри были книги, игрушки и много сладостей.\n\n'Это Дом знаний,' сказала бабочка. 'Здесь живут добрые и умные дети.' Слонёнок сел читать книги. Каждый день он узнавал что-то новое.\n\nСкоро у него появилось много друзей. Все они читали вместе, играли и помогали друг другу. Потому что знание и дружба — настоящие сокровища волшебного леса."
+                },
+                {
+                    title: "Космическое Приключение",
+                    text: "Мальчик по имени Максим очень любил смотреть на звёзды. Каждую ночь он сидел у окна и мечтал: 'Когда же я полечу в космос?'\n\nОднажды ночью к его окну прилетела маленькая летающая тарелка. Из неё вышел крошечный робот. 'Максим, пойдём к звёздам!' сказал он.\n\nМаксим не испугался и залез в тарелку. Они взлетели вверх. Город внизу стал маленьким, как игрушка. Вскоре они достигли Луны — белой и круглой, как мяч.\n\nДальше они полетели к Сатурну. Его кольца переливались всеми цветами радуги. 'Красота!' воскликнул Максим. Потом был Марс — красная планета, покрытая камнями и пылью.\n\n'Наша Вселенная очень большая,' сказал робот. 'И знания о ней безграничны. Учись хорошо, Максим, и ты станешь настоящим космонавтом.'\n\nУтром Максим проснулся в своей кровати. Но в руке у него был маленький красный камешек с Марса. С тех пор он стал учиться ещё лучше. И все говорили: этот мальчик точно долетит до звёзд!"
+                },
+                {
+                    title: "Мудрая Черепаха",
+                    text: "На берегу озера жила черепаха по имени Тоша. Тоша ходила очень медленно, но знала очень много всего на свете.\n\nОднажды к ней подбежал заяц и засмеялся: 'Эй, черепаха! Ты такая медленная — в жизни ничего не успеешь!' Тоша спокойно ответила: 'Посмотрим.'\n\nНа следующее утро они решили устроить гонку. Все звери пришли посмотреть. Гонка началась. Заяц помчался со всех ног, а Тоша медленно, но уверенно шагала вперёд.\n\nНа полпути заяц решил отдохнуть под деревом. 'Я такой быстрый, всегда успею догнать,' подумал он и уснул. А Тоша шла и шла, не останавливаясь.\n\nКогда солнце клонилось к закату, Тоша первой пересекла финишную черту. Заяц проснулся и увидел, что отстал. Ему стало очень стыдно.\n\nТоша сказала ему: 'Дружок, важна не скорость, а настойчивость. Тот, кто не останавливается, всегда добьётся своего.' Заяц запомнил этот урок на всю жизнь."
+                }
             ],
             en: [
-                { title: "Magic Forest", text: "Once upon a time, in a faraway land, there was a magic forest. In this forest, trees were made of chocolate and leaves were made of candy. One day, a little elephant was walking and found a golden key..." },
-                { title: "Space Adventure", text: "A boy named Leo loved looking at the stars. One night, a small flying saucer landed on his window. A tiny robot said: 'Come on Leo, let's go to the stars!'..." }
+                {
+                    title: "Magic Forest",
+                    text: "Once upon a time, in a faraway land, there was a magic forest. In this forest, trees were made of chocolate and leaves were made of candy. The flowers smelled like strawberries, and a little stream flowed with lemonade.\n\nOne day, a little elephant was walking through the forest and found a golden key. He didn't know which door it belonged to. Suddenly, a butterfly flew down to him.\n\n'I know what this key opens,' said the butterfly. 'Come, I'll show you!' They walked together through the forest, past rivers of lemonade and trees of chocolate.\n\nIn the center of the forest stood a beautiful little house. There was a lock on the door. The elephant put in the key — and the door opened! Inside were books, toys, and lots of sweets.\n\n'This is the House of Knowledge,' said the butterfly. 'Kind and clever children live here.' The elephant sat down to read the books. Every day he learned something new.\n\nSoon he had many friends. They all read together, played, and helped each other. Because knowledge and friendship are the greatest treasures of the magic forest."
+                },
+                {
+                    title: "Space Adventure",
+                    text: "A boy named Leo loved looking at the stars every night. He would sit by his window and dream: 'One day I'll fly through space!'\n\nOne night, a tiny flying saucer landed on his windowsill. A little robot stepped out. 'Come on, Leo, let's go to the stars!' it said.\n\nLeo wasn't afraid. He climbed into the saucer and they flew up into the sky. The city below looked like a tiny toy. Soon they reached the Moon — white and round like a ball.\n\nNext, they flew to Saturn. Its rings shimmered with all the colors of the rainbow. 'Beautiful!' cried Leo. Then came Mars — a red planet covered in rocks and dust.\n\n'Our universe is very big,' said the robot. 'And the knowledge about it is endless. Study hard, Leo, and you will become a real astronaut one day.'\n\nIn the morning, Leo woke up in his own bed. But in his hand was a small red stone from Mars. From that day on, he studied harder than ever. And everyone said: that boy will surely fly to the stars!"
+                },
+                {
+                    title: "The Wise Tortoise",
+                    text: "By the shore of a beautiful lake lived a tortoise named Tilly. Tilly walked very slowly, but she knew a great many things about the world.\n\nOne day, a rabbit ran up to her and laughed. 'Hey, tortoise! You're so slow — you'll never get anywhere in life!' Tilly smiled calmly and said: 'We shall see.'\n\nThe next morning, they decided to have a race. All the animals came to watch. The race began. The rabbit shot off like a rocket, while Tilly walked slowly but steadily.\n\nHalfway through, the rabbit decided to rest under a shady tree. 'I'm so fast, I can easily catch up,' he thought, and fell asleep. But Tilly kept walking, one step at a time.\n\nAs the sun was setting, Tilly crossed the finish line first. The rabbit woke up and realized he had lost. He felt very ashamed.\n\nTilly said to him kindly: 'Dear friend, it's not speed that matters — it's persistence. Whoever never gives up will always reach their goal.' The rabbit remembered this lesson for the rest of his life."
+                }
             ]
         };
         const list = stories[lang] || stories.en;

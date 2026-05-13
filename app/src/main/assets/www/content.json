@@ -1,25 +1,205 @@
 {
   "stories": [
-    {"id":"story-001","category":"animals","emoji":"🦁","title":{"uz":"Sher va Sichqon","ru":"Лев и Мышь","en":"Lion and Mouse"},"audio":{"uz":"audio/stories/uz/story-001.mp3","ru":"audio/stories/ru/story-001.mp3","en":"audio/stories/en/story-001.mp3"}},
-    {"id":"story-002","category":"animals","emoji":"🐘","title":{"uz":"Fil va Chumoli","ru":"Слон и Муравей","en":"Elephant and Ant"},"audio":{"uz":"audio/stories/uz/story-002.mp3","ru":"audio/stories/ru/story-002.mp3","en":"audio/stories/en/story-002.mp3"}},
-    {"id":"story-003","category":"animals","emoji":"🐢","title":{"uz":"Toshbaqa va Quyon","ru":"Черепаха и Заяц","en":"Tortoise and Hare"},"audio":{"uz":"audio/stories/uz/story-003.mp3","ru":"audio/stories/ru/story-003.mp3","en":"audio/stories/en/story-003.mp3"}},
-    {"id":"story-004","category":"animals","emoji":"🦊","title":{"uz":"Tulki va Uzum","ru":"Лиса и Виноград","en":"Fox and Grapes"},"audio":{"uz":"audio/stories/uz/story-004.mp3","ru":"audio/stories/ru/story-004.mp3","en":"audio/stories/en/story-004.mp3"}},
-    {"id":"story-005","category":"nature","emoji":"🌳","title":{"uz":"Sehrli Daraxt","ru":"Волшебное Дерево","en":"Magic Tree"},"audio":{"uz":"audio/stories/uz/story-005.mp3","ru":"audio/stories/ru/story-005.mp3","en":"audio/stories/en/story-005.mp3"}},
-    {"id":"story-006","category":"nature","emoji":"🌈","title":{"uz":"Yomg'irdan Keyin","ru":"После Дождя","en":"After the Rain"},"audio":{"uz":"audio/stories/uz/story-006.mp3","ru":"audio/stories/ru/story-006.mp3","en":"audio/stories/en/story-006.mp3"}},
-    {"id":"story-007","category":"nature","emoji":"🌸","title":{"uz":"Bahor Keldi","ru":"Пришла Весна","en":"Spring Has Come"},"audio":{"uz":"audio/stories/uz/story-007.mp3","ru":"audio/stories/ru/story-007.mp3","en":"audio/stories/en/story-007.mp3"}},
-    {"id":"story-008","category":"nature","emoji":"⛄","title":{"uz":"Qorbobo","ru":"Снеговик","en":"Snowman"},"audio":{"uz":"audio/stories/uz/story-008.mp3","ru":"audio/stories/ru/story-008.mp3","en":"audio/stories/en/story-008.mp3"}},
-    {"id":"story-009","category":"heroes","emoji":"🦸","title":{"uz":"Jasur Bolakay","ru":"Смелый Мальчик","en":"Brave Boy"},"audio":{"uz":"audio/stories/uz/story-009.mp3","ru":"audio/stories/ru/story-009.mp3","en":"audio/stories/en/story-009.mp3"}},
-    {"id":"story-010","category":"heroes","emoji":"🌟","title":{"uz":"Kichkina Qahramonlar","ru":"Маленькие Герои","en":"Little Heroes"},"audio":{"uz":"audio/stories/uz/story-010.mp3","ru":"audio/stories/ru/story-010.mp3","en":"audio/stories/en/story-010.mp3"}},
-    {"id":"story-011","category":"heroes","emoji":"🚀","title":{"uz":"Yulduzga Sayohat","ru":"Путь к Звезде","en":"Journey to Stars"},"audio":{"uz":"audio/stories/uz/story-011.mp3","ru":"audio/stories/ru/story-011.mp3","en":"audio/stories/en/story-011.mp3"}},
-    {"id":"story-012","category":"heroes","emoji":"🧙","title":{"uz":"Sehrgar Bola","ru":"Волшебный Ребёнок","en":"Magic Child"},"audio":{"uz":"audio/stories/uz/story-012.mp3","ru":"audio/stories/ru/story-012.mp3","en":"audio/stories/en/story-012.mp3"}},
-    {"id":"story-013","category":"family","emoji":"👨‍👩‍👧","title":{"uz":"Biz Birgamiz","ru":"Мы Вместе","en":"We Are Together"},"audio":{"uz":"audio/stories/uz/story-013.mp3","ru":"audio/stories/ru/story-013.mp3","en":"audio/stories/en/story-013.mp3"}},
-    {"id":"story-014","category":"family","emoji":"👵","title":{"uz":"Buvi Ertagi","ru":"Бабушкина Сказка","en":"Grandmother's Story"},"audio":{"uz":"audio/stories/uz/story-014.mp3","ru":"audio/stories/ru/story-014.mp3","en":"audio/stories/en/story-014.mp3"}},
-    {"id":"story-015","category":"family","emoji":"🏠","title":{"uz":"Yangi Uy","ru":"Новый Дом","en":"New Home"},"audio":{"uz":"audio/stories/uz/story-015.mp3","ru":"audio/stories/ru/story-015.mp3","en":"audio/stories/en/story-015.mp3"}},
-    {"id":"story-016","category":"family","emoji":"👦","title":{"uz":"Aka-Uka","ru":"Братья","en":"Brothers"},"audio":{"uz":"audio/stories/uz/story-016.mp3","ru":"audio/stories/ru/story-016.mp3","en":"audio/stories/en/story-016.mp3"}},
-    {"id":"story-017","category":"space","emoji":"🌙","title":{"uz":"Koinotda Sayohat","ru":"Космическое Путешествие","en":"Space Journey"},"audio":{"uz":"audio/stories/uz/story-017.mp3","ru":"audio/stories/ru/story-017.mp3","en":"audio/stories/en/story-017.mp3"}},
-    {"id":"story-018","category":"space","emoji":"⭐","title":{"uz":"Yulduz Bolasi","ru":"Дитя Звезды","en":"Star Child"},"audio":{"uz":"audio/stories/uz/story-018.mp3","ru":"audio/stories/ru/story-018.mp3","en":"audio/stories/en/story-018.mp3"}},
-    {"id":"story-019","category":"space","emoji":"🔴","title":{"uz":"Marsdagi Sarguzasht","ru":"Приключение на Марсе","en":"Mars Adventure"},"audio":{"uz":"audio/stories/uz/story-019.mp3","ru":"audio/stories/ru/story-019.mp3","en":"audio/stories/en/story-019.mp3"}},
-    {"id":"story-020","category":"space","emoji":"🤖","title":{"uz":"Robot Do'stim","ru":"Мой Друг Робот","en":"My Robot Friend"},"audio":{"uz":"audio/stories/uz/story-020.mp3","ru":"audio/stories/ru/story-020.mp3","en":"audio/stories/en/story-020.mp3"}}
+    {
+      "id":"story-001","category":"animals","emoji":"🦁",
+      "title":{"uz":"Sher va Sichqon","ru":"Лев и Мышь","en":"Lion and Mouse"},
+      "audio":{"uz":"audio/stories/uz/story-001.mp3","ru":"audio/stories/ru/story-001.mp3","en":"audio/stories/en/story-001.mp3"},
+      "text":{
+        "uz":"Bir kuni sher uxlab yotganda, kichkina sichqon uning ustida chopib o'tib qoldi. Sher uyg'ondi va sichqonni tutib oldi. 'Meni yema!' dedi sichqon. 'Men bir kun seni qutqaraman!' Sher kulgisi keldi, lekin uni qo'yib yubordi.\n\nBiroz o'tgach, ovchilar sher uchun to'r qurdilar. Sher to'rga ilinib qoldi va qutula olmadi. U kuchli o'kirdi.\n\nSichqon ovozni eshitib yugurib keldi. U tishlab-tishlab iplarni uzdi. Sher ozod bo'ldi! 'Kichkinaligimga qarama, katta yurakman,' dedi sichqon. Ular umrbod do'st bo'lib qoldi.",
+        "ru":"Однажды лев спал на поляне, и маленькая мышь пробежала прямо по нему. Лев проснулся и схватил её. 'Не ешь меня!' — пискнула мышь. — 'Я когда-нибудь помогу тебе!' Лев засмеялся, но отпустил её.\n\nЧерез некоторое время охотники расставили ловушку, и лев попался в сеть. Он громко рычал, но выбраться не мог.\n\nМышь услышала рёв и прибежала. Острыми зубками она перегрызла верёвки — и лев был свободен! 'Не суди о помощнике по размеру,' — сказал лев. Они стали друзьями навсегда.",
+        "en":"One day a lion was sleeping when a little mouse ran across him. The lion woke up and grabbed the mouse. 'Don't eat me!' cried the mouse. 'I will help you someday!' The lion laughed but let her go.\n\nSoon after, hunters set a trap and the lion was caught in a net. He roared loudly but could not break free.\n\nThe mouse heard the roar and came running. She gnawed through the ropes with her tiny teeth — and the lion was free! 'Never judge a helper by their size,' said the lion. They were friends forever after."
+      }
+    },
+    {
+      "id":"story-002","category":"animals","emoji":"🐘",
+      "title":{"uz":"Fil va Chumoli","ru":"Слон и Муравей","en":"Elephant and Ant"},
+      "audio":{"uz":"audio/stories/uz/story-002.mp3","ru":"audio/stories/ru/story-002.mp3","en":"audio/stories/en/story-002.mp3"},
+      "text":{
+        "uz":"Ulkan fil daryo bo'yida suv ichardi. Kichkina chumoli unga yaqin keldi. 'Do'stim, meni narigi qirg'oqqa o'tkazib qo'ying,' dedi chumoli. Fil rozi bo'ldi va chumolini o'z ustiga oldi.\n\nUlar daryodan o'tdilar. 'Katta rahmat!' dedi chumoli. 'Lekin men sizga yordam bera olmayman — juda kichkinaman.' 'Kerak bo'lsa berar,' dedi fil muloyimlik bilan.\n\nKo'p o'tmay fil botqoqqa botib qoldi. Chumoli barcha do'stlarini chaqirdi. Yuzlab chumolillar birga tortib filni qutqardilar. Birlashgan kichkina kuchlar ham katta ajoyibotlarni amalga oshiradi.",
+        "ru":"Огромный слон пил воду у реки. К нему подполз маленький муравей. 'Друг, перенеси меня на тот берег!' — попросил муравей. Слон согласился и посадил его к себе на спину.\n\nОни перебрались через реку. 'Большое спасибо!' — сказал муравей. — 'Но я не смогу помочь тебе — я такой маленький.' 'Понадобится — поможешь,' — мягко ответил слон.\n\nСкоро слон застрял в болоте. Муравей позвал всех своих друзей. Сотни муравьёв вместе вытащили слона! Маленькие силы, объединившись, творят большие чудеса.",
+        "en":"A huge elephant was drinking water by the river. A tiny ant came up to him. 'Friend, could you carry me to the other side?' asked the ant. The elephant agreed and let the ant climb on.\n\nThey crossed the river together. 'Thank you so much!' said the ant. 'But I could never help you — I am too small.' 'You will help when the time comes,' said the elephant kindly.\n\nSoon the elephant got stuck in a swamp. The ant called all his friends. Hundreds of ants pulled together and freed the elephant! Small forces, united, can achieve great things."
+      }
+    },
+    {
+      "id":"story-003","category":"animals","emoji":"🐢",
+      "title":{"uz":"Toshbaqa va Quyon","ru":"Черепаха и Заяц","en":"Tortoise and Hare"},
+      "audio":{"uz":"audio/stories/uz/story-003.mp3","ru":"audio/stories/ru/story-003.mp3","en":"audio/stories/en/story-003.mp3"},
+      "text":{
+        "uz":"Quyon toshbaqaga masxara qilib: 'Sen shunchalik sekinsan! Hech qachon birinchi bo'la olmaysan!' dedi. Toshbaqa jimgina javob berdi: 'Ko'ramiz.'\n\nUlar poyga o'tkazishga qaror qildilar. Quyon shiddat bilan yugurib ketdi, toshbaqa esa sekin-sekin yura boshladi. Quyon o'rtada uxlab qoldi: 'Men juda tezman, hali yetib olaman.'\n\nToshbaqa to'xtamay yurdi. Quyosh botayotganda u finishga birinchi bo'lib yetdi. Quyon uyg'onib qolganini ko'rdi. 'Matonat — tezlikdan kuchliroq,' dedi toshbaqa. Quyon bu saboqni umrga yodida saqladi.",
+        "ru":"Заяц насмехался над черепахой: 'Ты такая медленная! Никогда не придёшь первой!' Черепаха спокойно ответила: 'Посмотрим.'\n\nОни решили устроить гонку. Заяц умчался вперёд, а черепаха медленно, но уверенно шла за ним. На полпути заяц прилёг отдохнуть: 'Я такой быстрый, всегда успею догнать.'\n\nЧерепаха шла без остановки. На закате она первой пересекла финишную черту. Заяц проснулся и увидел, что проиграл. 'Настойчивость сильнее скорости,' — сказала черепаха. Заяц запомнил этот урок навсегда.",
+        "en":"A hare mocked the tortoise: 'You are so slow! You will never come first!' The tortoise calmly replied: 'We shall see.'\n\nThey decided to have a race. The hare bolted ahead while the tortoise walked slowly but steadily. Halfway through, the hare lay down for a nap: 'I am so fast, I can catch up anytime.'\n\nThe tortoise walked without stopping. At sunset, she crossed the finish line first. The hare woke up to find he had lost. 'Persistence is stronger than speed,' said the tortoise. The hare never forgot that lesson."
+      }
+    },
+    {
+      "id":"story-004","category":"animals","emoji":"🦊",
+      "title":{"uz":"Tulki va Uzum","ru":"Лиса и Виноград","en":"Fox and Grapes"},
+      "audio":{"uz":"audio/stories/uz/story-004.mp3","ru":"audio/stories/ru/story-004.mp3","en":"audio/stories/en/story-004.mp3"},
+      "text":{
+        "uz":"Ochiqan tulki bir bog'dan o'tar ekan, baland tokda qizil uzum ko'rdi. 'Qanday mazali ko'rinadi!' deb sakrab ko'rdi. Lekin uza olmadi — tok juda baland edi.\n\nU bir necha bor urinib ko'rdi. Sakradi, yugurdi, turli yo'llarni sinadi. Bari bejo edi. Nihoyat charchab to'xtadi.\n\n'Baribir anovi uzumlar nordon ekan,' dedi u o'ziga o'zi va ketdi. Lekin aslida uzumlar juda shirin edi. Erisha olmagan narsani yomonlash — zaiflikning alomati. Qiyin bo'lsa ham yana urinish kerak.",
+        "ru":"Голодная лиса проходила мимо сада и увидела на высокой лозе красивые гроздья винограда. 'Как аппетитно!' — воскликнула она и попыталась дотянуться. Но виноград был слишком высоко.\n\nОна прыгала снова и снова — всё безуспешно. Наконец, устав, она остановилась.\n\n'Всё равно тот виноград кислый,' — сказала она себе и ушла. Но на самом деле виноград был очень сладким. Называть недостижимое плохим — признак слабости. Если трудно, нужно пробовать снова.",
+        "en":"A hungry fox was walking past a garden and spotted beautiful clusters of grapes on a high vine. 'How delicious they look!' she cried and jumped to reach them. But the grapes were too high.\n\nShe leaped again and again — all in vain. Finally, exhausted, she stopped.\n\n'Those grapes are probably sour anyway,' she told herself and walked away. But the grapes were very sweet indeed. Calling something bad just because we cannot reach it shows weakness. When things are hard, we should try again."
+      }
+    },
+    {
+      "id":"story-005","category":"nature","emoji":"🌳",
+      "title":{"uz":"Sehrli Daraxt","ru":"Волшебное Дерево","en":"Magic Tree"},
+      "audio":{"uz":"audio/stories/uz/story-005.mp3","ru":"audio/stories/ru/story-005.mp3","en":"audio/stories/en/story-005.mp3"},
+      "text":{
+        "uz":"O'rmon chetida yoshi ulug' bir daraxt o'sardi. Barcha hayvonlar uning soyasida dam olardi. Qushlar shoxlarida uyalar qurardi.\n\nBir kuni yomg'ir bo'lmay qo'ydi. Daryo qurib bordi. Hayvonlar tashna qoldi. Keksa daraxt barcha kuchini to'plab, ildizlari orqali yer ostidagi suvni chiqara boshladi.\n\nUning atrofida kichkina buloq paydo bo'ldi. Hayvonlar suv ichdi, qushlar sho'xlik qildi. Daraxt esa past ovozda dedi: 'Tabiatni asrang — u bizni asraydi.' O'sha o'rmonda buloq hozirgacha oqib turibdi.",
+        "ru":"На краю леса росло старое дерево. Все животные отдыхали в его тени, птицы вили гнёзда в его ветвях.\n\nОднажды дождей долго не было. Река стала мелеть. Животные страдали от жажды. Старое дерево собрало все свои силы и начало через корни доставать подземную воду.\n\nВокруг него забил маленький родник. Животные напились, птицы весело плескались. А дерево тихо сказало: 'Берегите природу — она бережёт нас.' Тот родник течёт в лесу и по сей день.",
+        "en":"At the edge of the forest grew a very old tree. All the animals rested in its shade and birds built nests in its branches.\n\nOne day the rains stopped. The river began to dry up. The animals were thirsty and worried. The old tree gathered all its strength and began drawing up underground water through its roots.\n\nA small spring appeared around it. The animals drank, and the birds splashed happily. The tree said softly: 'Take care of nature — and nature will take care of you.' That spring still flows in the forest today."
+      }
+    },
+    {
+      "id":"story-006","category":"nature","emoji":"🌈",
+      "title":{"uz":"Yomg'irdan Keyin","ru":"После Дождя","en":"After the Rain"},
+      "audio":{"uz":"audio/stories/uz/story-006.mp3","ru":"audio/stories/ru/story-006.mp3","en":"audio/stories/en/story-006.mp3"},
+      "text":{
+        "uz":"Kuchli yomg'irdan keyin hamma narsa yam-yashil bo'lib ketdi. Kichkina Aliya uydan chiqib, osmonni ko'rdi. Kamalak yoyilib turar edi!\n\n'Kamalak nima?' deb so'radi u onasidan. 'Bu quyosh va yomg'ir birga o'ynaganda paydo bo'ladigan chiroq,' dedi onasi. 'Etti rang — etti quvonch.'\n\nAliya mayinga sakrab kirdi. Uning oyoqlari ho'l bo'ldi, lekin u juda xursand edi. Tabiatning har bir hodisasi — bu dunyo bizga qilgan sovg'a. Ko'zlarni ochiq tutish kerak.",
+        "ru":"После сильного дождя всё вокруг позеленело и засверкало. Маленькая Алия вышла из дома и увидела радугу в небе!\n\n'Мама, что такое радуга?' — спросила она. 'Это когда солнышко и дождь играют вместе,' — ответила мама. — 'Семь цветов — семь радостей.'\n\nАлия прыгнула в лужу. Её ноги промокли, но она была очень счастлива. Каждое явление природы — это подарок миру. Нужно только не забывать смотреть вокруг.",
+        "en":"After a heavy rain, everything turned fresh and green. Little Aliya stepped outside and saw a rainbow stretching across the sky!\n\n'Mama, what is a rainbow?' she asked. 'It is when the sun and rain play together,' said her mother. 'Seven colors — seven joys.'\n\nAliya jumped into a puddle. Her feet got wet, but she was very happy. Every event in nature is a gift to the world. We just need to remember to look around us."
+      }
+    },
+    {
+      "id":"story-007","category":"nature","emoji":"🌸",
+      "title":{"uz":"Bahor Keldi","ru":"Пришла Весна","en":"Spring Has Come"},
+      "audio":{"uz":"audio/stories/uz/story-007.mp3","ru":"audio/stories/ru/story-007.mp3","en":"audio/stories/en/story-007.mp3"},
+      "text":{
+        "uz":"Qish uzoq davom etdi. Daraxtlar yalang'och, yer esa qor bilan qoplangan edi. Kichkina gul kurtagi yer ostida uxlardi.\n\nBir kuni quyosh iliqroq nurlarini yubordi. Qor erib, yer yumshoq bo'ldi. Gul kurtagi ko'zini ochdi va yuqoriga qarab o'sa boshladi.\n\nKo'p o'tmay u yer ustiga chiqdi va birinchi bahor gulini ochdi. Qushlar qo'shiq aytdi, bolalar o'ynadi. 'Bahor keldi!' deb xitob qildi hamma. Hatto eng sovuq qishdan keyin ham bahor albatta keladi.",
+        "ru":"Зима длилась долго. Деревья стояли голые, земля была покрыта снегом. Маленький цветочный росток спал под землёй.\n\nОднажды солнце послало более тёплые лучи. Снег растаял, земля смягчилась. Росток открыл глаза и потянулся вверх.\n\nСкоро он пробился наружу и раскрыл первый весенний цветок. Птицы запели, дети побежали играть. 'Весна пришла!' — радовались все. Даже после самой холодной зимы весна обязательно наступает.",
+        "en":"Winter had lasted a long time. The trees were bare and the ground was covered with snow. A little flower bud slept underground.\n\nOne day the sun sent warmer rays. The snow melted and the earth softened. The bud opened its eyes and began to grow upward.\n\nSoon it pushed through the soil and opened the first spring flower. The birds sang and the children ran out to play. 'Spring has come!' everyone cheered. Even after the coldest winter, spring always arrives."
+      }
+    },
+    {
+      "id":"story-008","category":"nature","emoji":"⛄",
+      "title":{"uz":"Qorbobo","ru":"Снеговик","en":"Snowman"},
+      "audio":{"uz":"audio/stories/uz/story-008.mp3","ru":"audio/stories/ru/story-008.mp3","en":"audio/stories/en/story-008.mp3"},
+      "text":{
+        "uz":"Kamol va Zulfiya ko'chada qor yog'ayotganini ko'rishdi. Ular kiyinib tashqariga chiqishdi. 'Qorbobo yasaymiz!' dedi Kamol.\n\nUlar katta-katta qor to'plari yuvashdi va ularni ustma-ust qo'yishdi. Ko'z uchun toshlar, burun uchun sabzi, og'iz uchun yog'och topishdi.\n\nQorbobo tayyor bo'ldi! U ularga tabassum qilib turganday ko'rinardi. Kechqurun ular uyga kirib iliq choy ichishdi. 'Qor faqat sovuq emas, u o'yin va quvonch ham,' dedi Zulfiya.",
+        "ru":"Камаль и Зульфия увидели, как за окном идёт снег. Они оделись и вышли на улицу. 'Давай слепим снеговика!' — сказал Камаль.\n\nОни катали большие снежные шары и складывали их один на другой. Нашли камешки для глаз, морковку для носа, палку для рта.\n\nСнеговик был готов! Он словно улыбался им. Вечером дети зашли домой и выпили тёплого чаю. 'Снег — это не только холод, это игра и радость,' — сказала Зульфия.",
+        "en":"Kamal and Zulfia saw snow falling outside the window. They got dressed and ran outside. 'Let's build a snowman!' said Kamal.\n\nThey rolled big balls of snow and stacked them on top of each other. They found pebbles for eyes, a carrot for the nose, and a stick for the mouth.\n\nThe snowman was ready! He seemed to be smiling at them. That evening the children went inside for warm tea. 'Snow is not only cold — it is fun and joy too,' said Zulfia."
+      }
+    },
+    {
+      "id":"story-009","category":"heroes","emoji":"🦸",
+      "title":{"uz":"Jasur Bolakay","ru":"Смелый Мальчик","en":"Brave Boy"},
+      "audio":{"uz":"audio/stories/uz/story-009.mp3","ru":"audio/stories/ru/story-009.mp3","en":"audio/stories/en/story-009.mp3"},
+      "text":{
+        "uz":"Timur kichkina bo'lsa ham, juda jasur edi. Bir kuni mahallada yong'in bo'ldi. Kattalar vahima qilib yugurishdi. Lekin Timur bir keksani ko'rdi — u chiqib keta olmayapti edi.\n\nTimur qo'rqmay kirib, keksani qo'lidan ushlab chiqarishi oldi. Itfasochilar kelib o'tni o'chirdilar. Hamma Timurni qarsak bilan kutib oldi.\n\n'Qo'rqmadingmi?' deb so'rashdi. 'Qo'rqdim,' dedi Timur. 'Lekin kerak edi.' Jasorat — qo'rqmaslik emas, balki qo'rqib turib ham to'g'ri ish qilishdir.",
+        "ru":"Тимур был маленьким, но очень смелым. Однажды в квартале вспыхнул пожар. Все взрослые бегали в панике. Но Тимур увидел пожилого человека — тот не мог выйти.\n\nТимур без страха вбежал внутрь и вывел старика за руку. Приехали пожарные и потушили огонь. Все встретили Тимура аплодисментами.\n\n'Тебе не было страшно?' — спросили его. 'Было,' — сказал Тимур. — 'Но так было надо.' Храбрость — это не отсутствие страха, а умение делать правильное дело, несмотря на него.",
+        "en":"Timur was small but very brave. One day a fire broke out in the neighbourhood. The adults ran around in panic. But Timur saw an elderly person who could not get out.\n\nWithout hesitation, Timur ran inside and led the old person out by the hand. The firefighters arrived and put out the fire. Everyone greeted Timur with applause.\n\n'Were you scared?' they asked. 'Yes,' said Timur. 'But it had to be done.' Courage is not the absence of fear — it is doing the right thing even when you are afraid."
+      }
+    },
+    {
+      "id":"story-010","category":"heroes","emoji":"🌟",
+      "title":{"uz":"Kichkina Qahramonlar","ru":"Маленькие Герои","en":"Little Heroes"},
+      "audio":{"uz":"audio/stories/uz/story-010.mp3","ru":"audio/stories/ru/story-010.mp3","en":"audio/stories/en/story-010.mp3"},
+      "text":{
+        "uz":"Sinf o'quvchilari parkda sayr qilayotganda, ko'l yonida yig'layotgan kichkina bolani ko'rib qolishdi. Uning o'yinchoq kemasi suvga ketib qolgan edi.\n\nHech kim suv ichiga kirishni istamadi. Shunda Mohira uzun tayoq topib keldi. Barcha birgalikda tayoqni uzatib kemani qirg'oqqa surib olib keldilar.\n\nBola xursand bo'lib kuldi. 'Siz qahramonlarsiz!' dedi u. Bola esa: 'Biz hech narsa qilmadik.' Mohira dedi: 'Hammamiz birga qildik — bu eng katta qahramonlik.'",
+        "ru":"Школьники прогуливались в парке, когда заметили у пруда плачущего малыша. Его игрушечный кораблик уплыл на середину.\n\nНикто не хотел лезть в воду. Тогда Мохира нашла длинную палку. Все вместе, передавая палку, дотолкали кораблик до берега.\n\nМалыш засмеялся от радости. 'Вы герои!' — сказал он. 'Мы ничего особого не сделали,' — ответили дети. Мохира добавила: 'Мы сделали это вместе — это и есть настоящий героизм.'",
+        "en":"Schoolchildren were walking in the park when they saw a little child crying by the pond. His toy boat had drifted to the middle.\n\nNobody wanted to go into the water. Then Mohira found a long stick. Together, passing the stick along, they nudged the boat back to shore.\n\nThe child laughed with joy. 'You are heroes!' he said. 'We didn't do anything special,' the children replied. Mohira added: 'We did it together — that is the greatest heroism of all.'"
+      }
+    },
+    {
+      "id":"story-011","category":"heroes","emoji":"🚀",
+      "title":{"uz":"Yulduzga Sayohat","ru":"Путь к Звезде","en":"Journey to Stars"},
+      "audio":{"uz":"audio/stories/uz/story-011.mp3","ru":"audio/stories/ru/story-011.mp3","en":"audio/stories/en/story-011.mp3"},
+      "text":{
+        "uz":"Sarvar har kecha osmonni kuzatardi. U yulduzlarni sanardi va ular haqida kitoblar o'qirdi. Do'stlari uni masxara qilardi: 'Koinot bilan nima ishlaring bor?'\n\nYillar o'tdi. Sarvar qattiq o'qidi, ilm oldi. Nihoyat katta bo'lganda u kosmonavtlar o'quv markaziga qabul qilindi.\n\nUning birinchi parvozida u kosmosdan yer sharini ko'rdi — kichkina, chiroyli, ko'k. Ko'z yoshlari edi. 'Orzu qilsang va ishlasang — yulduzlarga yetasan,' deb yubordi u Yerga xabar.",
+        "ru":"Сарвар каждую ночь наблюдал за небом. Он считал звёзды и читал о них книги. Друзья смеялись: 'Зачем тебе космос?'\n\nШли годы. Сарвар много учился и трудился. Наконец, повзрослев, он поступил в центр подготовки космонавтов.\n\nВо время первого полёта он увидел Землю из космоса — маленькую, красивую, голубую. На глазах выступили слёзы. 'Если мечтать и трудиться — доберёшься до звёзд,' — передал он сообщение на Землю.",
+        "en":"Sarvar watched the sky every night. He counted the stars and read books about them. His friends laughed: 'Why do you care about space?'\n\nYears passed. Sarvar studied hard and worked diligently. Finally, when he grew up, he was accepted into a cosmonaut training centre.\n\nDuring his first flight, he saw the Earth from space — small, beautiful and blue. Tears came to his eyes. 'If you dream and work hard, you will reach the stars,' he sent back as a message to Earth."
+      }
+    },
+    {
+      "id":"story-012","category":"heroes","emoji":"🧙",
+      "title":{"uz":"Sehrgar Bola","ru":"Волшебный Ребёнок","en":"Magic Child"},
+      "audio":{"uz":"audio/stories/uz/story-012.mp3","ru":"audio/stories/ru/story-012.mp3","en":"audio/stories/en/story-012.mp3"},
+      "text":{
+        "uz":"Dilnoza sinfdoshlari og'riqda ekanini ko'rdi va ularni kuldira boshladi. U hazillar aytdi, qo'g'irchoq o'yinlari ko'rsatdi. Hamma kuldi.\n\n'Bu sehrmi?' deb so'radi bir bola. 'Ha,' dedi Dilnoza. 'Kulgi — eng yaxshi sehrdir.' O'qituvchi ham taajjublandi.\n\nO'sha kundan boshlab Dilnoza sinfda 'Sehrgar Bola' nomini oldi. Uning sehri oddiy edi: u hamma uchun yaxshilik qilardi. Yaxshilik qilish — bu haqiqiy sehr.",
+        "ru":"Дильноза заметила, что одноклассники грустят, и начала их смешить. Она рассказывала шутки и показывала кукольные представления. Все засмеялись.\n\n'Это магия?' — спросил один ребёнок. 'Да,' — ответила Дильноза. — 'Смех — лучшее волшебство.' Учительница тоже удивилась.\n\nС того дня Дильнозу в классе стали называть 'Волшебным ребёнком'. Её волшебство было простым: она делала добро для всех. Творить добро — это настоящая магия.",
+        "en":"Dilnoza noticed her classmates were sad and began to cheer them up. She told jokes and put on a little puppet show. Everyone laughed.\n\n'Is this magic?' asked one child. 'Yes,' said Dilnoza. 'Laughter is the best magic of all.' Even the teacher was amazed.\n\nFrom that day, Dilnoza was called the 'Magic Child' of the class. Her magic was simple: she did good things for everyone. Doing good — that is real magic."
+      }
+    },
+    {
+      "id":"story-013","category":"family","emoji":"👨‍👩‍👧",
+      "title":{"uz":"Biz Birgamiz","ru":"Мы Вместе","en":"We Are Together"},
+      "audio":{"uz":"audio/stories/uz/story-013.mp3","ru":"audio/stories/ru/story-013.mp3","en":"audio/stories/en/story-013.mp3"},
+      "text":{
+        "uz":"Oila bog'da ish qilardi. Ota daraxtni kesdi, ona bog'ni sug'ordi, katta bola esa mevalar terdi. Kichik Yusuf ham yordam bermoqchi bo'ldi.\n\n'Men ham nimadir qilay,' dedi u. Onasi unga tuproqqa urug' ekishni o'rgatdi. Yusuf diqqat bilan har bir urug'ni yerga joylashtirdi.\n\nBahorda urug'lar o'sib, chiroyli gullar ochildi. 'Bu men ektim!' deb maqtandi Yusuf. 'Biz birga ektik,' dedi ota. Oila birligida har bir ish mazmunli bo'ladi.",
+        "ru":"Семья работала в саду. Отец рубил дерево, мама поливала грядки, старший брат собирал фрукты. Маленький Юсуф тоже захотел помочь.\n\n'Я тоже хочу что-нибудь сделать,' — сказал он. Мама научила его сажать семена в землю. Юсуф аккуратно укладывал каждое семечко.\n\nВесной семена проросли и расцвели красивыми цветами. 'Это я посадил!' — хвастался Юсуф. 'Мы посадили вместе,' — поправил папа. В единстве семьи каждое дело становится значимым.",
+        "en":"The family was working in the garden. Father chopped a tree, mother watered the beds, and big brother picked fruit. Little Yusuf wanted to help too.\n\n'I want to do something too,' he said. Mother taught him how to plant seeds in the soil. Yusuf carefully placed each seed in the ground.\n\nIn spring the seeds grew and bloomed into beautiful flowers. 'I planted those!' Yusuf boasted. 'We planted them together,' corrected father. In family unity, every task becomes meaningful."
+      }
+    },
+    {
+      "id":"story-014","category":"family","emoji":"👵",
+      "title":{"uz":"Buvi Ertagi","ru":"Бабушкина Сказка","en":"Grandmother's Story"},
+      "audio":{"uz":"audio/stories/uz/story-014.mp3","ru":"audio/stories/ru/story-014.mp3","en":"audio/stories/en/story-014.mp3"},
+      "text":{
+        "uz":"Har kecha Nilufar buvisinikiga borar va uning ertaklarini tinglardi. Buvi qo'lida ip, ko'zida nur bilan gapirar edi.\n\nBir kuni Nilufar: 'Buvi, siz hamma narsani bilasiz,' dedi. Buvi esa: 'Men ko'p yashab, ko'p ko'rdim. Sen ham yashaysan va bilib olasan,' dedi.\n\n'Lekin men bilmoqchiman — hozir!' dedi Nilufar. Buvi kuldi: 'Bilim — kitobda, tajriba — hayotda. Ikkalasini birlashtir — dono bo'lasan.' Nilufar o'sha gapni hech qachon unutmadi.",
+        "ru":"Каждый вечер Нилуфар приходила к бабушке слушать её сказки. Бабушка говорила с клубком ниток в руках и светом в глазах.\n\nОднажды Нилуфар сказала: 'Бабушка, ты всё знаешь.' Бабушка ответила: 'Я много жила и много видела. Ты тоже проживёшь и узнаешь.'\n\n'Но я хочу знать — прямо сейчас!' — сказала Нилуфар. Бабушка засмеялась: 'Знание — в книгах, мудрость — в жизни. Соедини оба — станешь мудрой.' Нилуфар запомнила эти слова навсегда.",
+        "en":"Every evening Nilufar came to her grandmother to listen to her stories. Grandma spoke with a ball of yarn in her hands and a sparkle in her eyes.\n\nOne day Nilufar said: 'Grandma, you know everything.' Grandma replied: 'I have lived long and seen much. You will too, and you will learn.'\n\n'But I want to know — right now!' said Nilufar. Grandma laughed: 'Knowledge comes from books, wisdom comes from life. Combine them both — and you will be truly wise.' Nilufar never forgot those words."
+      }
+    },
+    {
+      "id":"story-015","category":"family","emoji":"🏠",
+      "title":{"uz":"Yangi Uy","ru":"Новый Дом","en":"New Home"},
+      "audio":{"uz":"audio/stories/uz/story-015.mp3","ru":"audio/stories/ru/story-015.mp3","en":"audio/stories/en/story-015.mp3"},
+      "text":{
+        "uz":"Oila yangi shaharga ko'chib o'tdi. Bahor boshqa uy, boshqa ko'cha, boshqa maktab. U xafa edi — do'stlari qoldi.\n\nBirinchi kuni qo'shni qizaloq kelib salom berdi. 'Ismim Malika,' dedi u. 'Birga o'ynaymizmi?' Bahor avvaliga tortindi, keyin rozi bo'ldi.\n\nHafta o'tgach, Bahor yangi uyni yaxshi ko'rib qoldi. Yangi do'stlar, yangi o'yinlar — hamma narsa yangi. 'Har bir yangi boshlanish yangi sarguzasht,' dedi onasi. Bahor endi qo'rqmaydi.",
+        "ru":"Семья переехала в новый город. Бахор было грустно — другой дом, другая улица, другая школа. Её друзья остались позади.\n\nВ первый день пришла соседская девочка. 'Меня зовут Малика,' сказала она. — 'Хочешь играть вместе?' Бахор поначалу стеснялась, но согласилась.\n\nЧерез неделю Бахор полюбила новый дом. Новые друзья, новые игры — всё новое. 'Каждое новое начало — новое приключение,' — сказала мама. Теперь Бахор ничего не боится.",
+        "en":"The family moved to a new city. Bahor was sad — a different house, a different street, a different school. Her friends had been left behind.\n\nOn the first day, the girl next door came to say hello. 'My name is Malika,' she said. 'Want to play together?' Bahor was shy at first, but agreed.\n\nA week later, Bahor loved her new home. New friends, new games — everything was new. 'Every new beginning is a new adventure,' said her mother. Now Bahor is not afraid anymore."
+      }
+    },
+    {
+      "id":"story-016","category":"family","emoji":"👦",
+      "title":{"uz":"Aka-Uka","ru":"Братья","en":"Brothers"},
+      "audio":{"uz":"audio/stories/uz/story-016.mp3","ru":"audio/stories/ru/story-016.mp3","en":"audio/stories/en/story-016.mp3"},
+      "text":{
+        "uz":"Rustam va Sardor doim janjallashardi — o'yinchoqlar uchun, televizor uchun, hatto non uchun. Bir kuni ota ularni bog'ga chiqardi.\n\nU ikkita tayoqni berdi: 'Sindiring.' Har biri osonlik bilan sindirdi. Keyin u ikkala tayoqni birga bog'ladi: 'Endi sindiring.' Hech biri sindira olmadi.\n\n'Ko'rdingizmi?' dedi ota. 'Bitta bo'lsangiz — oson sinasiz. Birga bo'lsangiz — hech kim sindira olmaydi.' Rustam va Sardor bir-biriga qarab kuldi. O'sha kundan boshlab ular yaxshi aka-uka bo'lib qoldi.",
+        "ru":"Рустам и Сардор постоянно ссорились — из-за игрушек, телевизора, даже из-за хлеба. Однажды отец вывел их в сад.\n\nОн дал каждому по прутику: 'Сломайте.' Каждый легко сломал. Потом он связал оба прутика вместе: 'А теперь сломайте.' Никто не смог.\n\n'Видите?' — сказал отец. — 'По отдельности — легко сломать. Вместе — никто не сломает.' Рустам и Сардор переглянулись и засмеялись. С того дня они стали настоящими братьями.",
+        "en":"Rustam and Sardor were always arguing — over toys, the television, even over bread. One day their father took them to the garden.\n\nHe gave each one a stick: 'Break it.' Each broke it easily. Then he tied both sticks together: 'Now break it.' Neither could.\n\n'Do you see?' said father. 'Alone — easy to break. Together — no one can break you.' Rustam and Sardor looked at each other and laughed. From that day on, they became true brothers."
+      }
+    },
+    {
+      "id":"story-017","category":"space","emoji":"🌙",
+      "title":{"uz":"Koinotda Sayohat","ru":"Космическое Путешествие","en":"Space Journey"},
+      "audio":{"uz":"audio/stories/uz/story-017.mp3","ru":"audio/stories/ru/story-017.mp3","en":"audio/stories/en/story-017.mp3"},
+      "text":{
+        "uz":"Kamola o'z kosmik kemasi bilan koinotni aylanib chiqardi. Avval Oyga qo'ndi — u kumush kabi yaltirardi, oyoq izi qoldirib yurdi.\n\nKeyin Marsga bordi — qizil sahrolar, kichkina togʻlar. Oy toshi topdi va sumkasiga soldi. Quyash tizimidagi barcha sayyoralarni ko'rdi.\n\nUy qaytayotganda Kamola: 'Yer — eng chiroyli sayyora,' dedi. Ko'k okeanlar, yashil o'rmonlar, oq bulutlar. 'Men uni asrashim kerak,' deb o'yladim u. Yerga qaytganda hamma uni qarsak bilan kutib oldi.",
+        "ru":"Камола на своём космическом корабле путешествовала по Вселенной. Сначала она приземлилась на Луне — та сверкала как серебро, и на ней оставались следы шагов.\n\nПотом она полетела на Марс — красные пустыни, маленькие горы. Нашла лунный камень и положила в сумку. Побывала у всех планет Солнечной системы.\n\nКогда летела домой, Камола подумала: 'Земля — самая красивая планета.' Голубые океаны, зелёные леса, белые облака. 'Я должна её беречь.' Когда она вернулась, все встретили её аплодисментами.",
+        "en":"Kamola travelled through the universe in her own spaceship. First she landed on the Moon — it shimmered like silver and her footprints stayed in the dust.\n\nThen she flew to Mars — red deserts and small mountains. She found a moon rock and put it in her bag. She visited all the planets in the solar system.\n\nFlying home, Kamola thought: 'Earth is the most beautiful planet.' Blue oceans, green forests, white clouds. 'I must protect it.' When she returned, everyone greeted her with applause."
+      }
+    },
+    {
+      "id":"story-018","category":"space","emoji":"⭐",
+      "title":{"uz":"Yulduz Bolasi","ru":"Дитя Звезды","en":"Star Child"},
+      "audio":{"uz":"audio/stories/uz/story-018.mp3","ru":"audio/stories/ru/story-018.mp3","en":"audio/stories/en/story-018.mp3"},
+      "text":{
+        "uz":"Kichkina Zafar tunda osmonga qaraganda, bir yulduz unga ko'z qisib qo'yganday ko'rinar edi. U bu yulduzni 'Do'stim' deb atar edi.\n\nBir kuni u: 'Do'stim yulduz, nega siz shunchalik uzoqdasiz?' dedi. Yulduz porladi. Otasi tushuntirdi: 'Yulduzlar milliardlab yillar oldin paydo bo'lgan. Ular bizning yo'l ko'rsatuvchilarimiz.'\n\nZafar o'shandan beri ilm o'rganishga kirishdi — chunki u bildi: yulduzlar kabi porlash uchun ichdan nur yoqish kerak. U katta bo'lib, astronomchi bo'ldi.",
+        "ru":"Маленький Зафар, глядя ночью на небо, видел одну звезду, которая, казалось, ему подмигивала. Он называл её 'Мой друг.'\n\nОднажды он спросил: 'Звёздочка-друг, почему ты так далеко?' Звезда засияла ярче. Папа объяснил: 'Звёзды появились миллиарды лет назад. Они — наши путеводители.'\n\nС тех пор Зафар усердно учился — потому что понял: чтобы сиять как звезда, нужно зажечь свет внутри себя. Он вырос и стал астрономом.",
+        "en":"Little Zafar, looking at the night sky, saw one star that seemed to wink at him. He called it 'My Friend.'\n\nOne day he asked: 'Star-friend, why are you so far away?' The star shone brighter. His father explained: 'Stars were born billions of years ago. They are our guides.'\n\nFrom that day Zafar studied hard — because he understood: to shine like a star, you must light a fire inside yourself. He grew up to become an astronomer."
+      }
+    },
+    {
+      "id":"story-019","category":"space","emoji":"🔴",
+      "title":{"uz":"Marsdagi Sarguzasht","ru":"Приключение на Марсе","en":"Mars Adventure"},
+      "audio":{"uz":"audio/stories/uz/story-019.mp3","ru":"audio/stories/ru/story-019.mp3","en":"audio/stories/en/story-019.mp3"},
+      "text":{
+        "uz":"Robot Rovi Mars sahrolarida aylanib yurardi. U qizil toshlarni o'rganardi, tuproq namunaları olardi. Bir kuni chuqur jarlikka tushib qoldi.\n\nRovi yordam so'radi. Yer stansiyasidagi Anvar unga ko'rsatma berdi. Rovi asta-sekin jarlik devorlariga tayalib chiqdi.\n\n'Ofarin, Rovi!' dedi Anvar. Rovi javob berdi: 'Birovning yordami kuch beradi.' Ular birga Mars haqida katta kashfiyot qildilar. Do'stlik — kosmosda ham eng kuchli narsa.",
+        "ru":"Робот Рови колесил по марсианским пустыням. Он изучал красные камни и брал образцы почвы. Однажды он упал в глубокий овраг.\n\nРови попросил помощи. Анвар со станции на Земле давал ему инструкции. Рови медленно, опираясь о стены оврага, выбрался наружу.\n\n'Молодец, Рови!' — сказал Анвар. Рови ответил: 'Чья-то помощь придаёт силы.' Вместе они сделали великое открытие на Марсе. Дружба — самая мощная сила даже в космосе.",
+        "en":"Robot Rovi was rolling across the Martian desert. He studied red rocks and took soil samples. One day he fell into a deep ravine.\n\nRovi called for help. Anvar at the Earth station gave him instructions. Rovi slowly climbed out, pressing against the walls of the ravine.\n\n'Well done, Rovi!' said Anvar. Rovi replied: 'Someone else's help gives you strength.' Together they made a great discovery on Mars. Friendship is the most powerful force, even in space."
+      }
+    },
+    {
+      "id":"story-020","category":"space","emoji":"🤖",
+      "title":{"uz":"Robot Do'stim","ru":"Мой Друг Робот","en":"My Robot Friend"},
+      "audio":{"uz":"audio/stories/uz/story-020.mp3","ru":"audio/stories/ru/story-020.mp3","en":"audio/stories/en/story-020.mp3"},
+      "text":{
+        "uz":"Shaxlo uchun robot tug'ilgan kun sovg'asi keldi. Uning ismi 'Aron' edi. Aron hamma savolga javob berar, doska ustida chiziq chizib berardi.\n\nBir kuni Shaxlo maktab vazifasini bajara olmadi. 'Aron, sen qil,' dedi. Aron dedi: 'Sening qo'lingni tutaman, lekin sen yozasan.'\n\nShaxlo avval norozi bo'ldi. Keyin Aron bilan birga o'rganib, o'zi bajardi. O'qituvchi eng yaxshi baho qo'ydi. 'Rahmat, Aron,' dedi Shaxlo. 'Rahmat sanga — sen qilding,' dedi Aron. Haqiqiy do'st seni o'sishga yordam beradi.",
+        "ru":"На день рождения Шахло подарили робота. Его звали Арон. Арон отвечал на все вопросы и рисовал на доске.\n\nОднажды Шахло не смогла сделать домашнее задание. 'Арон, ты сделай,' сказала она. Арон ответил: 'Я подержу твою руку, но писать будешь ты.'\n\nШахло сначала обиделась. Потом, учась вместе с Ароном, справилась сама. Учительница поставила отличную оценку. 'Спасибо, Арон,' сказала Шахло. 'Спасибо тебе — ты сделала,' ответил Арон. Настоящий друг помогает тебе расти.",
+        "en":"For her birthday, Shaxlo received a robot as a gift. His name was Aron. Aron answered all questions and drew on the board.\n\nOne day Shaxlo could not do her homework. 'Aron, you do it,' she said. Aron replied: 'I will hold your hand, but you will write.'\n\nShaxlo was upset at first. But then, learning together with Aron, she did it herself. The teacher gave her the best grade. 'Thank you, Aron,' said Shaxlo. 'Thank you — you did it,' Aron replied. A true friend helps you grow."
+      }
+    }
   ],
   "songs": [
     {"id":"song-001","category":"lullaby","emoji":"🌙","title":{"uz":"Alla","ru":"Колыбельная","en":"Lullaby"},"audio":{"uz":"audio/songs/uz/song-001.mp3","ru":"audio/songs/ru/song-001.mp3","en":"audio/songs/en/song-001.mp3"}},
