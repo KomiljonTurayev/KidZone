@@ -157,16 +157,21 @@ class ContentManager {
         this._searchQuery = '';
     }
 
-    async load() {
-        try {
-            const res = await fetch('content.json');
-            const data = await res.json();
-            this.items = data[this.type] || [];
-            this.filtered = [...this.items];
-        } catch (e) {
-            this.items = [];
-            this.filtered = [];
-        }
+    load() {
+        return new Promise(resolve => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'content.json', true);
+            xhr.onload = () => {
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    this.items = data[this.type] || [];
+                } catch (_) { this.items = []; }
+                this.filtered = [...this.items];
+                resolve();
+            };
+            xhr.onerror = () => { this.items = []; this.filtered = []; resolve(); };
+            xhr.send();
+        });
     }
 
     filter(query, cat) {
@@ -303,8 +308,8 @@ class StoryManager extends ContentManager {
             document.getElementById('aiv-loading').classList.add('h');
             document.getElementById('ai-viewer').classList.remove('h');
             document.getElementById('aiv-title-text').textContent = title;
-            // Auto-read aloud after viewer opens
-            setTimeout(() => this._doSpeak(), 500);
+            // Auto-read aloud after viewer opens (app._doSpeak lives on GameManager)
+            setTimeout(() => window.app?._doSpeak?.call(window.app), 500);
         }
 
         // Also try audio; hide player on error
@@ -707,6 +712,12 @@ window.addEventListener("load", () => {
     // Load content and render
     app.storyManager.load().then(() => app.storyManager.render());
     app.songManager.load().then(() => app.songManager.render());
+
+    // Reward ad callback from Java
+    window.onRewardGranted = function(amount) {
+        app.addPoints(amount || 50);
+        app.ui.showToast('🎁 +' + (amount || 50) + ' ⭐');
+    };
 
     // Restore last active tab
     const savedTab = localStorage.getItem('kz-tab') || 'games';

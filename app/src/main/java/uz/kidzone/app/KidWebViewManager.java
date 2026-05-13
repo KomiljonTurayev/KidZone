@@ -36,21 +36,34 @@ public class KidWebViewManager {
             return;
         }
 
+        // Enable remote debugging via chrome://inspect
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+
         WebSettings settings = webView.getSettings();
         applySettings(settings);
 
         webView.addJavascriptInterface(jsInterface, interfaceName);
         webView.setWebViewClient(new InternalWebViewClient());
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new android.webkit.WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(android.webkit.ConsoleMessage cm) {
+                Log.d("KZ-JS", cm.messageLevel() + " [" + cm.sourceId() + ":" + cm.lineNumber() + "] " + cm.message());
+                return true;
+            }
+        });
     }
 
+    @SuppressWarnings("SetJavaScriptEnabled")
     private void applySettings(WebSettings settings) {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
+        // Allow JS inside file:// pages to fetch/XHR other local assets
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        
-        // Cache optimization for smoother game loading
         settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
     }
 

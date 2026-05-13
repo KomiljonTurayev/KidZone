@@ -67,10 +67,17 @@ public class MusicManager {
             mediaPlayer.setLooping(true);
             mediaPlayer.setVolume(isMuted ? 0f : 0.15f, isMuted ? 0f : 0.15f);
             mediaPlayer.setOnPreparedListener(mp -> { if (!isMuted) mp.start(); });
+            mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                Log.w(TAG, "Network music unavailable (what=" + what + "). Running silent.");
+                mp.reset();
+                mp.release();
+                mediaPlayer = null;
+                return true; // handled — no retry
+            });
             mediaPlayer.prepareAsync();
-            Log.d(TAG, "Loading fallback music");
+            Log.d(TAG, "Loading fallback network music");
         } catch (Exception e) {
-            Log.e(TAG, "Error loading network music", e);
+            Log.w(TAG, "Could not start network music: " + e.getMessage());
             mediaPlayer = null;
         }
     }

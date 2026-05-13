@@ -1339,7 +1339,7 @@
         const grid = document.getElementById("game-grid");
         const list = filter==="all" ? GAMES : GAMES.filter(g=>g.cat===filter);
         grid.innerHTML = "";
-        document.getElementById("grid-count").textContent = list.length+" ta";
+        document.getElementById("grid-count").textContent = list.length;
         document.getElementById("grid-title").textContent = T[app.translator.lang].gridTitle;
 
         list.forEach(g => {
