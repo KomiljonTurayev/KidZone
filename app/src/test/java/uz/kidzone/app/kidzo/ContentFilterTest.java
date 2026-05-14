@@ -84,6 +84,11 @@ public class ContentFilterTest {
     }
 
     @Test
+    public void findById_nullId_returnsNull() {
+        assertNull(filter.findById(null));
+    }
+
+    @Test
     public void toPromptBlock_formatsCorrectly() {
         List<ContentItem> items = filter.getTop5();
         String block = filter.toPromptBlock(items);

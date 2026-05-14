@@ -26,12 +26,14 @@ public class ContentFilter {
 
     /** Production: reads from assets/www/content.json */
     public static ContentFilter fromAssets(Context ctx) throws IOException, JSONException {
-        InputStream is = ctx.getAssets().open("www/content.json");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) sb.append(line);
-        return new ContentFilter(sb.toString());
+        try (InputStream is = ctx.getAssets().open("www/content.json");
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(is, java.nio.charset.StandardCharsets.UTF_8))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            return new ContentFilter(sb.toString());
+        }
     }
 
     private void parseItems(JSONArray arr, List<ContentItem> out) throws JSONException {
@@ -54,7 +56,8 @@ public class ContentFilter {
     public List<ContentItem> getTop5() {
         List<ContentItem> all = new ArrayList<>(stories);
         all.addAll(songs);
-        return all.subList(0, Math.min(5, all.size()));
+        int limit = Math.min(5, all.size());
+        return new ArrayList<>(all.subList(0, limit));
     }
 
     /** Filter by keyword — title (uz/ru/en) or category. */
@@ -64,11 +67,13 @@ public class ContentFilter {
         List<ContentItem> result = new ArrayList<>();
         for (ContentItem item : stories) { if (matches(item, q)) result.add(item); }
         for (ContentItem item : songs)   { if (matches(item, q)) result.add(item); }
-        return result.subList(0, Math.min(5, result.size()));
+        int limit = Math.min(5, result.size());
+        return new ArrayList<>(result.subList(0, limit));
     }
 
     @Nullable
-    public ContentItem findById(String id) {
+    public ContentItem findById(@Nullable String id) {
+        if (id == null) return null;
         for (ContentItem item : stories) { if (item.id.equals(id)) return item; }
         for (ContentItem item : songs)   { if (item.id.equals(id)) return item; }
         return null;
