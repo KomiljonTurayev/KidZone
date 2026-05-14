@@ -202,10 +202,46 @@
     }
   ],
   "songs": [
-    {"id":"song-001","category":"lullaby","emoji":"🌙","title":{"uz":"Alla","ru":"Колыбельная","en":"Lullaby"},"audio":{"uz":"audio/songs/uz/song-001.mp3","ru":"audio/songs/ru/song-001.mp3","en":"audio/songs/en/song-001.mp3"}},
-    {"id":"song-002","category":"lullaby","emoji":"⭐","title":{"uz":"Yoqimli Tush","ru":"Приятный Сон","en":"Sweet Dream"},"audio":{"uz":"audio/songs/uz/song-002.mp3","ru":"audio/songs/ru/song-002.mp3","en":"audio/songs/en/song-002.mp3"}},
-    {"id":"song-003","category":"lullaby","emoji":"🌜","title":{"uz":"Oy Botdi","ru":"Луна Зашла","en":"Moon Is Down"},"audio":{"uz":"audio/songs/uz/song-003.mp3","ru":"audio/songs/ru/song-003.mp3","en":"audio/songs/en/song-003.mp3"}},
-    {"id":"song-004","category":"lullaby","emoji":"😴","title":{"uz":"Uxlayapsizmi?","ru":"Ты Спишь?","en":"Are You Sleeping?"},"audio":{"uz":"audio/songs/uz/song-004.mp3","ru":"audio/songs/ru/song-004.mp3","en":"audio/songs/en/song-004.mp3"}},
+    {
+      "id":"song-001","category":"lullaby","emoji":"🌙",
+      "title":{"uz":"Alla","ru":"Колыбельная","en":"Lullaby"},
+      "audio":{"uz":"audio/songs/uz/song-001.mp3","ru":"audio/songs/ru/song-001.mp3","en":"audio/songs/en/song-001.mp3"},
+      "text":{
+        "uz":"Alla, alla, uyqu kel,\nBolam ko'zin yumdi,\nOy ham, yulduz ham,\nHammasi jim bo'ldi.\n\nAlla aytaman senga,\nTun sokin, osmon ko'k,\nErtalab uyg'onasan,\nKulum bilan, azizim.\n\nAlla, alla, alla,\nUyqung kelsin bolam,\nQo'llarim beshik bo'lsin,\nYostiqqa bosh qo'y.",
+        "ru":"Баю-баюшки-баю,\nНе ложися на краю,\nЗакрой глазки, крепко спи,\nНочи доброй — до зари.\n\nЗвёзды светятся в ночи,\nМесяц светит — помолчи,\nСпи, мой ангел, не шуми,\nСладких снов тебе, усни.\n\nБаю-бай, баю-бай,\nТихо спи, не зевай,\nУтром солнышко взойдёт,\nПтичка песенку споёт.",
+        "en":"Hush, little baby, don't you cry,\nMama's gonna sing a lullaby,\nClose your eyes and drift to sleep,\nIn sweet dreams may you always be.\n\nStars are watching over you,\nMoon is bright the whole night through,\nSleep my darling, rest your head,\nSafe and warm in your little bed.\n\nHush now, hush now, go to sleep,\nPeaceful slumber, soft and deep,\nMorning sun will come to say,\nTime to start a brand new day."
+      }
+    },
+    {
+      "id":"song-002","category":"lullaby","emoji":"⭐",
+      "title":{"uz":"Yoqimli Tush","ru":"Приятный Сон","en":"Sweet Dream"},
+      "audio":{"uz":"audio/songs/uz/song-002.mp3","ru":"audio/songs/ru/song-002.mp3","en":"audio/songs/en/song-002.mp3"},
+      "text":{
+        "uz":"Yoqimli tush ko'r, bolam,\nUch yulduzlar orasida,\nKapalaklar raqsga tushsin,\nGullar bilan o'ynasin.\n\nKo'zlaringni yum sekin,\nTun qo'riqchi turadi,\nErtalab quyosh chiqar,\nQuvonch senga keladi.\n\nTush ko'r shirin, bolam,\nParvoz qil osmonda,\nErtaga uyg'onasan,\nKulimsirab meningda.",
+        "ru":"Приятных снов тебе, малыш,\nЛети среди звёздочек,\nПусть бабочки танцуют,\nС цветочками играй.\n\nЗакрой глаза тихонько,\nНочь тебя охраняет,\nУтром солнышко выйдет,\nРадость к тебе придёт.\n\nСни сладко, мой малыш,\nПари в голубом небе,\nЗавтра ты проснёшься,\nС улыбкой на лице.",
+        "en":"Sweet dreams, my little one,\nFly among the stars tonight,\nLet butterflies dance for you,\nIn meadows of pure light.\n\nClose your eyes so gently,\nThe night will keep you safe,\nWhen morning comes with sunshine,\nJoy will fill your face.\n\nDream sweetly, my darling,\nSoar in skies of blue,\nTomorrow when you waken,\nI'll be smiling back at you."
+      }
+    },
+    {
+      "id":"song-003","category":"lullaby","emoji":"🌜",
+      "title":{"uz":"Oy Botdi","ru":"Луна Зашла","en":"Moon Is Down"},
+      "audio":{"uz":"audio/songs/uz/song-003.mp3","ru":"audio/songs/ru/song-003.mp3","en":"audio/songs/en/song-003.mp3"},
+      "text":{
+        "uz":"Oy botdi, tun keldi,\nYulduzlar porlaydi,\nBolam ko'zin yumdi,\nAlla aylanamiz.\n\nTun qo'riqchi bo'ldi,\nDaraxhlar ham tinch,\nUyqula, azizim,\nErtalabgacha.\n\nOy yana chiqadi,\nQuyosh ham kulib,\nSen uyg'onganingda,\nBarcha sevinchda.",
+        "ru":"Луна зашла, пришла ночь,\nЗвёздочки засветились,\nГлазки закрылись,\nКолыбельная льётся.\n\nНочь стоит на страже,\nДеревья тихо дремлют,\nСпи, моя родная,\nДо самого утра.\n\nЛуна взойдёт снова,\nСолнышко улыбнётся,\nКогда ты проснёшься,\nВсе будут рады тебе.",
+        "en":"Moon has set, the night has come,\nStars are twinkling one by one,\nClose your eyes my little dear,\nLullaby time is here.\n\nNight stands watch and keeps you safe,\nTrees are still and winds are soft,\nSleep my precious, sleep tonight,\nUntil the morning light.\n\nMoon will rise and sun will smile,\nWhen you wake up after a while,\nEveryone will celebrate,\nThe joy of you, so great."
+      }
+    },
+    {
+      "id":"song-004","category":"lullaby","emoji":"😴",
+      "title":{"uz":"Uxlayapsizmi?","ru":"Ты Спишь?","en":"Are You Sleeping?"},
+      "audio":{"uz":"audio/songs/uz/song-004.mp3","ru":"audio/songs/ru/song-004.mp3","en":"audio/songs/en/song-004.mp3"},
+      "text":{
+        "uz":"Uxlayapsizmi, bolam?\nKo'zlaringni yumdingmi?\nAlla, alla aytaman,\nSenga tinchliq tilash.\n\nUxlayapsizmi, azizim?\nTush ko'r shirin-shirin,\nErtalab uyg'onasan,\nKulum bilan yorqin.\n\nAlla, alla, alla,\nUyqung chuqur bo'lsin,\nSabah turganda esa,\nQuvnoq bo'lib chiqgin.",
+        "ru":"Ты спишь? Ты спишь?\nБратик Иван, братик Иван.\nУтром звонят колокола,\nДинь-дон, динь-дон.\n\nСпишь ли ты, малышка?\nЗакрой глазки, деточка,\nПусть приснятся сказки,\nЦветики, цветочки.\n\nБаю-бай, усни,\nОтдохни, поспи,\nЗавтра будет новый день,\nСолнечный и светлый.",
+        "en":"Are you sleeping, are you sleeping,\nBrother John, Brother John?\nMorning bells are ringing,\nMorning bells are ringing,\nDing ding dong, ding ding dong.\n\nAre you sleeping, little one,\nClose your eyes till morning sun,\nDream of flowers, dream of play,\nDream of a beautiful day.\n\nSleep and rest, sleep and rest,\nYou are loved and blessed,\nWhen tomorrow's sun comes bright,\nAll will be so right."
+      }
+    },
     {"id":"song-005","category":"alphabet","emoji":"🔤","title":{"uz":"ABC Qo'shig'i","ru":"Песня ABC","en":"ABC Song"},"audio":{"uz":"audio/songs/uz/song-005.mp3","ru":"audio/songs/ru/song-005.mp3","en":"audio/songs/en/song-005.mp3"}},
     {"id":"song-006","category":"alphabet","emoji":"📝","title":{"uz":"O'zbek Harflari","ru":"Буквы Алфавита","en":"Alphabet Letters"},"audio":{"uz":"audio/songs/uz/song-006.mp3","ru":"audio/songs/ru/song-006.mp3","en":"audio/songs/en/song-006.mp3"}},
     {"id":"song-007","category":"alphabet","emoji":"🔢","title":{"uz":"Raqamlar Qo'shig'i","ru":"Песня Цифр","en":"Numbers Song"},"audio":{"uz":"audio/songs/uz/song-007.mp3","ru":"audio/songs/ru/song-007.mp3","en":"audio/songs/en/song-007.mp3"}},

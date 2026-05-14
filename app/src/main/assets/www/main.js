@@ -194,31 +194,58 @@ class ContentManager {
 
     render() {
         const gridId = this.type === 'stories' ? 'stories-grid' : 'songs-grid';
+        const countId = this.type === 'stories' ? 'stories-count' : 'songs-count';
         const grid = document.getElementById(gridId);
         if (!grid) return;
         const lang = this.translator.lang;
+
+        // Update count display
+        const countEl = document.getElementById(countId);
+        if (countEl) {
+            const n = this.filtered.length;
+            const word = this.type === 'stories'
+                ? (lang==='uz'?'ta ertak':lang==='ru'?'сказок':'stories')
+                : (lang==='uz'?"ta qo'shiq":lang==='ru'?'песен':'songs');
+            countEl.textContent = n > 0 ? n + ' ' + word : '';
+        }
+
         grid.innerHTML = '';
         if (this.filtered.length === 0) {
-            const emptyIcon = this.type === 'stories' ? '📖' : '🎵';
-            const emptyMsg = this.translator.get('noAudio') || 'Not found';
             grid.style.display = 'block';
             grid.innerHTML =
                 '<div class="empty-state">' +
-                '<div class="empty-state-icon">' + emptyIcon + '</div>' +
-                '<div class="empty-state-title">' + (lang === 'uz' ? 'Hech narsa topilmadi' : lang === 'ru' ? 'Ничего не найдено' : 'Nothing found') + '</div>' +
-                '<div class="empty-state-sub">' + (lang === 'uz' ? 'Boshqa kalit so\'z sinab ko\'ring' : lang === 'ru' ? 'Попробуйте другой запрос' : 'Try a different search') + '</div>' +
+                '<div class="empty-state-icon">' + (this.type==='stories'?'📖':'🎵') + '</div>' +
+                '<div class="empty-state-title">' + (lang==='uz'?'Hech narsa topilmadi':lang==='ru'?'Ничего не найдено':'Nothing found') + '</div>' +
+                '<div class="empty-state-sub">' + (lang==='uz'?"Boshqa so'z sinab ko'ring":lang==='ru'?'Попробуйте другой запрос':'Try a different search') + '</div>' +
                 '</div>';
             return;
         }
         grid.style.display = '';
+
+        // Category labels map
+        const catLabels = {
+            animals: lang==='uz'?'Hayvonlar':lang==='ru'?'Животные':'Animals',
+            nature:  lang==='uz'?'Tabiat':lang==='ru'?'Природа':'Nature',
+            heroes:  lang==='uz'?'Qahramonlar':lang==='ru'?'Герои':'Heroes',
+            family:  lang==='uz'?'Oila':lang==='ru'?'Семья':'Family',
+            space:   lang==='uz'?'Koinot':lang==='ru'?'Космос':'Space',
+            lullaby: lang==='uz'?'Alla':lang==='ru'?'Колыбельная':'Lullaby',
+            alphabet:lang==='uz'?'Alifbo':lang==='ru'?'Азбука':'Alphabet',
+            dance:   lang==='uz'?'Raqs':lang==='ru'?'Танец':'Dance',
+            games:   lang==='uz'?"O'yin":lang==='ru'?'Игры':'Games'
+        };
+
         this.filtered.forEach(item => {
             const card = document.createElement('div');
             card.className = 'content-card' + (item.id === this.currentId ? ' playing' : '');
             const title = item.title[lang] || item.title.en;
+            const catLabel = catLabels[item.category] || item.category;
+            const isPlaying = item.id === this.currentId;
             card.innerHTML =
                 '<div class="cc-art">' + item.emoji + '</div>' +
                 '<div class="cc-title">' + title + '</div>' +
-                '<div class="cc-ic">' + (item.id === this.currentId ? (this.player.isPlaying() ? '⏸' : '▶') : '▶') + '</div>';
+                '<div class="cc-cat">' + catLabel + '</div>' +
+                '<div class="cc-ic">' + (isPlaying ? (this.player.isPlaying() ? '⏸' : '▶') : '▶') + '</div>';
             card.onclick = () => this._play(item);
             grid.appendChild(card);
         });
@@ -319,7 +346,7 @@ class StoryManager extends ContentManager {
         const title = item.title[lang] || item.title.en;
         const text = item.text ? (item.text[lang] || item.text.en || '') : '';
 
-        // Show text viewer immediately and auto-read
+        // Show text viewer and speak immediately (user gesture still active)
         if (text) {
             document.getElementById('aiv-story-title').textContent = item.emoji + ' ' + title;
             document.getElementById('aiv-content').textContent = text;
@@ -327,8 +354,8 @@ class StoryManager extends ContentManager {
             document.getElementById('aiv-loading').classList.add('h');
             document.getElementById('ai-viewer').classList.remove('h');
             document.getElementById('aiv-title-text').textContent = title;
-            // Auto-read aloud after viewer opens (app._doSpeak lives on GameManager)
-            setTimeout(() => window.app?._doSpeak?.call(window.app), 500);
+            // Speak directly — no timeout so Android gesture window stays active
+            if (window.app?._doSpeak) window.app._doSpeak.call(window.app);
         }
 
         // Also try audio; hide player on error
@@ -352,6 +379,46 @@ class StoryManager extends ContentManager {
 class SongManager extends ContentManager {
     constructor(player, translator, ui) {
         super('songs', player, translator, ui);
+    }
+
+    _play(item) {
+        const lang = this.translator.lang;
+        const title = item.title[lang] || item.title.en;
+        const text = item.text ? (item.text[lang] || item.text.en || '') : '';
+
+        if (text) {
+            // Show lyrics in viewer + speak immediately
+            document.getElementById('aiv-story-title').textContent = item.emoji + ' ' + title;
+            document.getElementById('aiv-content').textContent = text;
+            document.getElementById('aiv-content-wrap').classList.remove('h');
+            document.getElementById('aiv-loading').classList.add('h');
+            document.getElementById('ai-viewer').classList.remove('h');
+            document.getElementById('aiv-title-text').textContent = title;
+            if (window.app?._doSpeak) window.app._doSpeak.call(window.app);
+        }
+
+        // Try audio if available
+        const src = item.audio ? (item.audio[lang] || item.audio.en) : null;
+        if (src) {
+            this.currentId = item.id;
+            this.render();
+            if (text) this._showPlayer(item.emoji + ' ' + title);
+            this.player.play(src, title,
+                (cur, dur) => this._onTimeUpdate(cur, dur),
+                () => this._onEnded(),
+                () => {
+                    this._hidePlayer();
+                    this.currentId = null;
+                    this.render();
+                    // If no text shown and audio failed, show friendly message
+                    if (!text) this.ui.showToast(item.emoji + ' ' + (lang==='uz'?"Audio tez orada qo'shiladi":lang==='ru'?'Аудио скоро будет':'Audio coming soon'));
+                }
+            );
+        } else if (!text) {
+            // No audio, no text — show coming soon
+            const msg = lang==='uz'?"🎵 Bu qo'shiq tez orada qo'shiladi!":lang==='ru'?'🎵 Эта песня скоро появится!':'🎵 This song is coming soon!';
+            this.ui.showToast(msg);
+        }
     }
 }
 
@@ -609,8 +676,8 @@ class GameManager {
             content.classList.remove("h");
             this.addPoints(10);
 
-            // Auto-read the story aloud after a brief pause
-            setTimeout(() => this._doSpeak(), 600);
+            // Auto-read (2s timeout already passed — user may need to tap Listen manually on strict browsers)
+            this._doSpeak();
         }, 2000);
     }
 
@@ -635,18 +702,48 @@ class GameManager {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
         const text = document.getElementById("aiv-content")?.textContent;
-        if (!text) return;
+        if (!text || text.trim().length < 3) return;
         const btn = document.getElementById("ai-read-btn");
-        const msg = new SpeechSynthesisUtterance(text);
+        const lang = this.translator.lang;
         const langMap = { uz: "uz-UZ", ru: "ru-RU", en: "en-US" };
-        msg.lang = langMap[this.translator.lang] || "en-US";
-        msg.rate = 0.88;
-        msg.pitch = 1.05;
-        msg.volume = 1.0;
-        msg.onstart = () => { if (btn) btn.querySelector('span').textContent = "⏹️"; };
-        msg.onend = () => { if (btn) btn.querySelector('span').textContent = "🔊"; };
-        msg.onerror = () => { if (btn) btn.querySelector('span').textContent = "🔊"; };
-        window.speechSynthesis.speak(msg);
+        const targetLang = langMap[lang] || "en-US";
+
+        const doSpeak = () => {
+            const msg = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            // Priority: exact → prefix → Russian fallback for Uzbek → default
+            const voice = voices.find(v => v.lang === targetLang)
+                       || voices.find(v => v.lang.startsWith(targetLang.split('-')[0]))
+                       || (lang === 'uz' ? voices.find(v => v.lang.startsWith('ru')) : null)
+                       || voices.find(v => v.default) || null;
+            if (voice) msg.voice = voice;
+            msg.lang = voice ? voice.lang : targetLang;
+            msg.rate = 0.86;
+            msg.pitch = 1.0;
+            msg.volume = 1.0;
+            msg.onstart = () => { if (btn) btn.querySelector('span').textContent = "⏹️"; };
+            msg.onend   = () => { if (btn) btn.querySelector('span').textContent = "🔊"; };
+            msg.onerror = (e) => {
+                if (btn) btn.querySelector('span').textContent = "🔊";
+                if (e.error !== 'interrupted') this.ui?.showToast("🔊 Ovoz ishlamadi");
+            };
+            window.speechSynthesis.speak(msg);
+        };
+
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            doSpeak();
+        } else {
+            // Wait for voices to load (Android WebView async)
+            let fired = false;
+            window.speechSynthesis.onvoiceschanged = () => {
+                if (fired) return;
+                fired = true;
+                window.speechSynthesis.onvoiceschanged = null;
+                doSpeak();
+            };
+            setTimeout(() => { if (!fired) { fired = true; doSpeak(); } }, 500);
+        }
     }
 
     openAiMusic() {
