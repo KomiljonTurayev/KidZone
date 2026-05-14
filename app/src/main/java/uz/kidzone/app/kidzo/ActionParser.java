@@ -24,7 +24,7 @@ public class ActionParser {
     public static List<ContentCard> parseRecommendations(@Nullable String text) {
         List<ContentCard> result = new ArrayList<>();
         if (text == null || text.isEmpty()) return result;
-        for (String line : text.split("\n")) {
+        for (String line : text.split("\\r?\\n")) {
             Matcher m = LINE.matcher(line.trim());
             if (m.find()) {
                 result.add(new ContentCard(m.group(1), m.group(2).trim()));

@@ -60,4 +60,18 @@ public class ActionParserTest {
     public void parseRecommendations_nullInput_returnsEmptyList() {
         assertTrue(ActionParser.parseRecommendations(null).isEmpty());
     }
+
+    @Test
+    public void parseRecommendations_mixedLinesWithProse_returnsOnlyTaggedLines() {
+        String response = "Salom, bu qiziqarli kontentlar:\n"
+                + "[OPEN:story-001] Sher va Sichqon\n"
+                + "Yana ko'proq tanlash uchun:\n"
+                + "[OPEN:song-001] Alla";
+
+        List<ContentCard> cards = ActionParser.parseRecommendations(response);
+
+        assertEquals(2, cards.size());
+        assertEquals("story-001", cards.get(0).contentId);
+        assertEquals("song-001", cards.get(1).contentId);
+    }
 }
