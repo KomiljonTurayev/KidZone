@@ -6,4 +6,24 @@
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="rewarded_ad_unit_id">ca-app-pub-3940256099942544/5224354917</string>
+
+    <string name="ai_bird_name">Aqlli Qushcha</string>
+    <string name="ai_bird_desc">Bolalar uchun ertakchi qush</string>
+    <string name="btn_tell_story">Ertak aytib ber</string>
+    <string name="btn_play_music">🎵 Musiqa</string>
+    <string name="btn_close">❌ Yopish</string>
+    <string name="ai_thinking">🐥 Qushcha o\'ylamoqda...</string>
+    <string name="ai_error">Internetda biroz muammo bo\'ldi. Qaytadan urinib ko\'r!</string>
+    <string name="btn_stop_speech">To\'xtatish</string>
+    <string name="btn_listen">Eshitish</string>
+
+    <string name="kidzo_thinking">Kidzo o\'ylamoqda… 🐥</string>
+    <string name="kidzo_recommendations_header">Bugun siz uchun:</string>
+    <string name="kidzo_start_chat">💬 Kidzo bilan gaplash</string>
+    <string name="kidzo_chat_hint">Kidzo bilan gaplash…</string>
+    <string name="kidzo_send">Yuborish</string>
+    <string name="kidzo_retry">Qayta urining</string>
+    <string name="kidzo_close">Yopish</string>
+    <string name="kidzo_error_network">Internet yo\'q. Qaytadan urining 🐥</string>
+    <string name="kidzo_error_api">Kidzo biroz charchadi 😴 Keyinroq urinib ko\'ring</string>
 </resources>
