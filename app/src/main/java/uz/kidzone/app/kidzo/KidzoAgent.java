@@ -10,6 +10,7 @@ public class KidzoAgent {
     private final GeminiCaller geminiCaller;
     private final MainThreadRunner mainThreadRunner;
     private @Nullable KidzoStateListener listener;
+    private volatile int callGeneration = 0;
 
     /** Test constructor — GeminiCaller and MainThreadRunner are injected. */
     KidzoAgent(ContentFilter contentFilter,
@@ -28,13 +29,16 @@ public class KidzoAgent {
 
     /** FAB pressed: IDLE → THINKING → RECOMMENDATIONS */
     public void requestRecommendations() {
+        final int gen = ++callGeneration;
         setState(KidzoState.THINKING, null);
         List<ContentItem> top5 = contentFilter.getTop5();
         String promptBlock = contentFilter.toPromptBlock(top5);
+        // TODO Task 10: replace with profile.getChildName() and profile.getLastContentId()
         String prompt = buildRecommendationPrompt("Bolam", null, promptBlock);
 
         geminiCaller.call(prompt,
             text -> {
+                if (gen != callGeneration) return;
                 List<ContentCard> cards = ActionParser.parseRecommendations(text);
                 if (cards.isEmpty()) {
                     for (ContentItem item : top5) {
@@ -43,7 +47,10 @@ public class KidzoAgent {
                 }
                 setState(KidzoState.RECOMMENDATIONS, cards);
             },
-            errorMsg -> setState(KidzoState.ERROR, errorMsg)
+            errorMsg -> {
+                if (gen != callGeneration) return;
+                setState(KidzoState.ERROR, errorMsg);
+            }
         );
     }
 
@@ -61,16 +68,18 @@ public class KidzoAgent {
 
     /** Stub for P1/P2 compilation. Fully implemented in Task 12. */
     public void sendChatMessage(String userMessage) {
+        final int gen = ++callGeneration;
         setState(KidzoState.THINKING, null);
         geminiCaller.call(
             "Sen Kidzo. Qisqa javob ber: " + userMessage,
-            text -> setState(KidzoState.CHATTING, text),
-            err  -> setState(KidzoState.ERROR, err)
+            text -> { if (gen == callGeneration) setState(KidzoState.CHATTING, text); },
+            err  -> { if (gen == callGeneration) setState(KidzoState.ERROR, err); }
         );
     }
 
     /** Return to IDLE from any state. */
     public void dismiss() {
+        callGeneration++;
         setState(KidzoState.IDLE, null);
     }
 

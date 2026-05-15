@@ -77,6 +77,7 @@ public class KidzoAgentStateTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void requestRecommendations_emptyGeminiResponse_usesFallback() {
         KidzoAgent agent = new KidzoAgent(
             contentFilter,
@@ -87,7 +88,11 @@ public class KidzoAgentStateTest {
 
         agent.requestRecommendations();
 
-        verify(listener).onStateChanged(eq(KidzoState.RECOMMENDATIONS), any());
+        ArgumentCaptor<Object> payloadCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(listener).onStateChanged(eq(KidzoState.RECOMMENDATIONS), payloadCaptor.capture());
+        List<ContentCard> cards = (List<ContentCard>) payloadCaptor.getValue();
+        assertEquals(2, cards.size()); // story-001 + song-001 from TEST_JSON
+        assertEquals("story-001", cards.get(0).contentId);
     }
 
     @Test
