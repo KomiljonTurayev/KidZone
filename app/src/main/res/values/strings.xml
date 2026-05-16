@@ -26,4 +26,5 @@
     <string name="kidzo_close">Yopish</string>
     <string name="kidzo_error_network">Internet yo\'q. Qaytadan urining 🐥</string>
     <string name="kidzo_error_api">Kidzo biroz charchadi 😴 Keyinroq urinib ko\'ring</string>
+    <string name="kidzo_card_play_btn_desc">Eshitish</string>
 </resources>

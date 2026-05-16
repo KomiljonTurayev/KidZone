@@ -8,7 +8,8 @@
     android:gravity="center"
     android:padding="10dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:contentDescription="@null">
 
     <TextView
         android:id="@+id/tv_card_emoji"
@@ -44,7 +45,8 @@
         android:text="▶"
         android:textSize="13sp"
         android:textColor="@android:color/white"
-        android:background="#33FFFFFF"
+        android:background="@drawable/bg_card_play_btn"
+        android:contentDescription="@string/kidzo_card_play_btn_desc"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:paddingTop="3dp"
