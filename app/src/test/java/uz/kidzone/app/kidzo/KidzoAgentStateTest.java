@@ -150,4 +150,51 @@ public class KidzoAgentStateTest {
         assertEquals("🌙", card.emoji);
         assertEquals("Qo'shiq", card.type);
     }
+
+    @Test
+    public void requestRecommendations_geminiResponse_enrichesCardsWithEmoji() {
+        String fakeResponse =
+            "[OPEN:story-001] Sher va Sichqon — ajoyib!\n"
+          + "[OPEN:song-001] Alla — uxlash vaqti!";
+
+        KidzoAgent agent = new KidzoAgent(
+            contentFilter,
+            (prompt, onSuccess, onError) -> onSuccess.accept(fakeResponse),
+            syncRunner
+        );
+        agent.setListener(listener);
+        agent.requestRecommendations();
+
+        ArgumentCaptor<Object> payloadCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(listener, atLeast(2)).onStateChanged(any(), payloadCaptor.capture());
+        List<Object> payloads = payloadCaptor.getAllValues();
+        @SuppressWarnings("unchecked")
+        List<ContentCard> cards = (List<ContentCard>) payloads.get(payloads.size() - 1);
+
+        assertEquals("🦁", cards.get(0).emoji);
+        assertEquals("Ertak", cards.get(0).type);
+        assertEquals("🌙", cards.get(1).emoji);
+        assertEquals("Qo'shiq", cards.get(1).type);
+    }
+
+    @Test
+    public void requestRecommendations_fallback_includesEmojiAndType() {
+        KidzoAgent agent = new KidzoAgent(
+            contentFilter,
+            (prompt, onSuccess, onError) -> onSuccess.accept("no valid tags here"),
+            syncRunner
+        );
+        agent.setListener(listener);
+        agent.requestRecommendations();
+
+        ArgumentCaptor<Object> payloadCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(listener, atLeast(2)).onStateChanged(any(), payloadCaptor.capture());
+        List<Object> payloads = payloadCaptor.getAllValues();
+        @SuppressWarnings("unchecked")
+        List<ContentCard> cards = (List<ContentCard>) payloads.get(payloads.size() - 1);
+
+        assertFalse(cards.isEmpty());
+        assertFalse(cards.get(0).emoji.isEmpty());
+        assertFalse(cards.get(0).type.isEmpty());
+    }
 }

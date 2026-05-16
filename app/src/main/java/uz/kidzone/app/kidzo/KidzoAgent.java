@@ -1,7 +1,10 @@
 package uz.kidzone.app.kidzo;
 
 import androidx.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class KidzoAgent {
 
@@ -11,6 +14,11 @@ public class KidzoAgent {
     private final MainThreadRunner mainThreadRunner;
     private @Nullable KidzoStateListener listener;
     private volatile int callGeneration = 0;
+
+    /** Production factory — wires RealGeminiCaller. */
+    public static KidzoAgent create(ContentFilter contentFilter, MainThreadRunner runner) {
+        return new KidzoAgent(contentFilter, new RealGeminiCaller(), runner);
+    }
 
     /** Test constructor — GeminiCaller and MainThreadRunner are injected. */
     KidzoAgent(ContentFilter contentFilter,
@@ -33,16 +41,21 @@ public class KidzoAgent {
         setState(KidzoState.THINKING, null);
         List<ContentItem> top5 = contentFilter.getTop5();
         String promptBlock = contentFilter.toPromptBlock(top5);
-        // TODO Task 10: replace with profile.getChildName() and profile.getLastContentId()
         String prompt = buildRecommendationPrompt("Bolam", null, promptBlock);
+
+        // Build id→item map for emoji lookup
+        final Map<String, ContentItem> itemMap = new HashMap<>();
+        for (ContentItem item : top5) itemMap.put(item.id, item);
 
         geminiCaller.call(prompt,
             text -> {
                 if (gen != callGeneration) return;
-                List<ContentCard> cards = ActionParser.parseRecommendations(text);
+                List<ContentCard> parsed = ActionParser.parseRecommendations(text);
+                List<ContentCard> cards = enrich(parsed, itemMap);
                 if (cards.isEmpty()) {
                     for (ContentItem item : top5) {
-                        cards.add(new ContentCard(item.id, item.titleUz));
+                        cards.add(new ContentCard(item.id, item.titleUz,
+                            item.emoji, typeOf(item.id)));
                     }
                 }
                 setState(KidzoState.RECOMMENDATIONS, cards);
@@ -61,12 +74,10 @@ public class KidzoAgent {
         }
     }
 
-    /** Stub for P1/P2 compilation. Fully implemented in Task 12. */
     public void startChat() {
         setState(KidzoState.CHATTING, "Salom! Men Kidzo. Nima haqida gaplashamiz? 🐥");
     }
 
-    /** Stub for P1/P2 compilation. Fully implemented in Task 12. */
     public void sendChatMessage(String userMessage) {
         final int gen = ++callGeneration;
         setState(KidzoState.THINKING, null);
@@ -77,10 +88,27 @@ public class KidzoAgent {
         );
     }
 
-    /** Return to IDLE from any state. */
     public void dismiss() {
         callGeneration++;
         setState(KidzoState.IDLE, null);
+    }
+
+    // ── Private helpers ──────────────────────────────────────────────────────
+
+    private List<ContentCard> enrich(List<ContentCard> parsed,
+                                      Map<String, ContentItem> itemMap) {
+        List<ContentCard> result = new ArrayList<>();
+        for (ContentCard card : parsed) {
+            ContentItem item = itemMap.get(card.contentId);
+            String emoji = (item != null && !item.emoji.isEmpty()) ? item.emoji : "🐥";
+            result.add(new ContentCard(card.contentId, card.displayText,
+                emoji, typeOf(card.contentId)));
+        }
+        return result;
+    }
+
+    private static String typeOf(String contentId) {
+        return contentId.startsWith("song-") ? "Qo'shiq" : "Ertak";
     }
 
     private void setState(KidzoState newState, @Nullable Object payload) {
