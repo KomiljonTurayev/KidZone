@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private KidWebViewManager webViewManager;
     private IAdsManager adsManager;
     private SystemUiHelper systemUiHelper;
+    private BirdAiManager birdAiManager;
     private int lastBannerHeight = 0;
     private int gameLaunchCount = 0;
 
@@ -37,6 +38,45 @@ public class MainActivity extends AppCompatActivity {
 
         initializeUI();
         initializeManagers();
+        setupKidzoFab();
+    }
+
+    private void setupKidzoFab() {
+        birdAiManager = new BirdAiManager(this); // kept for onDestroy lifecycle
+
+        View fab = findViewById(R.id.btnBirdAi);
+        if (fab == null) return;
+        fab.bringToFront();
+
+        android.animation.ObjectAnimator scaleX =
+            android.animation.ObjectAnimator.ofFloat(fab, "scaleX", 1f, 1.18f);
+        android.animation.ObjectAnimator scaleY =
+            android.animation.ObjectAnimator.ofFloat(fab, "scaleY", 1f, 1.18f);
+        scaleX.setDuration(900);
+        scaleX.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+        scaleX.setRepeatMode(android.animation.ObjectAnimator.REVERSE);
+        scaleY.setDuration(900);
+        scaleY.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+        scaleY.setRepeatMode(android.animation.ObjectAnimator.REVERSE);
+        android.animation.AnimatorSet pulse = new android.animation.AnimatorSet();
+        pulse.playTogether(scaleX, scaleY);
+        pulse.start();
+
+        try {
+            uz.kidzone.app.kidzo.ContentFilter contentFilter =
+                uz.kidzone.app.kidzo.ContentFilter.fromAssets(this);
+            uz.kidzone.app.kidzo.KidzoAgent kidzoAgent =
+                uz.kidzone.app.kidzo.KidzoAgent.create(contentFilter, this::runOnUiThread);
+
+            fab.setOnClickListener(v -> {
+                uz.kidzone.app.kidzo.KidzoBottomSheet sheet =
+                    new uz.kidzone.app.kidzo.KidzoBottomSheet(kidzoAgent);
+                sheet.show(getSupportFragmentManager(), "kidzo");
+                kidzoAgent.requestRecommendations();
+            });
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Kidzo init failed", e);
+        }
     }
 
     private void initializeUI() {
@@ -53,9 +93,8 @@ public class MainActivity extends AppCompatActivity {
         if (mainLayout != null) {
             androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
                 androidx.core.graphics.Insets bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
-                v.setPadding(bars.left, bars.top, bars.right, 0);
-                View banner = findViewById(R.id.bannerContainer);
-                if (banner != null) banner.setPadding(0, 0, 0, bars.bottom);
+                // ✅ Professional Fix: Apply top and bottom system bar insets to the root container
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
                 return insets;
             });
         }
@@ -266,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if (adsManager != null) adsManager.onDestroy();
         if (webViewManager != null) webViewManager.destroy();
+        if (birdAiManager != null) birdAiManager.onDestroy();
         super.onDestroy();
     }
 }
