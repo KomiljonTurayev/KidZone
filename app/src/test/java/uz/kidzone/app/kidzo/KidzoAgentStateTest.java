@@ -136,4 +136,18 @@ public class KidzoAgentStateTest {
 
         verify(listener).onActionRequested("story-001");
     }
+
+    @Test
+    public void contentCard_twoArgConstructor_defaultsEmoji() {
+        ContentCard card = new ContentCard("story-001", "Sher");
+        assertEquals("🐥", card.emoji);
+        assertEquals("", card.type);
+    }
+
+    @Test
+    public void contentCard_fourArgConstructor_storesAll() {
+        ContentCard card = new ContentCard("song-001", "Alla", "🌙", "Qo'shiq");
+        assertEquals("🌙", card.emoji);
+        assertEquals("Qo'shiq", card.type);
+    }
 }

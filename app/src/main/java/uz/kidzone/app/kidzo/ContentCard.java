@@ -3,10 +3,19 @@ package uz.kidzone.app.kidzo;
 public class ContentCard {
     public final String contentId;
     public final String displayText;
+    public final String emoji;
+    public final String type;
 
-    public ContentCard(String contentId, String displayText) {
-        this.contentId = contentId;
+    public ContentCard(String contentId, String displayText, String emoji, String type) {
+        this.contentId   = contentId;
         this.displayText = displayText;
+        this.emoji       = emoji;
+        this.type        = type;
+    }
+
+    /** Backward-compatible 2-arg constructor used by ActionParser. */
+    public ContentCard(String contentId, String displayText) {
+        this(contentId, displayText, "🐥", "");
     }
 
     @Override
