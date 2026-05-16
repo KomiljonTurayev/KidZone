@@ -1,11 +1,15 @@
 package uz.kidzone.app.kidzo;
 
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,11 +25,13 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
     private final KidzoAgent agent;
 
     private LinearLayout layoutThinking;
-    private LinearLayout layoutRecommendations;
-    private LinearLayout layoutChat;
     private LinearLayout layoutError;
+    private View sectionCarousel;
+    private View sectionRecommendationsFooter;
+    private View sectionChat;
     private RecyclerView rvCards;
     private LinearLayout chatMessages;
+    private ScrollView scrollChat;
     private EditText etChatInput;
     private TextView tvErrorMessage;
 
@@ -45,16 +51,22 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        layoutThinking        = view.findViewById(R.id.layout_thinking);
-        layoutRecommendations = view.findViewById(R.id.layout_recommendations);
-        layoutChat            = view.findViewById(R.id.layout_chat);
-        layoutError           = view.findViewById(R.id.layout_error);
-        rvCards               = view.findViewById(R.id.rv_kidzo_cards);
-        chatMessages          = view.findViewById(R.id.chat_messages);
-        etChatInput           = view.findViewById(R.id.et_chat_input);
-        tvErrorMessage        = view.findViewById(R.id.tv_error_message);
+        layoutThinking               = view.findViewById(R.id.layout_thinking);
+        layoutError                  = view.findViewById(R.id.layout_error);
+        sectionCarousel              = view.findViewById(R.id.section_carousel);
+        sectionRecommendationsFooter = view.findViewById(R.id.section_recommendations_footer);
+        sectionChat                  = view.findViewById(R.id.section_chat);
+        rvCards                      = view.findViewById(R.id.rv_kidzo_cards);
+        chatMessages                 = view.findViewById(R.id.chat_messages);
+        scrollChat                   = view.findViewById(R.id.scroll_chat);
+        etChatInput                  = view.findViewById(R.id.et_chat_input);
+        tvErrorMessage               = view.findViewById(R.id.tv_error_message);
 
-        rvCards.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvCards.setLayoutManager(
+            new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        Button btnKidzoClose = view.findViewById(R.id.btn_kidzo_close);
+        btnKidzoClose.setOnClickListener(v -> agent.dismiss());
 
         view.findViewById(R.id.btn_start_chat).setOnClickListener(v -> agent.startChat());
 
@@ -67,10 +79,7 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
             }
         });
 
-        view.findViewById(R.id.btn_retry).setOnClickListener(v ->
-            agent.requestRecommendations()
-        );
-
+        view.findViewById(R.id.btn_retry).setOnClickListener(v -> agent.requestRecommendations());
         view.findViewById(R.id.btn_error_close).setOnClickListener(v -> dismiss());
 
         agent.setListener(this);
@@ -95,8 +104,9 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
         if (getView() == null) return;
         requireActivity().runOnUiThread(() -> {
             layoutThinking.setVisibility(View.GONE);
-            layoutRecommendations.setVisibility(View.GONE);
-            layoutChat.setVisibility(View.GONE);
+            sectionCarousel.setVisibility(View.GONE);
+            sectionRecommendationsFooter.setVisibility(View.GONE);
+            sectionChat.setVisibility(View.GONE);
             layoutError.setVisibility(View.GONE);
 
             switch (newState) {
@@ -105,7 +115,8 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
                     break;
 
                 case RECOMMENDATIONS:
-                    layoutRecommendations.setVisibility(View.VISIBLE);
+                    sectionCarousel.setVisibility(View.VISIBLE);
+                    sectionRecommendationsFooter.setVisibility(View.VISIBLE);
                     if (payload instanceof List) {
                         List<ContentCard> cards = (List<ContentCard>) payload;
                         rvCards.setAdapter(new KidzoCardAdapter(cards, contentId -> {
@@ -116,7 +127,8 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
                     break;
 
                 case CHATTING:
-                    layoutChat.setVisibility(View.VISIBLE);
+                    sectionCarousel.setVisibility(View.VISIBLE);
+                    sectionChat.setVisibility(View.VISIBLE);
                     if (payload instanceof String) {
                         addChatBubble((String) payload, false);
                     }
@@ -138,7 +150,7 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
 
     @Override
     public void onActionRequested(String contentId) {
-        // Handled by MainActivity listener
+        // Handled by MainActivity — future task
     }
 
     private void addChatBubble(String text, boolean isUser) {
@@ -147,19 +159,40 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.topMargin = 8;
+        int dp12 = dp(12);
+        int dp4  = dp(4);
+        int dp48 = dp(48);
+        int dp16 = dp(16);
+        params.topMargin    = dp12;
+        params.bottomMargin = dp4;
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp16);
+
         if (isUser) {
-            params.gravity = android.view.Gravity.END;
-            bubble.setBackgroundResource(android.R.color.holo_blue_light);
+            params.gravity    = Gravity.END;
+            params.leftMargin = dp48;
+            bg.setColor(0xFFFF6B35);
+            bubble.setTextColor(android.graphics.Color.WHITE);
+            bubble.setText(text);
         } else {
-            params.gravity = android.view.Gravity.START;
-            bubble.setBackgroundResource(android.R.color.holo_green_light);
+            params.gravity     = Gravity.START;
+            params.rightMargin = dp48;
+            bg.setColor(android.graphics.Color.WHITE);
+            bg.setStroke(dp(2), 0xFFFF6B35);
+            bubble.setTextColor(0xFF333333);
+            bubble.setText("🐦 " + text);
         }
+
+        bubble.setBackground(bg);
         bubble.setLayoutParams(params);
-        bubble.setPadding(16, 10, 16, 10);
-        bubble.setText(text);
-        bubble.setTextSize(15f);
-        bubble.setTextColor(android.graphics.Color.BLACK);
+        bubble.setPadding(dp12, dp(8), dp12, dp(8));
+        bubble.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14f);
         chatMessages.addView(bubble);
+        scrollChat.post(() -> scrollChat.fullScroll(View.FOCUS_DOWN));
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
     }
 }
