@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import uz.kidzone.app.R;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class KidzoBottomSheet extends BottomSheetDialogFragment
         implements KidzoStateListener {
 
     private final KidzoAgent agent;
+    private final Consumer<String> onContentAction;
 
     private LinearLayout layoutThinking;
     private LinearLayout layoutError;
@@ -35,8 +37,9 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
     private EditText etChatInput;
     private TextView tvErrorMessage;
 
-    public KidzoBottomSheet(KidzoAgent agent) {
+    public KidzoBottomSheet(KidzoAgent agent, Consumer<String> onContentAction) {
         this.agent = agent;
+        this.onContentAction = onContentAction;
     }
 
     @Nullable
@@ -150,7 +153,7 @@ public class KidzoBottomSheet extends BottomSheetDialogFragment
 
     @Override
     public void onActionRequested(String contentId) {
-        // Handled by MainActivity — future task
+        if (onContentAction != null) onContentAction.accept(contentId);
     }
 
     private void addChatBubble(String text, boolean isUser) {

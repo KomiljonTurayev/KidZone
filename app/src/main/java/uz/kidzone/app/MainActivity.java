@@ -70,7 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
             fab.setOnClickListener(v -> {
                 uz.kidzone.app.kidzo.KidzoBottomSheet sheet =
-                    new uz.kidzone.app.kidzo.KidzoBottomSheet(kidzoAgent);
+                    new uz.kidzone.app.kidzo.KidzoBottomSheet(kidzoAgent, contentId -> {
+                        String safeId = contentId.replaceAll("[^a-zA-Z0-9\\-]", "");
+                        webViewManager.evaluateJavascript("if(window.playContent)playContent('" + safeId + "')");
+                    });
                 sheet.show(getSupportFragmentManager(), "kidzo");
                 kidzoAgent.requestRecommendations();
             });
