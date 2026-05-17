@@ -2,15 +2,17 @@ package uz.kidzone.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.Locale;
 
@@ -28,11 +30,11 @@ public class OnboardingActivity extends AppCompatActivity implements TextToSpeec
     private boolean ttsReady = false;
 
     private View stepLang, stepAge, stepKidzo;
-    private Button btnUz, btnRu, btnEn, btnNextLang;
-    private Button btnAge24, btnAge57, btnAge8plus, btnNextAge, btnBackAge;
+    private MaterialButton btnUz, btnRu, btnEn, btnNextLang;
+    private MaterialButton btnAge24, btnAge57, btnAge8plus, btnNextAge, btnBackAge;
     private ImageView imgKidzo;
     private TextView tvGreeting;
-    private Button btnStart;
+    private MaterialButton btnStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,18 +87,30 @@ public class OnboardingActivity extends AppCompatActivity implements TextToSpeec
 
     private void selectLang(String lang) {
         selectedLang = lang;
-        btnUz.setSelected("uz".equals(lang));
-        btnRu.setSelected("ru".equals(lang));
-        btnEn.setSelected("en".equals(lang));
+        highlightBtn(btnUz, "uz".equals(lang));
+        highlightBtn(btnRu, "ru".equals(lang));
+        highlightBtn(btnEn, "en".equals(lang));
         btnNextLang.setEnabled(true);
     }
 
     private void selectAge(String age) {
         selectedAge = age;
-        btnAge24.setSelected("2-4".equals(age));
-        btnAge57.setSelected("5-7".equals(age));
-        btnAge8plus.setSelected("8+".equals(age));
+        highlightBtn(btnAge24,    "2-4".equals(age));
+        highlightBtn(btnAge57,    "5-7".equals(age));
+        highlightBtn(btnAge8plus, "8+".equals(age));
         btnNextAge.setEnabled(true);
+    }
+
+    private void highlightBtn(MaterialButton btn, boolean selected) {
+        if (selected) {
+            btn.setBackgroundTintList(ColorStateList.valueOf(0xFFFF6B35));
+            btn.setStrokeColor(ColorStateList.valueOf(0xFFFF6B35));
+            btn.setTextColor(0xFFFFFFFF);
+        } else {
+            btn.setBackgroundTintList(ColorStateList.valueOf(0xFFFFF8F0));
+            btn.setStrokeColor(ColorStateList.valueOf(0xFFCCCCCC));
+            btn.setTextColor(0xFF222222);
+        }
     }
 
     void showStep(int step) {
