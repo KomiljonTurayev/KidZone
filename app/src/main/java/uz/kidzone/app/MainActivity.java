@@ -30,11 +30,19 @@ public class MainActivity extends AppCompatActivity {
     private BirdAiManager birdAiManager;
     private int lastBannerHeight = 0;
     private int gameLaunchCount = 0;
+    private android.content.SharedPreferences kzPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+
+        kzPrefs = getSharedPreferences(OnboardingActivity.PREFS, MODE_PRIVATE);
+        if (!kzPrefs.getBoolean(OnboardingActivity.KEY_DONE, false)) {
+            startActivity(new android.content.Intent(this, OnboardingActivity.class));
+            finish();
+            return;
+        }
 
         initializeUI();
         initializeManagers();
@@ -130,6 +138,14 @@ public class MainActivity extends AppCompatActivity {
         webViewManager = new KidWebViewManager(findViewById(R.id.webView));
         webViewManager.setup(new AdMobBridge(), JS_INTERFACE_NAME);
         webViewManager.loadUrl(INDEX_PATH);
+
+        final String lang = kzPrefs.getString(OnboardingActivity.KEY_LANG, "uz");
+        final String age  = kzPrefs.getString(OnboardingActivity.KEY_AGE,  "2-4");
+        webViewManager.setOnPageReadyCallback(() ->
+            webViewManager.evaluateJavascript(
+                "localStorage.setItem('kz-lang','" + lang + "');" +
+                "localStorage.setItem('kz-age','"  + age  + "');")
+        );
 
         setupNavigation();
     }

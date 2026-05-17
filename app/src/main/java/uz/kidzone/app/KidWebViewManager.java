@@ -16,6 +16,8 @@ public class KidWebViewManager {
     private static final String TAG = "KidWebViewManager";
     private final WebView webView;
     private String currentLanguage = "en";
+    private Runnable onPageReadyCallback;
+    private boolean pageReadyCalled = false;
 
     public KidWebViewManager(WebView webView) {
         this.webView = webView;
@@ -27,6 +29,10 @@ public class KidWebViewManager {
 
     public String getLanguage() {
         return currentLanguage;
+    }
+
+    public void setOnPageReadyCallback(Runnable callback) {
+        this.onPageReadyCallback = callback;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -98,14 +104,11 @@ public class KidWebViewManager {
         }
     }
 
-    private static class InternalWebViewClient extends WebViewClient {
+    private class InternalWebViewClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             String url = request.getUrl().toString();
-            if (url.startsWith("file://")) {
-                return false; // local asset — WebView handles it
-            }
-            // External URL (http/https) → open in system browser
+            if (url.startsWith("file://")) return false;
             try {
                 android.content.Intent intent = new android.content.Intent(
                     android.content.Intent.ACTION_VIEW,
@@ -116,6 +119,14 @@ public class KidWebViewManager {
                 Log.w(TAG, "Cannot open external URL: " + url);
             }
             return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            if (!pageReadyCalled && onPageReadyCallback != null) {
+                pageReadyCalled = true;
+                view.post(onPageReadyCallback);
+            }
         }
     }
 }
