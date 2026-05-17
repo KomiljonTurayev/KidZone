@@ -32,6 +32,7 @@ public class OnboardingActivity extends AppCompatActivity implements TextToSpeec
     private View stepLang, stepAge, stepKidzo;
     private MaterialButton btnUz, btnRu, btnEn, btnNextLang;
     private MaterialButton btnAge24, btnAge57, btnAge8plus, btnNextAge, btnBackAge;
+    private TextView tvAgeTitle;
     private ImageView imgKidzo;
     private TextView tvGreeting;
     private MaterialButton btnStart;
@@ -64,6 +65,7 @@ public class OnboardingActivity extends AppCompatActivity implements TextToSpeec
         btnAge8plus = findViewById(R.id.btn_age_8plus);
         btnNextAge  = findViewById(R.id.btn_next_age);
         btnBackAge  = findViewById(R.id.btn_back_age);
+        tvAgeTitle  = findViewById(R.id.tv_age_title);
 
         imgKidzo   = findViewById(R.id.img_kidzo);
         tvGreeting = findViewById(R.id.tv_greeting);
@@ -118,10 +120,28 @@ public class OnboardingActivity extends AppCompatActivity implements TextToSpeec
         stepLang.setVisibility(step == 0 ? View.VISIBLE : View.GONE);
         stepAge.setVisibility(step == 1 ? View.VISIBLE : View.GONE);
         stepKidzo.setVisibility(step == 2 ? View.VISIBLE : View.GONE);
-        if (step == 2) {
+        if (step == 1) {
+            updateAgeStepLabels();
+        } else if (step == 2) {
             animateKidzo();
             updateGreeting();
             speakGreeting();
+        }
+    }
+
+    private void updateAgeStepLabels() {
+        if ("ru".equals(selectedLang)) {
+            tvAgeTitle.setText("Выберите возраст");
+            btnBackAge.setText("← Назад");
+            btnNextAge.setText("Далее →");
+        } else if ("en".equals(selectedLang)) {
+            tvAgeTitle.setText("Select age group");
+            btnBackAge.setText("← Back");
+            btnNextAge.setText("Next →");
+        } else {
+            tvAgeTitle.setText("Yosh guruhini tanlang");
+            btnBackAge.setText("← Orqaga");
+            btnNextAge.setText("Keyingi →");
         }
     }
 
