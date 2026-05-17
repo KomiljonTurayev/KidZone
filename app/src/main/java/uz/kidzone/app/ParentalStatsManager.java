@@ -86,7 +86,7 @@ public class ParentalStatsManager {
         return limit > 0 && getTodayMinutes() >= limit;
     }
 
-    private static String todayPtKey() {
+    static String todayPtKey() {
         return "kz_pt_" + new SimpleDateFormat("yyyyMMdd", Locale.US).format(new Date());
     }
 

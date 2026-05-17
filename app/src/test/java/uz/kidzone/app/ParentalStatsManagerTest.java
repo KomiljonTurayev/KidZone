@@ -30,28 +30,28 @@ public class ParentalStatsManagerTest {
 
     @Test
     public void getTodayMinutes_savedData_returnsSaved() {
-        prefs.edit().putInt(todayKey(), 20).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 20).commit();
         assertEquals(20, mgr.getTodayMinutes());
     }
 
     @Test
     public void isTimeLimitReached_limitZero_alwaysFalse() {
         mgr.setTimeLimitMinutes(0);
-        prefs.edit().putInt(todayKey(), 999).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 999).commit();
         assertFalse(mgr.isTimeLimitReached());
     }
 
     @Test
     public void isTimeLimitReached_belowLimit_false() {
         mgr.setTimeLimitMinutes(30);
-        prefs.edit().putInt(todayKey(), 29).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 29).commit();
         assertFalse(mgr.isTimeLimitReached());
     }
 
     @Test
     public void isTimeLimitReached_atLimit_true() {
         mgr.setTimeLimitMinutes(30);
-        prefs.edit().putInt(todayKey(), 30).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 30).commit();
         assertTrue(mgr.isTimeLimitReached());
     }
 
@@ -76,7 +76,7 @@ public class ParentalStatsManagerTest {
 
     @Test
     public void getWeeklyMinutes_todayAtIndex6() {
-        prefs.edit().putInt(todayKey(), 45).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 45).commit();
         assertEquals(45, mgr.getWeeklyMinutes()[6]);
     }
 
@@ -90,10 +90,5 @@ public class ParentalStatsManagerTest {
     public void onSessionEnd_calledBeforeStart_doesNothing() {
         mgr.onSessionEnd();
         assertEquals(0, mgr.getTodayMinutes());
-    }
-
-    private static String todayKey() {
-        return "kz_pt_" + new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US)
-                .format(new java.util.Date());
     }
 }
