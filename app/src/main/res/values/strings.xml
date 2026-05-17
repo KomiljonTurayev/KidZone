@@ -28,4 +28,16 @@
     <string name="kidzo_error_api">Kidzo biroz charchadi 😴 Keyinroq urinib ko\'ring</string>
     <string name="kidzo_card_play_btn_desc">Eshitish</string>
     <string name="kidzo_thinking_subtitle">Bugun sening uchun eng yaxshi kontent topmoqda…</string>
+
+    <!-- Onboarding -->
+    <string name="onb_lang_hint">🇺🇿 Tilni tanlang · 🇷🇺 Выберите язык · 🇬🇧 Choose language</string>
+    <string name="onb_lang_uz">🇺🇿  O\'zbek</string>
+    <string name="onb_lang_ru">🇷🇺  Русский</string>
+    <string name="onb_lang_en">🇬🇧  English</string>
+    <string name="onb_next">Keyingi →</string>
+    <string name="onb_back">← Orqaga</string>
+    <string name="onb_age_title">Yosh guruhini tanlang</string>
+    <string name="onb_age_24">👶\n2–4</string>
+    <string name="onb_age_57">🧒\n5–7</string>
+    <string name="onb_age_8plus">👦\n8+</string>
 </resources>

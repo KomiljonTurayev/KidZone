@@ -56,6 +56,13 @@
             </intent-filter>
         </activity>
 
+        <!-- ONBOARDING ACTIVITY -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.KidZone"/>
+
     </application>
 
 </manifest>
