@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             uz.kidzone.app.kidzo.ContentFilter contentFilter =
                 uz.kidzone.app.kidzo.ContentFilter.fromAssets(this);
             uz.kidzone.app.kidzo.KidzoAgent kidzoAgent =
-                uz.kidzone.app.kidzo.KidzoAgent.create(contentFilter, this::runOnUiThread);
+                uz.kidzone.app.kidzo.KidzoAgent.createStatic(contentFilter, this::runOnUiThread);
 
             fab.setOnClickListener(v -> {
                 uz.kidzone.app.kidzo.KidzoBottomSheet sheet =

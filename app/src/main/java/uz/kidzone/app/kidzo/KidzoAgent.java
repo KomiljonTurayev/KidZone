@@ -20,6 +20,19 @@ public class KidzoAgent {
         return new KidzoAgent(contentFilter, new RealGeminiCaller(), runner);
     }
 
+    /** Static factory — no Gemini API needed; shows content.json top-5 directly. */
+    public static KidzoAgent createStatic(ContentFilter contentFilter, MainThreadRunner runner) {
+        GeminiCaller staticCaller = (prompt, onSuccess, onError) -> new Thread(() -> {
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+            if (prompt.startsWith("Sen KidZone")) {
+                onSuccess.accept("");   // triggers top-5 fallback in requestRecommendations()
+            } else {
+                onSuccess.accept("Salom! 🐥 Bugun qaysi ertakni tinglaysiz?");
+            }
+        }).start();
+        return new KidzoAgent(contentFilter, staticCaller, runner);
+    }
+
     /** Test constructor — GeminiCaller and MainThreadRunner are injected. */
     KidzoAgent(ContentFilter contentFilter,
                GeminiCaller geminiCaller,
