@@ -15,7 +15,8 @@ const KidUI = (() => {
 
   /* Public API */
   function init({ title, icon, color, gameId, lang }) {
-    _lang  = lang  || 'en';
+    _lang = lang || 'en';
+    if (window !== window.top) return; // running inside KidZone iframe — outer #gv-top already provides the header
     const lv = (typeof KZL !== 'undefined' && gameId)
                ? KZL.getLevel(gameId)
                : 1;
@@ -28,7 +29,6 @@ const KidUI = (() => {
       `<span class="kt-title">${icon} ${title}</span>` +
       `<span class="kt-lv" id="kt-lv">${_t('level')} ${lv}</span>`;
 
-    /* Prepend to body so it sits above the flex children */
     document.body.prepend(hdr);
   }
 
