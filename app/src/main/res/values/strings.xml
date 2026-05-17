@@ -40,4 +40,14 @@
     <string name="onb_age_24">👶\n2–4</string>
     <string name="onb_age_57">🧒\n5–7</string>
     <string name="onb_age_8plus">👦\n8+</string>
+
+    <!-- Parental Dashboard -->
+    <string name="pd_title">👨‍👩‍👧 Parent Zone</string>
+    <string name="pd_stats_header">📊 STATS</string>
+    <string name="pd_content_header">🎮 CONTENT FILTER</string>
+    <string name="pd_limit_header">⏰ TIME LIMIT</string>
+    <string name="pd_security_header">🔒 SECURITY</string>
+    <string name="pd_no_limit">No limit</string>
+    <string name="pd_set_pin">Set PIN</string>
+    <string name="pd_change_pin">Change PIN</string>
 </resources>
