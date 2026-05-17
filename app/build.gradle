@@ -61,6 +61,12 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     // Modern Android App Bundle configuration
     bundle {
         language { enableSplit = true }
@@ -111,4 +117,5 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:5.4.0'
     testImplementation 'org.json:json:20231013'
+    testImplementation 'org.robolectric:robolectric:4.13'
 }
