@@ -1227,6 +1227,19 @@
       app.audioPlayer?.seek(parseFloat(val));
     }
 
+    window.playContent = function(id) {
+      if (!app) return;
+      if (id.startsWith('story-')) {
+        app.ui.switchTab('stories');
+        const item = app.storyManager?.items.find(i => i.id === id);
+        if (item) app.storyManager._play(item);
+      } else if (id.startsWith('song-')) {
+        app.ui.switchTab('songs');
+        const item = app.songManager?.items.find(i => i.id === id);
+        if (item) app.songManager._play(item);
+      }
+    };
+
     // Dynamic Banner Offset handler
     window.updateBannerOffset = function(height) {
         document.documentElement.style.setProperty('--bh', height + 'px');
