@@ -80,7 +80,7 @@
 `local.properties` faylini oching (`.gitignore`da allaqachon bor), quyidagi qatorni qo'shing:
 
 ```
-GEMINI_API_KEY=REMOVED_SECRET
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 - [ ] **Step 4: Sync va tekshirish**
