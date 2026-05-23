@@ -827,6 +827,76 @@ class GameManager {
     }
 }
 
+class ProfileManager {
+    constructor() {
+        this._migrate();
+        if (!localStorage.getItem('kz-active-profile')) {
+            const all = this.getAll();
+            if (all.length) localStorage.setItem('kz-active-profile', all[0].id);
+        }
+    }
+
+    _migrate() {
+        if (localStorage.getItem('kz-profiles') !== null) return;
+        const KEYS = ['pts','badges','lang','age','game-count','story-count',
+                      'song-count','cats-tried','streak-days','cat-off'];
+        KEYS.forEach(k => {
+            const v = localStorage.getItem('kz-' + k);
+            if (v !== null) {
+                localStorage.setItem('kz-p1-' + k, v);
+                localStorage.removeItem('kz-' + k);
+            }
+        });
+        localStorage.setItem('kz-profiles', JSON.stringify([{id:'p1',name:'Profil 1',avatarIdx:0}]));
+        localStorage.setItem('kz-active-profile', 'p1');
+    }
+
+    key(suffix) {
+        return 'kz-' + (localStorage.getItem('kz-active-profile') || 'p1') + '-' + suffix;
+    }
+
+    getActive() {
+        const id = localStorage.getItem('kz-active-profile') || 'p1';
+        return this.getAll().find(p => p.id === id) || {id, name:'Profil 1', avatarIdx:0};
+    }
+
+    getAll() {
+        return JSON.parse(localStorage.getItem('kz-profiles') || '[]');
+    }
+
+    create(name, avatarIdx) {
+        const all = this.getAll();
+        if (all.length >= 5) return null;
+        const id = 'p' + Date.now();
+        all.push({id, name, avatarIdx: parseInt(avatarIdx) || 0});
+        localStorage.setItem('kz-profiles', JSON.stringify(all));
+        return id;
+    }
+
+    rename(id, newName) {
+        const all = this.getAll();
+        const p = all.find(p => p.id === id);
+        if (p) { p.name = newName; localStorage.setItem('kz-profiles', JSON.stringify(all)); }
+    }
+
+    remove(id) {
+        let all = this.getAll();
+        if (all.length <= 1) return;
+        all = all.filter(p => p.id !== id);
+        localStorage.setItem('kz-profiles', JSON.stringify(all));
+        ['pts','badges','lang','age','game-count','story-count',
+         'song-count','cats-tried','streak-days','cat-off'].forEach(k =>
+            localStorage.removeItem('kz-' + id + '-' + k));
+        if (localStorage.getItem('kz-active-profile') === id)
+            localStorage.setItem('kz-active-profile', all[0].id);
+    }
+
+    switchTo(id) {
+        localStorage.setItem('kz-active-profile', id);
+        window.location.reload();
+    }
+}
+
 class BadgeManager {
     constructor() {
         this._badges = JSON.parse(localStorage.getItem('kz-badges') || '[]');
@@ -974,6 +1044,7 @@ class BadgeManager {
 // Initialize application
 let app;
 window.addEventListener("load", () => {
+    window.profileManager = new ProfileManager();
     const translator = new TranslationManager(T);
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);
@@ -1013,4 +1084,5 @@ window.addEventListener("load", () => {
         const loader = document.getElementById("loader");
         if (loader) loader.classList.add("h");
     }, 1400);
+    openProfilePicker();
 });
