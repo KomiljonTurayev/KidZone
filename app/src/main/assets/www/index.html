@@ -552,6 +552,33 @@
     #kzp-progress::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 2px 4px rgba(0,0,0,0.2)}
     #kzp-progress::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:rgba(0,0,0,0.10)}
     #kzp-time{font-size:11px;color:var(--dim);font-weight:700;text-align:right;margin-top:2px}
+
+    /* ── Badge popup ──────────────────────────────── */
+    #badge-popup{
+      position:fixed;top:50%;left:50%;
+      transform:translate(-50%,-50%) scale(0);
+      z-index:9999;pointer-events:auto;
+    }
+    #badge-popup.h{display:none}
+    #badge-popup.bdp-in{animation:bdpIn .4s ease forwards}
+    #badge-popup.bdp-out{animation:bdpOut .3s ease forwards}
+    @keyframes bdpIn{
+      0%{transform:translate(-50%,-50%) scale(0)}
+      70%{transform:translate(-50%,-50%) scale(1.15)}
+      100%{transform:translate(-50%,-50%) scale(1)}
+    }
+    @keyframes bdpOut{
+      from{transform:translate(-50%,-50%) scale(1);opacity:1}
+      to{transform:translate(-50%,-50%) scale(.8);opacity:0}
+    }
+    .bdp-inner{
+      background:#FFF8F0;border-radius:24px;
+      padding:28px 36px;text-align:center;
+      box-shadow:0 8px 32px rgba(0,0,0,.28);min-width:220px;
+    }
+    .bdp-emoji{font-size:56px;margin-bottom:8px}
+    .bdp-name{font-size:20px;font-weight:700;color:#222;margin-bottom:4px}
+    .bdp-desc{font-size:14px;color:#FF6B35;font-weight:600}
   </style>
 </head>
 <body>
@@ -1458,6 +1485,15 @@
     }, 3000);
 
   </script>
+
+  <!-- Badge popup -->
+  <div id="badge-popup" class="h">
+    <div class="bdp-inner">
+      <div id="bdp-emoji" class="bdp-emoji">🏅</div>
+      <div id="bdp-name"  class="bdp-name">Badge!</div>
+      <div id="bdp-desc"  class="bdp-desc">+50 ⭐</div>
+    </div>
+  </div>
 
   <script>
   (function() {
