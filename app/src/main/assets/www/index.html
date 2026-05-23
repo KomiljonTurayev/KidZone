@@ -579,6 +579,49 @@
     .bdp-emoji{font-size:56px;margin-bottom:8px}
     .bdp-name{font-size:20px;font-weight:700;color:#222;margin-bottom:4px}
     .bdp-desc{font-size:14px;color:#FF6B35;font-weight:600}
+    /* ── Badges overlay ───────────────────────────── */
+    #badges-overlay{
+      position:fixed;inset:0;background:#FFF8F0;
+      z-index:1000;display:flex;flex-direction:column;overflow:hidden;
+    }
+    #badges-overlay.h{display:none}
+    #badges-hdr{
+      display:flex;align-items:center;
+      padding:16px;border-bottom:1px solid #EEE;
+      background:#FFF8F0;
+    }
+    #badges-hdr-title{
+      flex:1;font-size:18px;font-weight:700;
+      color:#222;font-family:'Fredoka One',cursive;
+    }
+    #badges-close{
+      background:none;border:none;font-size:22px;
+      color:#888;cursor:pointer;padding:4px 8px;
+    }
+    #badges-progress{
+      text-align:center;font-size:13px;
+      color:#FF6B35;font-weight:600;padding:10px 16px;
+    }
+    #badges-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:12px;padding:16px;overflow-y:auto;flex:1;
+    }
+    .bdg-card{
+      background:#fff;border-radius:16px;
+      padding:16px 8px;text-align:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
+    }
+    .bdg-card.bdg-earned{border:2px solid #FF6B35}
+    .bdg-card.bdg-locked{opacity:.45}
+    .bdg-em{font-size:32px;margin-bottom:6px}
+    .bdg-nm{font-size:11px;color:#444;font-weight:600;line-height:1.3}
+    /* Badge pill in header */
+    #badge-pill{
+      background:var(--surface);border:none;border-radius:50%;
+      width:36px;height:36px;display:flex;align-items:center;
+      justify-content:center;font-size:18px;cursor:pointer;
+      margin-left:2px;flex-shrink:0;
+    }
   </style>
 </head>
 <body>
@@ -769,6 +812,7 @@
     <div id="lang-pill" onclick="openModal('lang-modal')"><span id="lang-cur">🇬🇧 EN</span></div>
     <button id="age-btn" onclick="openModal('age-modal')">👶 2–4 ▾</button>
     <div id="stars-pill">⭐<span id="stars-val">0</span></div>
+    <button id="badge-pill" onclick="openBadges()">🏅</button>
   </div>
 
   <!-- MASCOT -->
@@ -1190,6 +1234,11 @@
     function speakStory() { app.speakStory(); }
     function openAiMusic() { app.openAiMusic(); }
 
+    function openBadges() {
+      document.getElementById('badges-overlay').classList.remove('h');
+      if (window.badgeManager) badgeManager.renderOverlay();
+    }
+
     function switchTab(tab) {
       app.ui.switchTab(tab);
       if (tab === 'stories') app.storyManager?.render();
@@ -1485,6 +1534,16 @@
     }, 3000);
 
   </script>
+
+  <!-- Badges overlay -->
+  <div id="badges-overlay" class="h">
+    <div id="badges-hdr">
+      <div id="badges-hdr-title">🏅 Mening Yutuqlarim</div>
+      <button id="badges-close" onclick="document.getElementById('badges-overlay').classList.add('h')">✕</button>
+    </div>
+    <div id="badges-progress">0 / 16</div>
+    <div id="badges-grid"></div>
+  </div>
 
   <!-- Badge popup -->
   <div id="badge-popup" class="h">
