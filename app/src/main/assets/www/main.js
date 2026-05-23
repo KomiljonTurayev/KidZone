@@ -932,14 +932,14 @@ class BadgeManager {
     _streak(days) {
         if (!days.length) return 0;
         const sorted = [...days].sort();
-        let cur = 1, best = 1;
-        for (let i = 1; i < sorted.length; i++) {
-            const a = new Date(sorted[i-1].replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'));
+        let cur = 1;
+        for (let i = sorted.length - 1; i > 0; i--) {
             const b = new Date(sorted[i].replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'));
-            cur = (b - a) === 86400000 ? cur + 1 : 1;
-            if (cur > best) best = cur;
+            const a = new Date(sorted[i-1].replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'));
+            if ((b - a) === 86400000) cur++;
+            else break;
         }
-        return best;
+        return cur;
     }
 
     renderOverlay() {
