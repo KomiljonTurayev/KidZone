@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String INDEX_PATH = "file:///android_asset/www/index.html";
     private static final int INTERSTITIAL_FREQUENCY = 3;
 
+    static java.lang.ref.WeakReference<MainActivity> instance;
+
     private KidWebViewManager webViewManager;
     private IAdsManager adsManager;
     private SystemUiHelper systemUiHelper;
@@ -31,6 +33,19 @@ public class MainActivity extends AppCompatActivity {
     private int lastBannerHeight = 0;
     private int gameLaunchCount = 0;
     private android.content.SharedPreferences kzPrefs;
+    private ParentalStatsManager statsManager;
+    private android.os.Handler timeLockHandler;
+    private View lockOverlay;
+
+    private final Runnable timeLockRunnable = new Runnable() {
+        @Override public void run() {
+            if (statsManager != null && statsManager.isTimeLimitReached()) {
+                showLockOverlay();
+            } else {
+                timeLockHandler.postDelayed(this, 60_000);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        instance = new java.lang.ref.WeakReference<>(this);
+        statsManager = new ParentalStatsManager(this);
+        timeLockHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
         initializeUI();
         initializeManagers();
@@ -303,6 +322,16 @@ public class MainActivity extends AppCompatActivity {
                 if (webViewManager != null) webViewManager.setLanguage(lang);
             });
         }
+
+        @JavascriptInterface
+        public void openParentalDashboard() {
+            runOnUiThread(() -> showPinDialog());
+        }
+
+        @JavascriptInterface
+        public void gameLaunched(String gameId) {
+            if (statsManager != null) statsManager.onGameLaunched(gameId);
+        }
     }
 
     @Override
@@ -311,17 +340,145 @@ public class MainActivity extends AppCompatActivity {
         systemUiHelper.enableImmersiveMode();
         if (adsManager != null) adsManager.onResume();
         MusicManager.getInstance().startMusic(this);
+        if (statsManager != null) {
+            statsManager.onSessionStart();
+            timeLockHandler.postDelayed(timeLockRunnable, 60_000);
+        }
     }
 
     @Override
     protected void onPause() {
+        if (statsManager != null) {
+            statsManager.onSessionEnd();
+            timeLockHandler.removeCallbacks(timeLockRunnable);
+        }
         if (adsManager != null) adsManager.onPause();
         MusicManager.getInstance().pauseMusic();
         super.onPause();
     }
 
+    void injectJs(String script) {
+        if (webViewManager != null) webViewManager.evaluateJavascript(script);
+    }
+
+    private void showPinDialog() {
+        String savedPin = kzPrefs.getString("kz_pin", null);
+        if (savedPin == null) {
+            PinDialogHelper.showCreate(this, pin -> {
+                kzPrefs.edit().putString("kz_pin", pin).apply();
+                openDashboard();
+            });
+        } else if (savedPin.isEmpty()) {
+            openDashboard();
+        } else {
+            PinDialogHelper.showEnter(this, savedPin, this::openDashboard);
+        }
+    }
+
+    private void openDashboard() {
+        startActivity(new android.content.Intent(this, ParentalDashboardActivity.class));
+    }
+
+    private void showLockOverlay() {
+        if (lockOverlay != null) return;
+        timeLockHandler.removeCallbacks(timeLockRunnable);
+
+        lockOverlay = getLayoutInflater().inflate(R.layout.view_lock_overlay, null);
+
+        String lang = kzPrefs.getString(OnboardingActivity.KEY_LANG, "uz");
+        android.widget.TextView tvTitle = lockOverlay.findViewById(R.id.lock_title);
+        android.widget.TextView tvSub   = lockOverlay.findViewById(R.id.lock_subtitle);
+        if ("ru".equals(lang)) {
+            tvTitle.setText("Время вышло! ⏰");
+            tvSub.setText("Введите PIN для продолжения");
+        } else if ("en".equals(lang)) {
+            tvTitle.setText("Time's up! ⏰");
+            tvSub.setText("Enter parent PIN to continue");
+        }
+
+        String savedPin = kzPrefs.getString("kz_pin", "");
+        View pinSection  = lockOverlay.findViewById(R.id.lock_pin_section);
+        View continueBtn = lockOverlay.findViewById(R.id.lock_continue);
+
+        if (savedPin == null || savedPin.isEmpty()) {
+            pinSection.setVisibility(View.GONE);
+            continueBtn.setVisibility(View.VISIBLE);
+            continueBtn.setOnClickListener(v -> hideLockOverlay());
+        } else {
+            pinSection.setVisibility(View.VISIBLE);
+            continueBtn.setVisibility(View.GONE);
+            wireLockPad(lockOverlay, savedPin);
+        }
+
+        android.widget.FrameLayout decor =
+            (android.widget.FrameLayout) getWindow().getDecorView();
+        decor.addView(lockOverlay, new android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+    }
+
+    private void hideLockOverlay() {
+        if (lockOverlay == null) return;
+        if (statsManager != null) statsManager.setTimeLimitMinutes(0);
+        ((android.widget.FrameLayout) getWindow().getDecorView()).removeView(lockOverlay);
+        lockOverlay = null;
+        timeLockHandler.postDelayed(timeLockRunnable, 60_000);
+    }
+
+    private void wireLockPad(View overlay, String expectedPin) {
+        View[] dots = {
+            overlay.findViewById(R.id.lock_dot1), overlay.findViewById(R.id.lock_dot2),
+            overlay.findViewById(R.id.lock_dot3), overlay.findViewById(R.id.lock_dot4)
+        };
+        View dotsContainer = overlay.findViewById(R.id.lock_dots);
+        StringBuilder entered = new StringBuilder();
+
+        int[] keyIds = {R.id.lock_key_1, R.id.lock_key_2, R.id.lock_key_3,
+                        R.id.lock_key_4, R.id.lock_key_5, R.id.lock_key_6,
+                        R.id.lock_key_7, R.id.lock_key_8, R.id.lock_key_9,
+                        R.id.lock_key_0};
+        String[] digits = {"1","2","3","4","5","6","7","8","9","0"};
+
+        for (int i = 0; i < keyIds.length; i++) {
+            final String d = digits[i];
+            overlay.findViewById(keyIds[i]).setOnClickListener(v -> {
+                if (entered.length() >= 4) return;
+                entered.append(d);
+                updateLockDots(dots, entered.length());
+                if (entered.length() == 4) {
+                    if (entered.toString().equals(expectedPin)) {
+                        hideLockOverlay();
+                    } else {
+                        android.animation.ObjectAnimator anim =
+                            android.animation.ObjectAnimator.ofFloat(dotsContainer, "translationX",
+                                0f, -10f, 10f, -10f, 10f, -5f, 5f, 0f);
+                        anim.setDuration(400);
+                        anim.start();
+                        entered.setLength(0);
+                        updateLockDots(dots, 0);
+                    }
+                }
+            });
+        }
+
+        overlay.findViewById(R.id.lock_key_bsp).setOnClickListener(v -> {
+            if (entered.length() > 0) {
+                entered.deleteCharAt(entered.length() - 1);
+                updateLockDots(dots, entered.length());
+            }
+        });
+    }
+
+    private static void updateLockDots(View[] dots, int count) {
+        for (int i = 0; i < dots.length; i++) {
+            dots[i].setBackgroundResource(
+                i < count ? R.drawable.pin_dot_filled : R.drawable.pin_dot_empty);
+        }
+    }
+
     @Override
     protected void onDestroy() {
+        instance = null;
         if (adsManager != null) adsManager.onDestroy();
         if (webViewManager != null) webViewManager.destroy();
         if (birdAiManager != null) birdAiManager.onDestroy();
