@@ -95,6 +95,12 @@ public class KidWebViewManager {
         }
     }
 
+    public void evaluateJavascript(String script, android.webkit.ValueCallback<String> cb) {
+        if (webView != null) {
+            webView.post(() -> webView.evaluateJavascript(script, cb));
+        }
+    }
+
     public void destroy() {
         if (webView != null) {
             webView.stopLoading();

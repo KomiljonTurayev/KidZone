@@ -361,6 +361,10 @@ public class MainActivity extends AppCompatActivity {
         if (webViewManager != null) webViewManager.evaluateJavascript(script);
     }
 
+    public void evaluateJs(String script, android.webkit.ValueCallback<String> cb) {
+        if (webViewManager != null) webViewManager.evaluateJavascript(script, cb);
+    }
+
     private void showPinDialog() {
         String savedPin = kzPrefs.getString("kz_pin", null);
         if (savedPin == null) {

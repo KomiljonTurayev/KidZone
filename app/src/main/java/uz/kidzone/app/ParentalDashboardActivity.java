@@ -36,6 +36,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
     private MaterialButton btnLimitMinus, btnLimitPlus;
     private TextView tvLimitVal;
     private MaterialButton btnChangePIN;
+    private LinearLayout profilesLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         stats = new ParentalStatsManager(this);
 
         bindViews();
+        loadProfiles();
         loadStats();
         setupAgeButtons();
         setupCategoryToggles();
@@ -69,6 +71,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         btnLimitPlus     = findViewById(R.id.pd_limit_plus);
         tvLimitVal       = findViewById(R.id.pd_limit_val);
         btnChangePIN     = findViewById(R.id.pd_change_pin);
+        profilesLayout   = findViewById(R.id.pd_profiles);
     }
 
     // ── Stats ────────────────────────────────────────────────────────────────
@@ -77,6 +80,97 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         tvToday.setText("Today: " + stats.getTodayMinutes() + " min");
         drawChart(stats.getWeeklyMinutes());
         populateGames(stats.getTodayGames());
+    }
+
+    private void loadProfiles() {
+        MainActivity main = MainActivity.instance != null ? MainActivity.instance.get() : null;
+        if (main == null) return;
+        main.evaluateJs(
+            "JSON.stringify(window.profileManager ? profileManager.getAll() : [])",
+            value -> runOnUiThread(() -> renderProfiles(value))
+        );
+    }
+
+    private void renderProfiles(String json) {
+        if (profilesLayout == null) return;
+        profilesLayout.removeAllViews();
+        if (json == null || json.equals("null")) return;
+        if (json.startsWith("\"")) json = json.substring(1, json.length() - 1).replace("\\\"", "\"");
+        try {
+            org.json.JSONArray arr = new org.json.JSONArray(json);
+            for (int i = 0; i < arr.length(); i++) {
+                org.json.JSONObject p = arr.getJSONObject(i);
+                String id   = p.getString("id");
+                String name = p.getString("name");
+                profilesLayout.addView(buildProfileRow(id, name));
+            }
+        } catch (org.json.JSONException e) { /* ignore */ }
+
+        if (profilesLayout.getChildCount() < 5) {
+            MaterialButton addBtn = new MaterialButton(this);
+            addBtn.setText("+ Profil qo'shish");
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, dp(8), 0, 0);
+            addBtn.setLayoutParams(lp);
+            addBtn.setOnClickListener(v -> showAddProfileDialog());
+            profilesLayout.addView(addBtn);
+        }
+    }
+
+    private View buildProfileRow(String id, String name) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        row.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(48)));
+
+        TextView label = new TextView(this);
+        label.setText("👤  " + name);
+        label.setTextSize(14f);
+        label.setTextColor(0xFF222222);
+        label.setLayoutParams(new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        MaterialButton delBtn = new MaterialButton(this);
+        delBtn.setText("O'chirish");
+        delBtn.setTextSize(12f);
+        delBtn.setOnClickListener(v -> confirmDeleteProfile(id, name));
+
+        row.addView(label);
+        row.addView(delBtn);
+        return row;
+    }
+
+    private void showAddProfileDialog() {
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(this);
+        b.setTitle("Yangi profil");
+        android.widget.EditText et = new android.widget.EditText(this);
+        et.setHint("Ism kiriting");
+        et.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        b.setView(et);
+        b.setPositiveButton("Yaratish", (d, w) -> {
+            String name = et.getText().toString().trim();
+            if (name.isEmpty()) return;
+            injectJs("if(window.profileManager) profileManager.create('" +
+                    name.replace("'", "\\'") + "', 0)");
+            profilesLayout.postDelayed(this::loadProfiles, 400);
+        });
+        b.setNegativeButton("Bekor", null);
+        b.show();
+    }
+
+    private void confirmDeleteProfile(String id, String name) {
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Profilni o'chirish")
+            .setMessage("\"" + name + "\" profilini o'chirishni tasdiqlaysizmi?")
+            .setPositiveButton("O'chirish", (d, w) -> {
+                injectJs("if(window.profileManager) profileManager.remove('" + id + "')");
+                profilesLayout.postDelayed(this::loadProfiles, 400);
+            })
+            .setNegativeButton("Bekor", null)
+            .show();
     }
 
     private void drawChart(int[] weekly) {

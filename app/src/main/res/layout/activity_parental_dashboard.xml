@@ -50,6 +50,25 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- PROFILES -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="👤 Profillar"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/pd_profiles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+            </LinearLayout>
+
             <!-- STATS -->
             <TextView
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
