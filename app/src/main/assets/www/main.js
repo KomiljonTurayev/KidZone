@@ -25,12 +25,12 @@ const BADGE_DEFS = [
 class TranslationManager {
     constructor(translations) {
         this.translations = translations;
-        this.lang = localStorage.getItem("kz-lang") || "en";
+        this.lang = localStorage.getItem(profileManager.key('lang')) || "en";
     }
 
     setLanguage(lang) {
         this.lang = lang;
-        localStorage.setItem("kz-lang", lang);
+        localStorage.setItem(profileManager.key('lang'), lang);
     }
 
     get(key) {
@@ -448,8 +448,8 @@ class GameManager {
         this.games = games;
         this.ui = ui;
         this.translator = translator;
-        this.pts = parseInt(localStorage.getItem("kz-pts") || "0");
-        this.age = localStorage.getItem("kz-age") || "2-4";
+        this.pts = parseInt(localStorage.getItem(profileManager.key('pts')) || "0");
+        this.age = localStorage.getItem(profileManager.key('age')) || "2-4";
         this.isMuted = localStorage.getItem("kz-muted") === "true";
         this.cat = "all";
         this.pinEntry = "";
@@ -457,7 +457,7 @@ class GameManager {
 
     addPoints(n) {
         this.pts += n;
-        localStorage.setItem("kz-pts", this.pts);
+        localStorage.setItem(profileManager.key('pts'), this.pts);
         this.updateProgress();
         if (window.badgeManager) badgeManager.onPointsUpdated(this.pts);
     }
@@ -508,7 +508,7 @@ class GameManager {
 
     setAge(a, el) {
         this.age = a;
-        localStorage.setItem("kz-age", a);
+        localStorage.setItem(profileManager.key('age'), a);
         document.querySelectorAll(".age-card").forEach(x => x.classList.remove("sel"));
         if (el) el.classList.add("sel");
         const ageBtn = document.getElementById("age-btn");
@@ -899,7 +899,7 @@ class ProfileManager {
 
 class BadgeManager {
     constructor() {
-        this._badges = JSON.parse(localStorage.getItem('kz-badges') || '[]');
+        this._badges = JSON.parse(localStorage.getItem(profileManager.key('badges')) || '[]');
         this._queue = [];
         this._busy = false;
     }
@@ -909,7 +909,7 @@ class BadgeManager {
     awardBadge(id) {
         if (this.isEarned(id)) return;
         this._badges.push(id);
-        localStorage.setItem('kz-badges', JSON.stringify(this._badges));
+        localStorage.setItem(profileManager.key('badges'), JSON.stringify(this._badges));
         if (window.app) window.app.addPoints(50);
         this._queue.push(id);
         if (!this._busy) this._next();
@@ -952,13 +952,13 @@ class BadgeManager {
     }
 
     onGamePlayed(catId) {
-        const n = parseInt(localStorage.getItem('kz-game-count') || '0') + 1;
-        localStorage.setItem('kz-game-count', String(n));
+        const n = parseInt(localStorage.getItem(profileManager.key('game-count')) || '0') + 1;
+        localStorage.setItem(profileManager.key('game-count'), String(n));
 
-        const cats = JSON.parse(localStorage.getItem('kz-cats-tried') || '[]');
+        const cats = JSON.parse(localStorage.getItem(profileManager.key('cats-tried')) || '[]');
         if (catId && !cats.includes(catId)) {
             cats.push(catId);
-            localStorage.setItem('kz-cats-tried', JSON.stringify(cats));
+            localStorage.setItem(profileManager.key('cats-tried'), JSON.stringify(cats));
         }
 
         if (n === 1)  this.awardBadge('game_first');
@@ -970,15 +970,15 @@ class BadgeManager {
     }
 
     onStoryPlayed() {
-        const n = parseInt(localStorage.getItem('kz-story-count') || '0') + 1;
-        localStorage.setItem('kz-story-count', String(n));
+        const n = parseInt(localStorage.getItem(profileManager.key('story-count')) || '0') + 1;
+        localStorage.setItem(profileManager.key('story-count'), String(n));
         if (n === 1)  this.awardBadge('story_first');
         if (n === 10) this.awardBadge('story_10');
     }
 
     onSongPlayed() {
-        const n = parseInt(localStorage.getItem('kz-song-count') || '0') + 1;
-        localStorage.setItem('kz-song-count', String(n));
+        const n = parseInt(localStorage.getItem(profileManager.key('song-count')) || '0') + 1;
+        localStorage.setItem(profileManager.key('song-count'), String(n));
         if (n === 1)  this.awardBadge('song_first');
         if (n === 10) this.awardBadge('song_10');
     }
@@ -992,11 +992,11 @@ class BadgeManager {
 
     checkStreak() {
         const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
-        const days = JSON.parse(localStorage.getItem('kz-streak-days') || '[]');
+        const days = JSON.parse(localStorage.getItem(profileManager.key('streak-days')) || '[]');
         if (!days.includes(today)) {
             days.push(today);
             if (days.length > 30) days.shift();
-            localStorage.setItem('kz-streak-days', JSON.stringify(days));
+            localStorage.setItem(profileManager.key('streak-days'), JSON.stringify(days));
         }
         const streak = this._streak(days);
         if (streak >= 3) this.awardBadge('streak_3');
