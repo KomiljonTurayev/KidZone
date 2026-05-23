@@ -622,9 +622,189 @@
       justify-content:center;font-size:18px;cursor:pointer;
       margin-left:2px;flex-shrink:0;
     }
+    /* ── Profile Picker ───────────────────────────────── */
+    #profile-picker{
+      position:fixed;inset:0;background:#FFF8F0;
+      z-index:9000;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:24px;
+    }
+    #profile-picker.h{display:none}
+    #prof-title{
+      font-size:22px;font-weight:700;color:#222;
+      font-family:'Fredoka One',cursive;margin-bottom:24px;text-align:center;
+    }
+    #prof-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:12px;width:100%;max-width:360px;
+    }
+    .prof-card{
+      background:#fff;border-radius:20px;padding:14px 8px;
+      text-align:center;cursor:pointer;
+      box-shadow:0 2px 10px rgba(0,0,0,.1);
+    }
+    .prof-card:active{transform:scale(0.95)}
+    .prof-card.prof-active{border:2px solid #FF6B35}
+    .prof-av{width:56px;height:56px;margin:0 auto 8px;display:block}
+    .prof-av svg{width:100%;height:100%}
+    .prof-name{font-size:12px;font-weight:700;color:#222}
+    .prof-pts{font-size:11px;color:#FF6B35;margin-top:2px}
+    .prof-add{border:2px dashed #CCC;box-shadow:none;background:transparent}
+    .prof-add-icon{font-size:28px;margin-bottom:4px;color:#CCC}
+    #prof-create{width:100%;max-width:360px}
+    #prof-create.h{display:none}
+    #prof-create-title{
+      font-size:16px;font-weight:700;color:#222;
+      margin-bottom:14px;text-align:center;
+    }
+    #prof-name-input{
+      width:100%;padding:12px;border:2px solid #EEE;border-radius:12px;
+      font-size:16px;margin-bottom:14px;box-sizing:border-box;
+      font-family:'Fredoka One',cursive;
+    }
+    #av-picker{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:10px;margin-bottom:16px;
+    }
+    .av-opt{
+      width:56px;height:56px;cursor:pointer;border-radius:50%;
+      border:3px solid transparent;padding:2px;box-sizing:border-box;
+    }
+    .av-opt.selected{border-color:#FF6B35}
+    .av-opt svg{width:100%;height:100%;border-radius:50%}
+    #prof-create-btns{display:flex;gap:10px}
+    .prof-btn{
+      flex:1;padding:12px;border:none;border-radius:12px;
+      font-size:14px;font-weight:700;cursor:pointer;
+    }
+    .prof-btn-primary{background:#FF6B35;color:#fff}
+    .prof-btn-secondary{background:#EEE;color:#555}
+    #prof-grid-wrap.h{display:none}
   </style>
 </head>
 <body>
+
+<!-- Avatar templates -->
+<template id="av-tpl-0">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="38" rx="26" ry="24" fill="#8B4513"/>
+  <circle cx="40" cy="46" r="22" fill="#FFDBB4"/>
+  <ellipse cx="30" cy="17" rx="9" ry="6" fill="#FF69B4"/>
+  <ellipse cx="50" cy="17" rx="9" ry="6" fill="#FF69B4"/>
+  <circle cx="40" cy="17" r="4" fill="#FF1493"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="53" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-1">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="38" rx="26" ry="24" fill="#1C1C1C"/>
+  <circle cx="40" cy="46" r="22" fill="#FFDBB4"/>
+  <ellipse cx="30" cy="17" rx="9" ry="6" fill="#FFD700"/>
+  <ellipse cx="50" cy="17" rx="9" ry="6" fill="#FFD700"/>
+  <circle cx="40" cy="17" r="4" fill="#FFA500"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="53" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-2">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="38" rx="26" ry="24" fill="#DAA520"/>
+  <circle cx="40" cy="46" r="22" fill="#F0B87A"/>
+  <ellipse cx="30" cy="17" rx="9" ry="6" fill="#4169E1"/>
+  <ellipse cx="50" cy="17" rx="9" ry="6" fill="#4169E1"/>
+  <circle cx="40" cy="17" r="4" fill="#0000CD"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="53" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-3">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="38" rx="26" ry="24" fill="#3B1A08"/>
+  <circle cx="40" cy="46" r="22" fill="#C68642"/>
+  <ellipse cx="30" cy="17" rx="9" ry="6" fill="#9B59B6"/>
+  <ellipse cx="50" cy="17" rx="9" ry="6" fill="#9B59B6"/>
+  <circle cx="40" cy="17" r="4" fill="#6C3483"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="53" cy="50" r="5" fill="#FFB6C1" opacity="0.5"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-4">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="30" rx="26" ry="16" fill="#8B4513"/>
+  <circle cx="40" cy="46" r="22" fill="#FFDBB4"/>
+  <path d="M26 30 Q40 14 54 30" fill="#8B4513"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <circle cx="53" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-5">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="30" rx="26" ry="16" fill="#1C1C1C"/>
+  <circle cx="40" cy="46" r="22" fill="#FFDBB4"/>
+  <path d="M26 30 Q40 14 54 30" fill="#1C1C1C"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <circle cx="53" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-6">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="30" rx="26" ry="16" fill="#DAA520"/>
+  <circle cx="40" cy="46" r="22" fill="#F0B87A"/>
+  <path d="M26 30 Q40 14 54 30" fill="#DAA520"/>
+  <circle cx="33" cy="43" r="3.5" fill="#222"/>
+  <circle cx="47" cy="43" r="3.5" fill="#222"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <circle cx="53" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+<template id="av-tpl-7">
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="30" rx="26" ry="16" fill="#222"/>
+  <circle cx="40" cy="46" r="22" fill="#C68642"/>
+  <path d="M26 30 Q40 14 54 30" fill="#222"/>
+  <circle cx="33" cy="43" r="3.5" fill="#111"/>
+  <circle cx="47" cy="43" r="3.5" fill="#111"/>
+  <circle cx="34" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="48" cy="42" r="1.2" fill="#fff"/>
+  <circle cx="27" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <circle cx="53" cy="50" r="4" fill="#FFB6C1" opacity="0.3"/>
+  <path d="M33 53 Q40 59 47 53" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
+</template>
+
 
 <!-- LOADER -->
 <div id="loader">
