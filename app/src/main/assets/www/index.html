@@ -1419,6 +1419,98 @@
       if (window.badgeManager) badgeManager.renderOverlay();
     }
 
+    function openProfilePicker() {
+      renderProfilePicker();
+      document.getElementById('profile-picker').classList.remove('h');
+    }
+
+    function renderProfilePicker() {
+      var profiles = window.profileManager ? profileManager.getAll() : [];
+      var active = window.profileManager ? profileManager.getActive() : {id:''};
+      var grid = document.getElementById('prof-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      profiles.forEach(function(p) {
+        var pts = localStorage.getItem('kz-' + p.id + '-pts') || '0';
+        var card = document.createElement('div');
+        card.className = 'prof-card' + (p.id === active.id ? ' prof-active' : '');
+        var avEl = document.createElement('div');
+        avEl.className = 'prof-av';
+        avEl.innerHTML = getAvatarSvg(p.avatarIdx);
+        var nmEl = document.createElement('div');
+        nmEl.className = 'prof-name';
+        nmEl.textContent = p.name;
+        var ptEl = document.createElement('div');
+        ptEl.className = 'prof-pts';
+        ptEl.textContent = '⭐ ' + pts;
+        card.appendChild(avEl);
+        card.appendChild(nmEl);
+        card.appendChild(ptEl);
+        card.onclick = (function(id){ return function(){ selectProfile(id); }; })(p.id);
+        grid.appendChild(card);
+      });
+      if (profiles.length < 5) {
+        var addCard = document.createElement('div');
+        addCard.className = 'prof-card prof-add';
+        addCard.innerHTML = '<div class="prof-add-icon">➕</div><div class="prof-name">Yangi</div>';
+        addCard.onclick = showCreateProfile;
+        grid.appendChild(addCard);
+      }
+    }
+
+    function selectProfile(id) {
+      if (!window.profileManager) return;
+      if (id === profileManager.getActive().id) {
+        document.getElementById('profile-picker').classList.add('h');
+      } else {
+        profileManager.switchTo(id);
+      }
+    }
+
+    var _selectedAvatarIdx = 0;
+
+    function showCreateProfile() {
+      _selectedAvatarIdx = 0;
+      document.getElementById('prof-grid-wrap').classList.add('h');
+      document.getElementById('prof-create').classList.remove('h');
+      document.getElementById('prof-name-input').value = '';
+      renderAvatarPicker();
+    }
+
+    function cancelCreateProfile() {
+      document.getElementById('prof-create').classList.add('h');
+      document.getElementById('prof-grid-wrap').classList.remove('h');
+    }
+
+    function renderAvatarPicker() {
+      var wrap = document.getElementById('av-picker');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      for (var i = 0; i < 8; i++) {
+        (function(idx) {
+          var opt = document.createElement('div');
+          opt.className = 'av-opt' + (idx === _selectedAvatarIdx ? ' selected' : '');
+          opt.innerHTML = getAvatarSvg(idx);
+          opt.onclick = function() { _selectedAvatarIdx = idx; renderAvatarPicker(); };
+          wrap.appendChild(opt);
+        })(i);
+      }
+    }
+
+    function confirmCreateProfile() {
+      var name = (document.getElementById('prof-name-input').value || '').trim();
+      if (!name || !window.profileManager) return;
+      profileManager.create(name, _selectedAvatarIdx);
+      document.getElementById('prof-create').classList.add('h');
+      document.getElementById('prof-grid-wrap').classList.remove('h');
+      renderProfilePicker();
+    }
+
+    function getAvatarSvg(idx) {
+      var t = document.getElementById('av-tpl-' + idx);
+      return t ? t.innerHTML : '👤';
+    }
+
     function switchTab(tab) {
       app.ui.switchTab(tab);
       if (tab === 'stories') app.storyManager?.render();
@@ -1714,6 +1806,23 @@
     }, 3000);
 
   </script>
+
+  <!-- Profile picker -->
+  <div id="profile-picker" class="h">
+    <div id="prof-title">👶 Kim o'ynaydi?</div>
+    <div id="prof-grid-wrap">
+      <div id="prof-grid"></div>
+    </div>
+    <div id="prof-create" class="h">
+      <div id="prof-create-title">Yangi profil yaratish</div>
+      <input id="prof-name-input" type="text" placeholder="Ism kiriting..." maxlength="12"/>
+      <div id="av-picker"></div>
+      <div id="prof-create-btns">
+        <button class="prof-btn prof-btn-secondary" onclick="cancelCreateProfile()">Bekor</button>
+        <button class="prof-btn prof-btn-primary" onclick="confirmCreateProfile()">Yaratish</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Badges overlay -->
   <div id="badges-overlay" class="h">
