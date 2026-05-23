@@ -361,6 +361,7 @@ class StoryManager extends ContentManager {
     }
 
     _play(item) {
+        if (window.badgeManager) badgeManager.onStoryPlayed();
         const lang = this.translator.lang;
         const title = item.title[lang] || item.title.en;
         const text = item.text ? (item.text[lang] || item.text.en || '') : '';
@@ -401,6 +402,7 @@ class SongManager extends ContentManager {
     }
 
     _play(item) {
+        if (window.badgeManager) badgeManager.onSongPlayed();
         const lang = this.translator.lang;
         const title = item.title[lang] || item.title.en;
         const text = item.text ? (item.text[lang] || item.text.en || '') : '';
@@ -457,6 +459,7 @@ class GameManager {
         this.pts += n;
         localStorage.setItem("kz-pts", this.pts);
         this.updateProgress();
+        if (window.badgeManager) badgeManager.onPointsUpdated(this.pts);
     }
 
     updateProgress() {
@@ -600,6 +603,7 @@ class GameManager {
         if (game) {
             const earned = game.pts || 20;
             this.addPoints(earned);
+            if (window.badgeManager) badgeManager.onGamePlayed(game.cat);
             this.showRewardScreen(earned);
         }
     }
