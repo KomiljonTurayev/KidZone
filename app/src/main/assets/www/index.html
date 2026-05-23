@@ -1459,5 +1459,20 @@
 
   </script>
 
+  <script>
+  (function() {
+    var _pt;
+    var pill = document.getElementById('music-pill');
+    if (!pill) return;
+    pill.addEventListener('touchstart', function() {
+      _pt = setTimeout(function() {
+        if (window.AndroidAdMob) AndroidAdMob.openParentalDashboard();
+      }, 3000);
+    }, { passive: true });
+    pill.addEventListener('touchend', function() { clearTimeout(_pt); }, { passive: true });
+    pill.addEventListener('touchcancel', function() { clearTimeout(_pt); }, { passive: true });
+  })();
+  </script>
+
 </body>
 </html>
