@@ -204,7 +204,10 @@ function showResult(){
   document.getElementById('res-em').textContent = pct>=.8?'🏆':pct>=.6?'⭐':'💪';
   document.getElementById('res-ttl').textContent= pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById('res-sc').textContent = _score+' / '+max;
-  document.getElementById('btn-next').textContent=(pct>=.6&&_level<20)?t.next:t.again;
+  const _showNext = pct>=.6&&_level<20;
+  const _btnNext = document.getElementById('btn-next');
+  _btnNext.textContent = _showNext ? t.next : t.again;
+  _btnNext.style.display = _showNext ? '' : 'none';
   document.getElementById('result-screen').classList.remove('hidden');
   engine.reportScore(Math.round(_score/2));
   if(pct>=.6){
