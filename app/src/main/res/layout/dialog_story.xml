@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#FFFEF3C7"
+    android:elevation="8dp">
+
+    <ImageView
+        android:id="@+id/imgBirdIcon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/splash_icon"
+        android:contentDescription="@string/ai_bird_name" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="@string/ai_bird_name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#1A1A1A" />
+
+    <ProgressBar
+        android:id="@+id/pbThinking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvStoryContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/ai_thinking"
+        android:textSize="15sp"
+        android:textColor="#333333"
+        android:lineSpacingMultiplier="1.4"
+        android:minHeight="80dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnPlayMusic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="@string/btn_play_music"
+            android:textSize="13sp"
+            android:backgroundTint="#FF6B35" />
+
+        <Button
+            android:id="@+id/btnCloseStory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/btn_close"
+            android:textSize="13sp"
+            android:backgroundTint="#9E9E9E" />
+
+    </LinearLayout>
+
+</LinearLayout>

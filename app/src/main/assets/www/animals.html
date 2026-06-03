@@ -410,8 +410,9 @@ function showResult() {
   document.getElementById('res-stars').textContent = cfg.stars;
 
   const btnNext = document.getElementById('btn-next');
-  btnNext.textContent = (passed && level < 20) ? t.next : t.again;
-  btnNext.style.display = '';
+  const showNext = passed && level < 20;
+  btnNext.textContent = showNext ? t.next : t.again;
+  btnNext.style.display = showNext ? '' : 'none';
 
   if (passed) {
     engine.spawnConfetti();
