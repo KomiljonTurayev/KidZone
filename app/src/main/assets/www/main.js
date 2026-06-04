@@ -396,53 +396,6 @@ class StoryManager extends ContentManager {
     }
 }
 
-class SongManager extends ContentManager {
-    constructor(player, translator, ui) {
-        super('songs', player, translator, ui);
-    }
-
-    _play(item) {
-        if (window.badgeManager) badgeManager.onSongPlayed();
-        const lang = this.translator.lang;
-        const title = item.title[lang] || item.title.en;
-        const text = item.text ? (item.text[lang] || item.text.en || '') : '';
-
-        if (text) {
-            // Show lyrics in viewer + speak immediately
-            document.getElementById('aiv-story-title').textContent = item.emoji + ' ' + title;
-            document.getElementById('aiv-content').textContent = text;
-            document.getElementById('aiv-content-wrap').classList.remove('h');
-            document.getElementById('aiv-loading').classList.add('h');
-            document.getElementById('ai-viewer').classList.remove('h');
-            document.getElementById('aiv-title-text').textContent = title;
-            if (window.app?._doSpeak) window.app._doSpeak.call(window.app);
-        }
-
-        // Try audio if available
-        const src = item.audio ? (item.audio[lang] || item.audio.en) : null;
-        if (src) {
-            this.currentId = item.id;
-            this.render();
-            if (text) this._showPlayer(item.emoji + ' ' + title);
-            this.player.play(src, title,
-                (cur, dur) => this._onTimeUpdate(cur, dur),
-                () => this._onEnded(),
-                () => {
-                    this._hidePlayer();
-                    this.currentId = null;
-                    this.render();
-                    // If no text shown and audio failed, show friendly message
-                    if (!text) this.ui.showToast(item.emoji + ' ' + (lang==='uz'?"Audio tez orada qo'shiladi":lang==='ru'?'Аудио скоро будет':'Audio coming soon'));
-                }
-            );
-        } else if (!text) {
-            // No audio, no text — show coming soon
-            const msg = lang==='uz'?"🎵 Bu qo'shiq tez orada qo'shiladi!":lang==='ru'?'🎵 Эта песня скоро появится!':'🎵 This song is coming soon!';
-            this.ui.showToast(msg);
-        }
-    }
-}
-
 class GameManager {
     constructor(games, ui, translator) {
         this.games = games;
@@ -1051,7 +1004,6 @@ window.addEventListener("load", () => {
 
     const audioPlayer = new AudioPlayer();
     app.storyManager = new StoryManager(audioPlayer, translator, ui);
-    app.songManager  = new SongManager(audioPlayer, translator, ui);
     app.audioPlayer  = audioPlayer;
 
     // Initial state
@@ -1068,7 +1020,6 @@ window.addEventListener("load", () => {
 
     // Load content and render
     app.storyManager.load().then(() => app.storyManager.render());
-    app.songManager.load().then(() => app.songManager.render());
 
     // Reward ad callback from Java
     window.onRewardGranted = function(amount) {

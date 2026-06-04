@@ -505,7 +505,7 @@
     #main.with-player{padding-bottom:calc(var(--bh)+68px+78px+16px)!important}
 
     /* ── CONTENT SECTIONS ── */
-    #stories-section,#songs-section{padding-top:10px}
+    #stories-section{padding-top:10px}
 
     /* ── CONTENT CATEGORY CHIPS (first!) ── */
     .cc-cats{display:flex;gap:8px;overflow-x:auto;padding:0 var(--pad) 10px;scrollbar-width:none;-webkit-mask-image:linear-gradient(to right,black calc(100% - 24px),transparent);mask-image:linear-gradient(to right,black calc(100% - 24px),transparent)}
@@ -1020,7 +1020,6 @@
   <div id="tab-bar">
     <button class="kz-tab active" id="tab-games" onclick="switchTab('games')">🎮 <span id="tab-lbl-games">O'yinlar</span></button>
     <button class="kz-tab" id="tab-stories" onclick="switchTab('stories')">📖 <span id="tab-lbl-stories">Ertaklar</span></button>
-    <button class="kz-tab" id="tab-songs" onclick="switchTab('songs')">🎵 <span id="tab-lbl-songs">Qo'shiqlar</span></button>
   </div>
 
   <!-- MAIN -->
@@ -1146,28 +1145,6 @@
       <div class="content-grid" id="stories-grid"></div>
     </div><!-- /#stories-section -->
 
-    <!-- SONGS SECTION -->
-    <div id="songs-section" class="h">
-      <!-- 1. Categories first -->
-      <div class="cc-cats" id="songs-cats">
-        <button class="cc-chip active" onclick="songFilter(document.getElementById('songs-search').value,'all',this)">🎯 <span id="socat-all">Hammasi</span></button>
-        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'lullaby',this)">🌙 <span id="socat-lullaby">Allalar</span></button>
-        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'alphabet',this)">🔤 <span id="socat-alphabet">Alifbo</span></button>
-        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'animals',this)">🐾 <span id="socat-animals">Hayvonlar</span></button>
-        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'dance',this)">💃 <span id="socat-dance">Raqs</span></button>
-        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'games',this)">🎮 <span id="socat-games">O'yin</span></button>
-      </div>
-      <!-- 2. Search second -->
-      <div class="cs-search-wrap">
-        <input class="cs-search" type="text" id="songs-search"
-               placeholder="🔍 Qo'shiq qidirish..."
-               oninput="clearTimeout(window._sSo);window._sSo=setTimeout(()=>{var v=this.value;document.getElementById('songs-search-clear').classList.toggle('h',!v);songFilter(v,window._songCat||'all')},180)">
-        <button class="cs-clear h" id="songs-search-clear" onclick="clearSongSearch()">✕</button>
-      </div>
-      <div class="cs-count" id="songs-count"></div>
-      <!-- 3. Grid last -->
-      <div class="content-grid" id="songs-grid"></div>
-    </div><!-- /#songs-section -->
 
   </div><!-- /#main -->
 </div><!-- /#shell -->
@@ -1294,11 +1271,10 @@
         exit_msg: "Haqiqatan ham o'yindan chiqmoqchimisiz? To'plangan ballaringiz saqlanmasligi mumkin.",
         yes: "Ha",
         no: "Yo'q",
-        tabGames:"O'yinlar", tabStories:"Ertaklar", tabSongs:"Qo'shiqlar",
-        searchStory:"Ertak qidirish...", searchSong:"Qo'shiq qidirish...",
+        tabGames:"O'yinlar", tabStories:"Ertaklar",
+        searchStory:"Ertak qidirish...",
         catAll:"Hammasi", catAnimals:"Hayvonlar", catNature:"Tabiat",
         catHeroes:"Qahramonlar", catFamily:"Oila", catSpace:"Koinot",
-        catLullaby:"Allalar", catAlphabet:"Alifbo", catDance:"Raqs", catGamesLabel:"O'yin",
         noAudio:"Audio fayl yo'q 🎵",
       },
       ru: {
@@ -1340,11 +1316,10 @@
         exit_msg: "Вы действительно хотите выйти? Ваши баллы могут не сохраниться.",
         yes: "Да",
         no: "Нет",
-        tabGames:"Игры", tabStories:"Сказки", tabSongs:"Песни",
-        searchStory:"Поиск сказки...", searchSong:"Поиск песни...",
+        tabGames:"Игры", tabStories:"Сказки",
+        searchStory:"Поиск сказки...",
         catAll:"Все", catAnimals:"Животные", catNature:"Природа",
         catHeroes:"Герои", catFamily:"Семья", catSpace:"Космос",
-        catLullaby:"Колыбельные", catAlphabet:"Азбука", catDance:"Танцы", catGamesLabel:"Игры",
         noAudio:"Аудио недоступно 🎵",
       },
       en: {
@@ -1386,11 +1361,10 @@
         exit_msg: "Do you really want to exit? Your progress might not be saved.",
         yes: "Yes",
         no: "No",
-        tabGames:"Games", tabStories:"Stories", tabSongs:"Songs",
-        searchStory:"Search story...", searchSong:"Search song...",
+        tabGames:"Games", tabStories:"Stories",
+        searchStory:"Search story...",
         catAll:"All", catAnimals:"Animals", catNature:"Nature",
         catHeroes:"Heroes", catFamily:"Family", catSpace:"Space",
-        catLullaby:"Lullabies", catAlphabet:"Alphabet", catDance:"Dance", catGamesLabel:"Games",
         noAudio:"Audio unavailable 🎵",
       },
     };
@@ -1514,11 +1488,9 @@
     function switchTab(tab) {
       app.ui.switchTab(tab);
       if (tab === 'stories') app.storyManager?.render();
-      if (tab === 'songs') app.songManager?.render();
     }
 
     window._storyCat = 'all';
-    window._songCat  = 'all';
 
     function storyFilter(query, cat, chipEl) {
       if (chipEl) {
@@ -1530,16 +1502,6 @@
       app.storyManager?.render();
     }
 
-    function songFilter(query, cat, chipEl) {
-      if (chipEl) {
-        document.querySelectorAll('#songs-cats .cc-chip').forEach(c => c.classList.remove('active'));
-        chipEl.classList.add('active');
-      }
-      if (cat) window._songCat = cat;
-      app.songManager?.filter(query || '', window._songCat);
-      app.songManager?.render();
-    }
-
     function clearStorySearch() {
       var inp = document.getElementById('stories-search');
       var btn = document.getElementById('stories-search-clear');
@@ -1548,23 +1510,13 @@
       storyFilter('', window._storyCat || 'all');
     }
 
-    function clearSongSearch() {
-      var inp = document.getElementById('songs-search');
-      var btn = document.getElementById('songs-search-clear');
-      if (inp) inp.value = '';
-      if (btn) btn.classList.add('h');
-      songFilter('', window._songCat || 'all');
-    }
-
     function playerToggle() {
       const active = localStorage.getItem('kz-tab');
       if (active === 'stories') app.storyManager?.togglePlay();
-      else if (active === 'songs') app.songManager?.togglePlay();
     }
 
     function playerStop() {
       app.storyManager?.stop();
-      app.songManager?.stop();
       app.audioPlayer?.stop();
       const player = document.getElementById('kz-player');
       if (player) player.classList.add('h');
@@ -1581,10 +1533,6 @@
         app.ui.switchTab('stories');
         const item = app.storyManager?.items.find(i => i.id === id);
         if (item) app.storyManager._play(item);
-      } else if (id.startsWith('song-')) {
-        app.ui.switchTab('songs');
-        const item = app.songManager?.items.find(i => i.id === id);
-        if (item) app.songManager._play(item);
       }
     };
 
@@ -1683,16 +1631,12 @@
         const t2 = T[app.translator.lang];
         const tg = document.getElementById('tab-lbl-games');
         const ts = document.getElementById('tab-lbl-stories');
-        const tso = document.getElementById('tab-lbl-songs');
         if (tg) tg.textContent = t2.tabGames;
         if (ts) ts.textContent = t2.tabStories;
-        if (tso) tso.textContent = t2.tabSongs;
 
         // Search placeholders
         const ssearch = document.getElementById('stories-search');
         if (ssearch) ssearch.placeholder = '🔍 ' + t2.searchStory;
-        const sosearch = document.getElementById('songs-search');
-        if (sosearch) sosearch.placeholder = '🔍 ' + t2.searchSong;
 
         // Story category chip labels
         const scatMap = {
@@ -1701,16 +1645,8 @@
         };
         Object.entries(scatMap).forEach(([id,lbl]) => { const el=document.getElementById(id); if(el) el.textContent=lbl; });
 
-        // Song category chip labels
-        const socatMap = {
-          'socat-all':t2.catAll,'socat-lullaby':t2.catLullaby,'socat-alphabet':t2.catAlphabet,
-          'socat-animals':t2.catAnimals,'socat-dance':t2.catDance,'socat-games':t2.catGamesLabel
-        };
-        Object.entries(socatMap).forEach(([id,lbl]) => { const el=document.getElementById(id); if(el) el.textContent=lbl; });
-
         // Re-render content grids in new language
         app.storyManager?.render();
-        app.songManager?.render();
     }
 
     function buildFeatured() {
