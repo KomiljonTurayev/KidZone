@@ -1213,6 +1213,7 @@
 
 <!-- ADMOB BANNER: Java Layout (bannerContainer) tomonidan ko'rsatiladi -->
 
+  <script src="kidai.js"></script>
   <script src="main.js"></script>
   <script>
     // ════════════════════════════════════════════════════
@@ -1314,6 +1315,8 @@
         catAll:"Hammasi", catAnimals:"Hayvonlar", catNature:"Tabiat",
         catHeroes:"Qahramonlar", catFamily:"Oila", catSpace:"Koinot",
         noAudio:"Audio fayl yo'q 🎵",
+        tabKidai:"KidAI", kidaiPlaceholder:"Yoz...", kidaiClear:"Tozala",
+        kidaiQ1:"📖 Ertak ayt", kidaiQ2:"🎮 O'yin topchi", kidaiQ3:"❓ Savol ber",
       },
       ru: {
         heroH:"Играйте всей<br>Семьей! 👨‍👩‍👧",
@@ -1359,6 +1362,8 @@
         catAll:"Все", catAnimals:"Животные", catNature:"Природа",
         catHeroes:"Герои", catFamily:"Семья", catSpace:"Космос",
         noAudio:"Аудио недоступно 🎵",
+        tabKidai:"KidAI", kidaiPlaceholder:"Напиши...", kidaiClear:"Очистить",
+        kidaiQ1:"📖 Расскажи сказку", kidaiQ2:"🎮 Найди игру", kidaiQ3:"❓ Вопрос",
       },
       en: {
         heroH:"Play Together<br>with Family! 👨‍👩‍👧",
@@ -1404,6 +1409,8 @@
         catAll:"All", catAnimals:"Animals", catNature:"Nature",
         catHeroes:"Heroes", catFamily:"Family", catSpace:"Space",
         noAudio:"Audio unavailable 🎵",
+        tabKidai:"KidAI", kidaiPlaceholder:"Type...", kidaiClear:"Clear",
+        kidaiQ1:"📖 Tell a story", kidaiQ2:"🎮 Find a game", kidaiQ3:"❓ Ask me",
       },
     };
 
@@ -1523,9 +1530,128 @@
       return t ? t.innerHTML : '👤';
     }
 
+    // ── KIDAI CHAT ──────────────────────────────────────────────
+    var _kaiCtx = {};
+    var _kaiMsgId = 0;
+
+    function kaiSend() {
+      var inp = document.getElementById('kai-input');
+      var text = inp.value.trim();
+      if (!text) return;
+      inp.value = '';
+      kaiHandleInput(text);
+    }
+
+    function kaiQuick(intent) {
+      var lang = app && app.translator ? app.translator.lang : 'uz';
+      var prompts = {
+        story: {uz:"Ertak ayt", ru:"Расскажи сказку", en:"Tell me a story"},
+        game:  {uz:"O'yin topchi", ru:"Найди игру", en:"Find me a game"},
+        fact:  {uz:"Savol beraman", ru:"Задам вопрос", en:"I have a question"}
+      };
+      kaiHandleInput((prompts[intent] || prompts.fact)[lang] || 'story');
+    }
+
+    function kaiHandleInput(text) {
+      kaiAppendMsg(text, 'user', null, null);
+      kaiShowTyping();
+      setTimeout(function() {
+        kaiHideTyping();
+        var lang = app && app.translator ? app.translator.lang : 'uz';
+        var response = window.kidAI
+          ? window.kidAI.respond(text, lang)
+          : {type:'fallback', text:'...', chips:[]};
+        if (response) kaiAppendMsg(response.text, 'bot', response.chips, response);
+      }, 600);
+    }
+
+    function kaiAppendMsg(text, role, chips, ctx) {
+      var list = document.getElementById('kidai-messages');
+      var msgId = ++_kaiMsgId;
+      if (ctx) _kaiCtx[msgId] = ctx;
+      var div = document.createElement('div');
+      div.className = 'kai-msg' + (role === 'user' ? ' user' : '');
+      if (role === 'bot') {
+        var html = text
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+          .replace(/\n/g,'<br>');
+        var chipsHtml = '';
+        if (chips && chips.length) {
+          chipsHtml = '<div class="kai-chips">' +
+            chips.map(function(c) {
+              return '<button class="kai-chip" data-chip="' +
+                c.replace(/"/g,'&quot;') + '" data-mid="' + msgId +
+                '" onclick="kaiChipTap(this)">' + c + '</button>';
+            }).join('') + '</div>';
+        }
+        div.innerHTML = '<span class="kai-av">🤖</span><div><div class="kai-bub">' +
+          html + '</div>' + chipsHtml + '</div>';
+      } else {
+        var safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        div.innerHTML = '<div class="kai-bub">' + safe + '</div>';
+      }
+      list.appendChild(div);
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function kaiShowTyping() {
+      var list = document.getElementById('kidai-messages');
+      var div = document.createElement('div');
+      div.className = 'kai-msg';
+      div.id = 'kai-typing';
+      div.innerHTML = '<span class="kai-av">🤖</span>' +
+        '<div class="kai-bub kai-typing"><span></span><span></span><span></span></div>';
+      list.appendChild(div);
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function kaiHideTyping() {
+      var el = document.getElementById('kai-typing');
+      if (el) el.remove();
+    }
+
+    function kaiChipTap(btn) {
+      var chip = btn.getAttribute('data-chip');
+      var msgId = parseInt(btn.getAttribute('data-mid'));
+      var ctx = _kaiCtx[msgId];
+
+      if (chip.indexOf("o'qi") !== -1 || chip.indexOf('Read full') !== -1 ||
+          chip.indexOf('полностью') !== -1) {
+        if (ctx && ctx.storyId && app && app.storyManager) {
+          var items = app.storyManager.items;
+          var item = items && items.find(function(i){ return i.id === ctx.storyId; });
+          if (item) { app.storyManager._play(item); return; }
+        }
+      }
+      if (chip.indexOf("O'yna") !== -1 || chip.indexOf('Play!') !== -1 ||
+          chip.indexOf('Играть') !== -1) {
+        if (ctx && ctx.gameObj) { if (app) app.openGame(ctx.gameObj); return; }
+        if (ctx && ctx.gameId) {
+          var g = GAMES.find(function(x){ return x.id === ctx.gameId; });
+          if (g && app) { app.openGame(g); return; }
+        }
+      }
+      kaiHandleInput(chip);
+    }
+
+    function kaiInit() {
+      var list = document.getElementById('kidai-messages');
+      if (list && list.childElementCount === 0) {
+        var lang = app && app.translator ? app.translator.lang : 'uz';
+        var r = window.kidAI ? window.kidAI._greeting(lang)
+          : {type:'greeting',
+             text:"Salom! 👋 Men KidAI — sening bilim do'sting!",
+             chips:["📖 Ertak ayt","🎮 O'yin topchi","❓ Savol ber"]};
+        kaiAppendMsg(r.text, 'bot', r.chips, r);
+      }
+    }
+    // ────────────────────────────────────────────────────────────
+
     function switchTab(tab) {
       app.ui.switchTab(tab);
       if (tab === 'stories') app.storyManager?.render();
+      if (tab === 'kidai') kaiInit();
     }
 
     window._storyCat = 'all';
@@ -1671,6 +1797,13 @@
         const ts = document.getElementById('tab-lbl-stories');
         if (tg) tg.textContent = t2.tabGames;
         if (ts) ts.textContent = t2.tabStories;
+        const tk = document.getElementById('tab-lbl-kidai');
+        if (tk) tk.textContent = t2.tabKidai;
+        const kInput = document.getElementById('kai-input');
+        if (kInput) kInput.placeholder = t2.kidaiPlaceholder;
+        const q1 = document.getElementById('kai-q1'); if (q1) q1.textContent = t2.kidaiQ1;
+        const q2 = document.getElementById('kai-q2'); if (q2) q2.textContent = t2.kidaiQ2;
+        const q3 = document.getElementById('kai-q3'); if (q3) q3.textContent = t2.kidaiQ3;
 
         // Search placeholders
         const ssearch = document.getElementById('stories-search');
