@@ -89,7 +89,7 @@ class UIManager {
         document.querySelectorAll('.kz-tab').forEach(t => t.classList.remove('active'));
         const tabEl = document.getElementById('tab-' + tab);
         if (tabEl) tabEl.classList.add('active');
-        ['games', 'stories', 'songs'].forEach(s => {
+        ['games', 'stories', 'kidai'].forEach(s => {
             const el = document.getElementById(s + '-section');
             if (el) el.classList.toggle('h', s !== tab);
         });
