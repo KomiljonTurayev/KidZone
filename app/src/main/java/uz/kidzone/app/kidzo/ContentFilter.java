@@ -52,21 +52,18 @@ public class ContentFilter {
         }
     }
 
-    /** Top 5 items (stories first). */
+    /** Top 5 stories (songs removed from app). */
     public List<ContentItem> getTop5() {
-        List<ContentItem> all = new ArrayList<>(stories);
-        all.addAll(songs);
-        int limit = Math.min(5, all.size());
-        return new ArrayList<>(all.subList(0, limit));
+        int limit = Math.min(5, stories.size());
+        return new ArrayList<>(stories.subList(0, limit));
     }
 
-    /** Filter by keyword — title (uz/ru/en) or category. */
+    /** Filter stories by keyword — title (uz/ru/en) or category. */
     public List<ContentItem> getFiltered(String query) {
         if (query == null || query.trim().isEmpty()) return getTop5();
         String q = query.toLowerCase().trim();
         List<ContentItem> result = new ArrayList<>();
         for (ContentItem item : stories) { if (matches(item, q)) result.add(item); }
-        for (ContentItem item : songs)   { if (matches(item, q)) result.add(item); }
         int limit = Math.min(5, result.size());
         return new ArrayList<>(result.subList(0, limit));
     }

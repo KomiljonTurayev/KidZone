@@ -94,11 +94,52 @@ public class KidzoAgent {
     public void sendChatMessage(String userMessage) {
         final int gen = ++callGeneration;
         setState(KidzoState.THINKING, null);
-        geminiCaller.call(
-            "Sen Kidzo. Qisqa javob ber: " + userMessage,
-            text -> { if (gen == callGeneration) setState(KidzoState.CHATTING, text); },
-            err  -> { if (gen == callGeneration) setState(KidzoState.ERROR, err); }
-        );
+        new Thread(() -> {
+            try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+            if (gen != callGeneration) return;
+            setState(KidzoState.CHATTING, buildOfflineResponse(userMessage.toLowerCase().trim()));
+        }).start();
+    }
+
+    private String buildOfflineResponse(String lower) {
+        if (lower.matches(".*(salom|assalom|hello|hi|привет).*"))
+            return "Salom! 🐥 Men Kidzo — sening bilim do'sting! Ertak eshitmoqchimisan?";
+
+        if (lower.matches(".*(ertak|hikoya|ayt|eshit|story|сказку|расскажи).*")) {
+            List<ContentItem> results = contentFilter.getFiltered(lower);
+            if (results.isEmpty()) results = contentFilter.getTop5();
+            if (!results.isEmpty()) {
+                ContentItem item = results.get((int) (Math.random() * results.size()));
+                return "📖 " + item.emoji + " \"" + item.titleUz + "\" ertagi! Ochish uchun kartochkaga bos 👆";
+            }
+        }
+
+        if (lower.matches(".*(hayvon|sher|fil|mushuk|qush|animal|lion|жив).*")) {
+            String[] facts = {
+                "🦁 Sher — o'rmonning qiroli! U juda kuchli.",
+                "🐘 Fil — quruqlikdagi eng katta hayvon!",
+                "🦒 Jirafa — eng bo'yi baland hayvon. Bo'yni 2 metrga yetadi!",
+                "🐬 Delfinlar — dengizning eng aqlli jonzotlari."
+            };
+            return facts[(int) (Math.random() * facts.length)];
+        }
+
+        if (lower.matches(".*(rang|color|цвет|kamalak|qizil|yashil|ko'k).*"))
+            return "🌈 Kamalakda 7 ta rang: qizil, to'q sariq, sariq, yashil, ko'k, moviy, binafsha!";
+
+        if (lower.matches(".*(son|raqam|number|число|hisob|matematik|qo'sh).*"))
+            return "🔢 1 dan 10 gacha: bir, ikki, uch, to'rt, besh, olti, yetti, sakkiz, to'qqiz, o'n!";
+
+        if (lower.matches(".*(sayyora|planet|koinot|space|космос|oy|quyosh|moon).*"))
+            return "🪐 Quyosh sistemasida 8 ta sayyora bor. Yer — uchinchisi!";
+
+        if (lower.matches(".*(shakl|doira|kvadrat|shape|circle|square|фигур).*"))
+            return "🔵 Doira, 🔶 uchburchak, 🟦 kvadrat — asosiy shakllar!";
+
+        if (lower.matches(".*(meva|fruit|фрукт|olma|banan|apple|apelsin).*"))
+            return "🍎 Olma, 🍌 banan, 🍊 apelsin — foydali mevalar!";
+
+        return "🤔 Tushunmadim, lekin yordam bera olaman! \"ertak ayt\" de yoki hayvonlar, sayyoralar, ranglar haqida so'ra 📖";
     }
 
     public void dismiss() {
