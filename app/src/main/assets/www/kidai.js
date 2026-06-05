@@ -197,6 +197,19 @@ class KidAIEngine {
     return null;
   }
 
+  _randomFact(lang) {
+    const cats = Object.values(_KAI_FACT_DB);
+    const cat = cats[Math.floor(Math.random() * cats.length)];
+    const list = cat[lang] || cat.en;
+    const text = list[Math.floor(Math.random() * list.length)];
+    const CHIPS = {
+      uz: ['❓ Yana', '📖 Ertak', "🎮 O'yin"],
+      ru: ['❓ Ещё', '📖 Сказка', '🎮 Игра'],
+      en: ['❓ More', '📖 Story', '🎮 Game']
+    };
+    return { type: 'fact', text, chips: CHIPS[lang] || CHIPS.en };
+  }
+
   // ── INTENT DETECTION ─────────────────────────────────────────
 
   _detectIntent(text) {
