@@ -1547,7 +1547,7 @@
       var prompts = {
         story: {uz:"Ertak ayt", ru:"Расскажи сказку", en:"Tell me a story"},
         game:  {uz:"O'yin topchi", ru:"Найди игру", en:"Find me a game"},
-        fact:  {uz:"Savol beraman", ru:"Задам вопрос", en:"I have a question"}
+        fact:  {uz:"Hayvon haqida nima bilasan", ru:"Что интересного расскажешь", en:"What is interesting to know"}
       };
       kaiHandleInput((prompts[intent] || prompts.fact)[lang] || 'story');
     }
@@ -1639,10 +1639,20 @@
       var list = document.getElementById('kidai-messages');
       if (list && list.childElementCount === 0) {
         var lang = app && app.translator ? app.translator.lang : 'uz';
+        var fallbackGreetings = {
+          uz: "Salom! 👋 Men KidAI — sening bilim do'sting!",
+          ru: "Привет! 👋 Я KidAI — твой умный друг!",
+          en: "Hello! 👋 I'm KidAI — your learning buddy!"
+        };
+        var fallbackChips = {
+          uz: ["📖 Ertak ayt","🎮 O'yin topchi","❓ Savol ber"],
+          ru: ["📖 Расскажи сказку","🎮 Найди игру","❓ Вопрос"],
+          en: ["📖 Tell a story","🎮 Find a game","❓ Ask me"]
+        };
         var r = window.kidAI ? window.kidAI._greeting(lang)
           : {type:'greeting',
-             text:"Salom! 👋 Men KidAI — sening bilim do'sting!",
-             chips:["📖 Ertak ayt","🎮 O'yin topchi","❓ Savol ber"]};
+             text: fallbackGreetings[lang] || fallbackGreetings.en,
+             chips: fallbackChips[lang] || fallbackChips.en};
         kaiAppendMsg(r.text, 'bot', r.chips, r);
       }
     }

@@ -1038,7 +1038,9 @@ window.addEventListener("load", () => {
     };
 
     // Restore last active tab
-    const savedTab = localStorage.getItem('kz-tab') || 'games';
+    const validTabs = ['games', 'stories', 'kidai'];
+    const rawTab = localStorage.getItem('kz-tab') || 'games';
+    const savedTab = validTabs.includes(rawTab) ? rawTab : 'games';
     ui.switchTab(savedTab);
 
     setTimeout(() => {

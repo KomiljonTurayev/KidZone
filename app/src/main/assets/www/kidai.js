@@ -159,7 +159,7 @@ class KidAIEngine {
     const KW = {
       greeting: ['salom','assalom','xayr','yaxshimisan',
                  'привет','здравствуй','пока',
-                 'hello','hi','bye'],
+                 'hello','bye'],
       story:    ["ertak","hikoya","aytib ber","ayt","eshit","o'qi",
                  'сказку','сказка','расскажи',
                  'story','tale','tell','read'],
