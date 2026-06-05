@@ -644,7 +644,13 @@ class GameManager {
 
         // Simulate AI thinking
         setTimeout(() => {
-            const story = this.getAiStory(this.translator.lang);
+            const raw = window.kidAI
+              ? window.kidAI.retrieveStory(this.translator.lang, null)
+              : this.getAiStory(this.translator.lang);
+            const story = raw && raw.title && typeof raw.title === 'object'
+              ? { title: raw.title[this.translator.lang] || raw.title.en,
+                  text:  raw.text[this.translator.lang]  || raw.text.en  }
+              : raw;
             document.getElementById("aiv-story-title").textContent = story.title;
             document.getElementById("aiv-content").textContent = story.text;
 
@@ -1019,7 +1025,10 @@ window.addEventListener("load", () => {
     }
 
     // Load content and render
-    app.storyManager.load().then(() => app.storyManager.render());
+    app.storyManager.load().then(() => {
+      app.storyManager.render();
+      window.kidAI = new KidAIEngine(app.storyManager.items, GAMES);
+    });
 
     // Reward ad callback from Java
     window.onRewardGranted = function(amount) {
