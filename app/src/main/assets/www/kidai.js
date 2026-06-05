@@ -2,7 +2,15 @@
 
 const _KAI_FACT_DB = {
   hayvon: {
-    kws: ['hayvon','animal','животн','sher','fil','mushuk','qush','bear','lion','elephant','tiger','aysiq'],
+    kws: [
+      'hayvon','animal','животн',
+      'sher','fil','mushuk','qush','bear','lion','elephant','tiger','aysiq',
+      'it','kuchuk','baliq','qo\'y','ot','echki','tulki','bo\'ri','kiyik',
+      'dog','cat','fish','bird','horse','sheep','wolf','fox','deer','rabbit',
+      'quyon','maymun','zebra','krokodil','crocodile','monkey',
+      'кошка','собака','рыба','птица','лошадь','овца','волк','лиса','олень',
+      'медведь','тигр','обезьяна','крокодил','зебра','кролик'
+    ],
     uz: ["🦁 Sher — o'rmonning qiroli! U juda kuchli va tez yuguradi.",
          '🐘 Fil — quruqlikdagi eng katta hayvon, juda aqlli!',
          "🦒 Jirafa — eng bo'yi baland hayvon. Bo'yni 2 metrga yetadi!",
@@ -20,7 +28,14 @@ const _KAI_FACT_DB = {
          '🦋 A butterfly goes through 4 stages: egg → caterpillar → pupa → butterfly!']
   },
   rang: {
-    kws: ["rang","color","цвет","colour","kamalak","qizil","yashil","ko'k","red","blue","green","rainbow","sariq"],
+    kws: [
+      "rang","color","цвет","colour","kamalak","qizil","yashil","ko'k",
+      "red","blue","green","rainbow","sariq",
+      "oq","qora","white","black","purple","binafsha","pink","atirgul",
+      "kulrang","grey","gray","brown","jigarrang","moviy","to'q sariq","orange",
+      "синий","красный","жёлтый","белый","чёрный","розовый","фиолетовый",
+      "серый","коричневый","оранжевый","радуга"
+    ],
     uz: ["🌈 Kamalakda 7 ta rang: qizil, to'q sariq, sariq, yashil, ko'k, moviy, binafsha.",
          "❤️ Qizil rang — issiqlik va kuchni bildiradi!",
          "💛 Sariq rang — quyosh rangi, quvonch va baxtni bildiradi.",
@@ -35,7 +50,14 @@ const _KAI_FACT_DB = {
          '💚 Green is the color of nature and hope.']
   },
   son: {
-    kws: ["son","raqam","number","число","hisob","count","matematik","qo'sh","plus","sana"],
+    kws: [
+      "son","raqam","number","число","hisob","count","matematik","qo'sh","plus","sana",
+      "ikki","uch","to'rt","besh","olti","yetti","sakkiz","to'qqiz","o'n",
+      "two","three","four","five","six","seven","eight","nine","ten",
+      "два","три","четыре","пять","шесть","семь","восемь","девять","десять",
+      "ayir","minus","subtract","ko'payt","multiply","bo'l","divide",
+      "juft","toq","even","odd","чётный","нечётный","нуль","zero","nol"
+    ],
     uz: ["🔢 1 dan 10 gacha: bir, ikki, uch, to'rt, besh, olti, yetti, sakkiz, to'qqiz, o'n!",
          "➕ 2+3=5, 4+4=8, 5+5=10 — qo'shishni bilasanmi?",
          '🔢 Eng katta bir xonali son — 9!',
@@ -50,7 +72,12 @@ const _KAI_FACT_DB = {
          '🔢 Zero (0) is very important in math!']
   },
   shakl: {
-    kws: ['shakl','shape','фигур','doira','kvadrat','circle','square','triangle','uchburchak','rectangle'],
+    kws: [
+      'shakl','shape','фигур','doira','kvadrat','circle','square','triangle','uchburchak','rectangle',
+      'yulduz','star','oval','kub','cube','silindr','cylinder','konus','cone',
+      'to\'rtburchak','pentagon','hexagon','olti burchak',
+      'звезда','куб','цилиндр','конус','овал','прямоугольник','треугольник','круг','квадрат'
+    ],
     uz: ["🔵 Doira — burchaklari yo'q dumaloq shakl. G'ildirak, quyosh doira!",
          '🔶 Uchburchak — 3 ta burchagi va 3 ta tomoni bor.',
          '🟦 Kvadrat — 4 ta teng tomoni bor.',
@@ -65,7 +92,12 @@ const _KAI_FACT_DB = {
          '🟥 A rectangle has 4 corners but sides can be different lengths.']
   },
   sayyora: {
-    kws: ['sayyora','planet','планет','koinot','space','космос','oy','moon','quyosh','sun','yulduz','star','mars'],
+    kws: [
+      'sayyora','planet','планет','koinot','space','космос','oy','moon','quyosh','sun','yulduz','star','mars',
+      'raketa','rocket','astronavt','astronaut','galaktika','galaxy','kosmoschi',
+      'saturn','yupiter','jupiter','venera','venus','merkuriy','mercury','neptun','neptune','uran','uranus',
+      'ракета','астронавт','галактика','звезда','луна','солнце','сатурн','юпитер'
+    ],
     uz: ['🪐 Quyosh sistemasida 8 ta sayyora bor. Yer — uchinchisi!',
          "🌙 Oy — Yerning yo'ldoshi, Yer atrofida aylanadi.",
          "☀️ Quyosh — bizning yulduzimiz. Yer undan million marta kichik!",
@@ -80,7 +112,12 @@ const _KAI_FACT_DB = {
          '🔴 Mars is the red planet, fourth from the Sun.']
   },
   meva: {
-    kws: ['meva','fruit','фрукт','olma','banan','apple','banana','orange','apelsin','uzum','grape'],
+    kws: [
+      'meva','fruit','фрукт','olma','banan','apple','banana','orange','apelsin','uzum','grape',
+      'tarvuz','watermelon','nok','pear','gilos','cherry','qovun','melon','anor','pomegranate',
+      'limon','lemon','mango','ananas','pineapple','shaftoli','peach','o\'rik','apricot',
+      'sabzavot','vegetable','овощ','арбуз','груша','вишня','дыня','гранат','лимон','манго'
+    ],
     uz: ["🍎 Olma — juda foydali meva, vitaminlar ko'p!",
          '🍌 Banan — sariq, mazali va quvvat beradi!',
          "🍊 Apelsin — C vitamini ko'p, shamollashdan saqlaydi!",
