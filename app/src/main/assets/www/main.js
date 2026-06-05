@@ -646,11 +646,12 @@ class GameManager {
         setTimeout(() => {
             const raw = window.kidAI
               ? window.kidAI.retrieveStory(this.translator.lang, null)
-              : this.getAiStory(this.translator.lang);
-            const story = raw && raw.title && typeof raw.title === 'object'
-              ? { title: raw.title[this.translator.lang] || raw.title.en,
-                  text:  raw.text[this.translator.lang]  || raw.text.en  }
-              : raw;
+              : null;
+            const fallback = raw || this.getAiStory(this.translator.lang);
+            const story = fallback && typeof fallback.title === 'object'
+              ? { title: fallback.title[this.translator.lang] || fallback.title.en,
+                  text:  fallback.text[this.translator.lang]  || fallback.text.en  }
+              : fallback;
             document.getElementById("aiv-story-title").textContent = story.title;
             document.getElementById("aiv-content").textContent = story.text;
 
