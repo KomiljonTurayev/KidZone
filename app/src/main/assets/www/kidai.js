@@ -189,6 +189,14 @@ class KidAIEngine {
     return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
 
+  _detectTopic(text) {
+    const lower = text.toLowerCase();
+    for (const [cat, data] of Object.entries(_KAI_FACT_DB)) {
+      if (data.kws.some(kw => lower.includes(kw))) return cat;
+    }
+    return null;
+  }
+
   // ── INTENT DETECTION ─────────────────────────────────────────
 
   _detectIntent(text) {
