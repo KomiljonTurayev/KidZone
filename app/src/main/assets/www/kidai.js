@@ -316,12 +316,32 @@ class KidAIEngine {
   }
 
   _fallback(lang) {
-    const T = {
-      uz: "🤔 Tushunmadim, lekin yordam bera olaman! Ertak, o'yin yoki savol — nima kerak?",
-      ru: '🤔 Не понял, но я помогу! Сказка, игра или вопрос — что нужно?',
-      en: "🤔 I didn't get that, but I can help! Story, game, or question?"
+    const pool = {
+      uz: [
+        "🤔 Tushunmadim, lekin yordam bera olaman! Ertak, o'yin yoki savol?",
+        "🌟 Qiziq so'rov! Menga ertak yoki o'yin haqida so'ra.",
+        "💡 Bilmayman, lekin ko'p narsani bilaman! Hayvonlar, sayyoralar, ranglar...",
+        "🔍 Izladim, topolmadim. Boshqacha yozsang-chi?",
+        "😊 Keling, birga o'rganamiz! Nima haqida bilmoqchisan?"
+      ],
+      ru: [
+        '🤔 Не понял, но помогу! Сказка, игра или вопрос?',
+        '🌟 Интересный запрос! Спроси про сказку или игру.',
+        '💡 Не знаю этого, но знаю многое! Животные, планеты, цвета...',
+        '🔍 Поискал — не нашёл. Попробуй написать иначе?',
+        '😊 Давай учиться вместе! О чём хочешь узнать?'
+      ],
+      en: [
+        "🤔 I didn't get that, but I can help! Story, game, or question?",
+        '🌟 Interesting! Ask me about a story or a game.',
+        "💡 I don't know that, but I know lots! Animals, planets, colors...",
+        "🔍 Searched but didn't find it. Try writing differently?",
+        "😊 Let's learn together! What do you want to know?"
+      ]
     };
-    return { type:'fallback', text:T[lang]||T.en, chips:this._defaultChips(lang) };
+    const list = pool[lang] || pool.en;
+    const text = list[Math.floor(Math.random() * list.length)];
+    return { type: 'fallback', text, chips: this._defaultChips(lang) };
   }
 
   _defaultChips(lang) {
