@@ -156,13 +156,16 @@ class KidAIEngine {
   respond(text, lang) {
     if (!text || !text.trim()) return null;
     const input  = text.slice(0, 200);
+
+    const topic = this._detectTopic(input);
+    if (topic) return this._fact(input, lang);
+
     const intent = this._detectIntent(input);
     switch (intent) {
       case 'greeting': return this._greeting(lang);
       case 'story':    return this._story(input, lang);
       case 'game':     return this._game(input, lang);
-      case 'fact':     return this._fact(input, lang);
-      default:         return this._fallback(lang);
+      default:         return this._randomFact(lang);
     }
   }
 
