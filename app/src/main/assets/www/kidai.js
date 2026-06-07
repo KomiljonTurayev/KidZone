@@ -215,26 +215,28 @@ class KidAIEngine {
   _detectIntent(text) {
     const lower = text.toLowerCase();
     const KW = {
-      greeting: ['salom','assalom','xayr','yaxshimisan',
-                 'привет','здравствуй','пока',
-                 'hello','bye'],
-      story:    ["ertak","hikoya","aytib ber","ayt","eshit","o'qi",
-                 'сказку','сказка','расскажи',
-                 'story','tale','tell','read'],
-      game:     ["o'yin","o'yna","ko'rsat",
-                 'игру','игра','играть','покажи',
-                 'game','play'],
-      fact:     ['nima','nega','qanday','qancha','kim','qachon',
-                 'что','почему','как','сколько','кто',
-                 'what','why','how','who','when']
+      greeting: [
+        'salom','assalom','xayr','yaxshimisan','qalaysan','nima gap',
+        'привет','здравствуй','пока','как дела',
+        'hello','bye','hi','hey','sup','yo'
+      ],
+      story: [
+        "ertak","hikoya","aytib ber","ayt","eshit","o'qi","bitta","boshla","davom","eshitay",
+        'сказку','сказка','расскажи','начни','продолжи',
+        'story','tale','tell','read','begin','once upon'
+      ],
+      game: [
+        "o'yin","o'yna","ko'rsat","qanday o'yin","nimani o'ynayman",
+        'игру','игра','играть','покажи','какую игру','запусти',
+        'game','play','show','launch'
+      ]
     };
-    const scores = { greeting: 0, story: 0, game: 0, fact: 0 };
+    const scores = { greeting: 0, story: 0, game: 0 };
     for (const [intent, keywords] of Object.entries(KW)) {
       for (const kw of keywords) { if (lower.includes(kw)) scores[intent]++; }
     }
     const max = Math.max(...Object.values(scores));
     if (!max) return 'fallback';
-    if (scores.fact === max) return 'fact';
     return Object.keys(scores).find(k => scores[k] === max) || 'fallback';
   }
 
