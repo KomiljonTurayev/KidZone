@@ -74,9 +74,9 @@ const _KAI_FACT_DB = {
   shakl: {
     kws: [
       'shakl','shape','фигур','doira','kvadrat','circle','square','triangle','uchburchak','rectangle',
-      'yulduz','star','oval','kub','cube','silindr','cylinder','konus','cone',
+      'oval','kub','cube','silindr','cylinder','konus','cone',
       'to\'rtburchak','pentagon','hexagon','olti burchak',
-      'звезда','куб','цилиндр','конус','овал','прямоугольник','треугольник','круг','квадрат'
+      'куб','цилиндр','конус','овал','прямоугольник','треугольник','круг','квадрат'
     ],
     uz: ["🔵 Doira — burchaklari yo'q dumaloq shakl. G'ildirak, quyosh doira!",
          '🔶 Uchburchak — 3 ta burchagi va 3 ta tomoni bor.',
