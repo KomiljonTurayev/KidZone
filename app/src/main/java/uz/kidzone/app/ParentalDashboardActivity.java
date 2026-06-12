@@ -37,6 +37,9 @@ public class ParentalDashboardActivity extends AppCompatActivity {
     private TextView tvLimitVal;
     private MaterialButton btnChangePIN;
     private LinearLayout profilesLayout;
+    private View cloudHeader, cloudCard;
+    private TextView tvCloudStatus;
+    private MaterialButton btnCloudSignIn, btnCloudSignOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         setupCategoryToggles();
         setupTimeLimitControls();
         setupPinButton();
+        setupCloudBackup();
 
         findViewById(R.id.pd_back).setOnClickListener(v -> finish());
     }
@@ -72,6 +76,11 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         tvLimitVal       = findViewById(R.id.pd_limit_val);
         btnChangePIN     = findViewById(R.id.pd_change_pin);
         profilesLayout   = findViewById(R.id.pd_profiles);
+        cloudHeader      = findViewById(R.id.pd_cloud_header);
+        cloudCard        = findViewById(R.id.pd_cloud_card);
+        tvCloudStatus    = findViewById(R.id.pd_cloud_status);
+        btnCloudSignIn   = findViewById(R.id.pd_cloud_signin_btn);
+        btnCloudSignOut  = findViewById(R.id.pd_cloud_signout_btn);
     }
 
     // ── Stats ────────────────────────────────────────────────────────────────
@@ -357,6 +366,107 @@ public class ParentalDashboardActivity extends AppCompatActivity {
                 btnChangePIN.setText(newPin.isEmpty() ? "Set PIN" : "Change PIN");
             })
         );
+    }
+
+    // ── Cloud Backup ──────────────────────────────────────────────────────────
+
+    private void setupCloudBackup() {
+        refreshCloudUi();
+        btnCloudSignIn.setOnClickListener(v -> showAuthDialog(false));
+        btnCloudSignOut.setOnClickListener(v -> {
+            FirebaseManager.getInstance().signOut();
+            refreshCloudUi();
+        });
+    }
+
+    private void refreshCloudUi() {
+        FirebaseManager fm = FirebaseManager.getInstance();
+        if (!fm.isAvailable()) {
+            cloudHeader.setVisibility(View.GONE);
+            cloudCard.setVisibility(View.GONE);
+            return;
+        }
+        cloudHeader.setVisibility(View.VISIBLE);
+        cloudCard.setVisibility(View.VISIBLE);
+
+        com.google.firebase.auth.FirebaseUser user = fm.getCurrentUser();
+        if (user != null) {
+            String email = user.getEmail() != null ? user.getEmail() : "";
+            tvCloudStatus.setText(getString(R.string.pd_cloud_signed_in_as, email));
+            btnCloudSignIn.setVisibility(View.GONE);
+            btnCloudSignOut.setVisibility(View.VISIBLE);
+        } else {
+            tvCloudStatus.setText(R.string.pd_cloud_signin);
+            btnCloudSignIn.setVisibility(View.VISIBLE);
+            btnCloudSignOut.setVisibility(View.GONE);
+        }
+    }
+
+    private void showAuthDialog(boolean createMode) {
+        View view = getLayoutInflater().inflate(R.layout.dialog_email_auth, null);
+        TextView title = view.findViewById(R.id.auth_title);
+        com.google.android.material.textfield.TextInputEditText etEmail = view.findViewById(R.id.auth_email);
+        com.google.android.material.textfield.TextInputEditText etPassword = view.findViewById(R.id.auth_password);
+        TextView tvError = view.findViewById(R.id.auth_error);
+        MaterialButton btnSubmit = view.findViewById(R.id.auth_submit);
+        MaterialButton btnToggle = view.findViewById(R.id.auth_toggle_mode);
+
+        final boolean[] mode = {createMode};
+        applyAuthMode(title, btnSubmit, btnToggle, mode[0]);
+
+        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(true)
+                .create();
+
+        btnToggle.setOnClickListener(v -> {
+            mode[0] = !mode[0];
+            applyAuthMode(title, btnSubmit, btnToggle, mode[0]);
+            tvError.setVisibility(View.GONE);
+        });
+
+        btnSubmit.setOnClickListener(v -> {
+            String email = String.valueOf(etEmail.getText()).trim();
+            String password = String.valueOf(etPassword.getText());
+            if (email.isEmpty() || password.isEmpty()) {
+                tvError.setText(R.string.cloud_error_empty_fields);
+                tvError.setVisibility(View.VISIBLE);
+                return;
+            }
+            FirebaseManager.AuthCallback cb = new FirebaseManager.AuthCallback() {
+                @Override public void onSuccess(com.google.firebase.auth.FirebaseUser user) {
+                    runOnUiThread(() -> {
+                        dialog.dismiss();
+                        refreshCloudUi();
+                    });
+                }
+                @Override public void onError(String message) {
+                    runOnUiThread(() -> {
+                        tvError.setText(message != null ? message : getString(R.string.cloud_error_generic));
+                        tvError.setVisibility(View.VISIBLE);
+                    });
+                }
+            };
+            if (mode[0]) {
+                FirebaseManager.getInstance().createAccountWithEmail(email, password, cb);
+            } else {
+                FirebaseManager.getInstance().signInWithEmail(email, password, cb);
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void applyAuthMode(TextView title, MaterialButton submit, MaterialButton toggle, boolean createMode) {
+        if (createMode) {
+            title.setText(R.string.cloud_create_account_title);
+            submit.setText(R.string.cloud_create_account_title);
+            toggle.setText(R.string.cloud_toggle_to_signin);
+        } else {
+            title.setText(R.string.cloud_signin_title);
+            submit.setText(R.string.cloud_signin_title);
+            toggle.setText(R.string.cloud_toggle_to_create);
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
