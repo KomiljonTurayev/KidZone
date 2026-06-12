@@ -1,4 +1,17 @@
 // Top-level build file
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Firebase Gradle plugin — applied conditionally by app/build.gradle,
+        // only when app/google-services.json exists.
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
 plugins {
     id 'com.android.application' version '8.2.2' apply false
 }

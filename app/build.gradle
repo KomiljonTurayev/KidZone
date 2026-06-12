@@ -98,6 +98,10 @@ dependencies {
     // Google Services
     implementation 'com.google.android.gms:play-services-ads:23.6.0'
 
+    // Firebase (CRM Block 1 — Auth foundation)
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+    implementation 'com.google.firebase:firebase-auth'
+
     // Material Design 3
     implementation 'com.google.android.material:material:1.12.0'
 
@@ -118,4 +122,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.4.0'
     testImplementation 'org.json:json:20231013'
     testImplementation 'org.robolectric:robolectric:4.13'
+}
+
+// Apply the Google Services plugin only when a real config file is present,
+// so the project still builds for contributors without Firebase credentials.
+if (file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
 }
