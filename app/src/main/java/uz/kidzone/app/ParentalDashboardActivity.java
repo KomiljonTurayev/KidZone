@@ -353,7 +353,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         btnChangePIN.setText((pin != null && !pin.isEmpty()) ? "Change PIN" : "Set PIN");
         btnChangePIN.setOnClickListener(v ->
             PinDialogHelper.showCreate(this, newPin -> {
-                prefs.edit().putString("kz_pin", newPin).apply();
+                prefs.edit().putString("kz_pin", newPin.isEmpty() ? "" : PinUtil.hash(newPin)).apply();
                 btnChangePIN.setText(newPin.isEmpty() ? "Set PIN" : "Change PIN");
             })
         );

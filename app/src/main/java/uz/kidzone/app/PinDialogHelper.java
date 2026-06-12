@@ -59,7 +59,7 @@ public class PinDialogHelper {
     }
 
     /** Show "Enter PIN" flow — no skip button. Calls cb.onVerified() on correct PIN. */
-    public static void showEnter(Context ctx, String expectedPin, OnPinVerified cb) {
+    public static void showEnter(Context ctx, String expectedHash, OnPinVerified cb) {
         View view = LayoutInflater.from(ctx).inflate(R.layout.dialog_pin, null);
         TextView tvTitle = view.findViewById(R.id.pin_title);
         tvTitle.setText("Enter parent PIN");
@@ -71,7 +71,7 @@ public class PinDialogHelper {
                 .setView(view).setCancelable(true).create();
 
         wireKeypad(view, entered, () -> {
-            if (entered.toString().equals(expectedPin)) {
+            if (PinUtil.matches(entered.toString(), expectedHash)) {
                 dialog.dismiss();
                 cb.onVerified();
             } else {

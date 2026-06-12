@@ -369,13 +369,14 @@ public class MainActivity extends AppCompatActivity {
         String savedPin = kzPrefs.getString("kz_pin", null);
         if (savedPin == null) {
             PinDialogHelper.showCreate(this, pin -> {
-                kzPrefs.edit().putString("kz_pin", pin).apply();
+                kzPrefs.edit().putString("kz_pin", pin.isEmpty() ? "" : PinUtil.hash(pin)).apply();
                 openDashboard();
             });
         } else if (savedPin.isEmpty()) {
             openDashboard();
         } else {
-            PinDialogHelper.showEnter(this, savedPin, this::openDashboard);
+            String hash = PinUtil.getOrMigrateHash(kzPrefs, "kz_pin");
+            PinDialogHelper.showEnter(this, hash, this::openDashboard);
         }
     }
 
@@ -400,18 +401,18 @@ public class MainActivity extends AppCompatActivity {
             tvSub.setText("Enter parent PIN to continue");
         }
 
-        String savedPin = kzPrefs.getString("kz_pin", "");
+        String savedPinHash = PinUtil.getOrMigrateHash(kzPrefs, "kz_pin");
         View pinSection  = lockOverlay.findViewById(R.id.lock_pin_section);
         View continueBtn = lockOverlay.findViewById(R.id.lock_continue);
 
-        if (savedPin == null || savedPin.isEmpty()) {
+        if (savedPinHash == null || savedPinHash.isEmpty()) {
             pinSection.setVisibility(View.GONE);
             continueBtn.setVisibility(View.VISIBLE);
             continueBtn.setOnClickListener(v -> hideLockOverlay());
         } else {
             pinSection.setVisibility(View.VISIBLE);
             continueBtn.setVisibility(View.GONE);
-            wireLockPad(lockOverlay, savedPin);
+            wireLockPad(lockOverlay, savedPinHash);
         }
 
         android.widget.FrameLayout decor =
@@ -429,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
         timeLockHandler.postDelayed(timeLockRunnable, 60_000);
     }
 
-    private void wireLockPad(View overlay, String expectedPin) {
+    private void wireLockPad(View overlay, String expectedHash) {
         View[] dots = {
             overlay.findViewById(R.id.lock_dot1), overlay.findViewById(R.id.lock_dot2),
             overlay.findViewById(R.id.lock_dot3), overlay.findViewById(R.id.lock_dot4)
@@ -450,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
                 entered.append(d);
                 updateLockDots(dots, entered.length());
                 if (entered.length() == 4) {
-                    if (entered.toString().equals(expectedPin)) {
+                    if (PinUtil.matches(entered.toString(), expectedHash)) {
                         hideLockOverlay();
                     } else {
                         android.animation.ObjectAnimator anim =
