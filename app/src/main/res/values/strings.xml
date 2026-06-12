@@ -2,10 +2,11 @@
 <resources>
     <string name="app_name">KidZone</string>
 
-    <!-- ✅ ADMOB UNIT IDs — PASTE YOUR ACTUAL IDs BELOW -->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
-    <string name="rewarded_ad_unit_id">ca-app-pub-3940256099942544/5224354917</string>
+    <!-- ✅ ADMOB UNIT IDs -->
+    <string name="banner_ad_unit_id">ca-app-pub-3291187691091325/6512602917</string>
+    <string name="banner_bottom_ad_unit_id">ca-app-pub-3291187691091325/9947441737</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-3291187691091325/4259797529</string>
+    <string name="rewarded_ad_unit_id">ca-app-pub-3291187691091325/2312494290</string>
 
     <string name="ai_bird_name">Aqlli Qushcha</string>
     <string name="ai_bird_desc">Bolalar uchun ertakchi qush</string>
@@ -50,4 +51,18 @@
     <string name="pd_no_limit">No limit</string>
     <string name="pd_set_pin">Set PIN</string>
     <string name="pd_change_pin">Change PIN</string>
+
+    <!-- Cloud Backup (CRM Block 1) -->
+    <string name="pd_cloud_header">☁️ CLOUD BACKUP</string>
+    <string name="pd_cloud_signin">Sign in to sync</string>
+    <string name="pd_cloud_signout">Sign out</string>
+    <string name="pd_cloud_signed_in_as">Signed in as %1$s</string>
+    <string name="cloud_email_hint">Email</string>
+    <string name="cloud_password_hint">Password (min 6 characters)</string>
+    <string name="cloud_signin_title">Sign in</string>
+    <string name="cloud_create_account_title">Create account</string>
+    <string name="cloud_toggle_to_create">Need an account? Create one</string>
+    <string name="cloud_toggle_to_signin">Already have an account? Sign in</string>
+    <string name="cloud_error_generic">Something went wrong. Please try again.</string>
+    <string name="cloud_error_empty_fields">Enter email and password</string>
 </resources>

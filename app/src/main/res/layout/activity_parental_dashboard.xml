@@ -229,7 +229,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp" app:cardElevation="2dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="16dp">
                 <LinearLayout
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:padding="16dp">
@@ -238,6 +238,46 @@
                         android:layout_width="match_parent" android:layout_height="48dp"
                         android:text="@string/pd_set_pin"
                         android:backgroundTint="#FF6B35"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- CLOUD BACKUP -->
+            <TextView
+                android:id="@+id/pd_cloud_header"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/pd_cloud_header"
+                android:textSize="13sp" android:textStyle="bold"
+                android:textColor="#FF6B35" android:layout_marginBottom="8dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/pd_cloud_card"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp" app:cardElevation="2dp"
+                android:layout_marginBottom="32dp">
+                <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/pd_cloud_status"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="@string/pd_cloud_signin"
+                        android:textSize="14sp" android:textColor="#222222"
+                        android:layout_marginBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/pd_cloud_signin_btn"
+                        android:layout_width="match_parent" android:layout_height="48dp"
+                        android:text="@string/pd_cloud_signin"
+                        android:backgroundTint="#FF6B35"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/pd_cloud_signout_btn"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent" android:layout_height="48dp"
+                        android:text="@string/pd_cloud_signout"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
