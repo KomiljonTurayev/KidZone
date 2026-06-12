@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         instance = new java.lang.ref.WeakReference<>(this);
+        FirebaseManager.init(this);
         statsManager = new ParentalStatsManager(this);
         timeLockHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
