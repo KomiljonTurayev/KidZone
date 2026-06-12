@@ -23,6 +23,9 @@ local.properties
 *.keystore
 keystore.properties
 
+## Firebase – credentials, not the template ##
+app/google-services.json
+
 ## Misc ##
 *.swp
 *.swo
