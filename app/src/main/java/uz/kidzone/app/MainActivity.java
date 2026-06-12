@@ -366,16 +366,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPinDialog() {
-        String savedPin = kzPrefs.getString("kz_pin", null);
-        if (savedPin == null) {
+        String hash = PinUtil.getOrMigrateHash(kzPrefs, "kz_pin");
+        if (hash == null) {
             PinDialogHelper.showCreate(this, pin -> {
                 kzPrefs.edit().putString("kz_pin", pin.isEmpty() ? "" : PinUtil.hash(pin)).apply();
                 openDashboard();
             });
-        } else if (savedPin.isEmpty()) {
+        } else if (hash.isEmpty()) {
             openDashboard();
         } else {
-            String hash = PinUtil.getOrMigrateHash(kzPrefs, "kz_pin");
             PinDialogHelper.showEnter(this, hash, this::openDashboard);
         }
     }

@@ -349,7 +349,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
     // ── PIN ───────────────────────────────────────────────────────────────────
 
     private void setupPinButton() {
-        String pin = prefs.getString("kz_pin", null);
+        String pin = PinUtil.getOrMigrateHash(prefs, "kz_pin");
         btnChangePIN.setText((pin != null && !pin.isEmpty()) ? "Change PIN" : "Set PIN");
         btnChangePIN.setOnClickListener(v ->
             PinDialogHelper.showCreate(this, newPin -> {
