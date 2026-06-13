@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ParentalStatsManager statsManager;
     private android.os.Handler timeLockHandler;
     private View lockOverlay;
+    private FirestoreSync firestoreSync;
 
     private final Runnable timeLockRunnable = new Runnable() {
         @Override public void run() {
@@ -61,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
         instance = new java.lang.ref.WeakReference<>(this);
         FirebaseManager.init(this);
+        firestoreSync = FirestoreSync.init(this);
+        FirebaseManager.getInstance().ensureAuthAsync(() -> {
+            String uid = FirebaseManager.getInstance().getUid();
+            if (uid != null) FcmTokenManager.registerToken(uid, firestoreSync);
+        });
         statsManager = new ParentalStatsManager(this);
         timeLockHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
@@ -345,16 +351,33 @@ public class MainActivity extends AppCompatActivity {
             statsManager.onSessionStart();
             timeLockHandler.postDelayed(timeLockRunnable, 60_000);
         }
+        String uid = FirebaseManager.getInstance().getUid();
+        if (uid != null && firestoreSync != null) {
+            String ageGroup = kzPrefs.getString(OnboardingActivity.KEY_AGE, "2-4");
+            firestoreSync.syncUserProfile(uid, "", "", ageGroup);
+        }
     }
 
     @Override
     protected void onPause() {
+        long sessionMinutes = statsManager != null ? statsManager.getSessionMinutes() : 0;
+        java.util.List<String> sessionGames = statsManager != null ? statsManager.getSessionGames() : java.util.Collections.emptyList();
         if (statsManager != null) {
             statsManager.onSessionEnd();
             timeLockHandler.removeCallbacks(timeLockRunnable);
         }
         if (adsManager != null) adsManager.onPause();
         MusicManager.getInstance().pauseMusic();
+        String uid = FirebaseManager.getInstance().getUid();
+        if (uid != null && firestoreSync != null && sessionMinutes > 0) {
+            java.util.Map<String, String> gamePlays = new java.util.HashMap<>();
+            for (String gameId : sessionGames) gamePlays.put(gameId, gameId);
+            String dateKey = new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US).format(new java.util.Date());
+            String dauKey = "kz_dau_" + dateKey;
+            boolean isFirstSession = !kzPrefs.getBoolean(dauKey, false);
+            firestoreSync.recordSession(uid, sessionMinutes, gamePlays, isFirstSession);
+            if (isFirstSession) kzPrefs.edit().putBoolean(dauKey, true).apply();
+        }
         super.onPause();
     }
 
