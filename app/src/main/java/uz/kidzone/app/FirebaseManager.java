@@ -73,6 +73,12 @@ public class FirebaseManager {
             .addOnFailureListener(e -> cb.onError(e.getMessage()));
     }
 
+    public void ensureAuthAsync(Runnable onReady) {
+        if (auth == null) { onReady.run(); return; }
+        if (auth.getCurrentUser() != null) { onReady.run(); return; }
+        auth.signInAnonymously().addOnCompleteListener(task -> onReady.run());
+    }
+
     public void signOut() {
         if (auth != null) auth.signOut();
     }

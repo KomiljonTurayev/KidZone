@@ -36,7 +36,20 @@
       "Bash(Get-ChildItem *)",
       "Bash(\"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug)",
       "PowerShell(& \"C:\\\\Users\\\\Komiljon\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-8.10.2-bin\\\\bdi6judpd05k11v1fv3i0jq3i\\\\gradle-8.10.2\\\\bin\\\\gradle.bat\" assembleDebug 2>&1 | Select-Object -Last 20)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(./gradlew.bat :app:assembleDebug)",
+      "Bash(./gradlew.bat :app:compileDebugKotlin)",
+      "Bash(grep -v \"^$\")",
+      "Bash(./gradlew.bat :app:assembleDebug --stacktrace)",
+      "PowerShell($adb = \"C:\\\\Users\\\\Komiljon\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell am start -n \"uz.kidzone.app/.MainActivity\")",
+      "PowerShell($adb = \"C:\\\\Users\\\\Komiljon\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb logcat -d -t 200 --pid=$\\(& $adb shell pidof -s uz.kidzone.app\\) 2>&1 | Select-String -Pattern \"FATAL|AndroidRuntime|Exception|Error|crash\" | Select-Object -Last 30)",
+      "PowerShell($adb = \"C:\\\\Users\\\\Komiljon\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb logcat -d -s AndroidRuntime 2>&1 | Select-Object -Last 50)",
+      "Bash(git reset *)",
+      "Bash(git clean *)",
+      "Bash(git -C D:/android_projects/KidZone show c2f7ed4a:app/build.gradle)",
+      "PowerShell($adb = \"C:\\\\Users\\\\Komiljon\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; & $adb shell am start -n \"uz.kidzone.app/.OnboardingActivity\" 2>&1; Start-Sleep 2; & $adb shell am start -n \"uz.kidzone.app/.MainActivity\" 2>&1)",
+      "PowerShell($adb = \"C:\\\\Users\\\\Komiljon\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; Start-Sleep -Seconds 3; & $adb logcat -d -t 100 2>&1 | Select-String -Pattern \"FATAL|AndroidRuntime|Exception|uz.kidzone\" | Select-Object -Last 20)",
+      "PowerShell(mvn spring-boot:run *)"
     ]
   }
 }

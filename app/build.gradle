@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -50,8 +51,6 @@ android {
         }
 
         debug {
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
             debuggable true
         }
     }
@@ -82,13 +81,22 @@ android {
 
     buildFeatures {
         buildConfig true
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.13'
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 }
 
 dependencies {
     // Core AndroidX
     implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.core:core-ktx:1.15.0' // Use KTX for better extensions even in Java
+    implementation 'androidx.core:core-ktx:1.15.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
 
     // WebView and Browser
@@ -98,9 +106,11 @@ dependencies {
     // Google Services
     implementation 'com.google.android.gms:play-services-ads:23.6.0'
 
-    // Firebase (CRM Block 1 — Auth foundation)
+    // Firebase
     implementation platform('com.google.firebase:firebase-bom:33.7.0')
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-messaging'
 
     // Material Design 3
     implementation 'com.google.android.material:material:1.12.0'
@@ -116,6 +126,22 @@ dependencies {
 
     // RecyclerView (KidzoCardAdapter uchun)
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
+
+    // Jetpack Compose
+    implementation platform('androidx.compose:compose-bom:2024.04.01')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.activity:activity-compose:1.9.0'
+
+    // Compose Navigation
+    implementation 'androidx.navigation:navigation-compose:2.7.7'
+
+    // ViewModel + Compose
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
+
+    debugImplementation 'androidx.compose.ui:ui-tooling'
 
     // Test dependencies
     testImplementation 'junit:junit:4.13.2'

@@ -15,6 +15,7 @@ public class ParentalStatsManager {
     private static final String KEY_TIME_LIMIT = "kz_time_limit";
     private final SharedPreferences prefs;
     private long sessionStartMs = 0;
+    private final List<String> sessionGames = new ArrayList<>();
 
     public ParentalStatsManager(Context ctx) {
         this(ctx.getSharedPreferences("kz_prefs", Context.MODE_PRIVATE));
@@ -26,6 +27,7 @@ public class ParentalStatsManager {
 
     public void onSessionStart() {
         sessionStartMs = System.currentTimeMillis();
+        sessionGames.clear();
     }
 
     public void onSessionEnd() {
@@ -39,6 +41,7 @@ public class ParentalStatsManager {
 
     public void onGameLaunched(String gameId) {
         if (gameId == null || gameId.isEmpty()) return;
+        if (!sessionGames.contains(gameId)) sessionGames.add(gameId);
         String key = todayGlKey();
         String existing = prefs.getString(key, "");
         List<String> list = parseList(existing);
@@ -46,6 +49,15 @@ public class ParentalStatsManager {
             list.add(gameId);
             prefs.edit().putString(key, joinList(list)).apply();
         }
+    }
+
+    public long getSessionMinutes() {
+        if (sessionStartMs == 0) return 0;
+        return (System.currentTimeMillis() - sessionStartMs) / 60_000L;
+    }
+
+    public List<String> getSessionGames() {
+        return new ArrayList<>(sessionGames);
     }
 
     public int getTodayMinutes() {
