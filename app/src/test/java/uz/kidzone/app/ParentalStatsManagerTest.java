@@ -91,4 +91,42 @@ public class ParentalStatsManagerTest {
         mgr.onSessionEnd();
         assertEquals(0, mgr.getTodayMinutes());
     }
+
+    // --- Session tracking ---
+
+    @Test
+    public void getSessionGames_initiallyEmpty() {
+        assertTrue(mgr.getSessionGames().isEmpty());
+    }
+
+    @Test
+    public void getSessionGames_afterOnGameLaunched_containsGame() {
+        mgr.onGameLaunched("math_counting");
+        assertTrue(mgr.getSessionGames().contains("math_counting"));
+    }
+
+    @Test
+    public void getSessionGames_deduplicatesWithinSession() {
+        mgr.onGameLaunched("math_counting");
+        mgr.onGameLaunched("math_counting");
+        assertEquals(1, mgr.getSessionGames().size());
+    }
+
+    @Test
+    public void onSessionStart_clearsSessionGames() {
+        mgr.onGameLaunched("math_counting");
+        mgr.onSessionStart();
+        assertTrue(mgr.getSessionGames().isEmpty());
+    }
+
+    @Test
+    public void getSessionMinutes_beforeSessionStart_returnsZero() {
+        assertEquals(0, mgr.getSessionMinutes());
+    }
+
+    @Test
+    public void getSessionMinutes_afterSessionStart_subMinuteIsZero() {
+        mgr.onSessionStart();
+        assertEquals(0, mgr.getSessionMinutes()); // sub-minute elapsed = 0
+    }
 }
