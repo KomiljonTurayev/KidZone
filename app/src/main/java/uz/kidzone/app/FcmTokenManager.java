@@ -31,6 +31,8 @@ public final class FcmTokenManager {
     /** Package-private overload with injectable TokenProvider for unit testing. */
     static void registerToken(String uid, FirestoreSync sync, TokenProvider provider) {
         if (uid == null || !sync.isAvailable()) return;
+        FirebaseMessaging.getInstance().subscribeToTopic("all-users")
+            .addOnFailureListener(e -> Log.w("FcmTokenManager", "topic sub failed: " + e));
         provider.getToken(token -> {
             if (token != null) sync.updateFcmToken(uid, token);
         });
