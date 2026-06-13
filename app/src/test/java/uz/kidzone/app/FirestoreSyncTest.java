@@ -72,4 +72,18 @@ public class FirestoreSyncTest {
         FirestoreSync sync = new FirestoreSync(null);
         sync.recordSession(null, 5, Collections.emptyMap(), true);
     }
+
+    @Test
+    public void syncUserProfile_nullDisplayName_usesEmptyString() {
+        FirestoreSync sync = new FirestoreSync(null);
+        sync.syncUserProfile("uid", null, "a@b.com", "3-5");
+        // no exception
+    }
+
+    @Test
+    public void syncUserProfile_nullEmail_usesEmptyString() {
+        FirestoreSync sync = new FirestoreSync(null);
+        sync.syncUserProfile("uid", "Name", null, "3-5");
+        // no exception
+    }
 }

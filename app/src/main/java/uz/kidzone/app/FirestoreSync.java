@@ -1,6 +1,8 @@
 package uz.kidzone.app;
 
 import android.content.Context;
+import android.util.Log;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 public class FirestoreSync {
 
+    private static final String TAG = "FirestoreSync";
     private static FirestoreSync instance;
     private final FirebaseFirestore db;
 
@@ -49,7 +52,21 @@ public class FirestoreSync {
         data.put("ageGroup", normalizeAgeGroup(ageGroup));
         data.put("status", "active");
         data.put("lastActiveAt", FieldValue.serverTimestamp());
-        db.collection("users").document(uid).set(data, SetOptions.merge());
+
+        DocumentReference ref = db.collection("users").document(uid);
+        ref.get()
+            .addOnSuccessListener(snap -> {
+                if (!snap.exists() || !snap.contains("createdAt")) {
+                    data.put("createdAt", FieldValue.serverTimestamp());
+                }
+                ref.set(data, SetOptions.merge())
+                   .addOnFailureListener(e -> Log.w(TAG, "syncUserProfile failed: " + e));
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "syncUserProfile get() failed, skipping createdAt: " + e);
+                ref.set(data, SetOptions.merge())
+                   .addOnFailureListener(e2 -> Log.w(TAG, "syncUserProfile set failed: " + e2));
+            });
     }
 
     public void updateFcmToken(String uid, String token) {
