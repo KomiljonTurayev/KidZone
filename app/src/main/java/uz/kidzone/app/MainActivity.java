@@ -65,7 +65,14 @@ public class MainActivity extends AppCompatActivity {
         firestoreSync = FirestoreSync.init(this);
         FirebaseManager.getInstance().ensureAuthAsync(() -> {
             String uid = FirebaseManager.getInstance().getUid();
-            if (uid != null) FcmTokenManager.registerToken(uid, firestoreSync);
+            if (uid != null) {
+                FcmTokenManager.registerToken(uid, firestoreSync);
+                BanChecker.checkAsync(uid, firestoreSync, status -> {
+                    if (status == BanChecker.Status.BANNED) {
+                        runOnUiThread(this::banUser);
+                    }
+                });
+            }
         });
         statsManager = new ParentalStatsManager(this);
         timeLockHandler = new android.os.Handler(android.os.Looper.getMainLooper());
@@ -73,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
         initializeUI();
         initializeManagers();
         setupKidzoFab();
+    }
+
+    private void banUser() {
+        if (isFinishing()) return;
+        kzPrefs.edit().putBoolean(OnboardingActivity.KEY_DONE, false).apply();
+        startActivity(new android.content.Intent(this, OnboardingActivity.class));
+        finish();
     }
 
     private void setupKidzoFab() {
