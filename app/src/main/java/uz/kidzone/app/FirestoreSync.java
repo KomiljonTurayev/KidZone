@@ -44,6 +44,11 @@ public class FirestoreSync {
         return db != null;
     }
 
+    /** Package-private for BanChecker. */
+    FirebaseFirestore getDb() {
+        return db;
+    }
+
     public void syncUserProfile(String uid, String displayName, String email, String ageGroup) {
         if (!isAvailable() || uid == null) return;
         Map<String, Object> data = new HashMap<>();
