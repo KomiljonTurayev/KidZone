@@ -10,6 +10,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import okhttp3.OkHttpClient;
 import uz.kidzone.app.BuildConfig;
 
@@ -50,8 +51,17 @@ public class KidZoneApplication extends Application {
 
     private void syncToFirestore(String uid) {
         SharedPreferences prefs = getSharedPreferences("kz_prefs", MODE_PRIVATE);
+        prefs.edit().putString("kz_uid", uid).apply();
         String ageGroup = prefs.getString("kz_age_filter", "3-5");
         FirestoreSync.init(this).syncUserProfile(uid, null, null, ageGroup);
+        FirebaseMessaging.getInstance().getToken()
+            .addOnSuccessListener(token -> {
+                Log.d("KZ_DEBUG", "FCM token saved for uid=" + uid);
+                prefs.edit().putString("kz_fcm_token", token).apply();
+                FirestoreSync.getInstance().updateFcmToken(uid, token);
+            })
+            .addOnFailureListener(e ->
+                Log.w("KZ_DEBUG", "FCM token fetch failed: " + e.getMessage()));
     }
 
     private void createNotificationChannel() {

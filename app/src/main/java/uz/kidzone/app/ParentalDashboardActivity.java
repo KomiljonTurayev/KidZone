@@ -1,5 +1,8 @@
 package uz.kidzone.app;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
@@ -58,6 +61,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         setupTimeLimitControls();
         setupPinButton();
         setupCloudBackup();
+        setupPushInfo();
 
         findViewById(R.id.pd_back).setOnClickListener(v -> finish());
     }
@@ -466,6 +470,44 @@ public class ParentalDashboardActivity extends AppCompatActivity {
             title.setText(R.string.cloud_signin_title);
             submit.setText(R.string.cloud_signin_title);
             toggle.setText(R.string.cloud_toggle_to_create);
+        }
+    }
+
+    // ── Push Info ─────────────────────────────────────────────────────────────
+
+    private void setupPushInfo() {
+        SharedPreferences p = getSharedPreferences("kz_prefs", MODE_PRIVATE);
+
+        String uid   = p.getString("kz_uid", "—");
+        String token = p.getString("kz_fcm_token", "—");
+        String title = p.getString("kz_last_notif_title", null);
+        String body  = p.getString("kz_last_notif_body", null);
+        long   time  = p.getLong("kz_last_notif_time", 0);
+
+        TextView tvUid   = findViewById(R.id.pd_push_uid);
+        TextView tvToken = findViewById(R.id.pd_push_token);
+        TextView tvNotif = findViewById(R.id.pd_last_notif);
+
+        tvUid.setText(uid);
+        tvToken.setText(token.length() > 40 ? token.substring(0, 40) + "…" : token);
+
+        if (title != null) {
+            String timeStr = time > 0
+                ? new java.text.SimpleDateFormat("dd/MM HH:mm", java.util.Locale.US)
+                    .format(new java.util.Date(time))
+                : "";
+            tvNotif.setText(timeStr + "\n" + title + "\n" + body);
+        }
+
+        findViewById(R.id.pd_copy_uid).setOnClickListener(v -> copyToClipboard("UID", uid));
+        findViewById(R.id.pd_copy_token).setOnClickListener(v -> copyToClipboard("FCM Token", token));
+    }
+
+    private void copyToClipboard(String label, String text) {
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (cm != null) {
+            cm.setPrimaryClip(ClipData.newPlainText(label, text));
+            android.widget.Toast.makeText(this, label + " nusxalandi!", android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
