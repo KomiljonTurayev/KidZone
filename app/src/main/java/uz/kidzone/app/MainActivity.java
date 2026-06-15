@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
         String uid = FirebaseManager.getInstance().getUid();
         if (uid != null && firestoreSync != null && sessionMinutes > 0) {
             java.util.Map<String, String> gamePlays = new java.util.HashMap<>();
-            for (String gameId : sessionGames) gamePlays.put(gameId, gameId);
+            for (String gameId : sessionGames) gamePlays.put(gameId, toGameName(gameId));
             String dateKey = new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US).format(new java.util.Date());
             String dauKey = "kz_dau_" + dateKey;
             boolean isFirstSession = !kzPrefs.getBoolean(dauKey, false);
@@ -393,6 +393,55 @@ public class MainActivity extends AppCompatActivity {
             if (isFirstSession) kzPrefs.edit().putBoolean(dauKey, true).apply();
         }
         super.onPause();
+    }
+
+    private static String toGameName(String gameId) {
+        if (gameId == null) return "";
+        switch (gameId) {
+            case "abc-en":           return "ABC - English";
+            case "abc-ru":           return "ABC - Russian";
+            case "abc-uz":           return "ABC - Uzbek";
+            case "abc-game":         return "ABC Game";
+            case "animals":          return "Animals";
+            case "body":             return "Body Parts";
+            case "bubble-pop":       return "Bubble Pop";
+            case "catch-the-apple":  return "Catch the Apple";
+            case "clock":            return "Clock";
+            case "color-rush":       return "Color Rush";
+            case "colors-shapes":    return "Colors & Shapes";
+            case "co-op-draw":       return "Co-op Draw";
+            case "dino-match":       return "Dino Match";
+            case "family-adventure": return "Family Adventure";
+            case "fruits":           return "Fruits";
+            case "instrument":       return "Instrument";
+            case "jigsaw":           return "Jigsaw Puzzle";
+            case "jump-rope":        return "Jump Rope";
+            case "match":            return "Match";
+            case "math-kids":        return "Math for Kids";
+            case "maze":             return "Maze";
+            case "memory-game":      return "Memory Game";
+            case "memory-match":     return "Memory Match";
+            case "paint":            return "Paint";
+            case "piano":            return "Piano";
+            case "plants":           return "Plants";
+            case "puzzle-slider":    return "Puzzle Slider";
+            case "shadow":           return "Shadow Match";
+            case "shape-match":      return "Shape Match";
+            case "sing":             return "Sing Along";
+            case "soccer":           return "Soccer";
+            case "tic-tac-toe":      return "Tic Tac Toe";
+            case "transport":        return "Transport";
+            case "weather":          return "Weather";
+            default: {
+                String[] parts = gameId.split("-");
+                StringBuilder sb = new StringBuilder();
+                for (String part : parts) {
+                    if (sb.length() > 0) sb.append(' ');
+                    if (!part.isEmpty()) sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+                }
+                return sb.toString();
+            }
+        }
     }
 
     void injectJs(String script) {
