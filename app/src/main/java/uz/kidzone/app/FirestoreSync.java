@@ -29,9 +29,11 @@ public class FirestoreSync {
             try {
                 db = FirebaseFirestore.getInstance();
             } catch (Exception e) {
+                Log.e(TAG, "Firestore init FAILED: " + e.getMessage());
                 db = null;
             }
             instance = new FirestoreSync(db);
+            Log.d(TAG, "init complete, available=" + (db != null));
         }
         return instance;
     }
@@ -50,6 +52,7 @@ public class FirestoreSync {
     }
 
     public void syncUserProfile(String uid, String displayName, String email, String ageGroup) {
+        Log.d(TAG, "syncUserProfile: uid=" + uid + " available=" + isAvailable());
         if (!isAvailable() || uid == null) return;
         Map<String, Object> data = new HashMap<>();
         data.put("displayName", displayName != null ? displayName : "");
@@ -82,8 +85,14 @@ public class FirestoreSync {
     }
 
     public void recordSession(String uid, long sessionMinutes, Map<String, String> gamePlays, boolean isFirstSession) {
-        if (!isAvailable() || uid == null || sessionMinutes <= 0) return;
+        if (!isAvailable() || uid == null || sessionMinutes <= 0) {
+            Log.w(TAG, "recordSession skipped: available=" + isAvailable()
+                + " uid=" + uid + " minutes=" + sessionMinutes);
+            return;
+        }
         String dateKey = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+        Log.d(TAG, "recordSession: date=" + dateKey + " uid=" + uid
+            + " minutes=" + sessionMinutes + " firstSession=" + isFirstSession);
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalMinutes", FieldValue.increment(sessionMinutes));
         stats.put("totalSessions", FieldValue.increment(1));
@@ -98,7 +107,9 @@ public class FirestoreSync {
                 stats.put("gameBreakdown." + gameId + ".playCount", FieldValue.increment(1));
             }
         }
-        db.collection("stats").document(dateKey).set(stats, SetOptions.merge());
+        db.collection("stats").document(dateKey).set(stats, SetOptions.merge())
+            .addOnSuccessListener(v -> Log.d(TAG, "recordSession write OK: " + dateKey))
+            .addOnFailureListener(e -> Log.e(TAG, "recordSession write FAILED: " + e.getMessage()));
     }
 
     static String normalizeAgeGroup(String ageGroup) {
