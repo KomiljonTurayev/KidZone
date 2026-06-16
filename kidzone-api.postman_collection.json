@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "KidZone Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://kidzone-backend-s7to.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) {",
+                  "    pm.collectionVariables.set('token', data.token);",
+                  "    console.log('Token saqlandi');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@kidzone.uz\",\n  \"password\": \"kidzone2026\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by UID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/admin/users/:uid",
+            "variable": [{ "key": "uid", "value": "USER_UID_HERE" }]
+          }
+        },
+        {
+          "name": "Ban User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/admin/users/:uid/ban",
+            "variable": [{ "key": "uid", "value": "USER_UID_HERE" }]
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/admin/users/:uid",
+            "variable": [{ "key": "uid", "value": "USER_UID_HERE" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Stats",
+      "item": [
+        {
+          "name": "Daily Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/admin/stats/daily?from=2026-06-01&to=2026-06-16",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "stats", "daily"],
+              "query": [
+                { "key": "from", "value": "2026-06-01" },
+                { "key": "to", "value": "2026-06-16" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Top Games",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/admin/stats/games"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Push",
+      "item": [
+        {
+          "name": "Send to All Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sarlavha\",\n  \"body\": \"Xabar matni\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/push/send"
+          }
+        },
+        {
+          "name": "Send to Single User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sarlavha\",\n  \"body\": \"Xabar matni\",\n  \"uid\": \"USER_UID_HERE\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/push/send"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mobile — Push",
+      "item": [
+        {
+          "name": "Register FCM Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer FIREBASE_ID_TOKEN_HERE" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcmToken\": \"FCM_DEVICE_TOKEN_HERE\"\n}"
+            },
+            "url": "{{baseUrl}}/push/register-token",
+            "description": "Authorization headeriga Firebase ID token (JWT) yuboring — backend JWT emas.\nFirebase ID tokenni Firebase Auth dan olish mumkin (signInAnonymously, signInWithEmailAndPassword va h.k.)"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 package uz.kidzone.app;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -8,6 +11,8 @@ import android.webkit.JavascriptInterface;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.google.android.material.button.MaterialButton;
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private BirdAiManager birdAiManager;
     private int lastBannerHeight = 0;
     private int gameLaunchCount = 0;
+    private boolean inGame = false;
     private android.content.SharedPreferences kzPrefs;
     private ParentalStatsManager statsManager;
     private android.os.Handler timeLockHandler;
@@ -60,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        requestNotificationPermissionIfNeeded();
         instance = new java.lang.ref.WeakReference<>(this);
         FirebaseManager.init(this);
         firestoreSync = FirestoreSync.init(this);
@@ -194,14 +201,11 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                View banner = findViewById(R.id.bannerContainer);
-                if (banner != null && banner.getVisibility() == View.GONE) {
-                    // Foydalanuvchi o'yin ichida — o'yindan chiqishni so'raymiz
+                if (inGame) {
                     showExitDialog(true);
                 } else if (webViewManager != null && webViewManager.canGoBack()) {
                     webViewManager.goBack();
                 } else {
-                    // Foydalanuvchi asosiy menyuda — dasturdan chiqishni so'raymiz
                     showExitDialog(false);
                 }
             }
@@ -303,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
     private class AdMobBridge {
         @JavascriptInterface
         public void showBanner() {
+            inGame = false;
             runOnUiThread(() -> {
                 findViewById(R.id.bannerContainer).setVisibility(View.VISIBLE);
                 webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
@@ -311,6 +316,7 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void hideBanner() {
+            inGame = true;
             runOnUiThread(() -> {
                 findViewById(R.id.bannerContainer).setVisibility(View.GONE);
                 webViewManager.evaluateJavascript("if(window.updateBannerOffset) updateBannerOffset(0);");
@@ -351,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void gameLaunched(String gameId) {
+            inGame = true;
             if (statsManager != null) statsManager.onGameLaunched(gameId);
         }
     }
@@ -564,6 +571,39 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < dots.length; i++) {
             dots[i].setBackgroundResource(
                 i < count ? R.drawable.pin_dot_filled : R.drawable.pin_dot_empty);
+        }
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) return;
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+            new MaterialAlertDialogBuilder(this)
+                .setTitle("Bildirishnomalar")
+                .setMessage("KidZone o'yinlar va yangiliklar haqida xabar berish uchun bildirishnomaga ruxsat kerak.")
+                .setPositiveButton("Ruxsat berish", (d, w) ->
+                    ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001))
+                .setNegativeButton("Bekor", null)
+                .show();
+        } else if (kzPrefs.getBoolean("kz_notif_asked", false)) {
+            new MaterialAlertDialogBuilder(this)
+                .setTitle("Bildirishnomalar o'chirilgan")
+                .setMessage("Bildirishnomalarni yoqish uchun Sozlamalar → Ilovalar → KidZone → Ruxsatlar bo'limiga o'ting.")
+                .setPositiveButton("Sozlamalarga o'tish", (d, w) -> {
+                    android.content.Intent intent = new android.content.Intent(
+                        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        android.net.Uri.fromParts("package", getPackageName(), null));
+                    startActivity(intent);
+                })
+                .setNegativeButton("Keyinroq", null)
+                .show();
+        } else {
+            kzPrefs.edit().putBoolean("kz_notif_asked", true).apply();
+            ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
         }
     }
 

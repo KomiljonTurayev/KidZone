@@ -11,7 +11,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+import java.io.IOException;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import uz.kidzone.app.BuildConfig;
 
 public class KidZoneApplication extends Application {
@@ -56,12 +63,38 @@ public class KidZoneApplication extends Application {
         FirestoreSync.init(this).syncUserProfile(uid, null, null, ageGroup);
         FirebaseMessaging.getInstance().getToken()
             .addOnSuccessListener(token -> {
-                Log.d("KZ_DEBUG", "FCM token saved for uid=" + uid);
                 prefs.edit().putString("kz_fcm_token", token).apply();
                 FirestoreSync.getInstance().updateFcmToken(uid, token);
+                registerTokenWithBackend(token);
             })
             .addOnFailureListener(e ->
                 Log.w("KZ_DEBUG", "FCM token fetch failed: " + e.getMessage()));
+    }
+
+    private void registerTokenWithBackend(String fcmToken) {
+        FirebaseAuth.getInstance().getCurrentUser()
+            .getIdToken(false)
+            .addOnSuccessListener(result -> {
+                String idToken = result.getToken();
+                String json = "{\"fcmToken\":\"" + fcmToken + "\"}";
+                RequestBody body = RequestBody.create(json, MediaType.parse("application/json"));
+                Request request = new Request.Builder()
+                    .url("https://kidzone-backend-s7to.onrender.com/push/register-token")
+                    .addHeader("Authorization", "Bearer " + idToken)
+                    .post(body)
+                    .build();
+                httpClient.newCall(request).enqueue(new Callback() {
+                    @Override public void onFailure(Call call, IOException e) {
+                        Log.w("KZ_DEBUG", "registerToken failed: " + e.getMessage());
+                    }
+                    @Override public void onResponse(Call call, Response response) {
+                        Log.d("KZ_DEBUG", "registerToken HTTP " + response.code());
+                        response.close();
+                    }
+                });
+            })
+            .addOnFailureListener(e ->
+                Log.w("KZ_DEBUG", "getIdToken failed: " + e.getMessage()));
     }
 
     private void createNotificationChannel() {
