@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private BirdAiManager birdAiManager;
     private int lastBannerHeight = 0;
     private int gameLaunchCount = 0;
-    private boolean inGame = false;
+    private volatile boolean inGame = false;
     private android.content.SharedPreferences kzPrefs;
     private ParentalStatsManager statsManager;
     private android.os.Handler timeLockHandler;
@@ -201,13 +201,18 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (inGame) {
-                    showExitDialog(true);
-                } else if (webViewManager != null && webViewManager.canGoBack()) {
-                    webViewManager.goBack();
-                } else {
-                    showExitDialog(false);
-                }
+                evaluateJs(
+                    "document.getElementById('gv') ? !document.getElementById('gv').classList.contains('h') : false",
+                    value -> runOnUiThread(() -> {
+                        if ("true".equals(value)) {
+                            showExitDialog(true);
+                        } else if (webViewManager != null && webViewManager.canGoBack()) {
+                            webViewManager.goBack();
+                        } else {
+                            showExitDialog(false);
+                        }
+                    })
+                );
             }
         });
     }
