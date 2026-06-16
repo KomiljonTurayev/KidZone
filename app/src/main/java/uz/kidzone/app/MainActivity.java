@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         btnYes.setOnClickListener(v -> {
             dialog.dismiss();
             if (isInGame) {
-                webViewManager.evaluateJavascript("if(window.app) app.closeGame();");
+                webViewManager.evaluateJavascript("if(typeof closeGame==='function') closeGame();");
             } else {
                 finishAffinity();
             }
