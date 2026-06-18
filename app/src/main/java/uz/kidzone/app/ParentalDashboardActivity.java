@@ -521,6 +521,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         if (!AdminConfig.ADMIN_UID.equals(uid)) return;
         adminContainer.setVisibility(View.VISIBLE);
         buildUserListCard();
+        buildBannerCard();
     }
 
     private void buildUserListCard() {
@@ -630,6 +631,138 @@ public class ParentalDashboardActivity extends AppCompatActivity {
             )
             .setNegativeButton("Bekor", null)
             .show();
+    }
+
+    private void buildBannerCard() {
+        // Ajratuvchi chiziq
+        View divider = new View(this);
+        divider.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(1)));
+        divider.setBackgroundColor(0xFFEEEEEE);
+        LinearLayout.LayoutParams dlp = (LinearLayout.LayoutParams) divider.getLayoutParams();
+        dlp.topMargin = dp(16);
+        adminContainer.addView(divider);
+
+        // Sarlavha
+        TextView tvTitle = new TextView(this);
+        tvTitle.setText("📢 Banner");
+        tvTitle.setTextSize(15f);
+        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        tvTitle.setTextColor(0xFF222222);
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        tlp.topMargin = dp(12);
+        tvTitle.setLayoutParams(tlp);
+        adminContainer.addView(tvTitle);
+
+        // Aktiv banner holati
+        TextView tvActive = new TextView(this);
+        tvActive.setTextSize(12f);
+        tvActive.setTextColor(0xFF888888);
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        alp.topMargin = dp(4);
+        tvActive.setLayoutParams(alp);
+        adminContainer.addView(tvActive);
+
+        // Input maydonlari
+        android.widget.EditText etTitle = buildEditText("Sarlavha");
+        android.widget.EditText etBody  = buildEditText("Matn");
+        android.widget.EditText etUrl   = buildEditText("URL (https://... yoki kidzone://game/id)");
+
+        adminContainer.addView(etTitle);
+        adminContainer.addView(etBody);
+        adminContainer.addView(etUrl);
+
+        // Tugmalar
+        LinearLayout btnRow = new LinearLayout(this);
+        btnRow.setOrientation(LinearLayout.HORIZONTAL);
+        btnRow.setGravity(android.view.Gravity.END);
+        LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        blp.topMargin = dp(8);
+        btnRow.setLayoutParams(blp);
+
+        MaterialButton btnClear = new MaterialButton(this,
+            null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        btnClear.setText("O'chirish");
+        btnClear.setTextSize(12f);
+
+        MaterialButton btnSend = new MaterialButton(this);
+        btnSend.setText("Yuborish");
+        btnSend.setTextSize(12f);
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        slp.leftMargin = dp(8);
+        btnSend.setLayoutParams(slp);
+
+        btnRow.addView(btnClear);
+        btnRow.addView(btnSend);
+        adminContainer.addView(btnRow);
+
+        // Aktiv bannerni yuklash
+        refreshBannerStatus(tvActive, btnClear);
+
+        btnSend.setOnClickListener(v -> {
+            String title = etTitle.getText().toString().trim();
+            String body  = etBody.getText().toString().trim();
+            String url   = etUrl.getText().toString().trim();
+            if (title.isEmpty() || url.isEmpty()) {
+                android.widget.Toast.makeText(this,
+                    "Sarlavha va URL majburiy", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String adminUid = FirebaseManager.getInstance().getUid();
+            FirestoreSync.getInstance().setBanner(title, body, url, adminUid);
+            BackendClient.sendTopicPush(title, body, url,
+                () -> runOnUiThread(() -> {
+                    android.widget.Toast.makeText(this,
+                        "Banner yuborildi!", android.widget.Toast.LENGTH_SHORT).show();
+                    refreshBannerStatus(tvActive, btnClear);
+                }),
+                () -> runOnUiThread(() ->
+                    android.widget.Toast.makeText(this,
+                        "Push xatosi (Firestore'ga yozildi)", android.widget.Toast.LENGTH_SHORT).show()
+                )
+            );
+        });
+
+        btnClear.setOnClickListener(v -> {
+            FirestoreSync.getInstance().clearBanner();
+            android.widget.Toast.makeText(this, "Banner o'chirildi", android.widget.Toast.LENGTH_SHORT).show();
+            tvActive.setText("Aktiv banner yo'q");
+            btnClear.setEnabled(false);
+        });
+    }
+
+    private android.widget.EditText buildEditText(String hint) {
+        android.widget.EditText et = new android.widget.EditText(this);
+        et.setHint(hint);
+        et.setTextSize(13f);
+        et.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(6);
+        et.setLayoutParams(lp);
+        return et;
+    }
+
+    private void refreshBannerStatus(TextView tvActive, MaterialButton btnClear) {
+        if (!FirestoreSync.getInstance().isAvailable()) return;
+        FirestoreSync.getInstance().getDb()
+            .collection("config").document("banner").get()
+            .addOnSuccessListener(snap -> runOnUiThread(() -> {
+                boolean active = snap.exists() && Boolean.TRUE.equals(snap.getBoolean("active"));
+                if (active) {
+                    tvActive.setText("Aktiv: “" + snap.getString("title") + "”");
+                    tvActive.setTextColor(0xFF008800);
+                    btnClear.setEnabled(true);
+                } else {
+                    tvActive.setText("Aktiv banner yoʻq");
+                    tvActive.setTextColor(0xFF888888);
+                    btnClear.setEnabled(false);
+                }
+            }));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
