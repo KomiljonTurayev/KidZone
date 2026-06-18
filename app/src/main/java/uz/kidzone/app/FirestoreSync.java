@@ -84,6 +84,76 @@ public class FirestoreSync {
         db.collection("users").document(uid).set(data, SetOptions.merge());
     }
 
+    public interface UserListCallback {
+        void onResult(java.util.List<UserInfo> users);
+    }
+
+    public static class UserInfo {
+        public final String uid;
+        public final String email;
+        public final String status;
+        public UserInfo(String uid, String email, String status) {
+            this.uid = uid;
+            this.email = email;
+            this.status = status;
+        }
+    }
+
+    public void getAllUsers(UserListCallback callback) {
+        if (!isAvailable()) {
+            callback.onResult(java.util.Collections.emptyList());
+            return;
+        }
+        db.collection("users").get()
+            .addOnSuccessListener(snap -> {
+                java.util.List<UserInfo> users = new java.util.ArrayList<>();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot doc : snap) {
+                    String email = doc.getString("email");
+                    String status = doc.getString("status");
+                    users.add(new UserInfo(
+                        doc.getId(),
+                        email != null ? email : "",
+                        status != null ? status : "active"
+                    ));
+                }
+                callback.onResult(users);
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "getAllUsers failed: " + e);
+                callback.onResult(java.util.Collections.emptyList());
+            });
+    }
+
+    public void setUserStatus(String uid, String status, Runnable onDone) {
+        if (!isAvailable() || uid == null) return;
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("status", status);
+        db.collection("users").document(uid).update(data)
+            .addOnSuccessListener(v -> { if (onDone != null) onDone.run(); })
+            .addOnFailureListener(e -> Log.w(TAG, "setUserStatus failed: " + e));
+    }
+
+    public void setBanner(String title, String body, String url, String adminUid) {
+        if (!isAvailable()) return;
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("active", true);
+        data.put("title", title != null ? title : "");
+        data.put("body", body != null ? body : "");
+        data.put("url", url != null ? url : "");
+        data.put("createdAt", FieldValue.serverTimestamp());
+        data.put("createdBy", adminUid != null ? adminUid : "");
+        db.collection("config").document("banner").set(data)
+            .addOnFailureListener(e -> Log.w(TAG, "setBanner failed: " + e));
+    }
+
+    public void clearBanner() {
+        if (!isAvailable()) return;
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("active", false);
+        db.collection("config").document("banner").update(data)
+            .addOnFailureListener(e -> Log.w(TAG, "clearBanner failed: " + e));
+    }
+
     public void recordSession(String uid, long sessionMinutes, Map<String, String> gamePlays, boolean isFirstSession) {
         if (!isAvailable() || uid == null || sessionMinutes <= 0) {
             Log.w(TAG, "recordSession skipped: available=" + isAvailable()
