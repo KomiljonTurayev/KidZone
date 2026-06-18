@@ -664,6 +664,8 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         alp.topMargin = dp(4);
         tvActive.setLayoutParams(alp);
         adminContainer.addView(tvActive);
+        tvActive.setText("Aktiv banner yo'q");
+        tvActive.setTextColor(0xFF888888);
 
         // Input maydonlari
         android.widget.EditText etTitle = buildEditText("Sarlavha");
@@ -762,6 +764,11 @@ public class ParentalDashboardActivity extends AppCompatActivity {
                     tvActive.setTextColor(0xFF888888);
                     btnClear.setEnabled(false);
                 }
+            }))
+            .addOnFailureListener(e -> runOnUiThread(() -> {
+                tvActive.setText("Aktiv banner yo'q");
+                tvActive.setTextColor(0xFF888888);
+                btnClear.setEnabled(false);
             }));
     }
 
