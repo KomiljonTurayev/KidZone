@@ -43,6 +43,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
     private View cloudHeader, cloudCard;
     private TextView tvCloudStatus;
     private MaterialButton btnCloudSignIn, btnCloudSignOut;
+    private LinearLayout adminContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         setupPinButton();
         setupCloudBackup();
         setupPushInfo();
+        setupAdminPanel();
 
         findViewById(R.id.pd_back).setOnClickListener(v -> finish());
     }
@@ -85,6 +87,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         tvCloudStatus    = findViewById(R.id.pd_cloud_status);
         btnCloudSignIn   = findViewById(R.id.pd_cloud_signin_btn);
         btnCloudSignOut  = findViewById(R.id.pd_cloud_signout_btn);
+        adminContainer   = findViewById(R.id.pd_admin_container);
     }
 
     // ── Stats ────────────────────────────────────────────────────────────────
@@ -509,6 +512,124 @@ public class ParentalDashboardActivity extends AppCompatActivity {
             cm.setPrimaryClip(ClipData.newPlainText(label, text));
             android.widget.Toast.makeText(this, label + " nusxalandi!", android.widget.Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // ── Admin Panel ───────────────────────────────────────────────────────────────
+
+    private void setupAdminPanel() {
+        String uid = FirebaseManager.getInstance().getUid();
+        if (!AdminConfig.ADMIN_UID.equals(uid)) return;
+        adminContainer.setVisibility(View.VISIBLE);
+        buildUserListCard();
+    }
+
+    private void buildUserListCard() {
+        // Sarlavha + Yangilash tugmasi
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        header.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(44)));
+
+        TextView tvTitle = new TextView(this);
+        tvTitle.setText("👥 Foydalanuvchilar");
+        tvTitle.setTextSize(15f);
+        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        tvTitle.setTextColor(0xFF222222);
+        tvTitle.setLayoutParams(new LinearLayout.LayoutParams(
+            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        MaterialButton btnRefresh = new MaterialButton(this,
+            null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        btnRefresh.setText("Yangilash");
+        btnRefresh.setTextSize(11f);
+
+        header.addView(tvTitle);
+        header.addView(btnRefresh);
+        adminContainer.addView(header);
+
+        // Foydalanuvchilar uchun container
+        LinearLayout usersContainer = new LinearLayout(this);
+        usersContainer.setOrientation(LinearLayout.VERTICAL);
+        adminContainer.addView(usersContainer);
+
+        btnRefresh.setOnClickListener(v -> loadUsers(usersContainer));
+        loadUsers(usersContainer);
+    }
+
+    private void loadUsers(LinearLayout container) {
+        container.removeAllViews();
+        TextView loading = new TextView(this);
+        loading.setText("Yuklanmoqda…");
+        loading.setTextColor(0xFF888888);
+        loading.setPadding(0, dp(8), 0, dp(8));
+        container.addView(loading);
+
+        FirestoreSync.getInstance().getAllUsers(users -> runOnUiThread(() -> {
+            container.removeAllViews();
+            if (users.isEmpty()) {
+                TextView empty = new TextView(this);
+                empty.setText("Foydalanuvchilar topilmadi");
+                empty.setTextColor(0xFF888888);
+                container.addView(empty);
+                return;
+            }
+            for (FirestoreSync.UserInfo user : users) {
+                container.addView(buildUserRow(user, container));
+            }
+        }));
+    }
+
+    private View buildUserRow(FirestoreSync.UserInfo user, LinearLayout container) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        row.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(52)));
+        row.setPadding(0, dp(4), 0, dp(4));
+
+        String display = !user.email.isEmpty()
+            ? user.email
+            : user.uid.substring(0, Math.min(12, user.uid.length())) + "…";
+        TextView tvEmail = new TextView(this);
+        tvEmail.setText(display);
+        tvEmail.setTextSize(12f);
+        tvEmail.setTextColor(0xFF222222);
+        tvEmail.setLayoutParams(new LinearLayout.LayoutParams(
+            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        boolean isBanned = "banned".equals(user.status);
+        TextView tvStatus = new TextView(this);
+        tvStatus.setText(isBanned ? "● ban" : "● aktiv");
+        tvStatus.setTextColor(isBanned ? 0xFFCC0000 : 0xFF008800);
+        tvStatus.setTextSize(11f);
+        tvStatus.setPadding(dp(6), 0, dp(6), 0);
+
+        MaterialButton btn = new MaterialButton(this,
+            null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        btn.setText(isBanned ? "Unban" : "Ban");
+        btn.setTextSize(11f);
+        String newStatus = isBanned ? "active" : "banned";
+        btn.setOnClickListener(v -> confirmSetStatus(user, newStatus, container));
+
+        row.addView(tvEmail);
+        row.addView(tvStatus);
+        row.addView(btn);
+        return row;
+    }
+
+    private void confirmSetStatus(FirestoreSync.UserInfo user, String newStatus,
+                                   LinearLayout container) {
+        String action = "banned".equals(newStatus) ? "ban" : "unban";
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Tasdiqlash")
+            .setMessage(user.email + " foydalanuvchini " + action + " qilasizmi?")
+            .setPositiveButton("Ha", (d, w) ->
+                FirestoreSync.getInstance().setUserStatus(user.uid, newStatus,
+                    () -> runOnUiThread(() -> loadUsers(container)))
+            )
+            .setNegativeButton("Bekor", null)
+            .show();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
