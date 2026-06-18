@@ -1,20 +1,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Har bir foydalanuvchi faqat o'z ma'lumotiga yeta oladi
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if request.auth.uid == uid
+                         || request.auth.uid == "REPLACE_WITH_YOUR_FIREBASE_UID";
     }
-    match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-
-    // Global stats — har qanday login qilgan foydalanuvchi yoza oladi
-    // O'qish faqat backend Admin SDK orqali (rules bypass qiladi)
-    match /stats/{date} {
-      allow write: if request.auth != null;
-      allow read: if false;
+    match /config/{doc} {
+      allow read:  if request.auth != null;
+      allow write: if request.auth.uid == "REPLACE_WITH_YOUR_FIREBASE_UID";
     }
   }
 }

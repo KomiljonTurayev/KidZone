@@ -84,20 +84,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+            BannerChecker.checkAsync(firestoreSync, banner -> runOnUiThread(() -> {
+                if (banner == null || promoBanner == null) return;
+                promoBannerTitle.setText(banner.title);
+                promoBannerBody.setText(banner.body);
+                promoBanner.setVisibility(View.VISIBLE);
+                promoBanner.setOnClickListener(v -> openUrl(banner.url));
+                promoBannerClose.setOnClickListener(v ->
+                    promoBanner.setVisibility(View.GONE));
+            }));
         });
         statsManager = new ParentalStatsManager(this);
         timeLockHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
         initializeUI();
-        BannerChecker.checkAsync(firestoreSync, banner -> runOnUiThread(() -> {
-            if (banner == null || promoBanner == null) return;
-            promoBannerTitle.setText(banner.title);
-            promoBannerBody.setText(banner.body);
-            promoBanner.setVisibility(View.VISIBLE);
-            promoBanner.setOnClickListener(v -> openUrl(banner.url));
-            promoBannerClose.setOnClickListener(v ->
-                promoBanner.setVisibility(View.GONE));
-        }));
         initializeManagers();
         setupKidzoFab();
     }
@@ -408,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
             getSharedPreferences("kz_prefs", MODE_PRIVATE);
         String url = prefs.getString("kz_pending_url", null);
         if (url == null || url.isEmpty()) return;
-        prefs.edit().remove("kz_pending_url").apply();
+        prefs.edit().remove("kz_pending_url").commit();
         openUrl(url);
     }
 
@@ -489,6 +489,7 @@ public class MainActivity extends AppCompatActivity {
         if (url.startsWith("kidzone://game/")) {
             String gameId = url.substring("kidzone://game/".length())
                 .replaceAll("[^a-zA-Z0-9\\-]", "");
+            if (gameId.isEmpty()) return;
             if (webViewManager != null)
                 webViewManager.evaluateJavascript(
                     "if(window.playContent)playContent('" + gameId + "')");

@@ -722,10 +722,11 @@ public class ParentalDashboardActivity extends AppCompatActivity {
                         "Banner yuborildi!", android.widget.Toast.LENGTH_SHORT).show();
                     refreshBannerStatus(tvActive, btnClear);
                 }),
-                () -> runOnUiThread(() ->
+                () -> runOnUiThread(() -> {
                     android.widget.Toast.makeText(this,
-                        "Push xatosi (Firestore'ga yozildi)", android.widget.Toast.LENGTH_SHORT).show()
-                )
+                        "Push xatosi (Firestore'ga yozildi)", android.widget.Toast.LENGTH_SHORT).show();
+                    refreshBannerStatus(tvActive, btnClear);
+                })
             );
         });
 

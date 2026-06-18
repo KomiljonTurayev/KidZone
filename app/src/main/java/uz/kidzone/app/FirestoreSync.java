@@ -128,7 +128,7 @@ public class FirestoreSync {
         if (!isAvailable() || uid == null) return;
         java.util.Map<String, Object> data = new java.util.HashMap<>();
         data.put("status", status);
-        db.collection("users").document(uid).update(data)
+        db.collection("users").document(uid).set(data, SetOptions.merge())
             .addOnSuccessListener(v -> { if (onDone != null) onDone.run(); })
             .addOnFailureListener(e -> Log.w(TAG, "setUserStatus failed: " + e));
     }
