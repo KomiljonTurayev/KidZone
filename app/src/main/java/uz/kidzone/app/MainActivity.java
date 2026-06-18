@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private View promoBanner;
     private android.widget.TextView promoBannerTitle;
     private android.widget.TextView promoBannerBody;
+    private View promoBannerClose;
 
     private final Runnable timeLockRunnable = new Runnable() {
         @Override public void run() {
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             promoBannerBody.setText(banner.body);
             promoBanner.setVisibility(View.VISIBLE);
             promoBanner.setOnClickListener(v -> openUrl(banner.url));
-            findViewById(R.id.promo_banner_close).setOnClickListener(v ->
+            promoBannerClose.setOnClickListener(v ->
                 promoBanner.setVisibility(View.GONE));
         }));
         initializeManagers();
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         promoBanner      = findViewById(R.id.promo_banner);
         promoBannerTitle = findViewById(R.id.promo_banner_title);
         promoBannerBody  = findViewById(R.id.promo_banner_body);
+        promoBannerClose = findViewById(R.id.promo_banner_close);
 
         // Apply insets to the main layout to prevent overlap with notches/system bars
         View mainLayout = findViewById(R.id.main_root);
