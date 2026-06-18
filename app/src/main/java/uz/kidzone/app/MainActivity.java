@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private android.os.Handler timeLockHandler;
     private View lockOverlay;
     private FirestoreSync firestoreSync;
+    private View promoBanner;
+    private android.widget.TextView promoBannerTitle;
+    private android.widget.TextView promoBannerBody;
 
     private final Runnable timeLockRunnable = new Runnable() {
         @Override public void run() {
@@ -85,6 +88,15 @@ public class MainActivity extends AppCompatActivity {
         timeLockHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
         initializeUI();
+        BannerChecker.checkAsync(firestoreSync, banner -> runOnUiThread(() -> {
+            if (banner == null || promoBanner == null) return;
+            promoBannerTitle.setText(banner.title);
+            promoBannerBody.setText(banner.body);
+            promoBanner.setVisibility(View.VISIBLE);
+            promoBanner.setOnClickListener(v -> openUrl(banner.url));
+            findViewById(R.id.promo_banner_close).setOnClickListener(v ->
+                promoBanner.setVisibility(View.GONE));
+        }));
         initializeManagers();
         setupKidzoFab();
     }
@@ -145,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         
         setContentView(R.layout.activity_main);
+
+        promoBanner      = findViewById(R.id.promo_banner);
+        promoBannerTitle = findViewById(R.id.promo_banner_title);
+        promoBannerBody  = findViewById(R.id.promo_banner_body);
 
         // Apply insets to the main layout to prevent overlap with notches/system bars
         View mainLayout = findViewById(R.id.main_root);
@@ -452,6 +468,26 @@ public class MainActivity extends AppCompatActivity {
                     if (!part.isEmpty()) sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
                 }
                 return sb.toString();
+            }
+        }
+    }
+
+    void openUrl(String url) {
+        if (url == null || url.isEmpty()) return;
+        if (url.startsWith("kidzone://game/")) {
+            String gameId = url.substring("kidzone://game/".length())
+                .replaceAll("[^a-zA-Z0-9\\-]", "");
+            if (webViewManager != null)
+                webViewManager.evaluateJavascript(
+                    "if(window.playContent)playContent('" + gameId + "')");
+        } else {
+            try {
+                new androidx.browser.customtabs.CustomTabsIntent.Builder()
+                    .build()
+                    .launchUrl(this, android.net.Uri.parse(url));
+            } catch (Exception e) {
+                startActivity(new android.content.Intent(
+                    android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)));
             }
         }
     }
