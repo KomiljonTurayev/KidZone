@@ -400,6 +400,16 @@ public class MainActivity extends AppCompatActivity {
             String ageGroup = kzPrefs.getString(OnboardingActivity.KEY_AGE, "2-4");
             firestoreSync.syncUserProfile(uid, "", "", ageGroup);
         }
+        checkPendingUrl();
+    }
+
+    private void checkPendingUrl() {
+        android.content.SharedPreferences prefs =
+            getSharedPreferences("kz_prefs", MODE_PRIVATE);
+        String url = prefs.getString("kz_pending_url", null);
+        if (url == null || url.isEmpty()) return;
+        prefs.edit().remove("kz_pending_url").apply();
+        openUrl(url);
     }
 
     @Override

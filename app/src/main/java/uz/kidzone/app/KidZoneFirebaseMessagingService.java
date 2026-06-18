@@ -27,6 +27,13 @@ public class KidZoneFirebaseMessagingService extends FirebaseMessagingService {
         if (title == null || title.isEmpty()) title = message.getData().get("title");
         if (body  == null || body.isEmpty())  body  = message.getData().get("body");
 
+        String pushUrl = message.getData().get("url");
+        if (pushUrl != null && !pushUrl.isEmpty()) {
+            getSharedPreferences("kz_prefs", MODE_PRIVATE).edit()
+                .putString("kz_pending_url", pushUrl)
+                .apply();
+        }
+
         String finalTitle = title != null && !title.isEmpty() ? title : "KidZone";
         String finalBody  = body  != null ? body : "";
         saveLastNotification(finalTitle, finalBody);
