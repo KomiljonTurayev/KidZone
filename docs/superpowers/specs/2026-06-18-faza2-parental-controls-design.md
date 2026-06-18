@@ -1,7 +1,7 @@
 # Faza 2 — Parental Controls: Time-Limit Overlay + Dashboard Compose Migration
 
 **Sana:** 2026-06-18  
-**Holat:** Approved  
+**Holat:** Approved (v2 — PIN Change + Push Notifications qo'shildi)  
 **Bog'liq:** `docs/superpowers/plans/2026-06-12-hybrid-migration-faza1.md`
 
 ---
@@ -19,6 +19,8 @@ Faza 1'da defer qilingan `showLockOverlay()` ni implement qilish va `ParentalDas
 - `TimeLimitOverlay` — Compose overlay (Warning, AwaitingPin, Locked)
 - `ParentPinGateScreen` — PIN entry gate (NavHost route)
 - `ParentDashboardScreen` — to'liq Compose dashboard (NavHost route)
+- `ChangePinScreen` — to'liq Compose PIN o'zgartirish flow (NavHost route)
+- Push bildirishnomalar — toggle (yoq/o'chir) + oxirgi 10 ta tarix
 - TDD: `TimeLimitViewModelTest` (fake timer bilan)
 
 **Kirmaydi:**
@@ -53,8 +55,9 @@ KidZoneApp (setContent bloki)
     └── NavHost
           ├── /games, /stories, /songs, /kidai  (mavjud)
           ├── /game/{gameId}                    (mavjud)
-          ├── /parent/gate  → ParentPinGateScreen   (yangi)
-          └── /parent       → ParentDashboardScreen  (yangi)
+          ├── /parent/gate       → ParentPinGateScreen    (yangi)
+          ├── /parent            → ParentDashboardScreen  (yangi)
+          └── /parent/change-pin → ChangePinScreen         (yangi)
 ```
 
 ### TimeLimitState holatlari
@@ -146,11 +149,48 @@ Seksiyalar (LazyColumn):
 2. **Bugun o'ynalgan o'yinlar** — emoji qatori (`getTodayGames()` dan)
 3. **Yosh guruhi** — `FilterChip` row: 2-4 / 5-7 / 8+
 4. **Vaqt limiti** — `[-]  45 min  [+]`, 15 daqiqalik qadamlar, 0 = "No limit"
-5. **PIN** — "Change PIN" tugmasi → `PinDialogHelper.showCreate()` (Java, mavjud)
+5. **PIN o'zgartirish** — "PIN o'zgartirish" tugmasi → `/parent/change-pin` navigate
 6. **Cloud Backup** — Firebase Auth sign-in/out, email ko'rsatish
-7. **Back** — TopAppBar'da `←` tugmasi
+7. **Push bildirishnomalar** — toggle + oxirgi 10 ta bildirishnoma tarixi
+8. **Back** — TopAppBar'da `←` tugmasi
 
 Admin panel seksiyasi ko'rsatilmaydi (faqat `ParentalDashboardActivity`'da).
+
+### ChangePinScreen (`/parent/change-pin`)
+
+Uch bosqichli Compose flow (bitta ekranda bosqichma-bosqich):
+
+```
+Bosqich 1: Joriy PIN kiriting
+  [● ● ● ●]  4 xonali klaviatura
+  → To'g'ri: Bosqich 2'ga
+  → Noto'g'ri: shake + "PIN noto'g'ri"
+
+Bosqich 2: Yangi PIN kiriting
+  [○ ○ ○ ○]  4 xona
+
+Bosqich 3: Yangi PINni tasdiqlang
+  → Mos kelsa: PinUtil.hash(newPin) → prefs'ga yoziladi → Dashboard'ga qaytish
+  → Mos kelmasa: shake + Bosqich 2'ga qaytish
+```
+
+- `PinUtil.verify(input, existingHash)` — joriy PIN tekshirish
+- `PinUtil.hash(newPin)` — yangi hash saqlash
+- Back → `/parent`'ga qaytadi (o'zgarish yo'q)
+
+### Push Bildirishnomalar seksiyasi (ParentDashboardScreen ichida)
+
+**Toggle:**
+- `Switch` — "Push bildirishnomalarni olish"
+- Holat: `kz_push_enabled` (SharedPreferences, default: `true`)
+- `KidZoneFirebaseMessagingService.onMessageReceived()` — `kz_push_enabled == false` bo'lsa notification ko'rsatmaydi
+
+**Tarix:**
+- Oxirgi 10 ta bildirishnoma `kz_notif_history` kalitida JSON array sifatida saqlanadi
+- Har bir yozuv: `{title, body, time}` (hozir faqat bitta `kz_last_notif_*` bor — migratsiya kerak)
+- `KidZoneFirebaseMessagingService.onMessageReceived()` yangi xabar kelganda tarixga qo'shadi (10 tadan oshsa eskisi o'chadi)
+- Ko'rinish: `LazyColumn` — har bir qator: vaqt (dd/MM HH:mm) + sarlavha + matn
+- Bo'sh holat: "Hali bildirishnoma kelmagan"
 
 ---
 
@@ -162,16 +202,18 @@ app/src/main/java/uz/kidzone/app/
   ui/overlay/TimeLimitOverlay.kt
   ui/screens/ParentPinGateScreen.kt
   ui/screens/ParentDashboardScreen.kt
+  ui/screens/ChangePinScreen.kt
 
 app/src/test/java/uz/kidzone/app/
   ui/viewmodel/TimeLimitViewModelTest.kt
 ```
 
 **O'zgaradigan mavjud fayllar:**
-- `ui/navigation/NavRoutes.kt` — `PARENT_GATE`, `PARENT` route'lar qo'shiladi
-- `ui/navigation/KidZoneNavHost.kt` — ikkita yangi `composable()` qo'shiladi
+- `ui/navigation/NavRoutes.kt` — `PARENT_GATE`, `PARENT`, `CHANGE_PIN` route'lar qo'shiladi
+- `ui/navigation/KidZoneNavHost.kt` — uchta yangi `composable()` qo'shiladi
 - `ui/KidZoneApp.kt` — `TimeLimitOverlay` qatlami qo'shiladi
 - `MainActivity.java` — `TimeLimitViewModel` wiring (hozirgi codeda Java versiyasi mavjud)
+- `KidZoneFirebaseMessagingService.java` — `kz_push_enabled` tekshiruvi + `kz_notif_history` yangilash
 
 ---
 
@@ -202,8 +244,8 @@ Mavjud 7 test o'zgarishsiz qoladi.
 | Java klass | Faza 2 roli |
 |-----------|-------------|
 | `ParentalStatsManager` | O'zgarishsiz — ViewModel to'g'ridan ishlaydi |
-| `PinUtil` | `verifyAndExtend()` ichida `PinUtil.verify()` chaqiriladi |
-| `PinDialogHelper` | Dashboard PIN o'zgartirish uchun saqlanadi |
+| `PinUtil` | `verifyAndExtend()` + `ChangePinScreen`'da `verify()` va `hash()` chaqiriladi |
+| `PinDialogHelper` | Endi ishlatilmaydi — `ChangePinScreen` Compose flow bilan almashtiriladi |
 | `FirebaseManager` | Cloud Backup seksiyasida ishlatiladi |
 | `ParentalDashboardActivity` | Admin panel uchun saqlanadi, 🔒 tugmasi endi `/parent/gate`'ga yo'naltiradi |
 
@@ -220,4 +262,10 @@ Mavjud 7 test o'zgarishsiz qoladi.
 - [ ] Dashboard'da bugungi vaqt va haftalik chart to'g'ri ko'rsatiladi
 - [ ] Limit +/- tugmalari `ParentalStatsManager`'ga yozadi
 - [ ] Yosh guruhi tanlanganda `kz_age` prefs'ga saqlanadi
+- [ ] "PIN o'zgartirish" → joriy PIN to'g'ri → yangi PIN × 2 mos kelsa yangilanadi
+- [ ] Yangi PIN noto'g'ri tasdiqlansa shake ko'rsatiladi, qayta kiritiladi
+- [ ] Push toggle o'chirilsa yangi bildirishnomalar ko'rsatilmaydi
+- [ ] Push toggle yoqilsa bildirishnomalar yana keladi
+- [ ] Bildirishnoma kelganda tarixga qo'shiladi (max 10 ta)
+- [ ] Dashboard push seksiyasida tarix to'g'ri ko'rsatiladi
 - [ ] `TimeLimitViewModelTest` — 7 test yashil
