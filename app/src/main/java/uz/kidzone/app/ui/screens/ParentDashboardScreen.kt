@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -189,9 +190,10 @@ private fun PinGate(
     onBack: () -> Unit,
 ) {
     var entered by remember { mutableStateOf("") }
+    var lastAttemptFailed by remember { mutableStateOf(false) }
 
     if (!hasPinSet) {
-        onPinCorrect("")
+        LaunchedEffect(Unit) { onPinCorrect("") }
         return
     }
 
@@ -217,16 +219,32 @@ private fun PinGate(
                 }
             }
         }
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(8.dp))
+        if (lastAttemptFailed) {
+            Text(
+                "PIN noto'g'ri ❌",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Spacer(Modifier.height(16.dp))
         PinKeypad(
             onDigit = { d ->
                 if (entered.length < 4) {
                     entered += d
-                    if (entered.length == 4) onPinCorrect(entered)
+                    lastAttemptFailed = false
+                    if (entered.length == 4) {
+                        onPinCorrect(entered)
+                        entered = ""
+                        lastAttemptFailed = true
+                    }
                 }
             },
             onBackspace = {
-                if (entered.isNotEmpty()) entered = entered.dropLast(1)
+                if (entered.isNotEmpty()) {
+                    entered = entered.dropLast(1)
+                    lastAttemptFailed = false
+                }
             },
         )
         Spacer(Modifier.height(16.dp))
