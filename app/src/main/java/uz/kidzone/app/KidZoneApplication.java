@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
-import com.chuckerteam.chucker.api.ChuckerInterceptor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,9 +31,7 @@ public class KidZoneApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        httpClient = new OkHttpClient.Builder()
-            .addInterceptor(new ChuckerInterceptor.Builder(this).build())
-            .build();
+        httpClient = new OkHttpClient();
         if (BuildConfig.DEBUG) {
             FirebaseFirestore.setLoggingEnabled(true);
         }
