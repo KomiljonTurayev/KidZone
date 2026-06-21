@@ -1,8 +1,8 @@
 package uz.kidzone.app.kidzo
 
-data class ContentCard(
-    val contentId: String,
-    val displayText: String,
-    val emoji: String = "🐥",
-    val type: String = "",
+data class ContentCard @JvmOverloads constructor(
+    @JvmField val contentId: String,
+    @JvmField val displayText: String,
+    @JvmField val emoji: String = "🐥",
+    @JvmField val type: String = "",
 )

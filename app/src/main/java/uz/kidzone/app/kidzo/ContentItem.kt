@@ -1,12 +1,12 @@
 package uz.kidzone.app.kidzo
 
 data class ContentItem(
-    val id: String,
-    val emoji: String,
-    val titleUz: String,
-    val titleRu: String,
-    val titleEn: String,
-    val category: String,
+    @JvmField val id: String,
+    @JvmField val emoji: String,
+    @JvmField val titleUz: String,
+    @JvmField val titleRu: String,
+    @JvmField val titleEn: String,
+    @JvmField val category: String,
 ) {
     fun getTitle(lang: String): String = when (lang) {
         "uz" -> titleUz
