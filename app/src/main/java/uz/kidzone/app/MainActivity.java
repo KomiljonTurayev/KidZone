@@ -130,24 +130,12 @@ public class MainActivity extends AppCompatActivity {
         pulse.playTogether(scaleX, scaleY);
         pulse.start();
 
-        try {
-            uz.kidzone.app.kidzo.ContentFilter contentFilter =
-                uz.kidzone.app.kidzo.ContentFilter.fromAssets(this);
-            uz.kidzone.app.kidzo.KidzoAgent kidzoAgent =
-                uz.kidzone.app.kidzo.KidzoAgent.createStatic(contentFilter, this::runOnUiThread);
-
-            fab.setOnClickListener(v -> {
-                uz.kidzone.app.kidzo.KidzoBottomSheet sheet =
-                    new uz.kidzone.app.kidzo.KidzoBottomSheet(kidzoAgent, contentId -> {
-                        String safeId = contentId.replaceAll("[^a-zA-Z0-9\\-]", "");
-                        webViewManager.evaluateJavascript("if(window.playContent)playContent('" + safeId + "')");
-                    });
-                sheet.show(getSupportFragmentManager(), "kidzo");
-                kidzoAgent.requestRecommendations();
-            });
-        } catch (Exception e) {
-            android.util.Log.e("MainActivity", "Kidzo init failed", e);
-        }
+        // TODO(Task 8): Wire KidzoSheet Compose bottom sheet here.
+        // KidzoBottomSheet (Java) removed in Task 7. KidzoSheet.kt (Compose) will be
+        // launched from a ComposeView/Activity in Task 8.
+        fab.setOnClickListener(v -> {
+            android.util.Log.d("MainActivity", "Kidzo FAB clicked — Task 8 will wire KidzoSheet");
+        });
     }
 
     private void initializeUI() {
