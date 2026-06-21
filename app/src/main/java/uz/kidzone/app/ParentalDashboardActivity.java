@@ -51,7 +51,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_parental_dashboard);
 
-        prefs = getSharedPreferences(OnboardingActivity.PREFS, MODE_PRIVATE);
+        prefs = getSharedPreferences("kz_prefs", MODE_PRIVATE);
         stats = new ParentalStatsManager(this);
 
         bindViews();
@@ -270,7 +270,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
     // ── Age group ─────────────────────────────────────────────────────────────
 
     private void setupAgeButtons() {
-        String cur = prefs.getString(OnboardingActivity.KEY_AGE, "2-4");
+        String cur = prefs.getString("kz_age", "2-4");
         applyAgeHighlight(cur);
         btnAge24.setOnClickListener(v   -> selectAge("2-4"));
         btnAge57.setOnClickListener(v   -> selectAge("5-7"));
@@ -278,7 +278,7 @@ public class ParentalDashboardActivity extends AppCompatActivity {
     }
 
     private void selectAge(String age) {
-        prefs.edit().putString(OnboardingActivity.KEY_AGE, age).apply();
+        prefs.edit().putString("kz_age", age).apply();
         applyAgeHighlight(age);
         injectJs("localStorage.setItem('kz-age','" + age + "');");
     }
