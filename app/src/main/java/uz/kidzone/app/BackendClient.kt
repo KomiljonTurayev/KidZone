@@ -56,7 +56,7 @@ object BackendClient {
                 .post(reqBody)
                 .build()
 
-            KidZoneApplication.getHttpClient().newCall(request).enqueue(object : Callback {
+            KidZoneApplication.httpClient.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.w(TAG, "sendTopicPush failed: $e")
                     onError?.run()
