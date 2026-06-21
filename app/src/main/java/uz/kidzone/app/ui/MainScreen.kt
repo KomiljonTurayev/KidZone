@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.SharedPreferences
 import android.view.ViewGroup
 import android.webkit.WebView
+import java.lang.ref.WeakReference
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
@@ -84,7 +85,7 @@ fun MainScreen(
                     val lang = prefs.getString("kz_lang", "uz") ?: "uz"
                     val age = prefs.getString("kz_age", "2-4") ?: "2-4"
                     mgr.setup(
-                        AdMobBridge(mainViewModel, adsManager, onOpenDashboard),
+                        AdMobBridge(mainViewModel, adsManager, onOpenDashboard, context as Activity),
                         "AndroidAdMob",
                     )
                     mgr.setOnPageReadyCallback {
@@ -242,48 +243,71 @@ private class AdMobBridge(
     private val viewModel: MainViewModel,
     private val adsManager: AdsManager,
     private val onOpenDashboard: () -> Unit,
+    activity: Activity,
 ) {
+    private val activity = WeakReference(activity)
+
+    private fun onMain(block: () -> Unit) {
+        this.activity.get()?.runOnUiThread(block)
+    }
+
     @android.webkit.JavascriptInterface
     fun showBanner() {
-        viewModel.setInGame(false)
-        viewModel.setBannerVisible(true)
+        onMain {
+            viewModel.setInGame(false)
+            viewModel.setBannerVisible(true)
+        }
     }
 
     @android.webkit.JavascriptInterface
     fun hideBanner() {
-        viewModel.setInGame(true)
-        viewModel.setBannerVisible(false)
+        onMain {
+            viewModel.setInGame(true)
+            viewModel.setBannerVisible(false)
+        }
     }
 
     @android.webkit.JavascriptInterface
     fun showInterstitial() {
-        adsManager.showInterstitial()
+        onMain {
+            adsManager.showInterstitial()
+        }
     }
 
     @android.webkit.JavascriptInterface
     fun showRewarded() {
-        adsManager.showRewarded { amount ->
-            // reward callback — webview JS call could go here if needed
+        onMain {
+            adsManager.showRewarded { amount ->
+                // reward callback — webview JS call could go here if needed
+            }
         }
     }
 
     @android.webkit.JavascriptInterface
     fun toggleMusic(mute: Boolean) {
-        MusicManager.setMuted(mute)
+        onMain {
+            MusicManager.setMuted(mute)
+        }
     }
 
     @android.webkit.JavascriptInterface
     fun updateLanguage(lang: String) {
-        viewModel.setLanguage(lang)
+        onMain {
+            viewModel.setLanguage(lang)
+        }
     }
 
     @android.webkit.JavascriptInterface
     fun openParentalDashboard() {
-        onOpenDashboard()
+        onMain {
+            onOpenDashboard()
+        }
     }
 
     @android.webkit.JavascriptInterface
     fun gameLaunched(gameId: String) {
-        viewModel.setInGame(true)
+        onMain {
+            viewModel.setInGame(true)
+        }
     }
 }
