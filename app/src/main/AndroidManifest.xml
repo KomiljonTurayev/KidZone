@@ -57,20 +57,6 @@
             </intent-filter>
         </activity>
 
-        <!-- ONBOARDING ACTIVITY -->
-        <activity
-            android:name=".OnboardingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.KidZone"/>
-
-        <!-- PARENTAL DASHBOARD -->
-        <activity
-            android:name=".ParentalDashboardActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.KidZone"/>
-
         <!-- FCM Push Notifications -->
         <service
             android:name=".KidZoneFirebaseMessagingService"
