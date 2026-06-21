@@ -1,4 +1,4 @@
-﻿package uz.kidzone.app.kidzo
+package uz.kidzone.app.kidzo
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +27,7 @@ class KidzoAgent private constructor(
         /** Production factory — wires RealGeminiCaller. */
         @JvmStatic
         fun create(filter: ContentFilter, mainThread: (() -> Unit) -> Unit, @Suppress("UNUSED_PARAMETER") context: Context): KidzoAgent {
+            // TODO(Task 8): wire context into RealGeminiCaller if API key override is needed
             return KidzoAgent(RealGeminiCaller(), filter, mainThread)
         }
 
@@ -144,11 +145,11 @@ class KidzoAgent private constructor(
     }
 
     private fun typeOf(contentId: String): String =
-        if (contentId.startsWith("song-")) "Qo’shiq" else "Ertak"
+        if (contentId.startsWith("song-")) "Qo'shiq" else "Ertak"
 
     private fun buildOfflineResponse(lower: String): String {
         if (lower.matches(Regex(".*(salom|assalom|hello|hi|привет).*")))
-            return "Salom! 🐥 Men Kidzo — sening bilim do’sting! Ertak eshitmoqchimisan?"
+            return "Salom! 🐥 Men Kidzo — sening bilim do'sting! Ertak eshitmoqchimisan?"
 
         if (lower.matches(Regex(".*(ertak|hikoya|ayt|eshit|story|сказку|расскажи).*"))) {
             var results = contentFilter.getFiltered(lower)
@@ -161,19 +162,19 @@ class KidzoAgent private constructor(
 
         if (lower.matches(Regex(".*(hayvon|sher|fil|mushuk|qush|animal|lion|жив).*"))) {
             val facts = arrayOf(
-                "🦁 Sher — o’rmonning qiroli! U juda kuchli.",
+                "🦁 Sher — o'rmonning qiroli! U juda kuchli.",
                 "🐘 Fil — quruqlikdagi eng katta hayvon!",
-                "🦒 Jirafa — eng bo’yi baland hayvon. Bo’yni 2 metrga yetadi!",
+                "🦒 Jirafa — eng bo'yi baland hayvon. Bo'yni 2 metrga yetadi!",
                 "🐬 Delfinlar — dengizning eng aqlli jonzotlari."
             )
             return facts[(Math.random() * facts.size).toInt()]
         }
 
-        if (lower.matches(Regex(".*(rang|color|цвет|kamalak|qizil|yashil|ko’k).*")))
-            return "🌈 Kamalakda 7 ta rang: qizil, to’q sariq, sariq, yashil, ko’k, moviy, binafsha!"
+        if (lower.matches(Regex(".*(rang|color|цвет|kamalak|qizil|yashil|ko'k).*")))
+            return "🌈 Kamalakda 7 ta rang: qizil, to'q sariq, sariq, yashil, ko'k, moviy, binafsha!"
 
-        if (lower.matches(Regex(".*(son|raqam|number|число|hisob|matematik|qo’sh).*")))
-            return "🔢 1 dan 10 gacha: bir, ikki, uch, to’rt, besh, olti, yetti, sakkiz, to’qqiz, o’n!"
+        if (lower.matches(Regex(".*(son|raqam|number|число|hisob|matematik|qo'sh).*")))
+            return "🔢 1 dan 10 gacha: bir, ikki, uch, to'rt, besh, olti, yetti, sakkiz, to'qqiz, o'n!"
 
         if (lower.matches(Regex(".*(sayyora|planet|koinot|space|космос|oy|quyosh|moon).*")))
             return "🪐 Quyosh sistemasida 8 ta sayyora bor. Yer — uchinchisi!"
@@ -184,7 +185,7 @@ class KidzoAgent private constructor(
         if (lower.matches(Regex(".*(meva|fruit|фрукт|olma|banan|apple|apelsin).*")))
             return "🍎 Olma, 🍌 banan, 🍊 apelsin — foydali mevalar!"
 
-        return "🤔 Tushunmadim, lekin yordam bera olaman! \"ertak ayt\" de yoki hayvonlar, sayyoralar, ranglar haqida so’ra 📚"
+        return "🤔 Tushunmadim, lekin yordam bera olaman! \"ertak ayt\" de yoki hayvonlar, sayyoralar, ranglar haqida so'ra 📚"
     }
 
     private fun buildRecommendationPrompt(
@@ -193,7 +194,7 @@ class KidzoAgent private constructor(
         contentBlock: String
     ): String {
         return "Sen KidZone ilovasidagi \"Kidzo\" nomli mehribon qushchasan.\n" +
-            "Faqat O’zbek tilida, qisqa va bolalarga mos tarzda gaplash.\n" +
+            "Faqat O'zbek tilida, qisqa va bolalarga mos tarzda gaplash.\n" +
             "Bolaning ismi: $childName.\n" +
             (if (lastContentId != null) "Oxirgi eshitgan kontenti: $lastContentId.\n" else "") +
             "\nQuyidagi kontentlardan $childName uchun 3 ta mos tavsiya tanlaydi:\n" +
@@ -201,6 +202,6 @@ class KidzoAgent private constructor(
             "// Har qator formati: \"id|emoji|nomUz|kategoriya\"\n" +
             "\nHar bir tavsiyani quyidagi formatda yoz:\n" +
             "[OPEN:content-id] Kontent nomi — qisqa tavsif\n" +
-            "\nBoshqa format ishlatma. Faqat ro’yxatdagi ID’larni ishlat."
+            "\nBoshqa format ishlatma. Faqat ro'yxatdagi ID'larni ishlat."
     }
 }
