@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
-import android.webkit.ValueCallback
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -16,19 +15,8 @@ import androidx.core.view.WindowCompat
 import uz.kidzone.app.ui.KidZoneApp
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.PromoBannerData
-import java.lang.ref.WeakReference
 
 class MainActivity : ComponentActivity() {
-
-    companion object {
-        /**
-         * Weak reference kept for legacy Java code (ParentalDashboardActivity) that still calls
-         * evaluateJs / injectJs. Will be removed when Task 10 replaces ParentalDashboardActivity
-         * with a Compose screen.
-         */
-        @JvmField
-        var instance: WeakReference<MainActivity>? = null
-    }
 
     private val mainViewModel: MainViewModel by viewModels()
     private lateinit var adsManager: AdsManager
@@ -40,8 +28,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        instance = WeakReference(this)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -108,26 +94,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        instance = null
         adsManager.onDestroy()
         super.onDestroy()
-    }
-
-    /**
-     * Legacy JS injection used by ParentalDashboardActivity (Java).
-     * WebView is now owned by MainScreen composable; this is a no-op stub
-     * until Task 10 replaces ParentalDashboardActivity with Compose.
-     */
-    fun injectJs(script: String) {
-        // no-op: WebView reference lives in MainScreen composable state
-    }
-
-    /**
-     * Legacy JS evaluation used by ParentalDashboardActivity (Java).
-     * No-op stub until Task 10 replaces ParentalDashboardActivity with Compose.
-     */
-    fun evaluateJs(script: String, callback: ValueCallback<String>) {
-        // no-op: WebView reference lives in MainScreen composable state
     }
 
     private fun checkPendingUrl() {
