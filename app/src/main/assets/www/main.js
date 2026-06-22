@@ -284,7 +284,7 @@ class ContentManager {
             (cur, dur) => this._onTimeUpdate(cur, dur),
             () => this._onEnded(),
             () => {
-                this.ui.showToast(this.translator.get('noAudio') || 'Audio unavailable');
+                this._onAudioError();
                 this._hidePlayer();
                 this.currentId = null;
                 this.render();
@@ -292,6 +292,10 @@ class ContentManager {
         );
         const playBtn = document.getElementById('kzp-play');
         if (playBtn) playBtn.textContent = '⏸';
+    }
+
+    _onAudioError() {
+        this.ui.showToast(this.translator.get('noAudio') || 'Audio unavailable');
     }
 
     _onTimeUpdate(cur, dur) {
@@ -413,6 +417,28 @@ class SongManager extends ContentManager {
             document.getElementById('lyrics-viewer').classList.remove('h');
         }
         super._play(item);
+    }
+
+    _onAudioError() {
+        const text = document.getElementById('lv-lyrics')?.textContent;
+        if (text) this._speakLyrics(text, this.translator.lang);
+    }
+
+    _speakLyrics(text, lang) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const langMap = { uz: 'uz-UZ', ru: 'ru-RU', en: 'en-US' };
+        const targetLang = langMap[lang] || 'en-US';
+        const voices = window.speechSynthesis.getVoices();
+        const voice = voices.find(v => v.lang === targetLang)
+                   || voices.find(v => v.lang.startsWith(targetLang.split('-')[0]))
+                   || (lang === 'uz' ? voices.find(v => v.lang.startsWith('ru')) : null)
+                   || null;
+        const msg = new SpeechSynthesisUtterance(text);
+        if (voice) msg.voice = voice;
+        msg.lang = voice ? voice.lang : targetLang;
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
     }
 }
 
