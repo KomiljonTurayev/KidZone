@@ -179,14 +179,19 @@ fun MainScreen(
         if (uiState.isLocked) return@BackHandler
         val mgr = webMgrRef.value
         webMgrRef.value?.evaluateJavascript(
-            "document.getElementById('gv') ? !document.getElementById('gv').classList.contains('h') : false"
+            """(function(){
+                var lv=document.getElementById('lyrics-viewer');
+                if(lv&&!lv.classList.contains('h')){closeLyrics();return 'overlay';}
+                var ai=document.getElementById('ai-viewer');
+                if(ai&&!ai.classList.contains('h')){closeAi();return 'overlay';}
+                var gv=document.getElementById('gv');
+                return(gv&&!gv.classList.contains('h'))?'game':'none';
+            })()"""
         ) { result ->
-            if (result == "true") {
-                mainViewModel.showExitDialog(true)
-            } else if (mgr?.canGoBack() == true) {
-                mgr.goBack()
-            } else {
-                mainViewModel.showExitDialog(false)
+            when (result?.trim('"')) {
+                "overlay" -> { }
+                "game" -> mainViewModel.showExitDialog(true)
+                else -> if (mgr?.canGoBack() == true) { mgr.goBack() } else { mainViewModel.showExitDialog(false) }
             }
         }
     }
