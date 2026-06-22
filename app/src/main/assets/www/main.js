@@ -89,7 +89,7 @@ class UIManager {
         document.querySelectorAll('.kz-tab').forEach(t => t.classList.remove('active'));
         const tabEl = document.getElementById('tab-' + tab);
         if (tabEl) tabEl.classList.add('active');
-        ['games', 'stories', 'kidai'].forEach(s => {
+        ['games', 'stories', 'songs'].forEach(s => {
             const el = document.getElementById(s + '-section');
             if (el) el.classList.toggle('h', s !== tab);
         });
@@ -393,6 +393,12 @@ class StoryManager extends ContentManager {
             const playBtn = document.getElementById('kzp-play');
             if (playBtn) playBtn.textContent = '⏸';
         }
+    }
+}
+
+class SongManager extends ContentManager {
+    constructor(player, translator, ui) {
+        super('songs', player, translator, ui);
     }
 }
 
@@ -1026,10 +1032,10 @@ window.addEventListener("load", () => {
     }
 
     // Load content and render
-    app.storyManager.load().then(() => {
-      app.storyManager.render();
-      window.kidAI = new KidAIEngine(app.storyManager.items, GAMES);
-    });
+    app.songManager = new SongManager(audioPlayer, translator, ui);
+    app.songManager.load().then(() => app.songManager.render());
+
+    app.storyManager.load().then(() => app.storyManager.render());
 
     // Reward ad callback from Java
     window.onRewardGranted = function(amount) {
@@ -1038,7 +1044,7 @@ window.addEventListener("load", () => {
     };
 
     // Restore last active tab
-    const validTabs = ['games', 'stories', 'kidai'];
+    const validTabs = ['games', 'stories', 'songs'];
     const rawTab = localStorage.getItem('kz-tab') || 'games';
     const savedTab = validTabs.includes(rawTab) ? rawTab : 'games';
     ui.switchTab(savedTab);
