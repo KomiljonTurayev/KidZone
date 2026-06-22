@@ -400,6 +400,11 @@ class SongManager extends ContentManager {
     constructor(player, translator, ui) {
         super('songs', player, translator, ui);
     }
+
+    _play(item) {
+        if (window.badgeManager) badgeManager.onSongPlayed();
+        super._play(item);
+    }
 }
 
 class GameManager {
