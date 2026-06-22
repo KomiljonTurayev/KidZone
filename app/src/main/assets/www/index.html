@@ -628,6 +628,8 @@
       justify-content:center;font-size:18px;cursor:pointer;
       margin-left:2px;flex-shrink:0;
     }
+    #prof-pill{background:transparent;border:none;font-size:20px;cursor:pointer;padding:4px 6px;border-radius:8px}
+    #prof-pill:active{background:rgba(0,0,0,.08)}
     /* ── Profile Picker ───────────────────────────────── */
     #profile-picker{
       position:fixed;inset:0;background:#FFF8F0;
@@ -999,6 +1001,7 @@
     <button id="age-btn" onclick="openModal('age-modal')">👶 2–4 ▾</button>
     <div id="stars-pill">⭐<span id="stars-val">0</span></div>
     <button id="badge-pill" onclick="openBadges()">🏅</button>
+    <button id="prof-pill" onclick="openProfilePicker()">👤</button>
   </div>
 
   <!-- MASCOT -->
@@ -1450,8 +1453,6 @@
     }
 
     function openProfilePicker() {
-      var profiles = window.profileManager ? profileManager.getAll() : [];
-      if (profiles.length <= 1) return;
       renderProfilePicker();
       document.getElementById('profile-picker').classList.remove('h');
     }
@@ -1752,9 +1753,9 @@
         if (profCT) profCT.textContent = t.profCreateTitle;
         const profNI = document.getElementById('prof-name-input');
         if (profNI) profNI.placeholder = t.profNamePlaceholder;
-        const profCC = document.querySelector('.prof-btn-secondary');
+        const profCC = document.querySelector('#prof-create .prof-btn-secondary');
         if (profCC) profCC.textContent = t.profCancelBtn;
-        const profOK = document.querySelector('.prof-btn-primary');
+        const profOK = document.querySelector('#prof-create .prof-btn-primary');
         if (profOK) profOK.textContent = t.profCreateBtn;
 
         // Badges overlay i18n

@@ -1058,5 +1058,5 @@ window.addEventListener("load", () => {
         const loader = document.getElementById("loader");
         if (loader) loader.classList.add("h");
     }, 1400);
-    openProfilePicker();
+    if (window.profileManager && profileManager.getAll().length > 1) openProfilePicker();
 });
