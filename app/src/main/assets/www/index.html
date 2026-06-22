@@ -509,15 +509,9 @@
     #stories-section{padding-top:10px}
     #stories-section.h{display:none}
 
-    /* ── KIDAI CHAT ── */
-    #kidai-section{display:flex;flex-direction:column;height:100%;overflow:hidden}
-    #kidai-section.h{display:none}
-    #kidai-messages{flex:1;overflow-y:auto;padding:16px var(--pad);display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
-    .kai-msg{display:flex;align-items:flex-start;gap:8px;max-width:85%}
-    .kai-msg .kai-av{font-size:22px;flex-shrink:0;margin-top:2px}
-    .kai-msg .kai-bub{background:var(--surface);border-radius:0 16px 16px 16px;padding:10px 14px;font-size:15px;color:var(--text);line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,0.08);word-break:break-word}
-    .kai-msg.user{flex-direction:row-reverse;align-self:flex-end}
-    .kai-msg.user .kai-bub{background:var(--accent);color:#fff;border-radius:16px 0 16px 16px}
+    /* ── SONGS SECTION ── */
+    #songs-section{padding-top:10px}
+    #songs-section.h{display:none}
     .kai-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
     .kai-chip{background:#fff;border:1.5px solid var(--accent);border-radius:20px;padding:5px 12px;font-size:13px;color:var(--accent);font-family:'Fredoka One',cursive;cursor:pointer;touch-action:manipulation}
     .kai-typing span{display:inline-block;width:7px;height:7px;background:var(--dim);border-radius:50%;margin:0 2px;animation:kaiBounce 1.2s infinite}
@@ -1045,7 +1039,7 @@
   <div id="tab-bar">
     <button class="kz-tab active" id="tab-games" onclick="switchTab('games')">🎮 <span id="tab-lbl-games">O'yinlar</span></button>
     <button class="kz-tab" id="tab-stories" onclick="switchTab('stories')">📖 <span id="tab-lbl-stories">Ertaklar</span></button>
-    <button class="kz-tab" id="tab-kidai" onclick="switchTab('kidai')">🤖 <span id="tab-lbl-kidai">KidAI</span></button>
+    <button class="kz-tab" id="tab-songs" onclick="switchTab('songs')">🎵 <span id="tab-lbl-songs">Qo'shiqlar</span></button>
   </div>
 
   <!-- MAIN -->
@@ -1171,20 +1165,25 @@
       <div class="content-grid" id="stories-grid"></div>
     </div><!-- /#stories-section -->
 
-    <!-- KIDAI SECTION -->
-    <div id="kidai-section" class="h">
-      <div id="kidai-messages"></div>
-      <div id="kai-quick">
-        <button class="kai-qchip" id="kai-q1" onclick="kaiQuick('story')">📖 Ertak ayt</button>
-        <button class="kai-qchip" id="kai-q2" onclick="kaiQuick('game')">🎮 O'yin topchi</button>
-        <button class="kai-qchip" id="kai-q3" onclick="kaiQuick('fact')">❓ Savol ber</button>
+    <!-- SONGS SECTION -->
+    <div id="songs-section" class="h">
+      <div class="cc-cats" id="songs-cats">
+        <button class="cc-chip active" onclick="songFilter(document.getElementById('songs-search').value,'all',this)">🎯 <span id="sqcat-all">Hammasi</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'lullaby',this)">🌙 <span id="sqcat-lullaby">Allalar</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'alphabet',this)">🔤 <span id="sqcat-alphabet">Alifbo</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'animals',this)">🐾 <span id="sqcat-animals">Hayvonlar</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'dance',this)">💃 <span id="sqcat-dance">Raqs</span></button>
+        <button class="cc-chip" onclick="songFilter(document.getElementById('songs-search').value,'games',this)">🎈 <span id="sqcat-games">O'yin</span></button>
       </div>
-      <div id="kai-input-row">
-        <input id="kai-input" type="text" placeholder="Yoz..." maxlength="200"
-               onkeydown="if(event.key==='Enter')kaiSend()">
-        <button id="kai-send" onclick="kaiSend()">➤</button>
+      <div class="cs-search-wrap">
+        <input class="cs-search" type="text" id="songs-search"
+               placeholder="🔍 Qo'shiq qidirish..."
+               oninput="clearTimeout(window._sqTs);window._sqTs=setTimeout(()=>{var v=this.value;document.getElementById('songs-search-clear').classList.toggle('h',!v);songFilter(v,window._songCat||'all')},180)">
+        <button class="cs-clear h" id="songs-search-clear" onclick="clearSongSearch()">✕</button>
       </div>
-    </div><!-- /#kidai-section -->
+      <div class="cs-count" id="songs-count"></div>
+      <div class="content-grid" id="songs-grid"></div>
+    </div><!-- /#songs-section -->
 
   </div><!-- /#main -->
 </div><!-- /#shell -->
@@ -1215,7 +1214,6 @@
 
 <!-- ADMOB BANNER: Java Layout (bannerContainer) tomonidan ko'rsatiladi -->
 
-  <script src="kidai.js"></script>
   <script src="main.js"></script>
   <script>
     // ════════════════════════════════════════════════════
@@ -1317,8 +1315,9 @@
         catAll:"Hammasi", catAnimals:"Hayvonlar", catNature:"Tabiat",
         catHeroes:"Qahramonlar", catFamily:"Oila", catSpace:"Koinot",
         noAudio:"Audio fayl yo'q 🎵",
-        tabKidai:"KidAI", kidaiPlaceholder:"Yoz...", kidaiClear:"Tozala",
-        kidaiQ1:"📖 Ertak ayt", kidaiQ2:"🎮 O'yin topchi", kidaiQ3:"❓ Savol ber",
+        tabSongs:"Qo'shiqlar", searchSong:"Qo'shiq qidirish...",
+        sqCatAll:"Hammasi", sqCatLullaby:"Allalar", sqCatAlphabet:"Alifbo",
+        sqCatAnimals:"Hayvonlar", sqCatDance:"Raqs", sqCatGames:"O'yin",
       },
       ru: {
         heroH:"Играйте всей<br>Семьей! 👨‍👩‍👧",
@@ -1364,8 +1363,9 @@
         catAll:"Все", catAnimals:"Животные", catNature:"Природа",
         catHeroes:"Герои", catFamily:"Семья", catSpace:"Космос",
         noAudio:"Аудио недоступно 🎵",
-        tabKidai:"KidAI", kidaiPlaceholder:"Напиши...", kidaiClear:"Очистить",
-        kidaiQ1:"📖 Расскажи сказку", kidaiQ2:"🎮 Найди игру", kidaiQ3:"❓ Вопрос",
+        tabSongs:"Песни", searchSong:"Поиск песни...",
+        sqCatAll:"Все", sqCatLullaby:"Колыбельные", sqCatAlphabet:"Азбука",
+        sqCatAnimals:"Животные", sqCatDance:"Танцы", sqCatGames:"Игры",
       },
       en: {
         heroH:"Play Together<br>with Family! 👨‍👩‍👧",
@@ -1411,8 +1411,9 @@
         catAll:"All", catAnimals:"Animals", catNature:"Nature",
         catHeroes:"Heroes", catFamily:"Family", catSpace:"Space",
         noAudio:"Audio unavailable 🎵",
-        tabKidai:"KidAI", kidaiPlaceholder:"Type...", kidaiClear:"Clear",
-        kidaiQ1:"📖 Tell a story", kidaiQ2:"🎮 Find a game", kidaiQ3:"❓ Ask me",
+        tabSongs:"Songs", searchSong:"Search songs...",
+        sqCatAll:"All", sqCatLullaby:"Lullabies", sqCatAlphabet:"Alphabet",
+        sqCatAnimals:"Animals", sqCatDance:"Dance", sqCatGames:"Games",
       },
     };
 
@@ -1663,10 +1664,30 @@
     function switchTab(tab) {
       app.ui.switchTab(tab);
       if (tab === 'stories') app.storyManager?.render();
-      if (tab === 'kidai') kaiInit();
+      if (tab === 'songs') app.songManager?.render();
     }
 
     window._storyCat = 'all';
+
+    window._songCat = 'all';
+
+    function songFilter(query, cat, chipEl) {
+      if (chipEl) {
+        document.querySelectorAll('#songs-cats .cc-chip').forEach(c => c.classList.remove('active'));
+        chipEl.classList.add('active');
+      }
+      if (cat) window._songCat = cat;
+      app.songManager?.filter(query || '', window._songCat);
+      app.songManager?.render();
+    }
+
+    function clearSongSearch() {
+      var inp = document.getElementById('songs-search');
+      var btn = document.getElementById('songs-search-clear');
+      if (inp) inp.value = '';
+      if (btn) btn.classList.add('h');
+      songFilter('', window._songCat || 'all');
+    }
 
     function storyFilter(query, cat, chipEl) {
       if (chipEl) {
@@ -1689,10 +1710,12 @@
     function playerToggle() {
       const active = localStorage.getItem('kz-tab');
       if (active === 'stories') app.storyManager?.togglePlay();
+      else if (active === 'songs') app.songManager?.togglePlay();
     }
 
     function playerStop() {
       app.storyManager?.stop();
+      app.songManager?.stop();
       app.audioPlayer?.stop();
       const player = document.getElementById('kz-player');
       if (player) player.classList.add('h');
@@ -1709,6 +1732,10 @@
         app.ui.switchTab('stories');
         const item = app.storyManager?.items.find(i => i.id === id);
         if (item) app.storyManager._play(item);
+      } else if (id.startsWith('song-')) {
+        app.ui.switchTab('songs');
+        const item = app.songManager?.items.find(i => i.id === id);
+        if (item) app.songManager._play(item);
       }
     };
 
@@ -1809,13 +1836,16 @@
         const ts = document.getElementById('tab-lbl-stories');
         if (tg) tg.textContent = t2.tabGames;
         if (ts) ts.textContent = t2.tabStories;
-        const tk = document.getElementById('tab-lbl-kidai');
-        if (tk) tk.textContent = t2.tabKidai;
-        const kInput = document.getElementById('kai-input');
-        if (kInput) kInput.placeholder = t2.kidaiPlaceholder;
-        const q1 = document.getElementById('kai-q1'); if (q1) q1.textContent = t2.kidaiQ1;
-        const q2 = document.getElementById('kai-q2'); if (q2) q2.textContent = t2.kidaiQ2;
-        const q3 = document.getElementById('kai-q3'); if (q3) q3.textContent = t2.kidaiQ3;
+        const tk = document.getElementById('tab-lbl-songs');
+        if (tk) tk.textContent = t2.tabSongs;
+        const ssearch2 = document.getElementById('songs-search');
+        if (ssearch2) ssearch2.placeholder = '🔍 ' + t2.searchSong;
+        const sqcatMap = {
+          'sqcat-all': t2.sqCatAll, 'sqcat-lullaby': t2.sqCatLullaby,
+          'sqcat-alphabet': t2.sqCatAlphabet, 'sqcat-animals': t2.sqCatAnimals,
+          'sqcat-dance': t2.sqCatDance, 'sqcat-games': t2.sqCatGames
+        };
+        Object.entries(sqcatMap).forEach(([id,lbl]) => { const el=document.getElementById(id); if(el) el.textContent=lbl; });
 
         // Search placeholders
         const ssearch = document.getElementById('stories-search');
@@ -1830,6 +1860,7 @@
 
         // Re-render content grids in new language
         app.storyManager?.render();
+        app.songManager?.render();
     }
 
     function buildFeatured() {
