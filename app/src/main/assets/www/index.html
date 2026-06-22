@@ -202,6 +202,17 @@
       display:flex; align-items:center; justify-content:center; gap:8px;
     }
 
+    /* ── SONG LYRICS VIEWER ── */
+    #lyrics-viewer{
+      position:fixed; inset:0; z-index:350; background:var(--bg);
+      display:flex; flex-direction:column; animation:shUp 0.4s var(--spring);
+    }
+    #lyrics-viewer.h{display:none}
+    .lv-lyrics{
+      font-size:16px; color:var(--text); font-family:'Nunito',sans-serif;
+      white-space:pre-wrap; line-height:2; margin:0;
+    }
+
     /* ── CATEGORIES ── */
     #cat-row{
       display:flex;gap:8px;overflow-x:auto;padding:0 var(--pad) 12px;
@@ -967,11 +978,24 @@
     <button class="aiv-play-btn" id="ai-read-btn" onclick="speakStory()">
       <span>🔊</span> <span id="ai-read-label">Eshittirish</span>
     </button>
-    <button class="aiv-play-btn" style="background:#4CAF50" onclick="generateAiStory()">
+    <button id="aiv-regen-btn" class="aiv-play-btn h" style="background:#4CAF50" onclick="generateAiStory()">
       <span>🔄</span> <span id="ai-regen-label">Yangi ertak</span>
     </button>
   </div>
 </div>
+
+  <!-- SONG LYRICS VIEWER -->
+  <div id="lyrics-viewer" class="h">
+    <div class="aiv-hdr">
+      <button class="ni-pill" style="width:40px;background:#F0F0F0" onclick="closeLyrics()">✕</button>
+      <div style="color:var(--text);flex:1;text-align:center;font-weight:800" id="lv-title">🎵</div>
+      <div style="width:40px"></div>
+    </div>
+    <div class="aiv-body">
+      <div class="aiv-story-title" id="lv-song-title"></div>
+      <pre class="lv-lyrics" id="lv-lyrics"></pre>
+    </div>
+  </div>
 
 <!-- AUDIO PLAYER (shared for stories and songs) -->
 <div id="kz-player" class="h">
@@ -1444,6 +1468,7 @@
     function showToast(m) { app.ui.showToast(m); }
     function generateAiStory() { app.generateAiStory(); }
     function closeAi() { app.closeAi(); }
+    function closeLyrics() { document.getElementById('lyrics-viewer').classList.add('h'); }
     function speakStory() { app.speakStory(); }
     function openAiMusic() { app.openAiMusic(); }
 

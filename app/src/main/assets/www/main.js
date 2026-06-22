@@ -403,6 +403,15 @@ class SongManager extends ContentManager {
 
     _play(item) {
         if (window.badgeManager) badgeManager.onSongPlayed();
+        const lang = this.translator.lang;
+        const title = item.title[lang] || item.title.en;
+        const text = item.text ? (item.text[lang] || item.text.en || '') : '';
+        if (text) {
+            document.getElementById('lv-title').textContent = item.emoji + ' ' + title;
+            document.getElementById('lv-song-title').textContent = item.emoji + ' ' + title;
+            document.getElementById('lv-lyrics').textContent = text;
+            document.getElementById('lyrics-viewer').classList.remove('h');
+        }
         super._play(item);
     }
 }
@@ -649,6 +658,7 @@ class GameManager {
         const loading = document.getElementById("aiv-loading");
         const content = document.getElementById("aiv-content-wrap");
 
+        document.getElementById('aiv-regen-btn').classList.remove('h');
         viewer.classList.remove("h");
         loading.classList.remove("h");
         content.classList.add("h");
