@@ -17,6 +17,7 @@ data class MainUiState(
     val promoBanner: PromoBannerData? = null,
     val isLocked: Boolean = false,
     val bannerVisible: Boolean = true,
+    val bannerLoaded: Boolean = false,
 )
 
 class MainViewModel : ViewModel() {
@@ -32,4 +33,5 @@ class MainViewModel : ViewModel() {
     fun showLock() { _state.update { it.copy(isLocked = true) } }
     fun hideLock() { _state.update { it.copy(isLocked = false) } }
     fun setBannerVisible(visible: Boolean) { _state.update { it.copy(bannerVisible = visible) } }
+    fun setBannerLoaded(loaded: Boolean) { _state.update { it.copy(bannerLoaded = loaded) } }
 }
