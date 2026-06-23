@@ -52,7 +52,7 @@ class DashboardViewModel(
         }
     }
 
-    fun initFirebase() {
+    private fun initFirebase() {
         val user = FirebaseManager.getInstance().getCurrentUser()
         _state.update { it.copy(firebaseUid = user?.uid, firebaseEmail = user?.email) }
     }
@@ -102,6 +102,7 @@ class DashboardViewModel(
             firebaseEmail = null,
             lastSyncTime = null,
             loginError = null,
+            isSyncing = false,
         ) }
     }
 
