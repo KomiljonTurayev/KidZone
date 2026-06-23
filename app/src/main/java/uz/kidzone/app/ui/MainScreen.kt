@@ -2,8 +2,10 @@ package uz.kidzone.app.ui
 
 import android.app.Activity
 import android.content.SharedPreferences
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.FrameLayout
 import java.lang.ref.WeakReference
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -21,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -42,12 +45,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import uz.kidzone.app.AdsManager
+import uz.kidzone.app.IAdsManager
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
-import uz.kidzone.app.kidzo.ContentFilter
-import uz.kidzone.app.kidzo.KidzoAgent
-import uz.kidzone.app.ui.screens.KidzoSheet
-import uz.kidzone.app.ui.viewmodel.KidzoViewModel
+import uz.kidzone.shared.kidzo.ContentFilter
+import uz.kidzone.shared.kidzo.fromAssets
+import uz.kidzone.shared.kidzo.KidzoAgent
+import uz.kidzone.shared.ui.screens.KidzoSheet
+import uz.kidzone.shared.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 
 @Composable
@@ -62,17 +67,19 @@ fun MainScreen(
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
     var showKidzoSheet by remember { mutableStateOf(false) }
 
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val kidzoAgentRef = remember {
         val filter = try { ContentFilter.fromAssets(context) } catch (e: Exception) { null }
         filter?.let {
-            KidzoAgent.createStatic(it) { r -> (context as? Activity)?.runOnUiThread(r) }
+            KidzoAgent.createStatic(it, scope)
         }
     }
     val kidzoViewModel = remember(kidzoAgentRef) {
         kidzoAgentRef?.let { KidzoViewModel(it) }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
         // WebView
         AndroidView(
             factory = { ctx ->
@@ -125,7 +132,7 @@ fun MainScreen(
         }
 
         // Promo banner
-        AnimatedVisibility(
+        androidx.compose.animation.AnimatedVisibility(
             visible = uiState.promoBanner != null,
             modifier = Modifier.align(Alignment.TopCenter),
         ) {
@@ -172,7 +179,30 @@ fun MainScreen(
                 Text("🐥", style = MaterialTheme.typography.titleLarge)
             }
         }
-    }
+        } // end inner Box
+
+        // Banner
+        AndroidView(
+            factory = { ctx ->
+                FrameLayout(ctx).apply {
+                    val isTablet = ctx.resources.configuration.smallestScreenWidthDp >= 600
+                    adsManager.loadBanner(this, isTablet, object : IAdsManager.BannerListener {
+                        override fun onBannerLoaded(heightDp: Int) {
+                            mainViewModel.setBannerLoaded(true)
+                        }
+                        override fun onBannerFailed() {}
+                    })
+                }
+            },
+            update = { container ->
+                val show = uiState.bannerVisible && uiState.bannerLoaded
+                container.visibility = if (show) View.VISIBLE else View.GONE
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+        )
+    } // end Column
 
     // BackHandler
     BackHandler {
