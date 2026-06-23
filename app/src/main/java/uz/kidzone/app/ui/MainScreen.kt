@@ -32,11 +32,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import uz.kidzone.app.PinUtil
+import uz.kidzone.app.ui.screens.PinGate
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -116,6 +120,8 @@ fun MainScreen(
 
         // Lock overlay
         if (uiState.isLocked) {
+            var showUnlockPin by remember { mutableStateOf(false) }
+            val savedPinHash = remember { PinUtil.getOrMigrateHash(prefs, "kz_pin") }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -126,10 +132,22 @@ fun MainScreen(
                     Text("🌙", style = MaterialTheme.typography.displayLarge)
                     Text("Bugungi vaqting tugadi", color = Color.White)
                     Spacer(Modifier.height(16.dp))
-                    Button(onClick = { mainViewModel.hideLock() }) {
+                    Button(onClick = { showUnlockPin = true }) {
                         Text("Ota-ona uchun 🔐")
                     }
                 }
+            }
+            if (showUnlockPin) {
+                PinGate(
+                    hasPinSet = !savedPinHash.isNullOrEmpty(),
+                    onPinCorrect = { pin ->
+                        if (savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash)) {
+                            mainViewModel.hideLock()
+                            showUnlockPin = false
+                        }
+                    },
+                    onBack = { showUnlockPin = false },
+                )
             }
         }
 
@@ -205,6 +223,16 @@ fun MainScreen(
                 .wrapContentHeight(),
         )
     } // end Column
+
+    // Time limit check — every 60 seconds
+    LaunchedEffect(Unit) {
+        while (true) {
+            if (statsManager.isTimeLimitReached()) {
+                mainViewModel.showLock()
+            }
+            delay(60_000L)
+        }
+    }
 
     // BackHandler
     BackHandler {
