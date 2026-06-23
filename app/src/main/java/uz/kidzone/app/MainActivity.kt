@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
                 prefs = kzPrefs,
                 mainViewModel = mainViewModel,
                 adsManager = adsManager,
+                statsManager = statsManager,
             )
         }
     }

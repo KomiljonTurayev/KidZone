@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import uz.kidzone.app.AdsManager
 import uz.kidzone.app.IAdsManager
+import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
 import uz.kidzone.shared.kidzo.ContentFilter
@@ -60,6 +61,7 @@ fun MainScreen(
     mainViewModel: MainViewModel,
     adsManager: AdsManager,
     prefs: SharedPreferences,
+    statsManager: ParentalStatsManager,
     onOpenDashboard: () -> Unit,
 ) {
     val uiState by mainViewModel.state.collectAsState()
