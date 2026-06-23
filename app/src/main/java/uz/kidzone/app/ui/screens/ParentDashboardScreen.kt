@@ -246,7 +246,7 @@ private fun WeeklyChart(weeklyMinutes: List<Int>) {
 }
 
 @Composable
-private fun PinGate(
+internal fun PinGate(
     hasPinSet: Boolean,
     onPinCorrect: (String) -> Unit,
     onBack: () -> Unit,
