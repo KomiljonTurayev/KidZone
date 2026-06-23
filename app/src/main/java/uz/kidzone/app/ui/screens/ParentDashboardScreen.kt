@@ -48,6 +48,10 @@ import androidx.compose.ui.unit.dp
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.text.style.TextAlign
+import uz.kidzone.app.ui.viewmodel.DashboardState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +77,22 @@ fun ParentDashboardScreen(
                 }
             },
             onBack = onBack,
+        )
+        return
+    }
+
+    // Cloud login gate (optional)
+    var cloudResolved by remember { mutableStateOf(state.firebaseUid != null) }
+    if (!cloudResolved) {
+        CloudLoginSection(
+            state = state,
+            onLogin = { email, pass ->
+                vm.login(email, pass) { success -> if (success) cloudResolved = true }
+            },
+            onRegister = { email, pass ->
+                vm.register(email, pass) { success -> if (success) cloudResolved = true }
+            },
+            onSkip = { cloudResolved = true },
         )
         return
     }
@@ -160,6 +180,48 @@ fun ParentDashboardScreen(
                         checked = state.pushEnabled,
                         onCheckedChange = { vm.setPushEnabled(it) },
                     )
+                }
+            }
+
+            // 6. Cloud status (faqat login bo'lsa)
+            if (state.firebaseUid != null) {
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    Text("Cloud sinxronlash", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "☁️ Ulangan: ${state.firebaseEmail ?: state.firebaseUid}",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    if (!state.lastSyncTime.isNullOrEmpty()) {
+                        Text(
+                            "Oxirgi sync: ${state.lastSyncTime}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline,
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = { vm.syncNow() },
+                            enabled = !state.isSyncing,
+                        ) {
+                            if (state.isSyncing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp,
+                                )
+                            } else {
+                                Text("Sinxronlash")
+                            }
+                        }
+                        OutlinedButton(onClick = {
+                            vm.logout()
+                            cloudResolved = false
+                        }) {
+                            Text("Chiqish")
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
                 }
             }
         }
@@ -374,4 +436,90 @@ private fun ChangePinDialog(
             TextButton(onClick = onDismiss) { Text("Bekor") }
         },
     )
+}
+
+@Composable
+private fun CloudLoginSection(
+    state: DashboardState,
+    onLogin: (String, String) -> Unit,
+    onRegister: (String, String) -> Unit,
+    onSkip: () -> Unit,
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("☁️ Cloud Sinxronlash", style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Statistika va profil ma'lumotlarini bulutga saqlang",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true,
+        )
+        Spacer(Modifier.height(12.dp))
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Parol") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true,
+        )
+
+        if (!state.loginError.isNullOrEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                state.loginError,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+
+        Spacer(Modifier.height(20.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(
+                onClick = { onLogin(email, password) },
+                enabled = !state.isSyncing && email.isNotBlank() && password.isNotBlank(),
+                modifier = Modifier.weight(1f),
+            ) {
+                if (state.isSyncing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Text("Kirish")
+                }
+            }
+            OutlinedButton(
+                onClick = { onRegister(email, password) },
+                enabled = !state.isSyncing && email.isNotBlank() && password.isNotBlank(),
+                modifier = Modifier.weight(1f),
+            ) {
+                Text("Ro'yxat")
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        TextButton(onClick = onSkip) {
+            Text("O'tkazib yuborish →")
+        }
+    }
 }
