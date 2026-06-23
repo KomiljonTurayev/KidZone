@@ -2,10 +2,13 @@ package uz.kidzone.app.ui.viewmodel
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import uz.kidzone.app.FirebaseManager
+import uz.kidzone.app.FirestoreSync
 import uz.kidzone.app.ParentalStatsManager
 
 data class DashboardState(
@@ -18,6 +21,9 @@ data class DashboardState(
     val notifHistory: List<String> = emptyList(),
     val firebaseUid: String? = null,
     val firebaseEmail: String? = null,
+    val isSyncing: Boolean = false,
+    val lastSyncTime: String? = null,
+    val loginError: String? = null,
 )
 
 class DashboardViewModel(
@@ -30,6 +36,7 @@ class DashboardViewModel(
 
     init {
         refresh()
+        initFirebase()
     }
 
     fun refresh() {
@@ -43,6 +50,72 @@ class DashboardViewModel(
                 pushEnabled = prefs.getBoolean("kz_push_enabled", true),
             )
         }
+    }
+
+    fun initFirebase() {
+        val user = FirebaseManager.getInstance().getCurrentUser()
+        _state.update { it.copy(firebaseUid = user?.uid, firebaseEmail = user?.email) }
+    }
+
+    fun login(email: String, password: String, onDone: (Boolean) -> Unit) {
+        _state.update { it.copy(isSyncing = true, loginError = null) }
+        FirebaseManager.getInstance().signInWithEmail(email, password, object : FirebaseManager.AuthCallback {
+            override fun onSuccess(user: FirebaseUser) {
+                _state.update { it.copy(
+                    firebaseUid = user.uid,
+                    firebaseEmail = user.email,
+                    isSyncing = false,
+                    loginError = null,
+                ) }
+                onDone(true)
+            }
+            override fun onError(message: String) {
+                _state.update { it.copy(loginError = message, isSyncing = false) }
+                onDone(false)
+            }
+        })
+    }
+
+    fun register(email: String, password: String, onDone: (Boolean) -> Unit) {
+        _state.update { it.copy(isSyncing = true, loginError = null) }
+        FirebaseManager.getInstance().createAccountWithEmail(email, password, object : FirebaseManager.AuthCallback {
+            override fun onSuccess(user: FirebaseUser) {
+                _state.update { it.copy(
+                    firebaseUid = user.uid,
+                    firebaseEmail = user.email,
+                    isSyncing = false,
+                    loginError = null,
+                ) }
+                onDone(true)
+            }
+            override fun onError(message: String) {
+                _state.update { it.copy(loginError = message, isSyncing = false) }
+                onDone(false)
+            }
+        })
+    }
+
+    fun logout() {
+        FirebaseManager.getInstance().signOut()
+        _state.update { it.copy(
+            firebaseUid = null,
+            firebaseEmail = null,
+            lastSyncTime = null,
+            loginError = null,
+        ) }
+    }
+
+    fun syncNow() {
+        val uid = _state.value.firebaseUid ?: return
+        val email = _state.value.firebaseEmail
+        val ageGroup = prefs.getString("kz_age", "2-4") ?: "2-4"
+        _state.update { it.copy(isSyncing = true) }
+        val sync = FirestoreSync.getInstance()
+        sync.syncUserProfile(uid, null, email, ageGroup)
+        val minutes = statsManager.getTodayMinutes().toLong()
+        val games = statsManager.getTodayGames().associateWith { "played" }
+        sync.recordSession(uid, minutes, games, false)
+        _state.update { it.copy(isSyncing = false, lastSyncTime = "Az vaqt oldin") }
     }
 
     fun increaseLimit() {
