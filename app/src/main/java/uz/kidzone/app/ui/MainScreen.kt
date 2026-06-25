@@ -53,11 +53,10 @@ import uz.kidzone.app.IAdsManager
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
-import uz.kidzone.shared.kidzo.ContentFilter
-import uz.kidzone.shared.kidzo.fromAssets
-import uz.kidzone.shared.kidzo.KidzoAgent
-import uz.kidzone.shared.ui.screens.KidzoSheet
-import uz.kidzone.shared.ui.viewmodel.KidzoViewModel
+import uz.kidzone.app.kidzo.ContentFilter
+import uz.kidzone.app.kidzo.KidzoAgent
+import uz.kidzone.app.ui.screens.KidzoSheet
+import uz.kidzone.app.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 
 @Composable
@@ -73,11 +72,10 @@ fun MainScreen(
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
     var showKidzoSheet by remember { mutableStateOf(false) }
 
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val kidzoAgentRef = remember {
         val filter = try { ContentFilter.fromAssets(context) } catch (e: Exception) { null }
         filter?.let {
-            KidzoAgent.createStatic(it, scope)
+            KidzoAgent.createStatic(it) { block -> android.os.Handler(android.os.Looper.getMainLooper()).post(block) }
         }
     }
     val kidzoViewModel = remember(kidzoAgentRef) {
