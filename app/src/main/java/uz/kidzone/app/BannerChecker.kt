@@ -32,26 +32,33 @@ object BannerChecker {
         fun provide(cb: DocCallback)
     }
 
-    /** Production entry point — reads config/banner from Firestore. */
+    /** Production entry point — tries backend first, falls back to Firestore config/banner. */
     @JvmStatic
     fun checkAsync(sync: FirestoreSync, callback: Callback) {
-        if (!sync.isAvailable()) { callback.onResult(null); return }
-        checkAsync(DocProvider { docCb ->
-            sync.getDb()!!.collection("config").document("banner").get()
-                .addOnSuccessListener { snap ->
-                    docCb.onDoc(
-                        snap.exists(),
-                        snap.getBoolean("active") == true,
-                        snap.getString("title"),
-                        snap.getString("body"),
-                        snap.getString("url")
-                    )
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "banner check failed: $e")
-                    docCb.onError()
-                }
-        }, callback)
+        BackendClient.fetchFirstActiveBanner { backendBanner ->
+            if (backendBanner != null) {
+                callback.onResult(backendBanner)
+            } else {
+                // Fallback: read from Firestore
+                if (!sync.isAvailable()) { callback.onResult(null); return@fetchFirstActiveBanner }
+                checkAsync(DocProvider { docCb ->
+                    sync.getDb()!!.collection("config").document("banner").get()
+                        .addOnSuccessListener { snap ->
+                            docCb.onDoc(
+                                snap.exists(),
+                                snap.getBoolean("active") == true,
+                                snap.getString("title"),
+                                snap.getString("body"),
+                                snap.getString("url")
+                            )
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "banner check failed: $e")
+                            docCb.onError()
+                        }
+                }, callback)
+            }
+        }
     }
 
     /**

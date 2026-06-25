@@ -41,7 +41,10 @@ object FcmTokenManager {
         FirebaseMessaging.getInstance().subscribeToTopic("all-users")
             .addOnFailureListener { e -> Log.w(TAG, "topic sub failed: $e") }
         provider.getToken { token ->
-            if (token != null) sync.updateFcmToken(uid, token)
+            if (token != null) {
+                sync.updateFcmToken(uid, token)
+                BackendClient.registerToken(uid, token)
+            }
         }
     }
 }
