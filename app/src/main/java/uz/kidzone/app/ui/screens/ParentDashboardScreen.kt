@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -52,12 +54,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.text.style.TextAlign
 import uz.kidzone.app.ui.viewmodel.DashboardState
+import uz.kidzone.app.data.ProfileEntity
+import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParentDashboardScreen(
     prefs: SharedPreferences,
     onBack: () -> Unit,
+    profileViewModel: ProfileViewModel,
+    onNavigateToAddEdit: (String?) -> Unit,
 ) {
     val context = LocalContext.current
     val statsManager = remember { ParentalStatsManager(context) }
@@ -66,7 +72,9 @@ fun ParentDashboardScreen(
 
     // PIN gate
     var pinVerified by remember { mutableStateOf(false) }
-    val savedPinHash = remember { PinUtil.getOrMigrateHash(prefs, "kz_pin") }
+    val activeProfile by profileViewModel.activeProfile.collectAsState()
+    val savedPinHash = activeProfile?.pinHash
+    val profiles by profileViewModel.profiles.collectAsState()
 
     if (!pinVerified) {
         PinGate(
@@ -223,6 +231,35 @@ fun ParentDashboardScreen(
                     }
                     Spacer(Modifier.height(16.dp))
                 }
+            }
+
+            // 7. Profillar bo'limi
+            item {
+                Spacer(Modifier.height(16.dp))
+                Text("Profillar", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(8.dp))
+            }
+
+            items(profiles) { profile ->
+                ProfileListItem(
+                    profile = profile,
+                    isActive = profile.id == activeProfile?.id,
+                    onEdit = { onNavigateToAddEdit(profile.id) },
+                    onDelete = {
+                        if (profiles.size > 1) {
+                            profileViewModel.deleteProfile(profile) {}
+                        }
+                    },
+                    onSwitch = { profileViewModel.setActiveProfile(profile) },
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { onNavigateToAddEdit(null) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("+ Yangi profil qo'shish") }
             }
         }
     }
@@ -436,6 +473,36 @@ private fun ChangePinDialog(
             TextButton(onClick = onDismiss) { Text("Bekor") }
         },
     )
+}
+
+@Composable
+private fun ProfileListItem(
+    profile: ProfileEntity,
+    isActive: Boolean,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onSwitch: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            ProfileInitialAvatar(name = profile.name, size = 40.dp)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(profile.name, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    "${profile.language.uppercase()} | ${if (profile.timeLimitMinutes == 0) "Cheksiz" else "${profile.timeLimitMinutes} daq"}",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                if (isActive) Text("✓ Faol", style = MaterialTheme.typography.bodySmall)
+            }
+            TextButton(onClick = onSwitch) { Text("Tanlash") }
+            TextButton(onClick = onEdit) { Text("Tahrir") }
+            TextButton(onClick = onDelete) { Text("O'chir") }
+        }
+    }
 }
 
 @Composable
