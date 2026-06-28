@@ -58,6 +58,7 @@ import uz.kidzone.app.kidzo.KidzoAgent
 import uz.kidzone.app.ui.screens.KidzoSheet
 import uz.kidzone.app.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
+import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun MainScreen(
@@ -65,9 +66,11 @@ fun MainScreen(
     adsManager: AdsManager,
     prefs: SharedPreferences,
     statsManager: ParentalStatsManager,
+    profileViewModel: ProfileViewModel,
     onOpenDashboard: () -> Unit,
 ) {
     val uiState by mainViewModel.state.collectAsState()
+    val activeProfile by profileViewModel.activeProfile.collectAsState()
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
     var showKidzoSheet by remember { mutableStateOf(false) }
@@ -93,7 +96,7 @@ fun MainScreen(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                     )
                     val mgr = KidWebViewManager(this)
-                    val lang = prefs.getString("kz_lang", "uz") ?: "uz"
+                    val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
                     val age = prefs.getString("kz_age", "2-4") ?: "2-4"
                     mgr.setup(
                         AdMobBridge(mainViewModel, adsManager, onOpenDashboard, context as Activity),
@@ -119,7 +122,7 @@ fun MainScreen(
         // Lock overlay
         if (uiState.isLocked) {
             var showUnlockPin by remember { mutableStateOf(false) }
-            val savedPinHash = remember { PinUtil.getOrMigrateHash(prefs, "kz_pin") }
+            val savedPinHash = activeProfile?.pinHash
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -222,13 +225,14 @@ fun MainScreen(
         )
     } // end Column
 
-    // Time limit check — every 60 seconds
-    LaunchedEffect(Unit) {
+    // Time limit check — every 30 seconds
+    LaunchedEffect(activeProfile) {
         while (true) {
-            if (statsManager.isTimeLimitReached()) {
+            delay(30_000)
+            val limit = activeProfile?.timeLimitMinutes ?: 0
+            if (limit > 0 && statsManager.getTodayMinutes() >= limit) {
                 mainViewModel.showLock()
             }
-            delay(60_000L)
         }
     }
 

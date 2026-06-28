@@ -37,7 +37,8 @@ class MainActivity : ComponentActivity() {
 
         FirebaseManager.init(this)
         firestoreSync = FirestoreSync.init(this)
-        statsManager = ParentalStatsManager(this)
+        val activeProfileId = kzPrefs.getString("active_profile_id", "default") ?: "default"
+        statsManager = ParentalStatsManager(this, activeProfileId)
         adsManager = AdsManager(this)
         adsManager.initialize()
 

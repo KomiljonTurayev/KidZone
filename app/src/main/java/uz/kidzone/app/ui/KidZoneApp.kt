@@ -2,6 +2,8 @@ package uz.kidzone.app.ui
 
 import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,8 +15,10 @@ import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileRepository
 import uz.kidzone.app.data.ProfileSyncManager
+import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
+import uz.kidzone.app.ui.screens.ProfileSelectScreen
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModelFactory
@@ -41,10 +45,15 @@ fun KidZoneApp(
         factory = ProfileViewModelFactory(profileRepository)
     )
 
-    NavHost(
-        navController = navController,
-        startDestination = if (onboardingDone) "main" else "onboarding",
-    ) {
+    val profiles by profileViewModel.profiles.collectAsState()
+
+    val startDestination = when {
+        !onboardingDone -> "onboarding"
+        profiles.size >= 2 -> "profile_select"
+        else -> "main"
+    }
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("onboarding") {
             OnboardingScreen(
                 prefs = prefs,
@@ -55,12 +64,25 @@ fun KidZoneApp(
                 }
             )
         }
+        composable("profile_select") {
+            ProfileSelectScreen(
+                profiles = profiles,
+                onSelect = { profile ->
+                    profileViewModel.setActiveProfile(profile)
+                    navController.navigate("main") {
+                        popUpTo("profile_select") { inclusive = true }
+                    }
+                },
+                onAddNew = { navController.navigate("add_edit_profile/new") },
+            )
+        }
         composable("main") {
             MainScreen(
                 mainViewModel = mainViewModel,
                 adsManager = adsManager,
                 prefs = prefs,
                 statsManager = statsManager,
+                profileViewModel = profileViewModel,
                 onOpenDashboard = { navController.navigate("dashboard") },
             )
         }
@@ -69,9 +91,23 @@ fun KidZoneApp(
                 prefs = prefs,
                 onBack = { navController.popBackStack() },
                 profileViewModel = profileViewModel,
-                onNavigateToAddEdit = { _ ->
-                    // TODO(faza11-task11): navigate to profile_add_edit screen
+                onNavigateToAddEdit = { profileId ->
+                    navController.navigate("add_edit_profile/${profileId ?: "new"}")
                 },
+            )
+        }
+        composable("add_edit_profile/{profileId}") { backStack ->
+            val profileId = backStack.arguments?.getString("profileId")
+            val profile = if (profileId == "new") null
+                          else profiles.firstOrNull { it.id == profileId }
+            AddEditProfileScreen(
+                profile = profile,
+                onSave = { saved ->
+                    if (profile == null) profileViewModel.insertProfile(saved)
+                    else profileViewModel.updateProfile(saved)
+                    navController.popBackStack()
+                },
+                onCancel = { navController.popBackStack() },
             )
         }
     }
