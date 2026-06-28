@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -72,6 +71,7 @@ fun AddEditProfileScreen(
     var timeLimitSlider by remember { mutableFloatStateOf((profile?.timeLimitMinutes ?: 0).toFloat()) }
     var pinInput by remember { mutableStateOf("") }
     var nameError by remember { mutableStateOf(false) }
+    var pinError by remember { mutableStateOf(false) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -188,13 +188,17 @@ fun AddEditProfileScreen(
             // PIN (ixtiyoriy)
             OutlinedTextField(
                 value = pinInput,
-                onValueChange = { if (it.length <= 4 && it.all { c -> c.isDigit() }) pinInput = it },
+                onValueChange = { if (it.length <= 4 && it.all { c -> c.isDigit() }) { pinInput = it; pinError = false } },
                 label = { Text("PIN (ixtiyoriy, 4 xona)") },
+                isError = pinError,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
+            if (pinError) {
+                Text("PIN 4 ta raqam bo'lishi kerak", color = Color.Red)
+            }
 
             Spacer(Modifier.weight(1f))
 
@@ -204,7 +208,7 @@ fun AddEditProfileScreen(
                     val pinHash = when {
                         pinInput.length == 4 -> PinUtil.hash(pinInput)
                         pinInput.isEmpty() -> profile?.pinHash
-                        else -> { nameError = false; return@Button }
+                        else -> { pinError = true; return@Button }
                     }
                     val saved = (profile ?: ProfileEntity(
                         id = profileId,
@@ -236,7 +240,7 @@ private fun saveAvatarFromUri(context: Context, uri: Uri, profileId: String): St
     val dir = File(context.filesDir, "profiles").apply { mkdirs() }
     val file = File(dir, "$profileId.jpg")
     context.contentResolver.openInputStream(uri)?.use { input ->
-        val bmp = BitmapFactory.decodeStream(input)
+        val bmp = BitmapFactory.decodeStream(input) ?: return@use
         FileOutputStream(file).use { out -> bmp.compress(Bitmap.CompressFormat.JPEG, 80, out) }
     }
     return file.absolutePath
