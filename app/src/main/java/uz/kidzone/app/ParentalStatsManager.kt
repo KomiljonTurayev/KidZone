@@ -10,15 +10,13 @@ import java.util.Locale
 class ParentalStatsManager {
 
     companion object {
-        private const val KEY_TIME_LIMIT = "kz_time_limit"
+        @JvmStatic
+        fun todayPtKey(profileId: String): String =
+            "${profileId}_kz_pt_" + SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
 
         @JvmStatic
-        fun todayPtKey(): String =
-            "kz_pt_" + SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
-
-        @JvmStatic
-        fun todayGlKey(): String =
-            "kz_gl_" + SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+        fun todayGlKey(profileId: String): String =
+            "${profileId}_kz_gl_" + SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
 
         @JvmStatic
         fun parseList(csv: String?): MutableList<String> {
@@ -31,14 +29,18 @@ class ParentalStatsManager {
     }
 
     private val prefs: SharedPreferences
+    private val profileId: String
+    private val timeLimitKey: String
     private var sessionStartMs: Long = 0L
     private val sessionGames: MutableList<String> = mutableListOf()
 
-    constructor(ctx: Context) : this(ctx.getSharedPreferences("kz_prefs", Context.MODE_PRIVATE))
+    constructor(ctx: Context, profileId: String = "default") : this(ctx.getSharedPreferences("kz_prefs", Context.MODE_PRIVATE), profileId)
 
     // Package-private-equivalent constructor for testing
-    internal constructor(prefs: SharedPreferences) {
+    internal constructor(prefs: SharedPreferences, profileId: String = "default") {
         this.prefs = prefs
+        this.profileId = profileId
+        this.timeLimitKey = "${profileId}_kz_time_limit"
     }
 
     fun onSessionStart() {
@@ -51,14 +53,14 @@ class ParentalStatsManager {
         val elapsed = ((System.currentTimeMillis() - sessionStartMs) / 60_000L).toInt()
         sessionStartMs = 0L
         if (elapsed <= 0) return
-        val key = todayPtKey()
+        val key = todayPtKey(profileId)
         prefs.edit().putInt(key, prefs.getInt(key, 0) + elapsed).apply()
     }
 
     fun onGameLaunched(gameId: String?) {
         if (gameId.isNullOrEmpty()) return
         if (!sessionGames.contains(gameId)) sessionGames.add(gameId)
-        val key = todayGlKey()
+        val key = todayGlKey(profileId)
         val existing = prefs.getString(key, "") ?: ""
         val list = parseList(existing)
         if (!list.contains(gameId)) {
@@ -75,7 +77,7 @@ class ParentalStatsManager {
     fun getSessionGames(): List<String> = ArrayList(sessionGames)
 
     fun getTodayMinutes(): Int {
-        val saved = prefs.getInt(todayPtKey(), 0)
+        val saved = prefs.getInt(todayPtKey(profileId), 0)
         val current = if (sessionStartMs > 0L)
             ((System.currentTimeMillis() - sessionStartMs) / 60_000L).toInt()
         else 0
@@ -87,7 +89,7 @@ class ParentalStatsManager {
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)
         val cal = Calendar.getInstance()
         for (i in 6 downTo 0) {
-            val key = "kz_pt_" + sdf.format(cal.time)
+            val key = "${profileId}_kz_pt_" + sdf.format(cal.time)
             result[i] = prefs.getInt(key, 0)
             if (i == 6 && sessionStartMs > 0L) {
                 result[i] += ((System.currentTimeMillis() - sessionStartMs) / 60_000L).toInt()
@@ -98,12 +100,12 @@ class ParentalStatsManager {
     }
 
     fun getTodayGames(): List<String> =
-        parseList(prefs.getString(todayGlKey(), "") ?: "")
+        parseList(prefs.getString(todayGlKey(profileId), "") ?: "")
 
-    fun getTimeLimitMinutes(): Int = prefs.getInt(KEY_TIME_LIMIT, 0)
+    fun getTimeLimitMinutes(): Int = prefs.getInt(timeLimitKey, 0)
 
     fun setTimeLimitMinutes(minutes: Int) {
-        prefs.edit().putInt(KEY_TIME_LIMIT, maxOf(0, minutes)).apply()
+        prefs.edit().putInt(timeLimitKey, maxOf(0, minutes)).apply()
     }
 
     fun isTimeLimitReached(): Boolean {
