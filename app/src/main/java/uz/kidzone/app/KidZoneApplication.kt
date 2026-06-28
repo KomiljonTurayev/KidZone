@@ -9,13 +9,19 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import uz.kidzone.app.data.KidZoneDatabase
+import uz.kidzone.app.data.ProfileEntity
 import java.io.IOException
+import java.util.UUID
 
 class KidZoneApplication : Application() {
 
@@ -51,6 +57,7 @@ class KidZoneApplication : Application() {
                 }
         }
         createNotificationChannel()
+        CoroutineScope(Dispatchers.IO).launch { migrateToProfilesIfNeeded() }
     }
 
     private fun syncToFirestore(uid: String) {
@@ -105,5 +112,33 @@ class KidZoneApplication : Application() {
             )
             getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
         }
+    }
+
+    private suspend fun migrateToProfilesIfNeeded() {
+        val db = KidZoneDatabase.getInstance(this)
+        if (db.profileDao().count() > 0) return
+
+        val prefs = getSharedPreferences("kz_prefs", MODE_PRIVATE)
+        val lang = prefs.getString("kz_lang", "uz") ?: "uz"
+        val timeLimit = prefs.getInt("kz_time_limit", 0)
+        val pinHash = PinUtil.getOrMigrateHash(prefs, "kz_pin")
+        val profileId = UUID.randomUUID().toString()
+
+        val profile = ProfileEntity(
+            id = profileId,
+            name = "Asosiy",
+            avatarPath = null,
+            language = lang,
+            timeLimitMinutes = timeLimit,
+            pinHash = pinHash,
+            isDefault = true,
+            createdAt = System.currentTimeMillis(),
+        )
+        db.profileDao().insert(profile)
+        prefs.edit()
+            .putString("active_profile_id", profileId)
+            .putInt("kz_profile_count", 1)
+            .apply()
+        android.util.Log.d("KZ_DEBUG", "Migration complete: default profile=$profileId")
     }
 }
