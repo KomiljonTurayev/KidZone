@@ -35,8 +35,8 @@ android {
         minSdk 26
         targetSdk 35
         // CI passes -PversionCode=<run_number>; local default = 10
-        versionCode  project.hasProperty('versionCode')  ? project.versionCode.toInteger()  : 10
-        versionName  project.hasProperty('versionName')  ? project.versionName               : "1.1.0"
+        versionCode  project.hasProperty('versionCode')  ? project.versionCode.toInteger()  : 11
+        versionName  project.hasProperty('versionName')  ? project.versionName               : "1.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "GEMINI_API_KEY", "\"${project.findProperty('GEMINI_API_KEY') ?: ''}\""
@@ -64,6 +64,12 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+            all {
+                // Allow Android stubs (Log, etc.) to return defaults in JVM unit tests
+                // instead of throwing "not mocked" exceptions
+                systemProperty 'robolectric.logging.enabled', 'false'
+            }
+            returnDefaultValues = true
         }
     }
 
@@ -157,6 +163,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.4.0'
     testImplementation 'org.json:json:20231013'
     testImplementation 'org.robolectric:robolectric:4.13'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
 }
 
 // Apply the Google Services plugin only when a real config file is present,

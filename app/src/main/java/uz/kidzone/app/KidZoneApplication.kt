@@ -29,32 +29,34 @@ class KidZoneApplication : Application() {
         const val CHANNEL_ID = "kidzone_push"
 
         @JvmStatic
-        lateinit var httpClient: OkHttpClient
-            private set
+        val httpClient: OkHttpClient by lazy { OkHttpClient() }
     }
 
     override fun onCreate() {
         super.onCreate()
-        httpClient = OkHttpClient()
         if (BuildConfig.DEBUG) {
             FirebaseFirestore.setLoggingEnabled(true)
         }
 
-        val auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        if (user != null) {
-            Log.d("KZ_DEBUG", "Auth OK: uid=${user.uid}")
-            syncToFirestore(user.uid)
-        } else {
-            auth.signInAnonymously()
-                .addOnSuccessListener { result ->
-                    val uid = result.user?.uid ?: return@addOnSuccessListener
-                    Log.d("KZ_DEBUG", "signInAnonymously OK: uid=$uid")
-                    syncToFirestore(uid)
-                }
-                .addOnFailureListener { e ->
-                    Log.e("KZ_DEBUG", "signInAnonymously FAILED: ${e.message}")
-                }
+        try {
+            val auth = FirebaseAuth.getInstance()
+            val user = auth.currentUser
+            if (user != null) {
+                Log.d("KZ_DEBUG", "Auth OK: uid=${user.uid}")
+                syncToFirestore(user.uid)
+            } else {
+                auth.signInAnonymously()
+                    .addOnSuccessListener { result ->
+                        val uid = result.user?.uid ?: return@addOnSuccessListener
+                        Log.d("KZ_DEBUG", "signInAnonymously OK: uid=$uid")
+                        syncToFirestore(uid)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("KZ_DEBUG", "signInAnonymously FAILED: ${e.message}")
+                    }
+            }
+        } catch (e: IllegalStateException) {
+            Log.w("KZ_DEBUG", "Firebase not available (test environment?): ${e.message}")
         }
         createNotificationChannel()
         CoroutineScope(Dispatchers.IO).launch { migrateToProfilesIfNeeded() }

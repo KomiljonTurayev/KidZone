@@ -7,13 +7,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 
-class ProfileSyncManager(private val db: FirebaseFirestore?) {
+open class ProfileSyncManager(private val db: FirebaseFirestore?) {
 
     companion object {
         private const val TAG = "ProfileSyncManager"
     }
 
-    fun pushProfile(profile: ProfileEntity) {
+    open fun pushProfile(profile: ProfileEntity) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = db ?: return
         val data = mapOf(
@@ -30,7 +30,7 @@ class ProfileSyncManager(private val db: FirebaseFirestore?) {
             .addOnFailureListener { e -> Log.w(TAG, "pushProfile failed: $e") }
     }
 
-    fun pushStats(stats: ProfileStatsEntity) {
+    open fun pushStats(stats: ProfileStatsEntity) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = db ?: return
         val data = mapOf(
@@ -44,7 +44,7 @@ class ProfileSyncManager(private val db: FirebaseFirestore?) {
             .addOnFailureListener { e -> Log.w(TAG, "pushStats failed: $e") }
     }
 
-    suspend fun pullProfiles(uid: String): List<ProfileEntity> {
+    open suspend fun pullProfiles(uid: String): List<ProfileEntity> {
         val db = db ?: return emptyList()
         return try {
             val snap = db.collection("users").document(uid)

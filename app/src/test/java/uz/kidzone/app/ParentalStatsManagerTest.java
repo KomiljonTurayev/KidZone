@@ -20,7 +20,7 @@ public class ParentalStatsManagerTest {
         prefs = RuntimeEnvironment.getApplication()
                 .getSharedPreferences("test_prefs", Context.MODE_PRIVATE);
         prefs.edit().clear().commit();
-        mgr = new ParentalStatsManager(prefs);
+        mgr = new ParentalStatsManager(prefs, "default");
     }
 
     @Test
@@ -30,28 +30,28 @@ public class ParentalStatsManagerTest {
 
     @Test
     public void getTodayMinutes_savedData_returnsSaved() {
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 20).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 20).commit();
         assertEquals(20, mgr.getTodayMinutes());
     }
 
     @Test
     public void isTimeLimitReached_limitZero_alwaysFalse() {
         mgr.setTimeLimitMinutes(0);
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 999).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 999).commit();
         assertFalse(mgr.isTimeLimitReached());
     }
 
     @Test
     public void isTimeLimitReached_belowLimit_false() {
         mgr.setTimeLimitMinutes(30);
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 29).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 29).commit();
         assertFalse(mgr.isTimeLimitReached());
     }
 
     @Test
     public void isTimeLimitReached_atLimit_true() {
         mgr.setTimeLimitMinutes(30);
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 30).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 30).commit();
         assertTrue(mgr.isTimeLimitReached());
     }
 
@@ -76,7 +76,7 @@ public class ParentalStatsManagerTest {
 
     @Test
     public void getWeeklyMinutes_todayAtIndex6() {
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey(), 45).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 45).commit();
         assertEquals(45, mgr.getWeeklyMinutes()[6]);
     }
 

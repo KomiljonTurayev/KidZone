@@ -27,8 +27,9 @@ public class ContentFilterTest {
     }
 
     @Test
-    public void getTop5_returnsAllThreeItems() {
-        assertEquals(3, filter.getTop5().size());
+    public void getTop5_returnsStoriesOnly() {
+        // getTop5() returns only stories (songs excluded from top-5 since Faza 11 refactor)
+        assertEquals(2, filter.getTop5().size());
     }
 
     @Test
@@ -54,15 +55,17 @@ public class ContentFilterTest {
 
     @Test
     public void getFiltered_matchesCategory() {
-        List<ContentItem> result = filter.getFiltered("lullaby");
+        // getFiltered() searches stories only; "nature" matches story-002 category
+        List<ContentItem> result = filter.getFiltered("nature");
         assertEquals(1, result.size());
-        assertEquals("song-001", result.get(0).id);
+        assertEquals("story-002", result.get(0).id);
     }
 
     @Test
     public void getFiltered_emptyQuery_returnsTop5() {
+        // getTop5() returns stories only, so empty query returns 2 (2 stories, songs excluded)
         List<ContentItem> result = filter.getFiltered("");
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
     }
 
     @Test
@@ -90,10 +93,11 @@ public class ContentFilterTest {
 
     @Test
     public void toPromptBlock_formatsCorrectly() {
+        // getTop5() now returns stories only; songs are excluded
         List<ContentItem> items = filter.getTop5();
         String block = filter.toPromptBlock(items);
         assertTrue(block.contains("story-001|🦁|Sher va Sichqon|animals"));
-        assertTrue(block.contains("song-001|🌙|Alla|lullaby"));
+        assertFalse(block.contains("song-001"));
     }
 
     @Test

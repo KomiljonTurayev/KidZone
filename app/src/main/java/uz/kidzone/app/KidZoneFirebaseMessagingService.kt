@@ -56,7 +56,7 @@ class KidZoneFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    internal fun showNotification(title: String, body: String) {
+    fun showNotification(title: String, body: String) {
         val n = buildNotification(title, body)
         try {
             NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, n)
@@ -65,7 +65,7 @@ class KidZoneFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    internal fun buildNotification(title: String, body: String): Notification {
+    fun buildNotification(title: String, body: String): Notification {
         return NotificationCompat.Builder(this, KidZoneApplication.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)

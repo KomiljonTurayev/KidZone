@@ -52,7 +52,7 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
         viewModelScope.launch {
             repository.delete(profile)
             if (_activeProfile.value?.id == profile.id) {
-                val next = profiles.first().firstOrNull { it.id != profile.id }
+                val next = repository.profiles.first().firstOrNull { it.id != profile.id }
                 if (next != null) setActiveProfile(next)
                 onSwitched(next)
             } else {
