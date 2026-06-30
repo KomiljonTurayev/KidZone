@@ -6,6 +6,20 @@ on:
     tags:     ['v[0-9]+.[0-9]+.[0-9]+']
   pull_request:
     branches: [master, main]
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version name (e.g. 1.3.0)'
+        required: true
+      track:
+        description: 'Play Store track'
+        required: true
+        default: 'internal'
+        type: choice
+        options: [internal, alpha, beta, production]
+      rollout_percentage:
+        description: 'Rollout % (production track uchun)'
+        default: '10'
 
 env:
   JAVA_VERSION: '17'
@@ -78,13 +92,21 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Parse version from tag
+      - name: Parse version from tag or input
         id: version
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          echo "name=$TAG"          >> $GITHUB_OUTPUT
-          echo "code=${{ github.run_number }}" >> $GITHUB_OUTPUT
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RAW="${{ inputs.version_name }}"
+          else
+            RAW="${GITHUB_REF#refs/tags/v}"
+          fi
+          MAJOR=$(echo $RAW | cut -d. -f1)
+          MINOR=$(echo $RAW | cut -d. -f2)
+          PATCH=$(echo $RAW | cut -d. -f3)
+          CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
+          echo "code=$CODE"  >> $GITHUB_OUTPUT
+          echo "name=$RAW"   >> $GITHUB_OUTPUT
+          echo "tag=v$RAW"   >> $GITHUB_OUTPUT
 
       # Decode keystore stored as Base64 GitHub secret
       - name: Decode keystore
