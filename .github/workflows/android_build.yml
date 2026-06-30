@@ -176,3 +176,15 @@ jobs:
             ${{ steps.artifacts.outputs.aab }}
             ${{ steps.artifacts.outputs.apk }}
           retention-days: 90
+
+      - name: Upload to Play Store
+        if: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: uz.kidzone.app
+          releaseFiles: ${{ steps.artifacts.outputs.aab }}
+          track: ${{ inputs.track || 'internal' }}
+          rolloutPercentage: ${{ inputs.rollout_percentage || '100' }}
+          whatsNewDirectory: store_listing/whatsnew
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
