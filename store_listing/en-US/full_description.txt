@@ -1,0 +1,19 @@
+KidZone is a safe, fun, and educational app designed for young children aged 3–10.
+
+🎮 31 Mini-Games
+Puzzles, drawing, memory, bubble pop, shape matching, and more — all designed to develop cognitive skills through play.
+
+🌍 3 Languages
+Switch instantly between Uzbek, Russian, and English. Every game adapts to the chosen language.
+
+👨‍👩‍👧 Multiple Profiles
+Create separate profiles for each child. Set daily time limits per profile. Switch with a single tap.
+
+📚 Stories & Songs
+Age-appropriate stories and songs in all three languages, with text-to-speech support.
+
+🔒 Parental Controls
+PIN-protected parent dashboard. Monitor daily usage. Set time limits. No ads inside games.
+
+✅ Kid-Safe
+No in-app purchases. No social features. No data collection from children.

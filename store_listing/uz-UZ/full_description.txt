@@ -1,0 +1,19 @@
+KidZone — 3 yoshdan 10 yoshgacha bo'lgan bolalar uchun xavfsiz, qiziqarli va ta'limiy ilova.
+
+🎮 31 mini-o'yin
+Boshqotirmalar, chizish, xotira o'yinlari, pufakchalar, shakllar va yana ko'p narsa — barchasi o'yin orqali bilish qobiliyatini rivojlantirish uchun.
+
+🌍 3 til
+O'zbek, Rus va Ingliz tillarida bir zumda almashinish. Har bir o'yin tanlangan tilga moslashadi.
+
+👨‍👩‍👧 Ko'p profil
+Har bir bola uchun alohida profil yarating. Har bir profil uchun kunlik vaqt cheklovini belgilang.
+
+📚 Hikoyalar va qo'shiqlar
+Barcha uch tilda yoshga mos hikoyalar va qo'shiqlar, matnni o'qish (TTS) qo'llab-quvvatlanadi.
+
+🔒 Ota-ona nazorati
+PIN bilan himoyalangan boshqaruv paneli. Kunlik foydalanishni kuzatish. Vaqt chegarasini belgilash.
+
+✅ Bolalar uchun xavfsiz
+Ilovadagi xaridlar yo'q. Ijtimoiy funksiyalar yo'q. Bolalardan ma'lumot to'planmaydi.
