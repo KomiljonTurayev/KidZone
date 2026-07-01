@@ -83,7 +83,7 @@ data class StreakEntity(
 )
 ```
 
-Mavjud `KidZoneDatabase.kt` ga qo'shiladi (alohida DB yaratilmaydi).
+Mavjud `KidZoneDatabase.kt` ga qo'shiladi (alohida DB yaratilmaydi). Joriy `version = 1` → `version = 2` ga o'tadi, `MIGRATION_1_2` (empty migration, faqat yangi jadvallar) qo'shiladi.
 
 ### Repository logikasi
 
@@ -102,7 +102,9 @@ Mavjud `KidZoneDatabase.kt` ga qo'shiladi (alohida DB yaratilmaydi).
 
 ### O'yinlar ro'yxati manbasi
 
-`app/src/main/assets/www/content.json` allaqachon mavjud — shu fayldan `gameId` va `title` olinadi. Hardcode qilinmaydi.
+`app/src/main/assets/www/index.html` ichidagi `GAMES` konstant array (line ~1236) — har bir o'yin `{id, em, name:{uz,ru,en}, file, ...}` strukturasida. `content.json` faqat stories/songs saqlaydi, o'yinlar emas.
+
+Kotlin tomoni o'yinlar ro'yxatini JS dan oladi: app init da `window.AndroidChallenge.onGamesLoaded(json)` chaqiriladi. Bu hardcode dan qochadi — yangi o'yin qo'shilsa avtomatik tanlanadi.
 
 ---
 
@@ -140,29 +142,53 @@ Mavjud `KidZoneDatabase.kt` ga qo'shiladi (alohida DB yaratilmaydi).
 
 ### main.js (WebView tomoni)
 
-`closeGame()` funksiyasiga qo'shimcha:
+`openGame()` va `closeGame()` ga qo'shimchalar:
 
 ```javascript
-// closeGame() ichida, o'yin yopilgandan keyin:
-if (window.AndroidChallenge && typeof window.AndroidChallenge.onGameCompleted === 'function') {
-    window.AndroidChallenge.onGameCompleted(currentGameId);
+// openGame(g) ichida, iframe src o'rnatilgandan keyin:
+if (window.AndroidChallenge) {
+    window.AndroidChallenge.onGameOpened(g.id);
+}
+
+// closeGame() ichida, mavjud game topilgandan keyin:
+// const game = this.games.find(g => titleText.includes(g.em)); ← mavjud kod
+if (game && window.AndroidChallenge) {
+    window.AndroidChallenge.onGameClosed(game.id);
+}
+
+// GameManager constructor da bir marta:
+if (window.AndroidChallenge) {
+    const list = JSON.stringify(this.games.map(g => ({
+        id: g.id,
+        title: typeof g.name === 'object' ? (g.name.uz || g.name.en) : g.name
+    })));
+    window.AndroidChallenge.onGamesLoaded(list);
 }
 ```
-
-`dailyChallengeGameId` ni JS tomonda saqlash shart emas — Kotlin tomoni qaysi o'yin challenge ekanini biladi va filtr qiladi.
 
 ### KidWebViewManager.kt (Kotlin tomoni)
 
 ```kotlin
 @JavascriptInterface
-fun onGameCompleted(gameId: String) {
-    // faqat challenge o'yini bo'lsa markChallengeCompleted chaqiriladi
+fun onGamesLoaded(json: String) {
+    // games ro'yxatini repository ga saqlaydi (random tanlov uchun)
+    repository.updateGamesList(json)
+}
+
+@JavascriptInterface
+fun onGameOpened(gameId: String) {
+    currentOpenGameId = gameId
+}
+
+@JavascriptInterface
+fun onGameClosed(gameId: String) {
     coroutineScope.launch {
         val challenge = repository.getTodayChallenge(activeProfileId)
-        if (challenge?.gameId == gameId && challenge.completed.not()) {
+        if (challenge?.gameId == gameId && !challenge.completed) {
             repository.markChallengeCompleted(activeProfileId, gameId)
         }
     }
+    currentOpenGameId = null
 }
 ```
 
@@ -225,5 +251,5 @@ Alohida ekran yoki dialog kerak emas.
 
 - `main.js` da faqat `closeGame()` ga minimal qo'shimcha — boshqa logika o'zgarmaydi
 - Streak hisobi qurilma soati bo'yicha (`LocalDate.now()`) — server vaqt kerak emas
-- Room DB migration version oshiriladi (mavjud `ProfileEntity` bilan bir DBda)
+- Room DB: `version 1 → 2`, `MIGRATION_1_2` (yangi jadvallar uchun empty migration — `addMigrations` orqali)
 - Firestore xarajat: faqat challenge yakunida 1 write + restore da 1 read — minimal
