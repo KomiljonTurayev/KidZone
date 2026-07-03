@@ -4,6 +4,7 @@ package uz.kidzone.app.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,7 @@ open class DailyChallengeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private var activeProfileId: String? = null
+    private var loadJob: Job? = null
 
     open fun onProfileChanged(profileId: String) {
         if (activeProfileId == profileId) return
@@ -40,7 +42,8 @@ open class DailyChallengeViewModel(
     }
 
     private fun loadChallenge(profileId: String) {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             val challenge = repository.getTodayChallenge(profileId)
             val streak = repository.getStreak(profileId)
@@ -61,7 +64,8 @@ open class DailyChallengeViewModel(
 
     fun onGameClosed(gameId: String) {
         val profileId = activeProfileId ?: return
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             repository.markChallengeCompleted(profileId, gameId)
             val challenge = repository.getTodayChallenge(profileId)
             val streak = repository.getStreak(profileId)
