@@ -452,6 +452,15 @@ class GameManager {
         this.isMuted = localStorage.getItem("kz-muted") === "true";
         this.cat = "all";
         this.pinEntry = "";
+        if (window.AndroidChallenge) {
+            const list = JSON.stringify(this.games.map(function(g) {
+                return {
+                    id: g.id,
+                    title: typeof g.name === 'object' ? (g.name.uz || g.name.en) : g.name
+                };
+            }));
+            window.AndroidChallenge.onGamesLoaded(list);
+        }
     }
 
     addPoints(n) {
@@ -587,6 +596,9 @@ class GameManager {
             window.AndroidAdMob.showInterstitial();
             window.AndroidAdMob.hideBanner();
         }
+        if (window.AndroidChallenge) {
+            window.AndroidChallenge.onGameOpened(g.id);
+        }
     }
 
     closeGame() {
@@ -604,6 +616,9 @@ class GameManager {
             this.addPoints(earned);
             if (window.badgeManager) badgeManager.onGamePlayed(game.cat);
             this.showRewardScreen(earned);
+        }
+        if (game && window.AndroidChallenge) {
+            window.AndroidChallenge.onGameClosed(game.id);
         }
     }
 
