@@ -1,5 +1,6 @@
 package uz.kidzone.app.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,5 +11,5 @@ data class DailyChallengeEntity(
     val date: String,                   // "YYYY-MM-DD"
     val gameId: String,
     val gameTitle: String,
-    val completed: Boolean = false,
+    @ColumnInfo(defaultValue = "0") val completed: Boolean = false,
 )
