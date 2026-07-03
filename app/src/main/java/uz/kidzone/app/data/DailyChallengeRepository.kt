@@ -53,10 +53,10 @@ open class DailyChallengeRepository(
         if (challenge.gameId != gameId || challenge.completed) return
 
         challengeDao.markCompleted(id)
-        updateStreak(profileId, today, challenge.gameTitle)
+        updateStreak(profileId, today, gameId, challenge.gameTitle)
     }
 
-    private suspend fun updateStreak(profileId: String, today: String, gameTitle: String) {
+    private suspend fun updateStreak(profileId: String, today: String, gameId: String, gameTitle: String) {
         val current = streakDao.getByProfile(profileId) ?: StreakEntity(profileId)
         val yesterday = java.time.LocalDate.parse(today).minusDays(1).toString()
         val newCount = when (current.lastCompletedDate) {
@@ -72,7 +72,7 @@ open class DailyChallengeRepository(
             null
         } ?: return
         firestoreSync.syncStreak(uid, profileId, newCount, today)
-        firestoreSync.syncChallengeCompleted(uid, profileId, today, current.profileId, gameTitle)
+        firestoreSync.syncChallengeCompleted(uid, profileId, today, gameId, gameTitle)
     }
 
     open suspend fun getStreak(profileId: String): StreakEntity =

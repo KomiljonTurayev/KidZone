@@ -178,10 +178,37 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
     }
 
     open fun syncStreak(uid: String, profileId: String, count: Int, lastDate: String) {
-        // Task 6 da implementatsiya qilinadi
+        if (!isAvailable()) return
+        val data = mapOf<String, Any>(
+            "streak" to mapOf(
+                "count" to count,
+                "lastCompletedDate" to lastDate,
+            ),
+        )
+        db!!.collection("users").document(uid)
+            .collection("profiles").document(profileId)
+            .set(data, SetOptions.merge())
+            .addOnFailureListener { e -> Log.w(TAG, "syncStreak failed: $e") }
     }
 
-    open fun syncChallengeCompleted(uid: String, profileId: String, date: String, gameId: String, gameTitle: String) {
-        // Task 6 da implementatsiya qilinadi
+    open fun syncChallengeCompleted(
+        uid: String,
+        profileId: String,
+        date: String,
+        gameId: String,
+        gameTitle: String,
+    ) {
+        if (!isAvailable()) return
+        val data = mapOf<String, Any>(
+            "gameId" to gameId,
+            "gameTitle" to gameTitle,
+            "completed" to true,
+            "completedAt" to FieldValue.serverTimestamp(),
+        )
+        db!!.collection("users").document(uid)
+            .collection("profiles").document(profileId)
+            .collection("daily_challenges").document(date)
+            .set(data, SetOptions.merge())
+            .addOnFailureListener { e -> Log.w(TAG, "syncChallengeCompleted failed: $e") }
     }
 }
