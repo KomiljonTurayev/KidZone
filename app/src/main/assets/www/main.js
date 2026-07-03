@@ -452,6 +452,7 @@ class GameManager {
         this.isMuted = localStorage.getItem("kz-muted") === "true";
         this.cat = "all";
         this.pinEntry = "";
+        this.currentGameId = null;
         if (window.AndroidChallenge) {
             const list = JSON.stringify(this.games.map(function(g) {
                 return {
@@ -580,6 +581,8 @@ class GameManager {
             return;
         }
 
+        this.currentGameId = g.id;
+
         const titleEl = document.getElementById("gv-title");
         const backEl = document.getElementById("gvb-txt");
         const gameName = typeof g.name === 'object' ? (g.name[this.translator.lang] || g.name.en) : g.name;
@@ -608,9 +611,8 @@ class GameManager {
         if (frameEl) frameEl.src = "";
         if (window.AndroidAdMob) window.AndroidAdMob.showBanner();
 
-        const titleEl = document.getElementById("gv-title");
-        const titleText = titleEl ? titleEl.textContent : "";
-        const game = this.games.find(g => titleText.includes(g.em));
+        const game = this.games.find(g => g.id === this.currentGameId);
+        this.currentGameId = null;
         if (game) {
             const earned = game.pts || 20;
             this.addPoints(earned);
