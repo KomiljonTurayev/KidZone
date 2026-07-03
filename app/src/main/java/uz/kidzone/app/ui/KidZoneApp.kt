@@ -108,6 +108,7 @@ fun KidZoneApp(
                 prefs = prefs,
                 onBack = { navController.popBackStack() },
                 profileViewModel = profileViewModel,
+                challengeViewModel = challengeViewModel,
                 onNavigateToAddEdit = { profileId ->
                     navController.navigate("add_edit_profile/${profileId ?: "new"}")
                 },

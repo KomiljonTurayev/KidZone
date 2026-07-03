@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import uz.kidzone.app.ui.viewmodel.DashboardState
 import uz.kidzone.app.data.ProfileEntity
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
+import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +64,7 @@ fun ParentDashboardScreen(
     prefs: SharedPreferences,
     onBack: () -> Unit,
     profileViewModel: ProfileViewModel,
+    challengeViewModel: DailyChallengeViewModel,
     onNavigateToAddEdit: (String?) -> Unit,
 ) {
     val context = LocalContext.current
@@ -75,6 +77,7 @@ fun ParentDashboardScreen(
     val activeProfile by profileViewModel.activeProfile.collectAsState()
     val savedPinHash = activeProfile?.pinHash
     val profiles by profileViewModel.profiles.collectAsState()
+    val allStreaks by challengeViewModel.allStreaks.collectAsState()
 
     if (!pinVerified) {
         PinGate(
@@ -241,9 +244,13 @@ fun ParentDashboardScreen(
             }
 
             items(profiles) { profile ->
+                val streak = allStreaks.firstOrNull { it.profileId == profile.id }
+                val todayDate = java.time.LocalDate.now().toString()
                 ProfileListItem(
                     profile = profile,
                     isActive = profile.id == activeProfile?.id,
+                    streakCount = streak?.count ?: 0,
+                    doneToday = streak?.lastCompletedDate == todayDate,
                     onEdit = { onNavigateToAddEdit(profile.id) },
                     onDelete = {
                         if (profiles.size > 1) {
@@ -479,6 +486,8 @@ private fun ChangePinDialog(
 private fun ProfileListItem(
     profile: ProfileEntity,
     isActive: Boolean,
+    streakCount: Int,
+    doneToday: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onSwitch: () -> Unit,
@@ -497,6 +506,21 @@ private fun ProfileListItem(
                     style = MaterialTheme.typography.bodySmall,
                 )
                 if (isActive) Text("✓ Faol", style = MaterialTheme.typography.bodySmall)
+                // Streak satri
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 2.dp),
+                ) {
+                    Text(
+                        "🔥 $streakCount kun streak",
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        if (doneToday) "Bugun: ✅" else "Bugun: ⏳",
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
             }
             TextButton(onClick = onSwitch) { Text("Tanlash") }
             TextButton(onClick = onEdit) { Text("Tahrir") }
