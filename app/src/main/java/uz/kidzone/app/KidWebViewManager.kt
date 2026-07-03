@@ -67,6 +67,10 @@ class KidWebViewManager(private val webView: WebView) {
         settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
     }
 
+    fun addInterface(obj: Any, name: String) {
+        webView.addJavascriptInterface(obj, name)
+    }
+
     fun loadUrl(url: String) {
         webView.loadUrl(url)
     }

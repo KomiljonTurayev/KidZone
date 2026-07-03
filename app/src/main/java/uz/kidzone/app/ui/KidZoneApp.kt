@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import uz.kidzone.app.AdsManager
 import uz.kidzone.app.ParentalStatsManager
+import uz.kidzone.app.data.DailyChallengeRepository
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileRepository
 import uz.kidzone.app.data.ProfileSyncManager
@@ -19,6 +20,8 @@ import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
 import uz.kidzone.app.ui.screens.ProfileSelectScreen
+import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
+import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModelFactory
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModelFactory
@@ -43,6 +46,19 @@ fun KidZoneApp(
     }
     val profileViewModel: ProfileViewModel = viewModel(
         factory = ProfileViewModelFactory(profileRepository)
+    )
+
+    val challengeRepository = remember {
+        val db = KidZoneDatabase.getInstance(context)
+        val firestoreSync = uz.kidzone.app.FirestoreSync.getInstance()
+        uz.kidzone.app.data.DailyChallengeRepository(
+            challengeDao = db.dailyChallengeDao(),
+            streakDao = db.streakDao(),
+            firestoreSync = firestoreSync,
+        )
+    }
+    val challengeViewModel: DailyChallengeViewModel = viewModel(
+        factory = DailyChallengeViewModelFactory(challengeRepository)
     )
 
     val profiles by profileViewModel.profiles.collectAsState()
@@ -83,6 +99,7 @@ fun KidZoneApp(
                 prefs = prefs,
                 statsManager = statsManager,
                 profileViewModel = profileViewModel,
+                challengeViewModel = challengeViewModel,
                 onOpenDashboard = { navController.navigate("dashboard") },
             )
         }

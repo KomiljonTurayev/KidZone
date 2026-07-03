@@ -55,7 +55,10 @@ import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
 import uz.kidzone.app.kidzo.ContentFilter
 import uz.kidzone.app.kidzo.KidzoAgent
+import uz.kidzone.app.ui.screens.DailyChallengeCard
 import uz.kidzone.app.ui.screens.KidzoSheet
+import uz.kidzone.app.ui.viewmodel.ChallengeState
+import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
@@ -67,10 +70,17 @@ fun MainScreen(
     prefs: SharedPreferences,
     statsManager: ParentalStatsManager,
     profileViewModel: ProfileViewModel,
+    challengeViewModel: DailyChallengeViewModel,
     onOpenDashboard: () -> Unit,
 ) {
     val uiState by mainViewModel.state.collectAsState()
     val activeProfile by profileViewModel.activeProfile.collectAsState()
+    val challengeState by challengeViewModel.state.collectAsState()
+
+    // Profil o'zgarganda challengeViewModel ga xabar ber
+    LaunchedEffect(activeProfile) {
+        activeProfile?.id?.let { challengeViewModel.onProfileChanged(it) }
+    }
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
     var showKidzoSheet by remember { mutableStateOf(false) }
@@ -86,6 +96,17 @@ fun MainScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        // Daily Challenge Card — o'yin ko'rinisida emas, lock holatida emas
+        DailyChallengeCard(
+            streakCount = challengeState.streakCount,
+            challenge = challengeState.challenge,
+            visible = !uiState.inGame && !uiState.isLocked,
+            onPlay = { gameId ->
+                webMgrRef.value?.evaluateJavascript(
+                    "if(window.app){app.openGame(app.games.find(function(g){return g.id==='$gameId';}))||null}"
+                )
+            },
+        )
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
         // WebView
         AndroidView(
@@ -101,6 +122,10 @@ fun MainScreen(
                     mgr.setup(
                         AdMobBridge(mainViewModel, adsManager, onOpenDashboard, context as Activity),
                         "AndroidAdMob",
+                    )
+                    mgr.addInterface(
+                        ChallengeBridge(challengeViewModel, context as Activity),
+                        "AndroidChallenge",
                     )
                     mgr.setOnPageReadyCallback {
                         mgr.evaluateJavascript(
@@ -376,5 +401,31 @@ private class AdMobBridge(
         onMain {
             viewModel.setInGame(true)
         }
+    }
+}
+
+private class ChallengeBridge(
+    private val viewModel: DailyChallengeViewModel,
+    activity: Activity,
+) {
+    private val activity = WeakReference(activity)
+
+    private fun onMain(block: () -> Unit) {
+        activity.get()?.runOnUiThread(block)
+    }
+
+    @android.webkit.JavascriptInterface
+    fun onGamesLoaded(json: String) {
+        onMain { viewModel.updateGamesList(json) }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun onGameOpened(gameId: String) {
+        // future use
+    }
+
+    @android.webkit.JavascriptInterface
+    fun onGameClosed(gameId: String) {
+        onMain { viewModel.onGameClosed(gameId) }
     }
 }
