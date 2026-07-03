@@ -14,7 +14,7 @@ import java.util.Locale
  * Constructor is internal so tests in the same module can do:
  *   new FirestoreSync(null)  (Java) / FirestoreSync(null) (Kotlin)
  */
-class FirestoreSync internal constructor(private val db: FirebaseFirestore?) {
+open class FirestoreSync internal constructor(private val db: FirebaseFirestore?) {
 
     companion object {
         private const val TAG = "FirestoreSync"
@@ -175,5 +175,13 @@ class FirestoreSync internal constructor(private val db: FirebaseFirestore?) {
         db!!.collection("stats").document(dateKey).set(stats, SetOptions.merge())
             .addOnSuccessListener { Log.d(TAG, "recordSession write OK: $dateKey") }
             .addOnFailureListener { e -> Log.e(TAG, "recordSession write FAILED: ${e.message}") }
+    }
+
+    open fun syncStreak(uid: String, profileId: String, count: Int, lastDate: String) {
+        // Task 6 da implementatsiya qilinadi
+    }
+
+    open fun syncChallengeCompleted(uid: String, profileId: String, date: String, gameId: String, gameTitle: String) {
+        // Task 6 da implementatsiya qilinadi
     }
 }
