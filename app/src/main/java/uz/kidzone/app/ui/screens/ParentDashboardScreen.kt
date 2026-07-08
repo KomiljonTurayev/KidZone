@@ -55,6 +55,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.text.style.TextAlign
 import uz.kidzone.app.ui.viewmodel.DashboardState
 import uz.kidzone.app.data.ProfileEntity
+import uz.kidzone.app.data.AppClock
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 
@@ -245,7 +246,7 @@ fun ParentDashboardScreen(
 
             items(profiles) { profile ->
                 val streak = allStreaks.firstOrNull { it.profileId == profile.id }
-                val todayDate = java.time.LocalDate.now().toString()
+                val todayDate = AppClock.today()
                 ProfileListItem(
                     profile = profile,
                     isActive = profile.id == activeProfile?.id,
