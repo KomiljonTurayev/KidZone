@@ -32,6 +32,18 @@ class DailyChallengeRepositoryTest {
     }
 
     @Test
+    fun `default todayProvider uses AppClock`() = runTest {
+        val repo = DailyChallengeRepository(
+            challengeDao = FakeDailyChallengeDao(),
+            streakDao = FakeStreakDao(),
+            firestoreSync = NoOpFirestoreSync(),
+        )
+        repo.updateGamesList("""[{"id":"memory","title":"Memory Match"}]""")
+        val result = repo.getTodayChallenge("p1")
+        assertEquals(AppClock.today(), result!!.date)
+    }
+
+    @Test
     fun `getTodayChallenge returns null when no games loaded`() = runTest {
         assertNull(repo.getTodayChallenge("p1"))
     }

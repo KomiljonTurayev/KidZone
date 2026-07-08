@@ -13,7 +13,7 @@ open class DailyChallengeRepository(
     private val streakDao: StreakDao,
     private val firestoreSync: FirestoreSync,
     private val todayProvider: () -> String = {
-        java.time.LocalDate.now().toString()
+        AppClock.today()
     },
 ) {
     private var gamesList: List<GameItem> = emptyList()
