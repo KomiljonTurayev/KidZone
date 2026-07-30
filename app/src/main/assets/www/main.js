@@ -1070,6 +1070,16 @@ class BadgeManager {
 let app;
 window.addEventListener("load", () => {
     window.profileManager = new ProfileManager();
+    // The native app passes the user's chosen language/age as URL query params
+    // (e.g. index.html?lang=uz&age=2-4) so they're available synchronously here,
+    // before any localStorage read. Seed the active profile's keys from them so
+    // TranslationManager (constructed right below) picks up the right language
+    // instead of always defaulting to "en".
+    const urlParams = new URLSearchParams(location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang) localStorage.setItem(profileManager.key('lang'), urlLang);
+    const urlAge = urlParams.get('age');
+    if (urlAge) localStorage.setItem(profileManager.key('age'), urlAge);
     const translator = new TranslationManager(T);
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);

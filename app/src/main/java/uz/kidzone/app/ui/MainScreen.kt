@@ -2,6 +2,7 @@ package uz.kidzone.app.ui
 
 import android.app.Activity
 import android.content.SharedPreferences
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -129,13 +130,16 @@ fun MainScreen(
                         ChallengeBridge(challengeViewModel, context as Activity),
                         "AndroidChallenge",
                     )
-                    mgr.setOnPageReadyCallback {
-                        mgr.evaluateJavascript(
-                            "localStorage.setItem('kz-lang','$lang');" +
-                                "localStorage.setItem('kz-age','$age');"
-                        )
-                    }
-                    mgr.loadUrl("file:///android_asset/www/index.html")
+                    // lang/age travel as URL query params, read synchronously by main.js
+                    // as soon as it runs. A prior version pushed them via evaluateJavascript
+                    // from onPageFinished, but that raced against main.js's own "load"
+                    // listener (which reads localStorage to init the translator) and lost
+                    // most of the time, so the app's language picker never actually applied
+                    // inside games — it also wrote a flat "kz-lang" key that main.js's
+                    // per-profile ProfileManager never reads past the very first app launch.
+                    mgr.loadUrl(
+                        "file:///android_asset/www/index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}"
+                    )
                     webMgrRef.value = mgr
                     addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
                         override fun onViewAttachedToWindow(v: android.view.View) {}

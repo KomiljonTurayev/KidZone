@@ -23,6 +23,15 @@ body {
   font-family: var(--kt-font-b);
 }
 
+/* A handful of older games draw their own in-body #topbar (score/title/level
+   pills). That duplicates the app's own #gv-top header shown above the game
+   iframe, so it's hidden here rather than removed per-file — the games' JS
+   still writes into its child elements (#score, #lv-val, etc.), so hiding via
+   CSS avoids touching 13 files' worth of divergent markup/IDs. */
+#topbar {
+  display: none !important;
+}
+
 /* ── GAME HEADER ────────────────────────────────── */
 #kt-header {
   height: var(--kt-hdr-h);

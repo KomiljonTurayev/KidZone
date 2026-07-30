@@ -23,18 +23,12 @@ class KidWebViewManager(private val webView: WebView) {
     }
 
     var currentLanguage: String = "en"
-    private var onPageReadyCallback: Runnable? = null
-    private var pageReadyCalled = false
 
     fun setLanguage(lang: String) {
         currentLanguage = lang
     }
 
     fun getLanguage(): String = currentLanguage
-
-    fun setOnPageReadyCallback(callback: Runnable) {
-        onPageReadyCallback = callback
-    }
 
     @SuppressLint("SetJavaScriptEnabled")
     fun setup(jsInterface: Any, interfaceName: String) {
@@ -106,13 +100,6 @@ class KidWebViewManager(private val webView: WebView) {
                 Log.w(TAG, "Cannot open external URL: $url")
             }
             return true
-        }
-
-        override fun onPageFinished(view: WebView, url: String) {
-            if (!pageReadyCalled && onPageReadyCallback != null) {
-                pageReadyCalled = true
-                view.post(onPageReadyCallback)
-            }
         }
     }
 }
