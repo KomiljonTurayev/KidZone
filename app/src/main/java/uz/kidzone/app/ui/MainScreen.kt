@@ -17,7 +17,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,16 +28,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -55,9 +58,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -222,8 +227,15 @@ fun MainScreen(
         // FAB (Kidzo) — only on home screen (not in-game). Draggable like iOS's
         // AssistiveTouch bubble, since its default bottom-end spot can sit on top of
         // the WebView's own bottom nav bar on some screen sizes.
+        //
+        // Not a FloatingActionButton: its built-in clickable and an outer
+        // pointerInput(detectDragGestures) fight over the same touch sequence (the
+        // inner clickable claims the down event first), so neither tap nor drag work
+        // reliably. A single pointerInput below manually disambiguates tap vs. drag
+        // by touch-slop distance instead.
         if (!uiState.inGame && kidzoViewModel != null) {
             val density = LocalDensity.current
+            val viewConfiguration = LocalViewConfiguration.current
             val fabSizePx = with(density) { 56.dp.toPx() }
             val edgePaddingPx = with(density) { 16.dp.toPx() }
             var offsetX by remember { mutableFloatStateOf(0f) }
@@ -238,27 +250,46 @@ fun MainScreen(
                 ),
                 label = "pulse",
             )
-            FloatingActionButton(
-                onClick = {
-                    kidzoViewModel.requestRecommendations()
-                    showKidzoSheet = true
-                },
+            Surface(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                     .padding(16.dp)
+                    .size(56.dp)
                     .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale }
                     .pointerInput(containerSize) {
-                        detectDragGestures { change, dragAmount ->
-                            change.consume()
-                            val minX = -(containerSize.width - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
-                            val minY = -(containerSize.height - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
-                            offsetX = (offsetX + dragAmount.x).coerceIn(minX, 0f)
-                            offsetY = (offsetY + dragAmount.y).coerceIn(minY, 0f)
+                        awaitEachGesture {
+                            awaitFirstDown()
+                            var dragged = false
+                            do {
+                                val event = awaitPointerEvent()
+                                val change = event.changes.first()
+                                val delta = change.positionChange()
+                                if (!dragged && delta.getDistance() > viewConfiguration.touchSlop) {
+                                    dragged = true
+                                }
+                                if (dragged) {
+                                    change.consume()
+                                    val minX = -(containerSize.width - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
+                                    val minY = -(containerSize.height - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
+                                    offsetX = (offsetX + delta.x).coerceIn(minX, 0f)
+                                    offsetY = (offsetY + delta.y).coerceIn(minY, 0f)
+                                }
+                            } while (event.changes.any { it.pressed })
+                            if (!dragged) {
+                                kidzoViewModel.requestRecommendations()
+                                showKidzoSheet = true
+                            }
                         }
                     },
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                tonalElevation = 6.dp,
+                shadowElevation = 6.dp,
             ) {
-                Text("🐥", style = MaterialTheme.typography.titleLarge)
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text("🐥", style = MaterialTheme.typography.titleLarge)
+                }
             }
         }
         } // end inner Box
