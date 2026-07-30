@@ -1,5 +1,6 @@
 package uz.kidzone.app.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,12 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,10 +28,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uz.kidzone.app.kidzo.ContentCard
 import uz.kidzone.app.ui.viewmodel.KidzoViewModel
+
+// Matches the WebView games' --kt-accent (app/src/main/assets/www/kids-theme.css)
+// so native dialogs feel consistent with the rest of the UI.
+private val KidZoneOrange = Color(0xFFFF6B35)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,13 +50,22 @@ fun KidzoSheet(
     val messages by viewModel.chatMessages.collectAsStateWithLifecycle()
     var inputText by remember { mutableStateOf("") }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        containerColor = Color.White,
+    ) {
         Column(modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()) {
 
-            Text("🐥 Kidzo", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
+            Text(
+                "🐥 Kidzo",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = KidZoneOrange,
+            )
+            Spacer(Modifier.height(12.dp))
 
             // Content cards
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -78,14 +98,23 @@ fun KidzoSheet(
                     modifier = Modifier.weight(1f),
                     placeholder = { Text("Savol bering...") },
                     singleLine = true,
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = KidZoneOrange,
+                        cursorColor = KidZoneOrange,
+                    ),
                 )
                 Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    if (inputText.isNotBlank()) {
-                        viewModel.sendMessage(inputText)
-                        inputText = ""
-                    }
-                }) {
+                Button(
+                    onClick = {
+                        if (inputText.isNotBlank()) {
+                            viewModel.sendMessage(inputText)
+                            inputText = ""
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = KidZoneOrange),
+                ) {
                     Text("→")
                 }
             }
@@ -97,7 +126,10 @@ fun KidzoSheet(
 private fun KidzoCardItem(card: ContentCard, onClick: () -> Unit) {
     Card(
         onClick = onClick,
-        modifier = Modifier.width(120.dp)
+        modifier = Modifier.width(120.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8F0)),
+        border = BorderStroke(1.dp, KidZoneOrange.copy(alpha = 0.3f)),
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(card.emoji, style = MaterialTheme.typography.headlineMedium)
