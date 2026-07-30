@@ -52,10 +52,12 @@ fun DailyChallengeCard(
                 if (completed) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                "🔥 $streakCount kun streak",
-                                style = MaterialTheme.typography.labelMedium,
-                            )
+                            if (streakCount > 0) {
+                                Text(
+                                    "🔥 $streakCount kun streak",
+                                    style = MaterialTheme.typography.labelMedium,
+                                )
+                            }
                             Spacer(Modifier.weight(1f))
                             Text(
                                 "✅ Bajarildi!",

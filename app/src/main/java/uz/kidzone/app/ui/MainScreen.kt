@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -95,7 +96,8 @@ fun MainScreen(
         kidzoAgentRef?.let { KidzoViewModel(it) }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    // statusBarsPadding(): kartani tepadagi tizim swipe-gesture zonasidan chiqaradi, aks holda "O'ynash" tugmasi immersive rejimda bosilmaydi
+    Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         // Daily Challenge Card — o'yin ko'rinisida emas, lock holatida emas
         DailyChallengeCard(
             streakCount = challengeState.streakCount,

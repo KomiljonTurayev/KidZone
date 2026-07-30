@@ -3,6 +3,7 @@ package uz.kidzone.app
 import android.util.Log
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
@@ -66,8 +67,17 @@ object BackendClient {
     /** Fetches the first active banner from the backend. Calls callback(null) on any error. */
     @JvmStatic
     fun fetchFirstActiveBanner(callback: (BannerChecker.BannerData?) -> Unit) {
+        fetchFirstActiveBanner(null, callback)
+    }
+
+    /** Fetches the first active banner matching [ageGroup] (or any age group if null/blank). */
+    @JvmStatic
+    fun fetchFirstActiveBanner(ageGroup: String?, callback: (BannerChecker.BannerData?) -> Unit) {
+        val url = "$BASE_URL/banners".toHttpUrl().newBuilder().apply {
+            if (!ageGroup.isNullOrBlank()) addQueryParameter("ageGroup", ageGroup)
+        }.build()
         val request = Request.Builder()
-            .url("$BASE_URL/banners")
+            .url(url)
             .get()
             .build()
 
