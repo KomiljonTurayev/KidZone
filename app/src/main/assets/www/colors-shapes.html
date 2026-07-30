@@ -366,8 +366,10 @@ function drawShape(svgEl, type, color, size=56) {
 
 // ── KZL INTEGRATION ──────────────────────────────────────────────────────────
 const GAME_ID_CS = 'colors-shapes';
-const CS_LANG = navigator.language.startsWith('ru') ? 'ru'
-              : navigator.language.startsWith('en') ? 'en' : 'uz';
+const CS_LANG = new URLSearchParams(location.search).get('lang')
+              || localStorage.getItem('kz-lang')
+              || (navigator.language.startsWith('ru') ? 'ru'
+                : navigator.language.startsWith('en') ? 'en' : 'uz');
 KidUI.init({ title: "Colors & Shapes", icon: "🌈", color: "#F9A825", gameId: "colors_shapes", lang: CS_LANG });
 let _kzLevel = 1, _kzCfg = null, _kzHint = null, _kzLives = null, _kzTimer = null;
 

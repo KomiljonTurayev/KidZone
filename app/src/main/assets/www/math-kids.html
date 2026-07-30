@@ -117,8 +117,10 @@ body{min-height:100vh;background:#1a1a2e;
 /* ═══════════════════════════════════════════════
    LANG
 ═══════════════════════════════════════════════ */
-const LANG = navigator.language.startsWith('ru') ? 'ru'
-           : navigator.language.startsWith('en') ? 'en' : 'uz';
+const LANG = new URLSearchParams(location.search).get('lang')
+           || localStorage.getItem('kz-lang')
+           || (navigator.language.startsWith('ru') ? 'ru'
+             : navigator.language.startsWith('en') ? 'en' : 'uz');
 KidUI.init({ title: "Math Kids", icon: "🔢", color: "#1E88E5", gameId: "math_kids", lang: LANG });
 
 const T = {

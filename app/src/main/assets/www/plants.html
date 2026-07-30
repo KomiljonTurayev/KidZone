@@ -151,8 +151,10 @@ const DATA = [
 /* ═══════════════════════════════════════════════
    TRANSLATIONS
 ═══════════════════════════════════════════════ */
-const LANG = navigator.language.startsWith('ru') ? 'ru'
-           : navigator.language.startsWith('en') ? 'en' : 'uz';
+const LANG = new URLSearchParams(location.search).get('lang')
+           || localStorage.getItem('kz-lang')
+           || (navigator.language.startsWith('ru') ? 'ru'
+             : navigator.language.startsWith('en') ? 'en' : 'uz');
 KidUI.init({ title: "Plants", icon: "🌱", color: "#388E3C", gameId: "plants", lang: LANG });
 
 const T = {

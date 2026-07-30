@@ -68,7 +68,9 @@
 <script src="game-engine.js"></script>
 <script>
 const GAME_ID = 'dino-match';
-const _L = navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz';
+const _L = new URLSearchParams(location.search).get('lang')
+  || localStorage.getItem('kz-lang')
+  || (navigator.language.startsWith('ru')?'ru':navigator.language.startsWith('en')?'en':'uz');
 KidUI.init({ title: "Dino Match", icon: "🦕", color: "#2E7D32", gameId: "dino_match", lang: _L });
 
 const DM_T = {
