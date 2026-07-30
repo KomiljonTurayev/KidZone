@@ -57,7 +57,6 @@ import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
 import uz.kidzone.app.kidzo.ContentFilter
 import uz.kidzone.app.kidzo.KidzoAgent
-import uz.kidzone.app.ui.screens.DailyChallengeCard
 import uz.kidzone.app.ui.screens.KidzoSheet
 import uz.kidzone.app.ui.viewmodel.ChallengeState
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
@@ -77,7 +76,6 @@ fun MainScreen(
 ) {
     val uiState by mainViewModel.state.collectAsState()
     val activeProfile by profileViewModel.activeProfile.collectAsState()
-    val challengeState by challengeViewModel.state.collectAsState()
 
     // Profil o'zgarganda challengeViewModel ga xabar ber
     LaunchedEffect(activeProfile) {
@@ -99,17 +97,6 @@ fun MainScreen(
 
     // statusBarsPadding(): kartani tepadagi tizim swipe-gesture zonasidan chiqaradi, aks holda "O'ynash" tugmasi immersive rejimda bosilmaydi
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-        // Daily Challenge Card — o'yin ko'rinisida emas, lock holatida emas
-        DailyChallengeCard(
-            streakCount = challengeState.streakCount,
-            challenge = challengeState.challenge,
-            visible = !uiState.inGame && !uiState.isLocked,
-            onPlay = { gameId ->
-                webMgrRef.value?.evaluateJavascript(
-                    "if(window.app){app.openGame(app.games.find(function(g){return g.id==='$gameId';}))||null}"
-                )
-            },
-        )
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
         // WebView
         AndroidView(
