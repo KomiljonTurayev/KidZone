@@ -16,6 +16,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -37,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,9 +50,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import kotlin.math.roundToInt
 import uz.kidzone.app.AdsManager
 import uz.kidzone.app.IAdsManager
 import uz.kidzone.app.ParentalStatsManager
@@ -58,7 +67,6 @@ import uz.kidzone.app.MusicManager
 import uz.kidzone.app.kidzo.ContentFilter
 import uz.kidzone.app.kidzo.KidzoAgent
 import uz.kidzone.app.ui.screens.KidzoSheet
-import uz.kidzone.app.ui.viewmodel.ChallengeState
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
@@ -96,8 +104,15 @@ fun MainScreen(
     }
 
     // statusBarsPadding(): kartani tepadagi tizim swipe-gesture zonasidan chiqaradi, aks holda "O'ynash" tugmasi immersive rejimda bosilmaydi
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
+
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .onSizeChanged { containerSize = it },
+        ) {
         // WebView
         AndroidView(
             factory = { ctx ->
@@ -193,8 +208,15 @@ fun MainScreen(
             }
         }
 
-        // FAB (Kidzo) — only on home screen (not in-game)
+        // FAB (Kidzo) — only on home screen (not in-game). Draggable like iOS's
+        // AssistiveTouch bubble, since its default bottom-end spot can sit on top of
+        // the WebView's own bottom nav bar on some screen sizes.
         if (!uiState.inGame && kidzoViewModel != null) {
+            val density = LocalDensity.current
+            val fabSizePx = with(density) { 56.dp.toPx() }
+            val edgePaddingPx = with(density) { 16.dp.toPx() }
+            var offsetX by remember { mutableFloatStateOf(0f) }
+            var offsetY by remember { mutableFloatStateOf(0f) }
             val infiniteTransition = rememberInfiniteTransition(label = "kidzo_pulse")
             val pulseScale by infiniteTransition.animateFloat(
                 initialValue = 1.0f,
@@ -212,8 +234,18 @@ fun MainScreen(
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
                     .padding(16.dp)
-                    .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale },
+                    .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale }
+                    .pointerInput(containerSize) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            val minX = -(containerSize.width - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
+                            val minY = -(containerSize.height - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
+                            offsetX = (offsetX + dragAmount.x).coerceIn(minX, 0f)
+                            offsetY = (offsetY + dragAmount.y).coerceIn(minY, 0f)
+                        }
+                    },
             ) {
                 Text("🐥", style = MaterialTheme.typography.titleLarge)
             }

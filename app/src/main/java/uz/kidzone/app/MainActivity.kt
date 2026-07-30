@@ -31,6 +31,13 @@ class MainActivity : ComponentActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // Draw content edge-to-edge around notches/punch-hole cameras instead of
+            // letterboxing around them — statusBarsPadding() in Compose already reserves
+            // enough space so nothing renders under the cutout itself.
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
         systemUiHelper = SystemUiHelper(window)
 
         requestNotificationPermissionIfNeeded()
