@@ -77,10 +77,12 @@ fun DailyChallengeCard(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "🔥 $streakCount kun streak",
-                                style = MaterialTheme.typography.labelMedium,
-                            )
+                            if (streakCount > 0) {
+                                Text(
+                                    "🔥 $streakCount kun streak",
+                                    style = MaterialTheme.typography.labelMedium,
+                                )
+                            }
                             Text(
                                 "Bugungi vazifa: ${c.gameTitle}",
                                 style = MaterialTheme.typography.titleSmall,
