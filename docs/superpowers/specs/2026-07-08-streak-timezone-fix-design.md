@@ -2,7 +2,7 @@
 **Date:** 2026-07-08
 **Status:** Approved
 **Type:** Bugfix (not a numbered Faza — cross-repo consistency fix)
-**Related:** backend `StreakReminderService` (`D:\java_projects\kidzone`), Faza 14 (`2026-07-01-faza14-daily-challenge-streak-design.md`)
+**Related:** backend `StreakReminderService` (`D:\KidZone\Kidzone_Backend`), Faza 14 (`2026-07-01-faza14-daily-challenge-streak-design.md`)
 
 ---
 

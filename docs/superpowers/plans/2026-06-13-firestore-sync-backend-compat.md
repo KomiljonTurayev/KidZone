@@ -12,7 +12,7 @@
 
 ## Backend Firestore Schema (MUST NOT DEVIATE)
 
-From `D:\java_projects\kidzone\src\main\java\uz\kidzone\service\UserService.java` and `StatsService.java`:
+From `D:\KidZone\Kidzone_Backend\src\main\java\uz\kidzone\service\UserService.java` and `StatsService.java`:
 
 **`users/{uid}`** (String fields, Timestamp for dates):
 ```
