@@ -1,6 +1,7 @@
 package uz.kidzone.app.ui.screens
 
 import android.content.SharedPreferences
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,10 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
@@ -43,10 +46,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
@@ -58,6 +64,10 @@ import uz.kidzone.app.data.ProfileEntity
 import uz.kidzone.app.data.AppClock
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
+
+// Matches the WebView games' --kt-accent (app/src/main/assets/www/kids-theme.css)
+// so native dialogs feel consistent with the rest of the UI.
+private val KidZoneOrange = Color(0xFFFF6B35)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -399,7 +409,17 @@ private fun ChangePinDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("PIN o'zgartirish") },
+        shape = RoundedCornerShape(24.dp),
+        containerColor = Color.White,
+        icon = { Text("🔐", fontSize = 40.sp) },
+        title = {
+            Text(
+                "PIN o'zgartirish",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
         text = {
             Column {
                 when (step) {
@@ -458,27 +478,36 @@ private fun ChangePinDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                when (step) {
-                    0 -> {
-                        if (currentHash.isNullOrEmpty() || PinUtil.matches(currentPin, currentHash)) {
-                            step = 1
-                            error = ""
-                        } else {
-                            error = "PIN noto'g'ri"
+            Button(
+                onClick = {
+                    when (step) {
+                        0 -> {
+                            if (currentHash.isNullOrEmpty() || PinUtil.matches(currentPin, currentHash)) {
+                                step = 1
+                                error = ""
+                            } else {
+                                error = "PIN noto'g'ri"
+                            }
+                        }
+                        1 -> {
+                            if (newPin.length == 4) {
+                                step = 2
+                                error = ""
+                            }
                         }
                     }
-                    1 -> {
-                        if (newPin.length == 4) {
-                            step = 2
-                            error = ""
-                        }
-                    }
-                }
-            }) { Text("Keyingi") }
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = KidZoneOrange),
+            ) { Text("Keyingi") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Bekor") }
+            OutlinedButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = KidZoneOrange),
+                border = BorderStroke(1.dp, KidZoneOrange),
+            ) { Text("Bekor") }
         },
     )
 }

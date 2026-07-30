@@ -15,6 +15,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -28,11 +29,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -54,9 +58,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlin.math.roundToInt
 import uz.kidzone.app.AdsManager
@@ -71,6 +78,10 @@ import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
+
+// Matches the WebView games' --kt-accent (app/src/main/assets/www/kids-theme.css)
+// so native dialogs feel consistent with the rest of the UI.
+private val KidZoneOrange = Color(0xFFFF6B35)
 
 @Composable
 fun MainScreen(
@@ -312,33 +323,50 @@ fun MainScreen(
     if (uiState.showExitDialog) {
         AlertDialog(
             onDismissRequest = { mainViewModel.dismissExitDialog() },
+            shape = RoundedCornerShape(24.dp),
+            containerColor = Color.White,
+            icon = { Text(if (uiState.isExitFromGame) "🎮" else "👋", fontSize = 40.sp) },
             title = {
                 Text(
-                    if (uiState.isExitFromGame) "O’yindan chiqish?" else "KidZone’dan chiqish?"
+                    if (uiState.isExitFromGame) "O’yindan chiqish?" else "KidZone’dan chiqish?",
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             text = {
                 Text(
                     if (uiState.isExitFromGame) "Menyuga qaytmoqchimisiz?"
-                    else "Haqiqatan ham chiqib ketmoqchimisiz?"
+                    else "Haqiqatan ham chiqib ketmoqchimisiz?",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
-                    mainViewModel.dismissExitDialog()
-                    if (uiState.isExitFromGame) {
-                        webMgrRef.value?.evaluateJavascript(
-                            "(document.getElementById('gv-back')||{click:function(){}}).click();"
-                        )
-                    } else {
-                        (context as? Activity)?.finishAffinity()
-                    }
-                }) {
+                Button(
+                    onClick = {
+                        mainViewModel.dismissExitDialog()
+                        if (uiState.isExitFromGame) {
+                            webMgrRef.value?.evaluateJavascript(
+                                "(document.getElementById('gv-back')||{click:function(){}}).click();"
+                            )
+                        } else {
+                            (context as? Activity)?.finishAffinity()
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = KidZoneOrange),
+                ) {
                     Text(if (uiState.isExitFromGame) "Ha, menyuga" else "Ha, chiqish")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { mainViewModel.dismissExitDialog() }) { Text("Yoʼq, qolish") }
+                OutlinedButton(
+                    onClick = { mainViewModel.dismissExitDialog() },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = KidZoneOrange),
+                    border = BorderStroke(1.dp, KidZoneOrange),
+                ) { Text("Yoʼq, qolish") }
             },
         )
     }
