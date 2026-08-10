@@ -20,6 +20,7 @@ import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
 import uz.kidzone.app.ui.screens.ProfileSelectScreen
+import uz.kidzone.app.ui.theme.KidZoneTheme
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModelFactory
 import uz.kidzone.app.ui.viewmodel.MainViewModel
@@ -69,64 +70,66 @@ fun KidZoneApp(
         else -> "main"
     }
 
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable("onboarding") {
-            OnboardingScreen(
-                prefs = prefs,
-                onDone = {
-                    navController.navigate("main") {
-                        popUpTo("onboarding") { inclusive = true }
+    KidZoneTheme {
+        NavHost(navController = navController, startDestination = startDestination) {
+            composable("onboarding") {
+                OnboardingScreen(
+                    prefs = prefs,
+                    onDone = {
+                        navController.navigate("main") {
+                            popUpTo("onboarding") { inclusive = true }
+                        }
                     }
-                }
-            )
-        }
-        composable("profile_select") {
-            ProfileSelectScreen(
-                profiles = profiles,
-                onSelect = { profile ->
-                    profileViewModel.setActiveProfile(profile)
-                    navController.navigate("main") {
-                        popUpTo("profile_select") { inclusive = true }
-                    }
-                },
-                onAddNew = { navController.navigate("add_edit_profile/new") },
-            )
-        }
-        composable("main") {
-            MainScreen(
-                mainViewModel = mainViewModel,
-                adsManager = adsManager,
-                prefs = prefs,
-                statsManager = statsManager,
-                profileViewModel = profileViewModel,
-                challengeViewModel = challengeViewModel,
-                onOpenDashboard = { navController.navigate("dashboard") },
-            )
-        }
-        composable("dashboard") {
-            ParentDashboardScreen(
-                prefs = prefs,
-                onBack = { navController.popBackStack() },
-                profileViewModel = profileViewModel,
-                challengeViewModel = challengeViewModel,
-                onNavigateToAddEdit = { profileId ->
-                    navController.navigate("add_edit_profile/${profileId ?: "new"}")
-                },
-            )
-        }
-        composable("add_edit_profile/{profileId}") { backStack ->
-            val profileId = backStack.arguments?.getString("profileId")
-            val profile = if (profileId == "new") null
-                          else profiles.firstOrNull { it.id == profileId }
-            AddEditProfileScreen(
-                profile = profile,
-                onSave = { saved ->
-                    if (profile == null) profileViewModel.insertProfile(saved)
-                    else profileViewModel.updateProfile(saved)
-                    navController.popBackStack()
-                },
-                onCancel = { navController.popBackStack() },
-            )
+                )
+            }
+            composable("profile_select") {
+                ProfileSelectScreen(
+                    profiles = profiles,
+                    onSelect = { profile ->
+                        profileViewModel.setActiveProfile(profile)
+                        navController.navigate("main") {
+                            popUpTo("profile_select") { inclusive = true }
+                        }
+                    },
+                    onAddNew = { navController.navigate("add_edit_profile/new") },
+                )
+            }
+            composable("main") {
+                MainScreen(
+                    mainViewModel = mainViewModel,
+                    adsManager = adsManager,
+                    prefs = prefs,
+                    statsManager = statsManager,
+                    profileViewModel = profileViewModel,
+                    challengeViewModel = challengeViewModel,
+                    onOpenDashboard = { navController.navigate("dashboard") },
+                )
+            }
+            composable("dashboard") {
+                ParentDashboardScreen(
+                    prefs = prefs,
+                    onBack = { navController.popBackStack() },
+                    profileViewModel = profileViewModel,
+                    challengeViewModel = challengeViewModel,
+                    onNavigateToAddEdit = { profileId ->
+                        navController.navigate("add_edit_profile/${profileId ?: "new"}")
+                    },
+                )
+            }
+            composable("add_edit_profile/{profileId}") { backStack ->
+                val profileId = backStack.arguments?.getString("profileId")
+                val profile = if (profileId == "new") null
+                              else profiles.firstOrNull { it.id == profileId }
+                AddEditProfileScreen(
+                    profile = profile,
+                    onSave = { saved ->
+                        if (profile == null) profileViewModel.insertProfile(saved)
+                        else profileViewModel.updateProfile(saved)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
+                )
+            }
         }
     }
 }

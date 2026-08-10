@@ -2,9 +2,8 @@
 <resources>
 
     <!-- Asosiy tema -->
-    <style name="Theme.KidZone" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.KidZone" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">#FF6B35</item>
-        <item name="colorPrimaryVariant">#E55A25</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSecondary">#FF9F1C</item>
         <item name="colorOnSecondary">#FFFFFF</item>
@@ -23,7 +22,7 @@
     </style>
 
     <!-- Professional Bejirim Dialog -->
-    <style name="Theme.KidZone.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+    <style name="Theme.KidZone.Dialog" parent="Theme.Material3.Light.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="backgroundTint">#FFFFFF</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.KidZone.Dialog</item>
@@ -35,11 +34,11 @@
     </style>
 
     <!-- Bottom Sheet dialog — transparent background so custom shape shows -->
-    <style name="Theme.KidZone.BottomSheet" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+    <style name="Theme.KidZone.BottomSheet" parent="Theme.Material3.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.KidZone.BottomSheet</item>
     </style>
 
-    <style name="Widget.KidZone.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+    <style name="Widget.KidZone.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
         <item name="backgroundTint">@android:color/transparent</item>
     </style>
