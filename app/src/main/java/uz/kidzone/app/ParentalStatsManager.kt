@@ -84,6 +84,18 @@ class ParentalStatsManager {
         return saved + current
     }
 
+    // Second-level granularity of getTodayMinutes(), for a live countdown display.
+    // Minutes already flushed to prefs from earlier sessions today keep whole-minute
+    // precision (they were rounded down in onSessionEnd); only the in-progress
+    // session contributes sub-minute precision.
+    fun getTodaySeconds(): Long {
+        val savedMinutes = prefs.getInt(todayPtKey(profileId), 0)
+        val currentSeconds = if (sessionStartMs > 0L)
+            (System.currentTimeMillis() - sessionStartMs) / 1000L
+        else 0L
+        return savedMinutes * 60L + currentSeconds
+    }
+
     fun getWeeklyMinutes(): IntArray {
         val result = IntArray(7)
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)

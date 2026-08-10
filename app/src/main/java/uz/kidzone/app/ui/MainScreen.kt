@@ -108,6 +108,7 @@ fun MainScreen(
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
     var showKidzoSheet by remember { mutableStateOf(false) }
+    var remainingSeconds by remember { mutableStateOf<Long?>(null) }
 
     val kidzoAgentRef = remember {
         val filter = try { ContentFilter.fromAssets(context) } catch (e: Exception) { null }
@@ -198,6 +199,37 @@ fun MainScreen(
                     },
                     onBack = { showUnlockPin = false },
                 )
+            }
+        }
+
+        // Play-time countdown badge — visible only while a game is open, so it doesn't
+        // fight with the WebView's own home-screen header for the same top corner.
+        if (uiState.inGame && !uiState.isLocked) {
+            val left = remainingSeconds
+            if (left != null) {
+                val lowTime = left <= 5 * 60L
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 64.dp, end = 12.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    color = if (lowTime) Color(0xFFBA1A1A) else Color.Black.copy(alpha = 0.55f),
+                    tonalElevation = 4.dp,
+                    shadowElevation = 4.dp,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    ) {
+                        Text("⏳ ", fontSize = 14.sp)
+                        Text(
+                            text = "%d:%02d".format(left / 60, left % 60),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
             }
         }
 
@@ -317,14 +349,26 @@ fun MainScreen(
         )
     } // end Column
 
-    // Time limit check — every 30 seconds
+    // Time limit countdown — ticks every second so the in-game badge stays live.
+    // Locking is edge-triggered (only the instant remaining time first hits zero),
+    // not level-triggered, so a parent who unlocks via PIN after the limit is
+    // reached isn't immediately slammed back into the lock screen on the next tick.
     LaunchedEffect(activeProfile) {
+        var previousRemaining: Long? = null
         while (true) {
-            delay(30_000)
             val limit = activeProfile?.timeLimitMinutes ?: 0
-            if (limit > 0 && statsManager.getTodayMinutes() >= limit) {
-                mainViewModel.showLock()
+            if (limit > 0) {
+                val left = (limit * 60L - statsManager.getTodaySeconds()).coerceAtLeast(0L)
+                remainingSeconds = left
+                if (left == 0L && previousRemaining != 0L) {
+                    mainViewModel.showLock()
+                }
+                previousRemaining = left
+            } else {
+                remainingSeconds = null
+                previousRemaining = null
             }
+            delay(1_000)
         }
     }
 

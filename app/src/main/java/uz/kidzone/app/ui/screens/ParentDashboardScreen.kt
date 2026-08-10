@@ -160,19 +160,28 @@ fun ParentDashboardScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            // 3. Vaqt limiti
+            // 3. Vaqt limiti — activeProfile.timeLimitMinutes ustida ishlaydi, chunki
+            // aynan shu maydonni MainScreen kunlik limitni tekshirish uchun o'qiydi.
             item {
                 Text("Vaqt limiti", style = MaterialTheme.typography.titleMedium)
+                val currentLimit = activeProfile?.timeLimitMinutes ?: 0
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Button(onClick = { vm.decreaseLimit() }) { Text("-") }
+                    Button(onClick = {
+                        activeProfile?.let { p ->
+                            profileViewModel.updateProfile(p.copy(timeLimitMinutes = (p.timeLimitMinutes - 15).coerceAtLeast(0)))
+                        }
+                    }) { Text("-") }
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        if (state.timeLimitMinutes == 0) "Limit yo'q"
-                        else "${state.timeLimitMinutes} daqiqa",
+                        if (currentLimit == 0) "Limit yo'q" else "$currentLimit daqiqa",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Spacer(Modifier.width(12.dp))
-                    Button(onClick = { vm.increaseLimit() }) { Text("+") }
+                    Button(onClick = {
+                        activeProfile?.let { p ->
+                            profileViewModel.updateProfile(p.copy(timeLimitMinutes = (p.timeLimitMinutes + 15).coerceAtMost(180)))
+                        }
+                    }) { Text("+") }
                 }
                 Spacer(Modifier.height(16.dp))
             }

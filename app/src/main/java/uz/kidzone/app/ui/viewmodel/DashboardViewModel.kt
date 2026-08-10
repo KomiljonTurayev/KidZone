@@ -15,7 +15,6 @@ data class DashboardState(
     val todayMinutes: Int = 0,
     val weeklyMinutes: List<Int> = List(7) { 0 },
     val todayGames: List<String> = emptyList(),
-    val timeLimitMinutes: Int = 0,
     val age: String = "2-4",
     val pushEnabled: Boolean = true,
     val notifHistory: List<String> = emptyList(),
@@ -45,7 +44,6 @@ class DashboardViewModel(
                 todayMinutes = statsManager.getTodayMinutes(),
                 weeklyMinutes = statsManager.getWeeklyMinutes().toList(),
                 todayGames = statsManager.getTodayGames(),
-                timeLimitMinutes = statsManager.getTimeLimitMinutes(),
                 age = prefs.getString("kz_age", "2-4") ?: "2-4",
                 pushEnabled = prefs.getBoolean("kz_push_enabled", true),
             )
@@ -117,20 +115,6 @@ class DashboardViewModel(
         val games = statsManager.getTodayGames().associateWith { "played" }
         sync.recordSession(uid, minutes, games, false)
         _state.update { it.copy(isSyncing = false, lastSyncTime = "Az vaqt oldin") }
-    }
-
-    fun increaseLimit() {
-        val current = statsManager.getTimeLimitMinutes()
-        val next = if (current >= 180) 180 else current + 15
-        statsManager.setTimeLimitMinutes(next)
-        _state.update { it.copy(timeLimitMinutes = next) }
-    }
-
-    fun decreaseLimit() {
-        val current = statsManager.getTimeLimitMinutes()
-        val next = if (current <= 0) 0 else current - 15
-        statsManager.setTimeLimitMinutes(next)
-        _state.update { it.copy(timeLimitMinutes = next) }
     }
 
     fun setAge(age: String) {
