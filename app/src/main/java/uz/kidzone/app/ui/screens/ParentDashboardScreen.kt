@@ -89,6 +89,7 @@ fun ParentDashboardScreen(
     val savedPinHash = activeProfile?.pinHash
     val profiles by profileViewModel.profiles.collectAsState()
     val allStreaks by challengeViewModel.allStreaks.collectAsState()
+    val challengeState by challengeViewModel.state.collectAsState()
 
     if (!pinVerified) {
         PinGate(
@@ -266,11 +267,17 @@ fun ParentDashboardScreen(
             items(profiles) { profile ->
                 val streak = allStreaks.firstOrNull { it.profileId == profile.id }
                 val todayDate = AppClock.today()
+                val isActive = profile.id == activeProfile?.id
                 ProfileListItem(
                     profile = profile,
-                    isActive = profile.id == activeProfile?.id,
+                    isActive = isActive,
                     streakCount = streak?.count ?: 0,
                     doneToday = streak?.lastCompletedDate == todayDate,
+                    // celebrateMilestone tracks whichever profile last closed a game in
+                    // MainScreen (challengeViewModel's active profile) — only ever the
+                    // currently active profile, since only it can play games.
+                    celebrateMilestone = if (isActive) challengeState.celebrateMilestone else null,
+                    onCelebrationShown = challengeViewModel::onCelebrationShown,
                     onEdit = { onNavigateToAddEdit(profile.id) },
                     onDelete = {
                         if (profiles.size > 1) {
@@ -521,16 +528,31 @@ private fun ChangePinDialog(
     )
 }
 
+private val MILESTONE_COPY: Map<Int, Pair<String, String>> = mapOf(
+    3 to ("🔥" to "3 kun ketma-ket! Ajoyib boshlanish!"),
+    7 to ("🔥🔥" to "Bir hafta ketma-ket! Zo'r!"),
+    14 to ("🔥🔥🔥" to "Ikki hafta ketma-ket!"),
+    30 to ("🔥🔥🔥🔥" to "Bir oy ketma-ket! Sen chempion!"),
+)
+
 @Composable
 private fun ProfileListItem(
     profile: ProfileEntity,
     isActive: Boolean,
     streakCount: Int,
     doneToday: Boolean,
+    celebrateMilestone: Int?,
+    onCelebrationShown: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onSwitch: () -> Unit,
 ) {
+    LaunchedEffect(celebrateMilestone) {
+        if (celebrateMilestone != null) {
+            kotlinx.coroutines.delay(2500)
+            onCelebrationShown()
+        }
+    }
     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -546,19 +568,30 @@ private fun ProfileListItem(
                 )
                 if (isActive) Text("✓ Faol", style = MaterialTheme.typography.bodySmall)
                 // Streak satri
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 2.dp),
-                ) {
+                val milestoneCopy = celebrateMilestone?.let { MILESTONE_COPY[it] }
+                if (milestoneCopy != null) {
                     Text(
-                        "🔥 $streakCount kun streak",
+                        "${milestoneCopy.first} ${milestoneCopy.second}",
                         style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 2.dp),
                     )
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        if (doneToday) "Bugun: ✅" else "Bugun: ⏳",
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 2.dp),
+                    ) {
+                        Text(
+                            "🔥 $streakCount kun streak",
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Text(
+                            if (doneToday) "Bugun: ✅" else "Bugun: ⏳",
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
                 }
             }
             TextButton(onClick = onSwitch) { Text("Tanlash") }

@@ -112,6 +112,54 @@ class DailyChallengeRepositoryTest {
         repo.markChallengeCompleted("p1", "paint")  // wrong game
         assertFalse(challengeDao.getById("p1-$fixedDate")!!.completed)
     }
+
+    @Test
+    fun `markChallengeCompleted returns 3 when streak crosses first milestone`() = runTest {
+        streakDao.upsert(StreakEntity("p1", count = 2, lastCompletedDate = yesterday))
+        repo.updateGamesList("""[{"id":"memory","title":"Memory Match"}]""")
+        repo.getTodayChallenge("p1")
+        val milestone = repo.markChallengeCompleted("p1", "memory")
+        assertEquals(3, milestone)
+        assertEquals(3, repo.getStreak("p1").lastCelebratedMilestone)
+    }
+
+    @Test
+    fun `markChallengeCompleted returns 7 when streak crosses second milestone`() = runTest {
+        streakDao.upsert(StreakEntity("p1", count = 6, lastCompletedDate = yesterday, lastCelebratedMilestone = 3))
+        repo.updateGamesList("""[{"id":"memory","title":"Memory Match"}]""")
+        repo.getTodayChallenge("p1")
+        val milestone = repo.markChallengeCompleted("p1", "memory")
+        assertEquals(7, milestone)
+    }
+
+    @Test
+    fun `markChallengeCompleted returns null when no milestone is crossed`() = runTest {
+        streakDao.upsert(StreakEntity("p1", count = 3, lastCompletedDate = yesterday, lastCelebratedMilestone = 3))
+        repo.updateGamesList("""[{"id":"memory","title":"Memory Match"}]""")
+        repo.getTodayChallenge("p1")
+        val milestone = repo.markChallengeCompleted("p1", "memory")
+        assertNull(milestone)
+    }
+
+    @Test
+    fun `markChallengeCompleted resets lastCelebratedMilestone when streak breaks and restarts`() = runTest {
+        streakDao.upsert(StreakEntity("p1", count = 10, lastCompletedDate = olderDate, lastCelebratedMilestone = 7))
+        repo.updateGamesList("""[{"id":"memory","title":"Memory Match"}]""")
+        repo.getTodayChallenge("p1")
+        repo.markChallengeCompleted("p1", "memory")
+        assertEquals(0, repo.getStreak("p1").lastCelebratedMilestone)
+    }
+
+    @Test
+    fun `markChallengeCompleted returns null on repeat completion same day even after reaching a milestone`() = runTest {
+        streakDao.upsert(StreakEntity("p1", count = 2, lastCompletedDate = yesterday))
+        repo.updateGamesList("""[{"id":"memory","title":"Memory Match"}]""")
+        repo.getTodayChallenge("p1")
+        val first = repo.markChallengeCompleted("p1", "memory")
+        val second = repo.markChallengeCompleted("p1", "memory")
+        assertEquals(3, first)
+        assertNull(second)
+    }
 }
 
 // ---- Fake implementations ----

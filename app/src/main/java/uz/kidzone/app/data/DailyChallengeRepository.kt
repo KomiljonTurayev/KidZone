@@ -17,6 +17,7 @@ open class DailyChallengeRepository(
     },
 ) {
     private var gamesList: List<GameItem> = emptyList()
+    private val milestones = listOf(3, 7, 14, 30)
 
     open fun updateGamesList(json: String) {
         try {
@@ -46,17 +47,17 @@ open class DailyChallengeRepository(
         return entity
     }
 
-    open suspend fun markChallengeCompleted(profileId: String, gameId: String) {
+    open suspend fun markChallengeCompleted(profileId: String, gameId: String): Int? {
         val today = todayProvider()
         val id = "$profileId-$today"
-        val challenge = challengeDao.getById(id) ?: return
-        if (challenge.gameId != gameId || challenge.completed) return
+        val challenge = challengeDao.getById(id) ?: return null
+        if (challenge.gameId != gameId || challenge.completed) return null
 
         challengeDao.markCompleted(id)
-        updateStreak(profileId, today, gameId, challenge.gameTitle)
+        return updateStreak(profileId, today, gameId, challenge.gameTitle)
     }
 
-    private suspend fun updateStreak(profileId: String, today: String, gameId: String, gameTitle: String) {
+    private suspend fun updateStreak(profileId: String, today: String, gameId: String, gameTitle: String): Int? {
         val current = streakDao.getByProfile(profileId) ?: StreakEntity(profileId)
         val yesterday = java.time.LocalDate.parse(today).minusDays(1).toString()
         val newCount = when (current.lastCompletedDate) {
@@ -64,15 +65,19 @@ open class DailyChallengeRepository(
             yesterday -> current.count + 1
             else -> 1
         }
-        streakDao.upsert(StreakEntity(profileId, newCount, today))
+        val resetMilestone = if (newCount == 1 && current.count > 1) 0 else current.lastCelebratedMilestone
+        val newlyReached = milestones.lastOrNull { it <= newCount && it > resetMilestone }
+        val celebratedMilestone = newlyReached ?: resetMilestone
+        streakDao.upsert(StreakEntity(profileId, newCount, today, celebratedMilestone))
 
         val uid = try {
             FirebaseAuth.getInstance().currentUser?.uid
         } catch (_: Exception) {
             null
-        } ?: return
+        } ?: return newlyReached
         firestoreSync.syncStreak(uid, profileId, newCount, today)
         firestoreSync.syncChallengeCompleted(uid, profileId, today, gameId, gameTitle)
+        return newlyReached
     }
 
     open suspend fun getStreak(profileId: String): StreakEntity =

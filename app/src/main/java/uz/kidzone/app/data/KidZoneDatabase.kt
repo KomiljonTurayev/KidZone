@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DailyChallengeEntity::class,
         StreakEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class KidZoneDatabase : RoomDatabase() {
@@ -42,6 +42,14 @@ abstract class KidZoneDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE `streak` ADD COLUMN `lastCelebratedMilestone` INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
         fun getInstance(context: Context): KidZoneDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -49,7 +57,7 @@ abstract class KidZoneDatabase : RoomDatabase() {
                     KidZoneDatabase::class.java,
                     "kidzone.db",
                 )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build().also { instance = it }
             }
     }

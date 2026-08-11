@@ -77,6 +77,55 @@ class DailyChallengeViewModelTest {
         assertEquals(1, vm.state.value.streakCount)
         assertEquals(1, fakeRepo.markCompletedCallCount)
     }
+
+    @Test
+    fun `onGameClosed sets celebrateMilestone when repository returns a milestone`() = runTest {
+        fakeRepo.games = listOf(GameItem("memory", "Memory Match"))
+        vm.onProfileChanged("p1")
+        advanceUntilIdle()
+        fakeRepo.milestoneToReturn = 7
+        vm.onGameClosed("memory")
+        advanceUntilIdle()
+        assertEquals(7, vm.state.value.celebrateMilestone)
+    }
+
+    @Test
+    fun `onGameClosed leaves celebrateMilestone null when repository returns null`() = runTest {
+        fakeRepo.games = listOf(GameItem("memory", "Memory Match"))
+        vm.onProfileChanged("p1")
+        advanceUntilIdle()
+        fakeRepo.milestoneToReturn = null
+        vm.onGameClosed("memory")
+        advanceUntilIdle()
+        assertNull(vm.state.value.celebrateMilestone)
+    }
+
+    @Test
+    fun `onCelebrationShown clears celebrateMilestone`() = runTest {
+        fakeRepo.games = listOf(GameItem("memory", "Memory Match"))
+        vm.onProfileChanged("p1")
+        advanceUntilIdle()
+        fakeRepo.milestoneToReturn = 3
+        vm.onGameClosed("memory")
+        advanceUntilIdle()
+        vm.onCelebrationShown()
+        assertNull(vm.state.value.celebrateMilestone)
+    }
+
+    @Test
+    fun `onProfileChanged clears any pending celebration from the previous profile`() = runTest {
+        fakeRepo.games = listOf(GameItem("memory", "Memory Match"))
+        vm.onProfileChanged("p1")
+        advanceUntilIdle()
+        fakeRepo.milestoneToReturn = 3
+        vm.onGameClosed("memory")
+        advanceUntilIdle()
+        assertEquals(3, vm.state.value.celebrateMilestone)
+
+        vm.onProfileChanged("p2")
+        advanceUntilIdle()
+        assertNull(vm.state.value.celebrateMilestone)
+    }
 }
 
 class FakeDailyChallengeRepository : DailyChallengeRepository(
@@ -99,6 +148,7 @@ class FakeDailyChallengeRepository : DailyChallengeRepository(
     var streakToReturn: StreakEntity = StreakEntity("", 0, "")
     var getChallengeCallCount = 0
     var markCompletedCallCount = 0
+    var milestoneToReturn: Int? = null
 
     override fun updateGamesList(json: String) {
         super.updateGamesList("""${games.joinToString(",", "[", "]") { """{"id":"${it.id}","title":"${it.title}"}""" }}""")
@@ -118,7 +168,8 @@ class FakeDailyChallengeRepository : DailyChallengeRepository(
 
     override suspend fun getStreak(profileId: String) = streakToReturn.copy(profileId = profileId)
 
-    override suspend fun markChallengeCompleted(profileId: String, gameId: String) {
+    override suspend fun markChallengeCompleted(profileId: String, gameId: String): Int? {
         markCompletedCallCount++
+        return milestoneToReturn
     }
 }

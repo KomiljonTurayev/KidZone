@@ -9,4 +9,5 @@ data class StreakEntity(
     @PrimaryKey val profileId: String,
     @ColumnInfo(defaultValue = "0") val count: Int = 0,
     @ColumnInfo(defaultValue = "") val lastCompletedDate: String = "",  // "YYYY-MM-DD"
+    @ColumnInfo(defaultValue = "0") val lastCelebratedMilestone: Int = 0,
 )

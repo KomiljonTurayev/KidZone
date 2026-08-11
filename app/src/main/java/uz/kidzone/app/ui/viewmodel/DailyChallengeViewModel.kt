@@ -19,6 +19,7 @@ data class ChallengeState(
     val challenge: DailyChallengeEntity? = null,
     val streakCount: Int = 0,
     val isLoading: Boolean = true,
+    val celebrateMilestone: Int? = null,
 )
 
 open class DailyChallengeViewModel(
@@ -63,12 +64,16 @@ open class DailyChallengeViewModel(
     fun onGameClosed(gameId: String) {
         val profileId = activeProfileId ?: return
         viewModelScope.launch {
-            repository.markChallengeCompleted(profileId, gameId)
+            val milestone = repository.markChallengeCompleted(profileId, gameId)
             val challenge = repository.getTodayChallenge(profileId)
             val streak = repository.getStreak(profileId)
             if (activeProfileId != profileId) return@launch
-            _state.update { it.copy(challenge = challenge, streakCount = streak.count) }
+            _state.update { it.copy(challenge = challenge, streakCount = streak.count, celebrateMilestone = milestone) }
         }
+    }
+
+    fun onCelebrationShown() {
+        _state.update { it.copy(celebrateMilestone = null) }
     }
 }
 
