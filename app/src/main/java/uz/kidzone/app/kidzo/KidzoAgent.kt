@@ -1,6 +1,5 @@
 package uz.kidzone.app.kidzo
 
-import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -24,13 +23,6 @@ class KidzoAgent private constructor(
     private var callGeneration: Int = 0
 
     companion object {
-        /** Production factory — wires RealGeminiCaller. */
-        @JvmStatic
-        fun create(filter: ContentFilter, mainThread: (() -> Unit) -> Unit, @Suppress("UNUSED_PARAMETER") context: Context): KidzoAgent {
-            // TODO(Task 8): wire context into RealGeminiCaller if API key override is needed
-            return KidzoAgent(RealGeminiCaller(), filter, mainThread)
-        }
-
         /** Static factory — no Gemini API needed; shows content.json top-5 directly. */
         @JvmStatic
         fun createStatic(filter: ContentFilter, mainThread: (() -> Unit) -> Unit): KidzoAgent {

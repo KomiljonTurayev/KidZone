@@ -18,6 +18,7 @@ data class MainUiState(
     val isLocked: Boolean = false,
     val bannerVisible: Boolean = true,
     val bannerLoaded: Boolean = false,
+    val pendingDeepLinkContentId: String? = null,
 )
 
 class MainViewModel : ViewModel() {
@@ -34,4 +35,5 @@ class MainViewModel : ViewModel() {
     fun hideLock() { _state.update { it.copy(isLocked = false) } }
     fun setBannerVisible(visible: Boolean) { _state.update { it.copy(bannerVisible = visible) } }
     fun setBannerLoaded(loaded: Boolean) { _state.update { it.copy(bannerLoaded = loaded) } }
+    fun setPendingDeepLinkContentId(contentId: String?) { _state.update { it.copy(pendingDeepLinkContentId = contentId) } }
 }

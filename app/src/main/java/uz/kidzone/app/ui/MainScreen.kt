@@ -107,6 +107,15 @@ fun MainScreen(
     }
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
+
+    // Push bildirishnomadagi "url" maydoni content-id sifatida keladi (masalan
+    // "story-005"/"song-003") — main.js'dagi window.playContent xuddi shu formatni
+    // kutadi (KidzoSheet'ning onContentSelected'i ham shu yo'lni ishlatadi).
+    LaunchedEffect(uiState.pendingDeepLinkContentId) {
+        val contentId = uiState.pendingDeepLinkContentId ?: return@LaunchedEffect
+        webMgrRef.value?.evaluateJavascript("if(window.playContent)playContent('$contentId')")
+        mainViewModel.setPendingDeepLinkContentId(null)
+    }
     var showKidzoSheet by remember { mutableStateOf(false) }
     var remainingSeconds by remember { mutableStateOf<Long?>(null) }
 

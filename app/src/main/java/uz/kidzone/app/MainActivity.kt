@@ -108,9 +108,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkPendingUrl() {
-        val url = kzPrefs.getString("kz_pending_url", null) ?: return
+        val contentId = kzPrefs.getString("kz_pending_url", null) ?: return
         kzPrefs.edit().remove("kz_pending_url").apply()
-        // TODO: openUrl(url) — deep-link handling; implement after MainScreen exposes webMgr ref
+        mainViewModel.setPendingDeepLinkContentId(contentId)
     }
 
     private fun requestNotificationPermissionIfNeeded() {
