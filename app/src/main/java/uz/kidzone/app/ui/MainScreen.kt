@@ -155,7 +155,7 @@ fun MainScreen(
                         "AndroidAdMob",
                     )
                     mgr.addInterface(
-                        ChallengeBridge(challengeViewModel, context as Activity),
+                        ChallengeBridge(challengeViewModel, context),
                         "AndroidChallenge",
                     )
                     // lang/age travel as URL query params, read synchronously by main.js
@@ -506,7 +506,7 @@ private class AdMobBridge(
     @android.webkit.JavascriptInterface
     fun showRewarded() {
         onMain {
-            adsManager.showRewarded { amount ->
+            adsManager.showRewarded { _ ->
                 // reward callback — webview JS call could go here if needed
             }
         }
@@ -534,7 +534,7 @@ private class AdMobBridge(
     }
 
     @android.webkit.JavascriptInterface
-    fun gameLaunched(gameId: String) {
+    fun gameLaunched(@Suppress("UNUSED_PARAMETER") gameId: String) {
         onMain {
             viewModel.setInGame(true)
         }
@@ -557,7 +557,7 @@ private class ChallengeBridge(
     }
 
     @android.webkit.JavascriptInterface
-    fun onGameOpened(gameId: String) {
+    fun onGameOpened(@Suppress("UNUSED_PARAMETER") gameId: String) {
         // future use
     }
 
