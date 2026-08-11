@@ -23,7 +23,7 @@ class FirebaseManager internal constructor(private val auth: FirebaseAuth?) {
 
         @JvmStatic
         @Synchronized
-        fun init(ctx: Context): FirebaseManager {
+        fun init(@Suppress("UNUSED_PARAMETER") ctx: Context): FirebaseManager {
             return instance ?: run {
                 val auth = try { FirebaseAuth.getInstance() } catch (e: IllegalStateException) { null }
                 FirebaseManager(auth).also { instance = it }

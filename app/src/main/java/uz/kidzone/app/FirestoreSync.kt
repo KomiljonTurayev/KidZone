@@ -23,7 +23,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
 
         @JvmStatic
         @Synchronized
-        fun init(ctx: Context): FirestoreSync {
+        fun init(@Suppress("UNUSED_PARAMETER") ctx: Context): FirestoreSync {
             return instance ?: run {
                 val db: FirebaseFirestore? = try {
                     FirebaseFirestore.getInstance()

@@ -43,7 +43,7 @@ object FcmTokenManager {
         provider.getToken { token ->
             if (token != null) {
                 sync.updateFcmToken(uid, token)
-                BackendClient.registerToken(uid, token)
+                BackendClient.registerToken(token)
             }
         }
     }

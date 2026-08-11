@@ -19,9 +19,14 @@ object BackendClient {
     private const val TAG = "BackendClient"
     private const val BASE_URL = "https://kidzone-backend-s7to.onrender.com"
 
-    /** Registers the FCM token with the backend so UID-targeted pushes work. Failure is logged only. */
+    /**
+     * Registers the FCM token with the backend so push notifications reach this device.
+     * The backend derives the user identity from the Firebase ID token itself (see
+     * PushController#registerToken), so no client-supplied UID is needed here.
+     * Failure is logged only.
+     */
     @JvmStatic
-    fun registerToken(uid: String, fcmToken: String) {
+    fun registerToken(fcmToken: String) {
         val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
             Log.w(TAG, "registerToken: no Firebase user")
