@@ -30,7 +30,10 @@ class KidWebViewManager(private val webView: WebView) {
 
     fun getLanguage(): String = currentLanguage
 
-    @SuppressLint("SetJavaScriptEnabled")
+    // JavascriptInterface: lint can't see through the generic `Any` parameter to confirm
+    // the passed object's methods carry @JavascriptInterface — they do (AdMobBridge,
+    // ChallengeBridge in MainScreen.kt), this is a lint false positive on the wrapper shape.
+    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     fun setup(jsInterface: Any, interfaceName: String) {
         // Enable remote debugging via chrome://inspect
         WebView.setWebContentsDebuggingEnabled(true)
@@ -61,6 +64,7 @@ class KidWebViewManager(private val webView: WebView) {
         settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
     }
 
+    @SuppressLint("JavascriptInterface")
     fun addInterface(obj: Any, name: String) {
         webView.addJavascriptInterface(obj, name)
     }
