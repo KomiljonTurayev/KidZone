@@ -35,27 +35,6 @@ public class ParentalStatsManagerTest {
     }
 
     @Test
-    public void isTimeLimitReached_limitZero_alwaysFalse() {
-        mgr.setTimeLimitMinutes(0);
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 999).commit();
-        assertFalse(mgr.isTimeLimitReached());
-    }
-
-    @Test
-    public void isTimeLimitReached_belowLimit_false() {
-        mgr.setTimeLimitMinutes(30);
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 29).commit();
-        assertFalse(mgr.isTimeLimitReached());
-    }
-
-    @Test
-    public void isTimeLimitReached_atLimit_true() {
-        mgr.setTimeLimitMinutes(30);
-        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 30).commit();
-        assertTrue(mgr.isTimeLimitReached());
-    }
-
-    @Test
     public void onGameLaunched_noDuplicatesWithinDay() {
         mgr.onGameLaunched("story-001");
         mgr.onGameLaunched("story-001");
@@ -78,12 +57,6 @@ public class ParentalStatsManagerTest {
     public void getWeeklyMinutes_todayAtIndex6() {
         prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 45).commit();
         assertEquals(45, mgr.getWeeklyMinutes()[6]);
-    }
-
-    @Test
-    public void setTimeLimitMinutes_negativeClampedToZero() {
-        mgr.setTimeLimitMinutes(-10);
-        assertEquals(0, mgr.getTimeLimitMinutes());
     }
 
     @Test
@@ -128,5 +101,23 @@ public class ParentalStatsManagerTest {
     public void getSessionMinutes_afterSessionStart_subMinuteIsZero() {
         mgr.onSessionStart();
         assertEquals(0, mgr.getSessionMinutes()); // sub-minute elapsed = 0
+    }
+
+    // --- getTodaySeconds ---
+
+    @Test
+    public void getTodaySeconds_noData_returnsZero() {
+        assertEquals(0L, mgr.getTodaySeconds());
+    }
+
+    @Test
+    public void getTodaySeconds_savedMinutesOnly_convertsToSeconds() {
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 5).commit();
+        assertEquals(300L, mgr.getTodaySeconds());
+    }
+
+    @Test
+    public void getTodaySeconds_beforeSessionStart_ignoresElapsedTime() {
+        assertEquals(0L, mgr.getTodaySeconds());
     }
 }

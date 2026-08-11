@@ -30,7 +30,6 @@ class ParentalStatsManager {
 
     private val prefs: SharedPreferences
     private val profileId: String
-    private val timeLimitKey: String
     private var sessionStartMs: Long = 0L
     private val sessionGames: MutableList<String> = mutableListOf()
 
@@ -40,7 +39,6 @@ class ParentalStatsManager {
     internal constructor(prefs: SharedPreferences, profileId: String = "default") {
         this.prefs = prefs
         this.profileId = profileId
-        this.timeLimitKey = "${profileId}_kz_time_limit"
     }
 
     fun onSessionStart() {
@@ -113,15 +111,4 @@ class ParentalStatsManager {
 
     fun getTodayGames(): List<String> =
         parseList(prefs.getString(todayGlKey(profileId), "") ?: "")
-
-    fun getTimeLimitMinutes(): Int = prefs.getInt(timeLimitKey, 0)
-
-    fun setTimeLimitMinutes(minutes: Int) {
-        prefs.edit().putInt(timeLimitKey, maxOf(0, minutes)).apply()
-    }
-
-    fun isTimeLimitReached(): Boolean {
-        val limit = getTimeLimitMinutes()
-        return limit > 0 && getTodayMinutes() >= limit
-    }
 }
