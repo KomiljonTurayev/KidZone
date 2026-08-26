@@ -3,6 +3,7 @@ package uz.kidzone.app.ui
 import android.app.Activity
 import android.content.SharedPreferences
 import android.net.Uri
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebView
 import java.lang.ref.WeakReference
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -132,7 +134,11 @@ fun MainScreen(
     // statusBarsPadding(): kartani tepadagi tizim swipe-gesture zonasidan chiqaradi, aks holda "O'ynash" tugmasi immersive rejimda bosilmaydi
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
-    Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+    // imePadding(): without it, Compose doesn't shrink the WebView for the on-screen
+    // keyboard (edge-to-edge + adjustResize alone doesn't propagate into a Compose-hosted
+    // WebView) — the WebView's own position:fixed bottom sheets (e.g. the Personal Story
+    // modal's inputs) then stay anchored below where the keyboard covers them.
+    Column(modifier = Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -150,10 +156,8 @@ fun MainScreen(
                     val mgr = KidWebViewManager(this)
                     val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
                     val age = prefs.getString("kz_age", "2-4") ?: "2-4"
-                    mgr.setup(
-                        NativeBridge(mainViewModel, onOpenDashboard, mgr::evaluateJavascript, context as Activity),
-                        "AndroidBridge",
-                    )
+                    val nativeBridge = NativeBridge(mainViewModel, onOpenDashboard, mgr::evaluateJavascript, context as Activity)
+                    mgr.setup(nativeBridge, "AndroidBridge")
                     mgr.addInterface(
                         ChallengeBridge(challengeViewModel, context),
                         "AndroidChallenge",
@@ -171,7 +175,10 @@ fun MainScreen(
                     webMgrRef.value = mgr
                     addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
                         override fun onViewAttachedToWindow(v: android.view.View) {}
-                        override fun onViewDetachedFromWindow(v: android.view.View) { mgr.destroy() }
+                        override fun onViewDetachedFromWindow(v: android.view.View) {
+                            mgr.destroy()
+                            nativeBridge.shutdownTts()
+                        }
                     })
                 }
             },
@@ -459,6 +466,144 @@ private class NativeBridge(
         this.activity.get()?.runOnUiThread(block)
     }
 
+    // Native TTS instead of the WebView's own window.speechSynthesis: that API is
+    // present in the WebView's JS engine but frequently returns zero voices / speaks
+    // nothing on real devices (esp. MIUI), with no error surfaced to JS either.
+    // android.speech.tts.TextToSpeech talks to the OS engine directly and is reliable.
+    private var tts: android.speech.tts.TextToSpeech? = null
+    private var ttsReady = false
+
+    init {
+        val ctx = this.activity.get()
+        if (ctx != null) {
+            tts = android.speech.tts.TextToSpeech(ctx) { status ->
+                ttsReady = status == android.speech.tts.TextToSpeech.SUCCESS
+                if (ttsReady) {
+                    tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+                        override fun onStart(utteranceId: String?) {
+                            onMain { evalJs("window.onNativeSpeechStart && window.onNativeSpeechStart()") }
+                        }
+                        override fun onDone(utteranceId: String?) {
+                            onMain { evalJs("window.onNativeSpeechEnd && window.onNativeSpeechEnd()") }
+                        }
+                        @Deprecated("Deprecated in Java, still the only overload called on API < 21 engines")
+                        override fun onError(utteranceId: String?) {
+                            onMain { evalJs("window.onNativeSpeechEnd && window.onNativeSpeechEnd()") }
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    private var currentPlayer: android.media.MediaPlayer? = null
+
+    @android.webkit.JavascriptInterface
+    fun speakText(text: String, lang: String) {
+        if (lang != "uz") {
+            // Russian/English already get a real native OS voice (confirmed via
+            // isLanguageAvailable) — no need for the cloud round-trip there.
+            onMain { speakOnDevice(text, lang) }
+            return
+        }
+        // Aisha AI "Navoiy TTS" (Gulnoza voice) — the only source of genuine Uzbek
+        // pronunciation, since no on-device engine ships an Uzbek voice and Firebase
+        // AI Logic's Gemini TTS rejects requests from this app's pinned older SDK.
+        // Falls back to on-device TTS (Turkish-for-Uzbek approximation) on any failure.
+        val cacheDir = activity.get()?.cacheDir
+        scope.launch {
+            val audioFile = uz.kidzone.app.ai.AishaSpeechGenerator.synthesize(text, cacheDir)
+            val played = audioFile != null && playAudioFile(audioFile)
+            if (!played) onMain { speakOnDevice(text, lang) }
+        }
+    }
+
+    private fun playAudioFile(file: java.io.File): Boolean {
+        return try {
+            currentPlayer?.let { it.stop(); it.release() }
+            val player = android.media.MediaPlayer()
+            player.setAudioAttributes(
+                android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build(),
+            )
+            player.setDataSource(file.absolutePath)
+            player.setOnCompletionListener {
+                onMain { evalJs("window.onNativeSpeechEnd && window.onNativeSpeechEnd()") }
+                if (currentPlayer === it) currentPlayer = null
+                it.release()
+                file.delete()
+            }
+            player.setOnErrorListener { p, _, _ ->
+                onMain { evalJs("window.onNativeSpeechEnd && window.onNativeSpeechEnd()") }
+                if (currentPlayer === p) currentPlayer = null
+                p.release()
+                file.delete()
+                true
+            }
+            player.prepare()
+            currentPlayer = player
+            onMain { evalJs("window.onNativeSpeechStart && window.onNativeSpeechStart()") }
+            player.start()
+            true
+        } catch (e: Exception) {
+            Log.w("NativeBridge", "Cloud audio playback failed: ${e.message}")
+            false
+        }
+    }
+
+    private fun speakOnDevice(text: String, lang: String) {
+        val engine = tts
+        if (engine == null || !ttsReady) {
+            // No TTS engine on this device (or it's still initializing) — let the
+            // WebView fall back to window.speechSynthesis instead of staying silent.
+            evalJs("window.onNativeSpeechError && window.onNativeSpeechError()")
+            return
+        }
+        val locale = when (lang) {
+            "ru" -> java.util.Locale("ru", "RU")
+            "en" -> java.util.Locale.US
+            else -> java.util.Locale("uz", "UZ")
+        }
+        fun unsupported(r: Int) =
+            r == android.speech.tts.TextToSpeech.LANG_MISSING_DATA ||
+                r == android.speech.tts.TextToSpeech.LANG_NOT_SUPPORTED
+
+        var result = engine.setLanguage(locale)
+        if (lang != "ru" && lang != "en" && unsupported(result)) {
+            // No Android TTS engine ships an Uzbek voice (confirmed against
+            // Google's engine — "uz"/"uz-UZ" aren't in its supported set at all).
+            // Turkish is the closest available: same Turkic family and Latin
+            // script, so it reads Uzbek Latin text far more naturally than
+            // Russian's fallback did. Russian stays as a last resort in case a
+            // future/alternate engine only ships that one.
+            result = engine.setLanguage(java.util.Locale("tr", "TR"))
+            if (unsupported(result)) result = engine.setLanguage(java.util.Locale("ru", "RU"))
+        }
+        if (unsupported(result)) {
+            engine.setLanguage(java.util.Locale.getDefault())
+        }
+        engine.stop()
+        engine.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "kidzoStory")
+    }
+
+    @android.webkit.JavascriptInterface
+    fun stopSpeaking() {
+        onMain {
+            tts?.stop()
+            currentPlayer?.let { it.stop(); it.release() }
+            currentPlayer = null
+        }
+    }
+
+    fun shutdownTts() {
+        tts?.shutdown()
+        tts = null
+        currentPlayer?.let { it.stop(); it.release() }
+        currentPlayer = null
+    }
+
     @android.webkit.JavascriptInterface
     fun showBanner() {
         onMain {
@@ -502,9 +647,9 @@ private class NativeBridge(
     }
 
     @android.webkit.JavascriptInterface
-    fun generateStory(lang: String, ageRange: String) {
+    fun generateStory(lang: String, ageRange: String, childName: String, scenario: String) {
         scope.launch {
-            val story = StoryGenerator.generate(lang, ageRange)
+            val story = StoryGenerator.generate(lang, ageRange, childName, scenario)
             onMain {
                 if (story != null) {
                     val payload = JSONObject().put("title", story.title).put("text", story.text).toString()

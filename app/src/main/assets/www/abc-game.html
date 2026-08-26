@@ -176,6 +176,12 @@ const DATA = {
 ═══════════════════════════════════════════════ */
 const engine = new KidZoneGame({id:'abc'});
 const LANG = engine.lang || 'en';
+// Which alphabet to test is a separate choice from the UI language: the home
+// screen has three distinct cards ("O'zbek/Rus/Ingliz Alifbosi") that all used
+// to point at this file with only ?lang= set, so all three silently quizzed
+// whichever alphabet matched the app's current UI language. ?id= carries the
+// card's actual choice; UI text still follows LANG.
+const ABC_LANG = engine._getQueryParam('id') || LANG;
 KidUI.init({ title: "ABC Game", icon: "🔤", color: "#EF5350", gameId: "abc_game", lang: LANG });
 
 const T = {
@@ -202,12 +208,12 @@ function t(k){ return T[k][LANG] || T[k]['en']; }
    STATE
 ═══════════════════════════════════════════════ */
 const GAME_ID = 'abc';
-const POOL = DATA[LANG] || DATA.en;
+const POOL = DATA[ABC_LANG] || DATA.en;
 
 /* all unique letters in pool (for building wrong choices) */
-const ALL_LETTERS = LANG === 'ru'
+const ALL_LETTERS = ABC_LANG === 'ru'
   ? "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".split('')
-  : LANG === 'uz'
+  : ABC_LANG === 'uz'
     ? "ABDEFGHIJKLMNOQRSTUVXYZ".split('')
     : "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
 

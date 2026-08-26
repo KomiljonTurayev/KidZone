@@ -357,6 +357,12 @@ const CS_LANG = new URLSearchParams(location.search).get('lang')
 KidUI.init({ title: "Colors & Shapes", icon: "🌈", color: "#F9A825", gameId: "colors_shapes", lang: CS_LANG });
 let _kzLevel = 1, _kzCfg = null, _kzHint = null, _kzLives = null, _kzTimer = null;
 
+// "Rang & Shakl" and "Geometrik Shakllar" are two separate home-screen cards
+// that both used to point here with no way to tell them apart, so both just
+// followed the saved level's auto-picked mode. ?mode= locks the starting tab
+// to what the card promised; omitted keeps the level-based auto mode.
+const CS_MODE = new URLSearchParams(location.search).get('mode');
+
 function modeForLevel(lv) {
   if (lv <= 6)  return 'color';
   if (lv <= 13) return 'shape';
@@ -724,7 +730,8 @@ function confetti() {
 function startGame() {
   initKZL();
   totalQ = _kzCfg.q;
-  setMode(modeForLevel(_kzLevel));
+  const forcedMode = ['color','shape','mix'].includes(CS_MODE) ? CS_MODE : null;
+  setMode(forcedMode || modeForLevel(_kzLevel));
   score=0; qNum=0; correctCount=0;
   document.getElementById("score").textContent="0";
   document.getElementById("prog-inner").style.width="0%";

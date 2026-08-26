@@ -695,7 +695,7 @@ class GameManager {
 
     // ── AI STUDIO LOGIC ──
 
-    generateAiStory() {
+    generateAiStory(childName, scenario) {
         if (this._aiStoryPending) return;
 
         const viewer = document.getElementById("ai-viewer");
@@ -709,11 +709,12 @@ class GameManager {
 
         if (window.AndroidBridge && window.AndroidBridge.generateStory) {
             this._aiStoryPending = true;
-            window.AndroidBridge.generateStory(this.translator.lang, this.age);
+            window.AndroidBridge.generateStory(this.translator.lang, this.age, childName || "", scenario || "");
             return;
         }
 
         // No native bridge (e.g. a plain browser preview) — use the offline pool directly.
+        // Personalization needs the real model, so a name/scenario here is silently ignored.
         setTimeout(() => this._showAiStory(this.getAiStory(this.translator.lang)), 500);
     }
 
@@ -732,13 +733,28 @@ class GameManager {
     closeAi() {
         document.getElementById("ai-viewer").classList.add("h");
         document.getElementById('aiv-regen-btn').classList.add('h');
-        window.speechSynthesis?.cancel();
+        if (window.AndroidBridge && window.AndroidBridge.stopSpeaking) {
+            window.AndroidBridge.stopSpeaking();
+        } else {
+            window.speechSynthesis?.cancel();
+        }
+        this._nativeSpeaking = false;
         const btn = document.getElementById("ai-read-btn");
         if (btn) btn.querySelector('span').textContent = "🔊";
     }
 
     speakStory() {
         const btn = document.getElementById("ai-read-btn");
+        if (window.AndroidBridge && window.AndroidBridge.speakText) {
+            if (this._nativeSpeaking) {
+                window.AndroidBridge.stopSpeaking && window.AndroidBridge.stopSpeaking();
+                this._nativeSpeaking = false;
+                if (btn) btn.querySelector('span').textContent = "🔊";
+                return;
+            }
+            this._doSpeak();
+            return;
+        }
         if (window.speechSynthesis?.speaking) {
             window.speechSynthesis.cancel();
             if (btn) btn.querySelector('span').textContent = "🔊";
@@ -748,9 +764,23 @@ class GameManager {
     }
 
     _doSpeak() {
+        const text = document.getElementById("aiv-content")?.textContent;
+        if (!text || text.trim().length < 3) return;
+
+        // Native Android TTS is far more reliable than the WebView's own
+        // window.speechSynthesis (which often reports zero voices / speaks nothing
+        // on real devices). window.onNativeSpeechError falls back to _doSpeakWeb().
+        if (window.AndroidBridge && window.AndroidBridge.speakText) {
+            window.AndroidBridge.speakText(text, this.translator.lang);
+            return;
+        }
+        this._doSpeakWeb(text);
+    }
+
+    _doSpeakWeb(text) {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
-        const text = document.getElementById("aiv-content")?.textContent;
+        text = text || document.getElementById("aiv-content")?.textContent;
         if (!text || text.trim().length < 3) return;
         const btn = document.getElementById("ai-read-btn");
         const lang = this.translator.lang;
@@ -1214,6 +1244,22 @@ window.addEventListener("load", () => {
     window.onAiStoryError = function() {
         app._aiStoryPending = false;
         app._showAiStory(app.getAiStory(app.translator.lang));
+    };
+
+    // NativeBridge.speakText(...) callbacks (see _doSpeak in GameManager).
+    window.onNativeSpeechStart = function() {
+        app._nativeSpeaking = true;
+        const btn = document.getElementById("ai-read-btn");
+        if (btn) btn.querySelector('span').textContent = "⏹️";
+    };
+    window.onNativeSpeechEnd = function() {
+        app._nativeSpeaking = false;
+        const btn = document.getElementById("ai-read-btn");
+        if (btn) btn.querySelector('span').textContent = "🔊";
+    };
+    window.onNativeSpeechError = function() {
+        app._nativeSpeaking = false;
+        app._doSpeakWeb();
     };
 
     // Restore last active tab

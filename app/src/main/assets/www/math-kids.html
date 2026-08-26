@@ -123,6 +123,13 @@ const LANG = new URLSearchParams(location.search).get('lang')
              : navigator.language.startsWith('en') ? 'en' : 'uz');
 KidUI.init({ title: "Math Kids", icon: "🔢", color: "#1E88E5", gameId: "math_kids", lang: LANG });
 
+// "Raqamlar/Qo'shish/Ayirish" are three separate home-screen cards that all used
+// to point at this file with no way to tell them apart, so every one of them
+// showed the same level-mixed +/-/×/÷ progression. ?mode= locks the operation
+// to what the card promised; omitted (the "Raqamlar" card) keeps the mixed
+// level-based progression as before.
+const MODE = new URLSearchParams(location.search).get('mode');
+
 const T = {
   title:    {uz:"Matematika",         ru:"Математика",          en:"Math Kids"},
   label:    {uz:"MATEMATIKA",         ru:"МАТЕМАТИКА",          en:"MATH CHALLENGE"},
@@ -175,7 +182,10 @@ const MATH_CFG = [
    QUESTION GENERATOR
 ═══════════════════════════════════════════════ */
 function genQuestion(mcfg) {
-  const op = mcfg.ops[Math.floor(Math.random() * mcfg.ops.length)];
+  const opsPool = MODE === 'addition' ? ['+']
+                : MODE === 'subtraction' ? ['-']
+                : mcfg.ops;
+  const op = opsPool[Math.floor(Math.random() * opsPool.length)];
   let a, b, ans, text;
 
   if (op === '+') {

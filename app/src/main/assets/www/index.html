@@ -171,16 +171,26 @@
       border-radius:10px; font-size:10px; font-weight:900; text-transform:uppercase;
     }
     .ai-title{font-family:'Fredoka One',cursive; font-size:20px}
-    .ai-btns{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .ai-btns{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
     .ai-btn{
       background:white; color:#3F51B5; border:none; border-radius:16px;
-      padding:12px; display:flex; flex-direction:column; align-items:center;
+      padding:10px 6px; display:flex; flex-direction:column; align-items:center;
       gap:6px; cursor:pointer; transition:transform 0.2s var(--spring);
       box-shadow:0 4px 0 #CBD5E0;
     }
     .ai-btn:active{transform:translateY(3px); box-shadow:none}
-    .ai-btn-ic{font-size:24px}
-    .ai-btn-lb{font-size:12px; font-weight:800}
+    .ai-btn-ic{font-size:22px}
+    .ai-btn-lb{font-size:11px; font-weight:800; text-align:center}
+
+    /* ── PERSONAL STORY MODAL ── */
+    .ps-label{font-size:12px; font-weight:800; color:var(--dim); margin-bottom:6px; display:block}
+    .ps-input, .ps-textarea{
+      width:100%; padding:12px; border:2px solid #EEE; border-radius:12px;
+      font-size:15px; margin-bottom:14px; box-sizing:border-box;
+      font-family:'Nunito',sans-serif; color:var(--text);
+    }
+    .ps-textarea{resize:none; min-height:70px}
+    .ps-hint{font-size:11px; color:var(--dim); margin:-8px 0 14px}
 
     /* ── AI STORY VIEWER ── */
     #ai-viewer{
@@ -957,6 +967,21 @@
   <iframe id="gv-frame" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
 </div>
 
+  <!-- PERSONAL STORY MODAL -->
+<div class="modal-overlay h" id="ps-modal" onclick="closePersonalStory()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="ps-title">👶 Shaxsiy Ertak</div>
+    <span class="ps-label" id="ps-name-label">Bolaning ismi (ixtiyoriy)</span>
+    <input class="ps-input" type="text" id="ps-name-input" maxlength="30">
+    <span class="ps-label" id="ps-scenario-label">Voqea yoki mavzu (ixtiyoriy)</span>
+    <textarea class="ps-textarea" id="ps-scenario-input" maxlength="200"></textarea>
+    <div class="ps-hint" id="ps-hint">Bo'sh qoldirsangiz, oddiy ertak yaratiladi</div>
+    <button class="btn-primary" onclick="submitPersonalStory()" id="ps-submit-btn">✨ Ertak yaratish</button>
+    <button class="btn-outlined" onclick="closePersonalStory()" id="ps-cancel-btn">Bekor qilish</button>
+  </div>
+</div>
+
   <!-- AI VIEWER -->
 <div id="ai-viewer" class="h">
   <div class="aiv-hdr">
@@ -1079,6 +1104,10 @@
         <button class="ai-btn" onclick="generateAiStory()">
           <span class="ai-btn-ic">📚</span>
           <span class="ai-btn-lb" id="ai-btn-story">Ertak To'qish</span>
+        </button>
+        <button class="ai-btn" onclick="openPersonalStory()">
+          <span class="ai-btn-ic">👶</span>
+          <span class="ai-btn-lb" id="ai-btn-personal">Shaxsiy Ertak</span>
         </button>
         <button class="ai-btn" onclick="openAiMusic()">
           <span class="ai-btn-ic">🎵</span>
@@ -1235,18 +1264,18 @@
       // ── LEARN ───────────────────────────────────────
       {id:"animals",    em:"🐾", name:{uz:"Hayvonlar", ru:"Животные", en:"Animals"},      cat:"learn",  age:"2+", tag:{uz:"Ta'lim", ru:"Обучение", en:"Learn"},  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
       {id:"colors",     em:"🌈", name:{uz:"Rang & Shakl", ru:"Цвета и формы", en:"Colors & Shapes"},   cat:"colors", age:"2+", tag:{uz:"Ranglar", ru:"Цвета", en:"Colors"}, tc:"#FF9800", bg:"linear-gradient(135deg,#FFF3E0,#FFE0B2)", stars:5, plays:"10K", badge:"hot", file:"colors-shapes.html", pts:20},
-      {id:"abc-uz",     em:"🔤", name:{uz:"O'zbek Alifbosi", ru:"Узбекский алфавит", en:"Uzbek Alphabet"}, cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-game.html", pts:25},
-      {id:"abc-ru",     em:"А", name:{uz:"Rus Alifbosi", ru:"Русский алфавит", en:"Russian Alphabet"},    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-game.html", pts:25},
-      {id:"abc-en",     em:"🔡", name:{uz:"Ingliz ABC", ru:"Английский ABC", en:"English ABC"},     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-game.html", pts:25},
+      {id:"abc-uz",     em:"🔤", name:{uz:"O'zbek Alifbosi", ru:"Узбекский алфавит", en:"Uzbek Alphabet"}, cat:"learn", age:"3+", tag:"Til",     tc:"#2196F3", bg:"linear-gradient(135deg,#E3F2FD,#BBDEFB)", stars:4, plays:"8K",  badge:"new", file:"abc-game.html?id=uz", pts:25},
+      {id:"abc-ru",     em:"А", name:{uz:"Rus Alifbosi", ru:"Русский алфавит", en:"Russian Alphabet"},    cat:"learn",  age:"4+", tag:"Til",     tc:"#F44336", bg:"linear-gradient(135deg,#FFEBEE,#FFCDD2)", stars:4, plays:"7K",  badge:"new", file:"abc-game.html?id=ru", pts:25},
+      {id:"abc-en",     em:"🔡", name:{uz:"Ingliz ABC", ru:"Английский ABC", en:"English ABC"},     cat:"learn",  age:"4+", tag:"Til",     tc:"#3F51B5", bg:"linear-gradient(135deg,#E8EAF6,#C5CAE9)", stars:4, plays:"9K",  badge:null,  file:"abc-game.html?id=en", pts:25},
       {id:"body",       em:"👁️", name:{uz:"Tana A'zolari", ru:"Части тела", en:"Body Parts"},  cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#E91E63", bg:"linear-gradient(135deg,#FCE4EC,#F8BBD0)", stars:4, plays:"6K",  badge:null,  file:"body.html", pts:20},
       {id:"fruits",     em:"🍎", name:{uz:"Meva & Sabzavot", ru:"Фрукты и овощи", en:"Fruits & Veggies"},cat:"learn",  age:"2+", tag:"Ta'lim",  tc:"#FF5722", bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:5, plays:"11K", badge:"hot", file:"fruits.html", pts:20},
       {id:"transport",  em:"🚗", name:{uz:"Transport", ru:"Транспорт", en:"Transport"},      cat:"learn",  age:"3+", tag:"Ta'lim",  tc:"#607D8B", bg:"linear-gradient(135deg,#ECEFF1,#CFD8DC)", stars:4, plays:"5K",  badge:null,  file:"transport.html", pts:20},
 
       // ── MATH ─────────────────────────────────────────
       {id:"math",       em:"🔢", name:{uz:"Raqamlar", ru:"Цифры", en:"Numbers"},       cat:"math",   age:"3+", tag:"Matematik",tc:"#9C27B0",bg:"linear-gradient(135deg,#F3E5F5,#E1BEE7)", stars:5, plays:"9K",  badge:"hot", file:"math-kids.html", pts:30},
-      {id:"counting",   em:"➕", name:{uz:"Qo'shish", ru:"Сложение", en:"Addition"},       cat:"math",   age:"4+", tag:"Matematik",tc:"#00BCD4",bg:"linear-gradient(135deg,#E0F7FA,#B2EBF2)", stars:4, plays:"7K",  badge:null,  file:"math-kids.html", pts:30},
-      {id:"subtract",   em:"➖", name:{uz:"Ayirish", ru:"Вычитание", en:"Subtraction"},         cat:"math",   age:"5+", tag:"Matematik",tc:"#FF5722",bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:4, plays:"5K",  badge:null,  file:"math-kids.html", pts:30},
-      {id:"shapes3d",   em:"🔷", name:{uz:"Geometrik Shakllar", ru:"Геометрические фигуры", en:"Geometric Shapes"},cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:"colors-shapes.html", pts:25},
+      {id:"counting",   em:"➕", name:{uz:"Qo'shish", ru:"Сложение", en:"Addition"},       cat:"math",   age:"4+", tag:"Matematik",tc:"#00BCD4",bg:"linear-gradient(135deg,#E0F7FA,#B2EBF2)", stars:4, plays:"7K",  badge:null,  file:"math-kids.html?mode=addition", pts:30},
+      {id:"subtract",   em:"➖", name:{uz:"Ayirish", ru:"Вычитание", en:"Subtraction"},         cat:"math",   age:"5+", tag:"Matematik",tc:"#FF5722",bg:"linear-gradient(135deg,#FBE9E7,#FFCCBC)", stars:4, plays:"5K",  badge:null,  file:"math-kids.html?mode=subtraction", pts:30},
+      {id:"shapes3d",   em:"🔷", name:{uz:"Geometrik Shakllar", ru:"Геометрические фигуры", en:"Geometric Shapes"},cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:"colors-shapes.html?mode=shape", pts:25},
       {id:"shape-match", em:"🔷", name:{uz:"Shakllarni Moslashtir", ru:"Подбери форму", en:"Shape Match"}, cat:"learn", age:"4+", tag:{uz:"Shakllar", ru:"Фигуры", en:"Shapes"}, tc:"#6C63FF", bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)", stars:4, plays:"0", badge:"new", file:"shape-match.html", pts:25},
       {id:"clock",      em:"⏰", name:{uz:"Soat O'qish", ru:"Учимся определять время", en:"Learn to Read Clock"},    cat:"math",   age:"6+", tag:"Matematik",tc:"#795548",bg:"linear-gradient(135deg,#EFEBE9,#D7CCC8)", stars:3, plays:"3K",  badge:"pro", file:"clock.html", pts:35},
       {id:"money",      em:"💰", name:{uz:"Pul Sanoq", ru:"Счет денег", en:"Counting Money"},      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:"math-kids.html", pts:40},
@@ -1315,6 +1344,15 @@
         aiLoading: "AI ertak to'qimoqda...",
         aiRead: "Eshittirish",
         aiRegen: "Yangi ertak",
+        aiBtnPersonal: "Shaxsiy Ertak",
+        psTitle: "👶 Shaxsiy Ertak",
+        psNameLabel: "Bolaning ismi (ixtiyoriy)",
+        psNamePlaceholder: "Masalan: Amira",
+        psScenarioLabel: "Voqea yoki mavzu (ixtiyoriy)",
+        psScenarioPlaceholder: "Masalan: o'rmonda sayohat qilgan jasur mushukcha haqida",
+        psHint: "Bo'sh qoldirsangiz, oddiy ertak yaratiladi",
+        psSubmitBtn: "✨ Ertak yaratish",
+        psCancelBtn: "Bekor qilish",
         parentModeUnlocked: "Ota-ona rejimi ochildi!",
         wrongPin: "PIN noto'g'ri! (Maslahat: 1234)",
         exit_title: "O'yinni tark etish",
@@ -1369,6 +1407,15 @@
         aiLoading: "AI сочиняет сказку...",
         aiRead: "Слушать",
         aiRegen: "Новая сказка",
+        aiBtnPersonal: "Именная Сказка",
+        psTitle: "👶 Именная Сказка",
+        psNameLabel: "Имя ребёнка (необязательно)",
+        psNamePlaceholder: "Например: Амира",
+        psScenarioLabel: "Сюжет или тема (необязательно)",
+        psScenarioPlaceholder: "Например: про храброго котёнка, который путешествовал по лесу",
+        psHint: "Если оставить пустым, будет создана обычная сказка",
+        psSubmitBtn: "✨ Создать сказку",
+        psCancelBtn: "Отмена",
         parentModeUnlocked: "Родительский режим разблокирован!",
         wrongPin: "Неверный PIN! (Подсказка: 1234)",
         exit_title: "Выход из игры",
@@ -1423,6 +1470,15 @@
         aiLoading: "AI is creating a story...",
         aiRead: "Listen",
         aiRegen: "New Story",
+        aiBtnPersonal: "Personal Story",
+        psTitle: "👶 Personal Story",
+        psNameLabel: "Child's name (optional)",
+        psNamePlaceholder: "e.g. Amira",
+        psScenarioLabel: "Scenario or topic (optional)",
+        psScenarioPlaceholder: "e.g. a brave kitten who traveled through the forest",
+        psHint: "Leave it blank for a regular story",
+        psSubmitBtn: "✨ Create Story",
+        psCancelBtn: "Cancel",
         parentModeUnlocked: "Parent mode unlocked!",
         wrongPin: "Wrong PIN! (Hint: 1234)",
         exit_title: "Exit Game",
@@ -1466,6 +1522,18 @@
     function closeLyrics() { document.getElementById('lyrics-viewer').classList.add('h'); }
     function speakStory() { app.speakStory(); }
     function openAiMusic() { app.openAiMusic(); }
+    function openPersonalStory() {
+      document.getElementById('ps-name-input').value = '';
+      document.getElementById('ps-scenario-input').value = '';
+      document.getElementById('ps-modal').classList.remove('h');
+    }
+    function closePersonalStory() { document.getElementById('ps-modal').classList.add('h'); }
+    function submitPersonalStory() {
+      const name = document.getElementById('ps-name-input').value.trim().slice(0, 30);
+      const scenario = document.getElementById('ps-scenario-input').value.trim().slice(0, 200);
+      document.getElementById('ps-modal').classList.add('h');
+      app.generateAiStory(name, scenario);
+    }
 
     function openBadges() {
       document.getElementById('badges-overlay').classList.remove('h');
@@ -1703,9 +1771,20 @@
         document.getElementById("ai-studio-title").textContent = t.aiStudioTitle;
         document.getElementById("ai-btn-story").textContent = t.aiBtnStory;
         document.getElementById("ai-btn-music").textContent = t.aiBtnMusic;
+        document.getElementById("ai-btn-personal").textContent = t.aiBtnPersonal;
         document.getElementById("ai-loading-text").textContent = t.aiLoading;
         document.getElementById("ai-read-label").textContent = t.aiRead;
         document.getElementById("ai-regen-label").textContent = t.aiRegen;
+
+        // Personal Story modal
+        document.getElementById("ps-title").textContent = t.psTitle;
+        document.getElementById("ps-name-label").textContent = t.psNameLabel;
+        document.getElementById("ps-name-input").placeholder = t.psNamePlaceholder;
+        document.getElementById("ps-scenario-label").textContent = t.psScenarioLabel;
+        document.getElementById("ps-scenario-input").placeholder = t.psScenarioPlaceholder;
+        document.getElementById("ps-hint").textContent = t.psHint;
+        document.getElementById("ps-submit-btn").textContent = t.psSubmitBtn;
+        document.getElementById("ps-cancel-btn").textContent = t.psCancelBtn;
 
         // Age cards
         const acRange = document.querySelectorAll('.age-card .ac-range');

@@ -13,6 +13,13 @@ android {
     def keystoreFile = file('keystore.properties')
     if (keystoreFile.exists()) keystoreProps.load(new FileInputStream(keystoreFile))
 
+    // Aisha AI "Navoiy TTS" API key — kept out of source control (local.properties
+    // is gitignored), same pattern as sdk.dir. CI can inject it via env instead.
+    def localProps = new Properties()
+    def localPropsFile = rootProject.file('local.properties')
+    if (localPropsFile.exists()) localProps.load(new FileInputStream(localPropsFile))
+    def aishaTtsApiKey = System.getenv("AISHA_TTS_API_KEY") ?: localProps.getProperty('AISHA_TTS_API_KEY', '')
+
     signingConfigs {
         release {
             def envKeystore = System.getenv("KEYSTORE_FILE")
@@ -39,6 +46,7 @@ android {
         versionName  project.hasProperty('versionName')  ? project.versionName               : "1.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "AISHA_TTS_API_KEY", "\"${aishaTtsApiKey}\""
     }
 
     buildTypes {
