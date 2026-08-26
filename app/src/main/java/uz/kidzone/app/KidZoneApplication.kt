@@ -37,6 +37,7 @@ class KidZoneApplication : Application() {
         if (BuildConfig.DEBUG) {
             FirebaseFirestore.setLoggingEnabled(true)
         }
+        DebugAppCheckInit.install()
 
         try {
             val auth = FirebaseAuth.getInstance()

@@ -47,7 +47,12 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.screens.PinGate
 import androidx.compose.ui.Alignment
@@ -71,6 +76,7 @@ import kotlin.math.roundToInt
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
+import uz.kidzone.app.ai.StoryGenerator
 import uz.kidzone.app.kidzo.ContentFilter
 import uz.kidzone.app.kidzo.KidzoAgent
 import uz.kidzone.app.ui.screens.KidzoSheet
@@ -145,7 +151,7 @@ fun MainScreen(
                     val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
                     val age = prefs.getString("kz_age", "2-4") ?: "2-4"
                     mgr.setup(
-                        NativeBridge(mainViewModel, onOpenDashboard, context as Activity),
+                        NativeBridge(mainViewModel, onOpenDashboard, mgr::evaluateJavascript, context as Activity),
                         "AndroidBridge",
                     )
                     mgr.addInterface(
@@ -443,9 +449,11 @@ fun MainScreen(
 private class NativeBridge(
     private val viewModel: MainViewModel,
     private val onOpenDashboard: () -> Unit,
+    private val evalJs: (String) -> Unit,
     activity: Activity,
 ) {
     private val activity = WeakReference(activity)
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private fun onMain(block: () -> Unit) {
         this.activity.get()?.runOnUiThread(block)
@@ -490,6 +498,21 @@ private class NativeBridge(
     fun gameLaunched(@Suppress("UNUSED_PARAMETER") gameId: String) {
         onMain {
             viewModel.setInGame(true)
+        }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun generateStory(lang: String, ageRange: String) {
+        scope.launch {
+            val story = StoryGenerator.generate(lang, ageRange)
+            onMain {
+                if (story != null) {
+                    val payload = JSONObject().put("title", story.title).put("text", story.text).toString()
+                    evalJs("window.onAiStoryReady(${JSONObject.quote(payload)})")
+                } else {
+                    evalJs("window.onAiStoryError && window.onAiStoryError()")
+                }
+            }
         }
     }
 }

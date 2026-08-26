@@ -696,6 +696,8 @@ class GameManager {
     // ── AI STUDIO LOGIC ──
 
     generateAiStory() {
+        if (this._aiStoryPending) return;
+
         const viewer = document.getElementById("ai-viewer");
         const loading = document.getElementById("aiv-loading");
         const content = document.getElementById("aiv-content-wrap");
@@ -705,26 +707,26 @@ class GameManager {
         loading.classList.remove("h");
         content.classList.add("h");
 
-        // Simulate AI thinking
-        setTimeout(() => {
-            const raw = window.kidAI
-              ? window.kidAI.retrieveStory(this.translator.lang, null)
-              : null;
-            const fallback = raw || this.getAiStory(this.translator.lang);
-            const story = fallback && typeof fallback.title === 'object'
-              ? { title: fallback.title[this.translator.lang] || fallback.title.en,
-                  text:  fallback.text[this.translator.lang]  || fallback.text.en  }
-              : fallback;
-            document.getElementById("aiv-story-title").textContent = story.title;
-            document.getElementById("aiv-content").textContent = story.text;
+        if (window.AndroidBridge && window.AndroidBridge.generateStory) {
+            this._aiStoryPending = true;
+            window.AndroidBridge.generateStory(this.translator.lang, this.age);
+            return;
+        }
 
-            loading.classList.add("h");
-            content.classList.remove("h");
-            this.addPoints(10);
+        // No native bridge (e.g. a plain browser preview) — use the offline pool directly.
+        setTimeout(() => this._showAiStory(this.getAiStory(this.translator.lang)), 500);
+    }
 
-            // Auto-read (2s timeout already passed — user may need to tap Listen manually on strict browsers)
-            this._doSpeak();
-        }, 2000);
+    _showAiStory(story) {
+        const loading = document.getElementById("aiv-loading");
+        const content = document.getElementById("aiv-content-wrap");
+        document.getElementById("aiv-story-title").textContent = story.title;
+        document.getElementById("aiv-content").textContent = story.text;
+
+        loading.classList.add("h");
+        content.classList.remove("h");
+        this.addPoints(10);
+        this._doSpeak();
     }
 
     closeAi() {
@@ -1197,6 +1199,21 @@ window.addEventListener("load", () => {
     window.onRewardGranted = function(amount) {
         app.addPoints(amount || 50);
         app.ui.showToast('🎁 +' + (amount || 50) + ' ⭐');
+    };
+
+    // AndroidBridge.generateStory(...) callbacks (see generateAiStory in GameManager) —
+    // error falls back to the offline story pool so a network hiccup never dead-ends the UI.
+    window.onAiStoryReady = function(payloadJson) {
+        app._aiStoryPending = false;
+        try {
+            app._showAiStory(JSON.parse(payloadJson));
+        } catch (e) {
+            app._showAiStory(app.getAiStory(app.translator.lang));
+        }
+    };
+    window.onAiStoryError = function() {
+        app._aiStoryPending = false;
+        app._showAiStory(app.getAiStory(app.translator.lang));
     };
 
     // Restore last active tab

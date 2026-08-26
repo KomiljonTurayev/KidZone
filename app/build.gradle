@@ -39,7 +39,6 @@ android {
         versionName  project.hasProperty('versionName')  ? project.versionName               : "1.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "GEMINI_API_KEY", "\"${project.findProperty('GEMINI_API_KEY') ?: ''}\""
     }
 
     buildTypes {
@@ -115,18 +114,24 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-messaging'
+    // Debug-only App Check provider so the AI Logic backend (which now enforces
+    // App Check) accepts requests from local/emulator builds without needing
+    // Play Integrity set up. Never shipped in release (see KidZoneApplication).
+    debugImplementation 'com.google.firebase:firebase-appcheck-debug'
+    // Kept off the BOM deliberately: bumping the BOM to a version that carries
+    // firebase-ai also drags firebase-auth/firestore/messaging up to builds
+    // compiled with a newer Kotlin than this project's 1.9.23, which fails
+    // compileDebugKotlin outright ("incompatible version of Kotlin" on
+    // firebase-auth-api). 16.0.0 is the oldest firebase-ai release and has the
+    // same API surface we use (generativeModel/Schema/HarmCategory/SafetySetting).
+    // Revisit once the project's Kotlin plugin is bumped.
+    implementation 'com.google.firebase:firebase-ai:16.0.0'
 
     // Material Design 3
     implementation 'com.google.android.material:material:1.12.0'
 
     // Splash Screen API
     implementation 'androidx.core:core-splashscreen:1.0.1'
-
-    // Google Generative AI (Gemini)
-    implementation 'com.google.ai.client.generativeai:generativeai:0.9.0'
-
-    // Guava for ListenableFuture support (often needed with Gemini in Java)
-    implementation 'com.google.guava:guava:33.0.0-android'
 
     // Jetpack Compose
     implementation platform('androidx.compose:compose-bom:2024.04.01')
