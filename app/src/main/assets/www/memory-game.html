@@ -267,35 +267,6 @@ body {
   }
 }
 
-/* ── ADMOB ZONES ── */
-/* Banner — bottom */
-#admob-banner {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: 60px;
-  background: rgba(5,5,20,0.97);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 20;
-}
-#admob-banner span { color: rgba(255,255,255,0.2); font-size: 11px; }
-
-/* TABLET: Side banner (landscape, wide screens) */
-@media (min-width: 1024px) and (orientation: landscape) {
-  #admob-side {
-    position: fixed; right: 0; top: 50%;
-    transform: translateY(-50%);
-    width: 160px; height: 600px;
-    background: rgba(5,5,20,0.9);
-    border-left: 1px solid rgba(255,255,255,0.06);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 20;
-    writing-mode: vertical-lr;
-    text-align: center;
-  }
-  #admob-side span { color: rgba(255,255,255,0.15); font-size: 11px; }
-  #app { padding-right: 160px; }
-}
-
 /* SCREENS */
 .screen {
   position: fixed; inset: 0; z-index: 100;
@@ -411,8 +382,6 @@ body {
 <link rel="stylesheet" href="kids-theme.css">
 <script src="kids-ui.js"></script>
 <script src="kz-ui.js"></script>
-<script src="admob.js"></script>
-<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 <script>
 /* ── I18N ── */
 const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
@@ -583,39 +552,6 @@ const t = T[lang] || T.en;
   </div>
 </div>
 
-<!-- ADMOB BANNER (bottom) -->
-<div id="admob-banner">
-  <!--
-    ✅ ADMOB INTEGRATION — Capacitor
-    BANNER:
-    await AdMob.showBanner({
-      adId: 'ca-app-pub-XXXXXXXX/XXXXXXXX',
-      adSize: AdMobBannerSize.BANNER,           // phone
-      adSize: AdMobBannerSize.LEADERBOARD,      // tablet (728x90)
-      position: BannerAdPosition.BOTTOM_CENTER,
-      isTesting: true
-    });
-    
-    TABLET BANNER:
-    const isTablet = window.innerWidth >= 600;
-    adSize: isTablet ? AdMobBannerSize.LEADERBOARD : AdMobBannerSize.BANNER
-    
-    INTERSTITIAL (o'yin tugaganda):
-    await AdMob.prepareInterstitial({ adId: '...', isTesting: true });
-    await AdMob.showInterstitial();
-    
-    REWARDED (hint uchun):
-    await AdMob.prepareRewardVideoAd({ adId: '...', isTesting: true });
-    await AdMob.showRewardVideoAd();
-  -->
-  <span>📢 AdMob Banner — Tablet: 728×90 Leaderboard | Phone: 320×50</span>
-</div>
-
-<!-- TABLET SIDE BANNER -->
-<div id="admob-side" style="display:none">
-  <span>📢 AdMob 160×600 Side Banner (Tablet only)</span>
-</div>
-
 <!-- START SCREEN -->
 <div class="screen" id="start-screen">
   <div class="modal">
@@ -674,50 +610,6 @@ const t = T[lang] || T.en;
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════
-// ADMOB — PLANSHET UCHUN TO'LIQ INTEGRATSIYA
-// ════════════════════════════════════════════════════════
-/*
-import { AdMob, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
-
-const isTablet = window.innerWidth >= 600;
-
-async function initAds() {
-  await AdMob.initialize({ testingDevices: ['YOUR_DEVICE_ID'] });
-  
-  // Banner: planshetda katta format
-  await AdMob.showBanner({
-    adId: isTablet
-      ? 'ca-app-pub-XXXXXXXX/TABLET_BANNER_ID'   // 728x90 Leaderboard
-      : 'ca-app-pub-XXXXXXXX/PHONE_BANNER_ID',    // 320x50 Banner
-    adSize: isTablet ? BannerAdSize.LEADERBOARD : BannerAdSize.BANNER,
-    position: BannerAdPosition.BOTTOM_CENTER,
-    isTesting: true
-  });
-  
-  // Tablet landscape: side banner ham ko'rsatish
-  if (isTablet && window.innerWidth > window.innerHeight) {
-    document.getElementById('admob-side').style.display = 'flex';
-  }
-}
-
-// Interstitial (o'yin tugaganda)
-async function showInterstitial() {
-  const opts = { adId: 'ca-app-pub-XXXXXXXX/INTERSTITIAL_ID', isTesting: true };
-  await AdMob.prepareInterstitial(opts);
-  await AdMob.showInterstitial();
-}
-
-// Rewarded (Hint tugmasi uchun — foydalanuvchi ixtiyoriy ko'radi)
-async function showRewarded(onRewarded) {
-  await AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-XXXXXXXX/REWARDED_ID', isTesting: true });
-  AdMob.addListener(RewardAdPluginEvents.Rewarded, onRewarded);
-  await AdMob.showRewardVideoAd();
-}
-
-initAds();
-*/
-
 // ════════════════════════════════════════════════════════
 // O'YIN KONFIGURATSIYASI
 // ════════════════════════════════════════════════════════
@@ -963,9 +855,6 @@ function showResult(won) {
   // Update progress
   localStorage.setItem('kz-prog-memory', '100');
 
-  window.AdMobMgr?.showInterstitial(); // ✅ AdMob
-  // await showInterstitial();
-
   document.getElementById("win-screen").classList.remove("hidden");
 }
 
@@ -1016,7 +905,6 @@ function restartGame() {
   initGame();
 }
 
-window.addEventListener("load", () => window.AdMobMgr?.init("memory-game"));
 function goHome() {
   clearInterval(timerInterval);
   document.getElementById("win-screen").classList.add("hidden");
@@ -1029,13 +917,6 @@ window.addEventListener("resize", () => {
   const g = document.getElementById("grid");
   if (g.children.length > 0) {
     g.style.gridTemplateColumns = `repeat(${getCols(DIFFICULTY[diff].pairs)}, var(--card-size))`;
-  }
-  // Show/hide side banner
-  const side = document.getElementById("admob-side");
-  if (window.innerWidth >= 1024 && window.innerWidth > window.innerHeight) {
-    side.style.display = "flex";
-  } else {
-    side.style.display = "none";
   }
 });
 

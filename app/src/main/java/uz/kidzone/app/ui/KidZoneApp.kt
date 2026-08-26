@@ -10,7 +10,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import uz.kidzone.app.AdsManager
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.data.DailyChallengeRepository
 import uz.kidzone.app.data.KidZoneDatabase
@@ -31,7 +30,6 @@ import uz.kidzone.app.ui.viewmodel.ProfileViewModelFactory
 fun KidZoneApp(
     prefs: SharedPreferences,
     mainViewModel: MainViewModel,
-    adsManager: AdsManager,
     statsManager: ParentalStatsManager,
 ) {
     val navController = rememberNavController()
@@ -97,7 +95,6 @@ fun KidZoneApp(
             composable("main") {
                 MainScreen(
                     mainViewModel = mainViewModel,
-                    adsManager = adsManager,
                     prefs = prefs,
                     statsManager = statsManager,
                     profileViewModel = profileViewModel,

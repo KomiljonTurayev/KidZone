@@ -168,17 +168,6 @@ body {
   transition: width 0.3s ease;
 }
 
-/* ADMOB */
-#admob {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  height: 56px;
-  background: #fff;
-  border-top: 1px solid #eee;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: #bbb;
-  z-index: 10;
-}
-
 /* SCREENS */
 .screen {
   position: fixed; inset: 0; z-index: 50;
@@ -226,9 +215,6 @@ body {
   100% { transform: translate(var(--tx), 100vh) rotate(360deg); opacity: 0; }
 }
 </style>
-<script src="admob.js"></script>
-<script>window.addEventListener('load', () => window.AdMobMgr?.init('colors-shapes'));</script>
-<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 </head>
 <body>
 
@@ -282,8 +268,6 @@ body {
 
   <div id="choices-grid"></div>
 </div>
-
-<div id="admob">📢 AdMob — Bolalar uchun xavfsiz reklama</div>
 
 <!-- START -->
 <div class="screen" id="start-screen">
@@ -462,7 +446,6 @@ const CS_T = {
     resMsgGood:  "Deyarli hammasi to'g'ri! Davom eting 💪",
     resMsgOk:    "Yana bir oz mashq qiling! 📚",
     howToPlay:   "Qanday o'ynash?",
-    admob:       "📢 AdMob — Bolalar uchun xavfsiz reklama",
   },
   ru: {
     title:       "🎨 Цвета & Фигуры",
@@ -492,7 +475,6 @@ const CS_T = {
     resMsgGood:  "Почти всё верно! Продолжай 💪",
     resMsgOk:    "Ещё немного попрактикуйся! 📚",
     howToPlay:   "Как играть?",
-    admob:       "📢 AdMob — Безопасная реклама для детей",
   },
   en: {
     title:       "🎨 Colors & Shapes",
@@ -522,7 +504,6 @@ const CS_T = {
     resMsgGood:  "Almost all correct! Keep going 💪",
     resMsgOk:    "Practice a little more! 📚",
     howToPlay:   "How to play?",
-    admob:       "📢 AdMob — Safe ads for kids",
   },
 };
 
@@ -557,9 +538,6 @@ function applyCSLang() {
   const resLabels = document.querySelectorAll('#result-screen [style*="font-size:11px"]');
   if (resLabels[0]) resLabels[0].textContent = t.resBall;
   if (resLabels[1]) resLabels[1].textContent = t.resCorrect;
-  /* admob */
-  const admobEl = document.getElementById('admob');
-  if (admobEl) admobEl.textContent = t.admob;
 }
 
 /* level selector for colors-shapes */
@@ -800,7 +778,6 @@ function goHome() {
 
 setMode("color");
 window.addEventListener('load', () => {
-  window.AdMobMgr?.init('colors-shapes');
   initKZL();
 });
 </script>

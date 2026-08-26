@@ -19,7 +19,6 @@ import uz.kidzone.app.ui.viewmodel.PromoBannerData
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
-    private lateinit var adsManager: AdsManager
     private lateinit var statsManager: ParentalStatsManager
     private lateinit var systemUiHelper: SystemUiHelper
     private lateinit var firestoreSync: FirestoreSync
@@ -46,8 +45,6 @@ class MainActivity : ComponentActivity() {
         firestoreSync = FirestoreSync.init(this)
         val activeProfileId = kzPrefs.getString("active_profile_id", "default") ?: "default"
         statsManager = ParentalStatsManager(this, activeProfileId)
-        adsManager = AdsManager(this)
-        adsManager.initialize()
 
         FirebaseManager.getInstance().ensureAuthAsync {
             val uid = FirebaseManager.getInstance().getUid()
@@ -74,7 +71,6 @@ class MainActivity : ComponentActivity() {
             KidZoneApp(
                 prefs = kzPrefs,
                 mainViewModel = mainViewModel,
-                adsManager = adsManager,
                 statsManager = statsManager,
             )
         }
@@ -89,7 +85,6 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         systemUiHelper.enableImmersiveMode()
-        adsManager.onResume()
         MusicManager.startMusic(this)
         statsManager.onSessionStart()
         checkPendingUrl()
@@ -97,14 +92,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         statsManager.onSessionEnd()
-        adsManager.onPause()
         MusicManager.pauseMusic()
         super.onPause()
-    }
-
-    override fun onDestroy() {
-        adsManager.onDestroy()
-        super.onDestroy()
     }
 
     private fun checkPendingUrl() {

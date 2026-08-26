@@ -139,19 +139,6 @@ body {
   transition: width 0.08s linear;
 }
 
-/* ADMOB */
-#admob-banner {
-  width: 100%;
-  max-width: 420px;
-  height: 60px;
-  background: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-top: 1px solid #1f1f1f;
-}
-#admob-banner span { color: #333; font-size: 11px; }
-
 /* SCREEN OVERLAY */
 .screen {
   position: fixed;
@@ -245,8 +232,6 @@ body {
   100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(1); }
 }
 </style>
-<script src="admob.js"></script>
-<script>window.onRewardGranted=function(a){window.dispatchEvent(new CustomEvent("rewardGranted",{detail:{amount:a}}))};window.__gameEnd=function(){if(window.AndroidAdMob)window.AndroidAdMob.showInterstitial()};window.__showRewarded=function(){if(window.AndroidAdMob)window.AndroidAdMob.showRewarded()};</script>
 </head>
 <body>
 
@@ -281,11 +266,6 @@ body {
     <button class="color-btn" id="btn2" onclick="tap(2)"></button>
     <button class="color-btn" id="btn3" onclick="tap(3)"></button>
   </div>
-</div>
-
-<div id="admob-banner">
-  <!-- ✅ ADMOB BANNER SHU YERGA KELADI -->
-  <span>📢 AdMob Banner Reklama</span>
 </div>
 
 <!-- START SCREEN -->
@@ -397,34 +377,6 @@ const T = {
 };
 
 const t = T[lang] || T.en;
-
-// =============================================
-// ADMOB KOD — Capacitor Android uchun tayyor
-// =============================================
-/*
-QADAMLAR:
-1. npm install @capacitor/core @capacitor/android @capacitor-community/admob
-2. npx cap init
-3. npx cap add android
-4. Quyidagi ID larni o'z AdMob ID laringiz bilan almashtiring:
-
-const ADMOB_APP_ID    = "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX";
-const BANNER_ID       = "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX";
-const INTERSTITIAL_ID = "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX";
-
-5. AndroidManifest.xml ga qo'shing:
-<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
-           android:value="ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"/>
-
-6. Ishlatish:
-import { AdMob } from '@capacitor-community/admob';
-await AdMob.initialize({ testingDevices: ['TEST_DEVICE_ID'] });
-// Banner
-await AdMob.showBanner({ adId: BANNER_ID, position: 'BOTTOM_CENTER', isTesting: true });
-// Interstitial (o'yin tugaganda)
-await AdMob.prepareInterstitial({ adId: INTERSTITIAL_ID, isTesting: true });
-await AdMob.showInterstitial();
-*/
 
 // =============================================
 // O'YIN LOGIKASI
@@ -650,9 +602,6 @@ function updateHearts() {
 function endGame() {
   gameOn = false;
 
-  window.AdMobMgr?.showInterstitial(); // ✅ AdMob
-  // await AdMob.showInterstitial();
-
   const isNew = score > best;
   if (isNew) {
     best = score;
@@ -686,7 +635,6 @@ function endGame() {
   document.getElementById('over-screen').classList.remove('hidden');
 }
 
-window.addEventListener("load", () => window.AdMobMgr?.init("color-rush"));
 function goHome() {
   document.getElementById('over-screen').classList.add('hidden');
   document.getElementById('start-screen').classList.remove('hidden');

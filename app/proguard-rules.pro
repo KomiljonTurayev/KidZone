@@ -1,7 +1,3 @@
-# AdMob
--keep class com.google.android.gms.ads.** { *; }
--keep class com.google.ads.** { *; }
-
 # WebView JavaScript interface — annotatsiyaga asoslanib saqlanadi (klass yo'li o'zgarsayam ishlaydi)
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;

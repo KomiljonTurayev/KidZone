@@ -498,8 +498,8 @@ class GameManager {
         if (window.updateLangUI) window.updateLangUI();
 
         // Sync with Native
-        if (window.AndroidAdMob && window.AndroidAdMob.updateLanguage) {
-            window.AndroidAdMob.updateLanguage(l);
+        if (window.AndroidBridge && window.AndroidBridge.updateLanguage) {
+            window.AndroidBridge.updateLanguage(l);
         }
 
         document.querySelectorAll('#lang-modal .age-card').forEach(c => c.classList.remove('sel'));
@@ -529,8 +529,8 @@ class GameManager {
         this.isMuted = !this.isMuted;
         localStorage.setItem("kz-muted", this.isMuted);
         this.ui.updateMusicUI(this.isMuted);
-        if (window.AndroidAdMob?.toggleMusic) {
-            window.AndroidAdMob.toggleMusic(this.isMuted);
+        if (window.AndroidBridge?.toggleMusic) {
+            window.AndroidBridge.toggleMusic(this.isMuted);
         }
     }
 
@@ -595,9 +595,8 @@ class GameManager {
         const gvEl = document.getElementById("gv");
         if (gvEl) gvEl.classList.remove("h");
 
-        if (window.AndroidAdMob) {
-            window.AndroidAdMob.showInterstitial();
-            window.AndroidAdMob.hideBanner();
+        if (window.AndroidBridge) {
+            window.AndroidBridge.hideBanner();
         }
         if (window.AndroidChallenge) {
             window.AndroidChallenge.onGameOpened(g.id);
@@ -609,7 +608,7 @@ class GameManager {
         const frameEl = document.getElementById("gv-frame");
         if (gvEl) gvEl.classList.add("h");
         if (frameEl) frameEl.src = "";
-        if (window.AndroidAdMob) window.AndroidAdMob.showBanner();
+        if (window.AndroidBridge) window.AndroidBridge.showBanner();
 
         const game = this.games.find(g => g.id === this.currentGameId);
         this.currentGameId = null;
@@ -1096,8 +1095,8 @@ window.addEventListener("load", () => {
     if (window.updateLangUI) window.updateLangUI();
     ui.updateMusicUI(app.isMuted);
 
-    if (app.isMuted && window.AndroidAdMob?.toggleMusic) {
-        window.AndroidAdMob.toggleMusic(true);
+    if (app.isMuted && window.AndroidBridge?.toggleMusic) {
+        window.AndroidBridge.toggleMusic(true);
     }
 
     // Load content and render
@@ -1106,7 +1105,8 @@ window.addEventListener("load", () => {
 
     app.storyManager.load().then(() => app.storyManager.render());
 
-    // Reward ad callback from Java
+    // Win-bonus callback used by some mini-games (e.g. puzzle-slider, game-engine.html)
+    // via window.parent.onRewardGranted(amount) — not tied to any ad.
     window.onRewardGranted = function(amount) {
         app.addPoints(amount || 50);
         app.ui.showToast('🎁 +' + (amount || 50) + ' ⭐');

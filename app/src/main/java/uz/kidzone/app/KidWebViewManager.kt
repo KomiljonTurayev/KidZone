@@ -31,7 +31,7 @@ class KidWebViewManager(private val webView: WebView) {
     fun getLanguage(): String = currentLanguage
 
     // JavascriptInterface: lint can't see through the generic `Any` parameter to confirm
-    // the passed object's methods carry @JavascriptInterface — they do (AdMobBridge,
+    // the passed object's methods carry @JavascriptInterface — they do (NativeBridge,
     // ChallengeBridge in MainScreen.kt), this is a lint false positive on the wrapper shape.
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     fun setup(jsInterface: Any, interfaceName: String) {

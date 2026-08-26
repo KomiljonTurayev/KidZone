@@ -16,8 +16,6 @@ data class MainUiState(
     val isExitFromGame: Boolean = false,
     val promoBanner: PromoBannerData? = null,
     val isLocked: Boolean = false,
-    val bannerVisible: Boolean = true,
-    val bannerLoaded: Boolean = false,
     val pendingDeepLinkContentId: String? = null,
 )
 
@@ -33,7 +31,5 @@ class MainViewModel : ViewModel() {
     fun setPromoBanner(data: PromoBannerData?) { _state.update { it.copy(promoBanner = data) } }
     fun showLock() { _state.update { it.copy(isLocked = true) } }
     fun hideLock() { _state.update { it.copy(isLocked = false) } }
-    fun setBannerVisible(visible: Boolean) { _state.update { it.copy(bannerVisible = visible) } }
-    fun setBannerLoaded(loaded: Boolean) { _state.update { it.copy(bannerLoaded = loaded) } }
     fun setPendingDeepLinkContentId(contentId: String?) { _state.update { it.copy(pendingDeepLinkContentId = contentId) } }
 }

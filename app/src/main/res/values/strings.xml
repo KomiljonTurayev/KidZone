@@ -2,12 +2,6 @@
 <resources>
     <string name="app_name">KidZone</string>
 
-    <!-- ✅ ADMOB UNIT IDs -->
-    <string name="banner_ad_unit_id">ca-app-pub-3291187691091325/6512602917</string>
-    <string name="banner_bottom_ad_unit_id">ca-app-pub-3291187691091325/9947441737</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-3291187691091325/4259797529</string>
-    <string name="rewarded_ad_unit_id">ca-app-pub-3291187691091325/2312494290</string>
-
     <string name="ai_bird_name">Aqlli Qushcha</string>
     <string name="ai_bird_desc">Bolalar uchun ertakchi qush</string>
     <string name="btn_tell_story">Ertak aytib ber</string>

@@ -75,58 +75,10 @@ Klaviatura: Shift + F10
 **Ko'rinadigan narsa:**
 - 🟠 Splash screen (KidZone logo)
 - 🌈 Asosiy ekran (30 o'yin)
-- 📢 Pastda test banner reklama
 
 ---
 
-## 💰 QADAM 5 — AdMob ID Qo'shish
-
-### 5a. Test rejimida ishlash (HOZIR HAM ISHLAYDI ✅)
-```
-Hozir test ID lar bilan ishlayapti.
-Haqiqiy reklama uchun 5b–5d qadamlarni bajaring.
-```
-
-### 5b. admob.google.com da hisob oching
-```
-1. admob.google.com ga kiring
-2. "Apps" → "Add app" → Android
-3. App nomi: KidZone
-4. App ID oling: ca-app-pub-XXXX~XXXX
-```
-
-### 5c. Ad Units yarating (4 ta)
-```
-Banner      → "GZ_Banner"       → ID saqlang
-Interstitial → "GZ_Inter"       → ID saqlang
-Rewarded    → "GZ_Rewarded"     → ID saqlang
-```
-
-### 5d. MainActivity.java da almashtiring:
-```
-Fayl: app/src/main/java/uz/kidzone/app/MainActivity.java
-
-// HOZIRGI (test):
-private static final String BANNER_ID = "ca-app-pub-3940256099942544/6300978111";
-
-// O'ZINGIZNIKIGA ALMASHTIRING:
-private static final String BANNER_ID = "ca-app-pub-SIZNING/SIZNING";
-```
-
-### 5e. AndroidManifest.xml da almashtiring:
-```
-Fayl: app/src/main/AndroidManifest.xml
-
-<!-- HOZIRGI (test): -->
-android:value="ca-app-pub-3940256099942544~3347511713"
-
-<!-- O'ZINGIZNIKIGA: -->
-android:value="ca-app-pub-SIZNING~APPID"
-```
-
----
-
-## 📦 QADAM 6 — APK Yaratish (Play Store uchun)
+## 📦 QADAM 5 — APK Yaratish (Play Store uchun)
 
 ```
 Android Studio:
@@ -149,7 +101,7 @@ app/release/app-release.apk  ← SHU FAYL PLAY STORE GA YUKLANADI
 
 ---
 
-## 🏪 QADAM 7 — Play Store ga Yuklash
+## 🏪 QADAM 6 — Play Store ga Yuklash
 
 ```
 1. play.google.com/console → $25 to'lov (bir marta)
@@ -190,13 +142,6 @@ build.gradle da:
 minSdk 21  ← 24 dan past qurilmalar uchun
 ```
 
-### Reklama chiqmayapti
-```
-1. Internet bor-yo'qligini tekshiring
-2. Logcat da "AdMob" qidiring
-3. isTesting = true bo'lishini tekshiring (test uchun)
-```
-
 ---
 
 ## 📁 LOYIHA TUZILMASI
@@ -214,12 +159,12 @@ KidZoneApp/
 │   │   │   ├── math-kids.html     ← 🔢 O'yin 5
 │   │   │   └── colors-shapes.html ← 🌈 O'yin 6
 │   │   ├── java/uz/kidzone/app/
-│   │   │   └── MainActivity.java  ← AdMob + WebView
+│   │   │   └── MainActivity.kt    ← WebView + Compose shell
 │   │   ├── res/
 │   │   │   ├── layout/activity_main.xml
 │   │   │   ├── values/themes.xml
 │   │   │   └── drawable/splash_icon.xml
-│   │   └── AndroidManifest.xml    ← Ruxsatlar + AdMob ID
+│   │   └── AndroidManifest.xml    ← Ruxsatlar
 │   └── build.gradle               ← Dependencies
 ├── build.gradle
 ├── settings.gradle
@@ -232,12 +177,10 @@ KidZoneApp/
 
 | Narsa | Joyi |
 |-------|------|
-| AdMob App ID | AndroidManifest.xml |
-| Banner/Inter/Rewarded ID | MainActivity.java |
 | O'yin fayllari | assets/www/ |
 | Ikonka | res/drawable/ |
 | Ranglar | res/values/colors.xml |
 
 ---
 
-*Muammo bo'lsa — Logcat oching va "KidZone" yoki "AdMob" qidiring 🔍*
+*Muammo bo'lsa — Logcat oching va "KidZone" qidiring 🔍*

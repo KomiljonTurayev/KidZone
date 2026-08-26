@@ -9,7 +9,6 @@ class KidZoneGame {
         this.onScoreUpdate = config.onScoreUpdate || null;
         this.isMuted = localStorage.getItem("kz-muted") === "true";
         this.lang = this._getQueryParam('lang') || localStorage.getItem("kz-lang") || 'en';
-        this.adCounter = parseInt(localStorage.getItem('kz-ad-cnt') || '0');
 
         this._initListeners();
     }
@@ -265,33 +264,6 @@ class KidZoneGame {
      */
     gameOver(finalScore) {
         this.reportScore(finalScore);
-        this.adCounter++;
-        localStorage.setItem('kz-ad-cnt', this.adCounter);
-
-        // Show ad every 3rd game over to maintain UX
-        if (this.adCounter % 3 === 0) {
-            this.showAd();
-        }
-    }
-
-    /**
-     * Shows interstitial ad via Android Bridge
-     */
-    showAd() {
-        try {
-            // Check standard WebView interface
-            if (window.AndroidAdMob && window.AndroidAdMob.showInterstitial) {
-                window.AndroidAdMob.showInterstitial();
-            } 
-            // Fallback for iframe setups
-            else if (window.parent && window.parent.AndroidAdMob) {
-                window.parent.AndroidAdMob.showInterstitial();
-            } else {
-                console.warn("[GameEngine] Android Bridge not found");
-            }
-        } catch (e) {
-            console.error("[GameEngine] Ad show error:", e);
-        }
     }
 
     /**

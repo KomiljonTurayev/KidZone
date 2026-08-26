@@ -3,10 +3,8 @@ package uz.kidzone.app.ui
 import android.app.Activity
 import android.content.SharedPreferences
 import android.net.Uri
-import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
-import android.widget.FrameLayout
 import java.lang.ref.WeakReference
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -30,7 +28,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -71,8 +68,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlin.math.roundToInt
-import uz.kidzone.app.AdsManager
-import uz.kidzone.app.IAdsManager
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.MusicManager
@@ -91,7 +86,6 @@ private val KidZoneOrange = Color(0xFFFF6B35)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    adsManager: AdsManager,
     prefs: SharedPreferences,
     statsManager: ParentalStatsManager,
     profileViewModel: ProfileViewModel,
@@ -151,8 +145,8 @@ fun MainScreen(
                     val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
                     val age = prefs.getString("kz_age", "2-4") ?: "2-4"
                     mgr.setup(
-                        AdMobBridge(mainViewModel, adsManager, onOpenDashboard, context as Activity),
-                        "AndroidAdMob",
+                        NativeBridge(mainViewModel, onOpenDashboard, context as Activity),
+                        "AndroidBridge",
                     )
                     mgr.addInterface(
                         ChallengeBridge(challengeViewModel, context),
@@ -334,28 +328,6 @@ fun MainScreen(
             }
         }
         } // end inner Box
-
-        // Banner
-        AndroidView(
-            factory = { ctx ->
-                FrameLayout(ctx).apply {
-                    val isTablet = ctx.resources.configuration.smallestScreenWidthDp >= 600
-                    adsManager.loadBanner(this, isTablet, object : IAdsManager.BannerListener {
-                        override fun onBannerLoaded(heightDp: Int) {
-                            mainViewModel.setBannerLoaded(true)
-                        }
-                        override fun onBannerFailed() {}
-                    })
-                }
-            },
-            update = { container ->
-                val show = uiState.bannerVisible && uiState.bannerLoaded
-                container.visibility = if (show) View.VISIBLE else View.GONE
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-        )
     } // end Column
 
     // Time limit countdown — ticks every second so the in-game badge stays live.
@@ -467,10 +439,9 @@ fun MainScreen(
     }
 }
 
-// AdMob JavaScript bridge — standalone class (composable functions cannot have inner classes)
-private class AdMobBridge(
+// Native JavaScript bridge — standalone class (composable functions cannot have inner classes)
+private class NativeBridge(
     private val viewModel: MainViewModel,
-    private val adsManager: AdsManager,
     private val onOpenDashboard: () -> Unit,
     activity: Activity,
 ) {
@@ -484,7 +455,6 @@ private class AdMobBridge(
     fun showBanner() {
         onMain {
             viewModel.setInGame(false)
-            viewModel.setBannerVisible(true)
         }
     }
 
@@ -492,23 +462,6 @@ private class AdMobBridge(
     fun hideBanner() {
         onMain {
             viewModel.setInGame(true)
-            viewModel.setBannerVisible(false)
-        }
-    }
-
-    @android.webkit.JavascriptInterface
-    fun showInterstitial() {
-        onMain {
-            adsManager.showInterstitial()
-        }
-    }
-
-    @android.webkit.JavascriptInterface
-    fun showRewarded() {
-        onMain {
-            adsManager.showRewarded { _ ->
-                // reward callback — webview JS call could go here if needed
-            }
         }
     }
 

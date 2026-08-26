@@ -1149,7 +1149,7 @@
       <div class="pb-icon">👨‍👩‍👧</div>
       <div class="pb-text">
         <div class="pb-title">Parental Control</div>
-        <div class="pb-sub">Play time · Ads · Stats</div>
+        <div class="pb-sub">Play time · Stats</div>
       </div>
       <button class="pb-btn" onclick="openModal('parent-modal')">Enter 🔐</button>
     </div>
@@ -1226,8 +1226,6 @@
   </button>
 </div>
 
-<!-- ADMOB BANNER: Java Layout (bannerContainer) tomonidan ko'rsatiladi -->
-
   <script src="main.js"></script>
   <script>
     // ════════════════════════════════════════════════════
@@ -1301,7 +1299,7 @@
         plays:"o'yin", ageModal:"🎂 Yoshni tanlang", langModal:"🌍 Tilni tanlang",
         chTitle:"Bugungi Vazifa!", chSub:"5 ta o'yin o'yna → 100 ⭐ yut!", chBtn:"Boshlash",
         lvBall:"BALL", lvNext:"ball yig'ing",
-        pbTitle:"Ota-ona Boshqaruvi", pbSub:"O'yin vaqti · Reklamalar · Statistika", pbBtn:"Kirish 🔐",
+        pbTitle:"Ota-ona Boshqaruvi", pbSub:"O'yin vaqti · Statistika", pbBtn:"Kirish 🔐",
         ageCards:["2–4 yosh", "Ranglar, shakllar", "4–6 yosh", "Raqamlar, harflar", "6–8 yosh", "Matematika, mantiq", "8+ yosh", "Hammasi ochiq"],
         ageSave:"✅ Saqlash", langClose:"✅ Yopish",
         parentTitle:"Ota-ona rejimi", parentDesc:"Farzandingiz o'yin vaqtini va reklamalarni boshqaring",
@@ -1356,7 +1354,7 @@
         plays:"игр", ageModal:"🎂 Выбор возраста", langModal:"🌍 Выбор языка",
         chTitle:"Задача дня!", chSub:"Сыграй 5 игр → 100 ⭐!", chBtn:"Начать",
         lvBall:"БАЛЛ", lvNext:"соберите баллы",
-        pbTitle:"Родительский контроль", pbSub:"Время игры · Реклама · Статистика", pbBtn:"Войти 🔐",
+        pbTitle:"Родительский контроль", pbSub:"Время игры · Статистика", pbBtn:"Войти 🔐",
         ageCards:["2–4 года", "Цвета, формы", "4–6 лет", "Цифры, буквы", "6–8 лет", "Математика, логика", "8+ лет", "Все открыто"],
         ageSave:"✅ Сохранить", langClose:"✅ Закрыть",
         parentTitle:"Родительский режим", parentDesc:"Управляйте временем игры и рекламой",
@@ -1411,7 +1409,7 @@
         plays:"plays", ageModal:"🎂 Age Selection", langModal:"🌍 Select Language",
         chTitle:"Today's Challenge!", chSub:"Play 5 games → 100 ⭐!", chBtn:"Start",
         lvBall:"POINTS", lvNext:"collect points",
-        pbTitle:"Parental Control", pbSub:"Play time · Ads · Stats", pbBtn:"Enter 🔐",
+        pbTitle:"Parental Control", pbSub:"Play time · Stats", pbBtn:"Enter 🔐",
         ageCards:["2–4 years", "Colors, shapes", "4–6 years", "Numbers, letters", "6–8 years", "Math, logic", "8+ years", "All unlocked"],
         ageSave:"✅ Save", langClose:"✅ Close",
         parentTitle:"Parent Mode", parentDesc:"Manage play time and advertisements",
@@ -1937,7 +1935,7 @@
     if (!pill) return;
     pill.addEventListener('touchstart', function() {
       _pt = setTimeout(function() {
-        if (window.AndroidAdMob) AndroidAdMob.openParentalDashboard();
+        if (window.AndroidBridge) AndroidBridge.openParentalDashboard();
       }, 3000);
     }, { passive: true });
     pill.addEventListener('touchend', function() { clearTimeout(_pt); }, { passive: true });
