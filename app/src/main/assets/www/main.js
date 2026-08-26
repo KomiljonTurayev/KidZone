@@ -794,11 +794,7 @@ class GameManager {
     }
 
     openAiMusic() {
-        this.ui.showToast(this.translator.get("aiMusicToast"));
-        // For simplicity, we toggle music or open a specific music app game
-        setTimeout(() => {
-            this.openGame({id:"piano", em:"🎹", name:this.translator.get("aiBtnMusic"), file:"instrument.html", pts:15});
-        }, 1000);
+        this.openGame({id:"piano", em:"🎹", name:this.translator.get("aiBtnMusic"), file:"instrument.html", pts:15});
     }
 
     getAiStory(lang) {
@@ -815,6 +811,34 @@ class GameManager {
                 {
                     title: "Aqlli Toshbaqa",
                     text: "Bir vaqtlar ko'l yoqasida Sulton ismli toshbaqa yashardi. Sulton juda sekin yurardi, lekin u juda ko'p narsalar bilardi.\n\nBir kuni quyon unga masxara qilib: 'Hey, toshbaqa! Sen shu qadar sekinsan — hayotda hech narsaga ulgurmaysan!' dedi. Sulton jimgina javob berdi: 'Ko'ramiz.'\n\nErtalab ular poyga o'tkazishga qaror qilishdi. Barcha hayvonlar tomosha qilish uchun kelishdi. Poyga boshlandi. Quyon shiddat bilan yugurib ketdi, Sulton esa sekin-sekin yura boshladi.\n\nQuyon o'rtada bir daraxt tagida dam olishga yotdi. 'Men tezman, hali ham yetib olaman,' deb uxlab qoldi. Sulton esa to'xtamay, qadamba qadam oldinga bordi.\n\nQuyosh botayotganda Sulton finishga birinchi bo'lib yetib keldi. Quyon uyg'onib, orqada qolganini ko'rdi. Uyat bo'ldi.\n\nSulton quyonga dedi: 'Do'stim, tezlik emas, matonat muhim. Kim to'xtamay harakat qilsa — u g'alaba qozonadi.' Quyon bu darsni umrga yodida saqladi."
+                },
+                {
+                    title: "Mehribon Ayiqcha",
+                    text: "Tog' etagidagi o'rmonda Booz ismli kichkina ayiqcha yashar ekan. Kuzning so'nggi kunlarida u eng shirin qulupnaylarni topib, butun sabatini to'ldiribdi.\n\nUyiga qaytayotib, yo'lda holdan toygan kichkina quyonchani ko'rib qoldi — qish yaqinlashib, o'rmonda oziq kamayib qolgan edi. Booz bir lahza o'yladi, so'ng sabatining yarmini unga uzatdi. 'Ol, do'stim, birga yeymiz!' dedi u kulib.\n\nUlar yeb o'tirishganida och qolgan kichkina sincap ham kelib qoldi. Booz unga ham ulashdi. Tez orada uchovlon birgalikda yangi qulupnaylar terib, uni teng bo'lib yeyishdi.\n\nKechqurun Booz uyiga bo'sh sabat bilan qaytdi, lekin yuragi juda to'la edi — u ikkita yangi do'st topgan edi. Onasi mehr bilan dedi: 'Ulashish hech qachon kamaytirmaydi — u faqat ko'paytiradi.'\n\nO'shandan beri Booz har doim boshqalar bilan ulashishni yaxshi ko'rardi, chunki bilardi: mehribonlik eng shirin mevadan ham totliroq."
+                },
+                {
+                    title: "Dengiz Sirlari",
+                    text: "Marjon rifida Lola ismli kichkina baliqcha yashar ekan. U juda qiziquvchan edi va har kuni yangi joylarni kashf qilishni yaxshi ko'rardi.\n\nBir kuni Lola oddiy suzish yo'lidan chetga chiqib, tanish bo'lmagan g'orga kirib ketdi. Ichkarida u yo'lini yo'qotdi — atrofi qorong'i va notanish edi. Lola qo'rqib ketdi.\n\nShu payt unga mehribon dengiz toshbaqasi Karim duch keldi. 'Nima bo'ldi, kichkintoy?' deb so'radi u. Lola yig'lab, yo'lini yo'qotganini aytdi. Karim unga yordam berishga qaror qildi.\n\nUlar birga suzib, yorug' suv o'simliklariga qarab yo'l topishdi. Yo'lda ular sakkiz oyoqli Rustam va dengiz yulduzi Zebo bilan uchrashishdi — hammasi Lolaga uyiga qaytishda yordam berishdi.\n\nUyiga yetib kelgach, Lola tushundi: yolg'iz qo'rqishdan ko'ra, yordam so'rash va do'stlarga ishonish ancha yaxshi ekan. O'shandan beri u har doim do'stlari bilan birga suzardi — dengiz ham, hayot ham birgalikda go'zalroq edi."
+                },
+                {
+                    title: "Kichkina Bog'bon",
+                    text: "Nilufar ismli qizcha bobosidan bir dona kichkina urug' oldi. 'Buni ekib parvarish qil, u senga ajoyib sovg'a bo'ladi,' dedi bobosi kulib.\n\nNilufar urug'ni bog'ga ekdi va har kuni suv berdi. Lekin bir necha kun o'tsa ham hech narsa unmadi. U bezovtalanib: 'Bobojon, nega hech narsa chiqmayapti?' deb so'radi.\n\n'Sabr qil, qizim,' dedi bobosi. 'Har bir go'zal narsa vaqt talab qiladi.' Nilufar davom etib, har kuni g'amxo'rlik qilishda davom etdi — suv berdi, quyoshga chiqardi, begona o'tlardan tozaladi.\n\nBir necha hafta o'tgach, tuproqdan yashil nihol boshini chiqardi! Nilufar juda xursand bo'ldi. U nihol o'sishini har kuni kuzatib bordi, toki u chiroyli qizil gulga aylanguncha.\n\nO'sha kuni Nilufar tushundi: sabr va g'amxo'rlik bilan eng kichik urug' ham eng go'zal gulga aylanishi mumkin ekan."
+                },
+                {
+                    title: "Yorqin Yulduzcha",
+                    text: "Osmon uzra yashagan kichkina yulduzcha Chiroq o'zini boshqa katta va yorqin yulduzlar orasida arzimas his qilardi. 'Men juda kichkinaman, mening nurim hech kim ko'rmaydi,' deb qayg'urardi u har kuni.\n\nBir kecha yerdagi kichkina qiz osmonga qarab, eng yorqin emas, balki eng yaqin va mehribon ko'rinuvchi yulduzni topmoqchi bo'ldi. Uning ko'zi Chiroqqa tushdi.\n\n'Sen ajoyib porlab turibsan!' dedi qizcha shivirlab, ko'z yumib tilak tilarkan. Chiroq hayron bo'ldi — u o'zini shunchalik kichkina deb o'ylagandi, biroq kimdir uni ko'rgan va yoqtirgan edi.\n\nO'sha kechadan boshlab Chiroq tushundi: katta yoki kichik bo'lishning ahamiyati yo'q — muhimi, har bir yulduz o'z nuri bilan kimningdir kechasini yoritishi mumkin.\n\nShundan beri Chiroq har kecha g'urur bilan porlaydi, chunki biladi: uning kichkina nuri ham kimgadir juda katta ahamiyatga ega."
+                },
+                {
+                    title: "Do'stlik Ko'prigi",
+                    text: "Katta daryoning ikki tomonida ikkita hayvonlar oilasi yashar edi — bir tomonda quyonlar, ikkinchi tomonda sincoblar. Ular bir-birlarini ko'rar, lekin daryo ularni ajratib turardi.\n\nBir kuni kichkina quyon Aziz daryo bo'yida o'ynab, narigi tomondagi sincobcha Malika bilan tanishdi. Ular gaplashib, birga o'ynashni juda xohlashdi, lekin daryodan o'tib bo'lmasdi.\n\n'Nega ko'prik qurmaymiz?' deb taklif qildi Aziz. Malika bu g'oyani juda yoqtirdi. Ular hayvonlarni yig'ib, birga ishlashga chaqirishdi — quyonlar tosh tashidi, sincoblar novdalardan mahkam bog'ladi, qunduzlar esa ustalik bilan qurishga yordam berishdi.\n\nBir necha kundan so'ng mustahkam va chiroyli ko'prik tayyor bo'ldi! Endi ikkala tomondagi oilalar erkin o'tib, birga o'ynay olardi.\n\nAziz va Malika tushunishdi: birgalikda ishlasang, hech qanday to'siq — hatto katta daryo ham — do'stlikka to'sqinlik qila olmaydi."
+                },
+                {
+                    title: "Botir Kichkina Qush",
+                    text: "Baland daraxt uyasida kichkina qaldirg'och Sardor yashardi. Uning qanotlari allaqachon kuchli edi, lekin u birinchi marta uchishga juda qo'rqardi. 'Ya birdan yiqilsam-chi?' deb o'ylardi u har kuni.\n\nOnasi uni yumshoqlik bilan turtardi: 'Sardor, har bir qush avval qo'rqadi. Lekin uchishni his qilmaguningcha, bilib bo'lmaydi qanchalik go'zal ekanini.'\n\nBir kuni shamol kuchli esdi va Sardor uyadan beixtiyor sirg'alib tushib ketdi. Yuragi shiddat bilan urdi — lekin to'satdan u qanotlarini yozdi va... uchib ketdi! Avval noqulay, keyin esa erkin va yengil.\n\nU osmonda parvoz qilib, pastdagi o'rmonni, daryoni va uyini ko'rdi. Bu qanchalik ajoyib edi! Sardor xursandchilikdan sayrab yubordi.\n\nUyaga qaytganida u tushundi: qo'rquv — bu faqat birinchi qadam oldidagi hissiyot, lekin jasorat bilan tashlangan qadam har doim yangi dunyoni ochadi."
+                },
+                {
+                    title: "To'rt Fasl Sayohati",
+                    text: "Bahorda kichkina urug' tuproqdan bosh ko'tarib, yosh niholga aylandi. Quyosh iliq nurlarini sochib, uni parvarish qildi. 'Salom, dunyo!' dedi nihol quvonch bilan birinchi bargini yozarkan.\n\nYoz kelganda nihol baland daraxtga aylandi. Uning shoxlarida qushlar uya qurdi, soyasida bolalar o'ynadi. Kunlar issiq va uzun edi, daraxt esa har kuni kuchliroq bo'lib bordi.\n\nKuz kelganida daraxtning barglari sariq, qizil va to'q sariq ranglarga bo'yaldi. Shamol esganda barglar raqsga tushib, asta-sekin yerga tushardi. Daraxt bu go'zal manzarani kuzatib, o'z go'zalligiga guvoh bo'ldi.\n\nQish kelganida daraxt qorga burkanib, jimgina dam oldi. Sovuq shamollarga qaramay, uning ildizlari chuqurda mahkam va issiq edi — u bahorni sabr bilan kutardi.\n\nVa mana, yana bahor keldi, va daraxt yana yangi barglar chiqardi. U tushundiki: har bir fasl o'ziga xos go'zallikka ega, va o'zgarish — hayotning eng tabiiy va go'zal qismidir."
                 }
             ],
             ru: [
@@ -829,6 +853,34 @@ class GameManager {
                 {
                     title: "Мудрая Черепаха",
                     text: "На берегу озера жила черепаха по имени Тоша. Тоша ходила очень медленно, но знала очень много всего на свете.\n\nОднажды к ней подбежал заяц и засмеялся: 'Эй, черепаха! Ты такая медленная — в жизни ничего не успеешь!' Тоша спокойно ответила: 'Посмотрим.'\n\nНа следующее утро они решили устроить гонку. Все звери пришли посмотреть. Гонка началась. Заяц помчался со всех ног, а Тоша медленно, но уверенно шагала вперёд.\n\nНа полпути заяц решил отдохнуть под деревом. 'Я такой быстрый, всегда успею догнать,' подумал он и уснул. А Тоша шла и шла, не останавливаясь.\n\nКогда солнце клонилось к закату, Тоша первой пересекла финишную черту. Заяц проснулся и увидел, что отстал. Ему стало очень стыдно.\n\nТоша сказала ему: 'Дружок, важна не скорость, а настойчивость. Тот, кто не останавливается, всегда добьётся своего.' Заяц запомнил этот урок на всю жизнь."
+                },
+                {
+                    title: "Добрый Медвежонок",
+                    text: "В лесу у подножия гор жил маленький медвежонок по имени Буся. В последние осенние дни он нашёл самые сладкие ягоды и наполнил ими целую корзинку.\n\nПо дороге домой он увидел обессиленного зайчонка — зима приближалась, и еды в лесу становилось всё меньше. Буся на мгновение задумался, а потом протянул зайчонку половину своих ягод. 'Держи, дружок, разделим поровну!' — сказал он с улыбкой.\n\nПока они ели, к ним подбежала голодная белочка. Буся поделился и с ней. Вскоре все трое вместе собирали новые ягоды и делили их поровну.\n\nВечером Буся вернулся домой с пустой корзинкой, но с очень полным сердцем — ведь он нашёл двух новых друзей. Мама ласково сказала ему: 'Делиться — значит не терять, а приобретать ещё больше.'\n\nС тех пор Буся всегда делился с другими, ведь знал: доброта слаще любой самой сладкой ягоды."
+                },
+                {
+                    title: "Тайны Океана",
+                    text: "На коралловом рифе жила любопытная маленькая рыбка по имени Лола. Она обожала каждый день открывать для себя что-то новое.\n\nОднажды Лола отплыла в сторону от привычного пути и заплыла в незнакомую пещеру. Внутри она заблудилась — вокруг было темно и всё казалось чужим. Лола очень испугалась.\n\nВдруг ей повстречалась добрая морская черепаха Карим. 'Что случилось, малышка?' — спросил он. Лола, всхлипывая, рассказала, что потерялась. Карим решил помочь ей.\n\nОни вместе поплыли к свету, ориентируясь на морские растения. По пути к ним присоединились осьминог Рустам и морская звезда Зебо — все вместе помогли Лоле найти дорогу домой.\n\nДобравшись до дома, Лола поняла: гораздо лучше попросить о помощи и довериться друзьям, чем бояться в одиночку. С тех пор она всегда плавала вместе с друзьями — ведь и океан, и жизнь красивее вместе."
+                },
+                {
+                    title: "Маленький Садовник",
+                    text: "Девочка по имени Нилуфар получила от дедушки маленькое семечко. 'Посади его и заботься о нём, и оно станет для тебя чудесным подарком,' — сказал дедушка с улыбкой.\n\nНилуфар посадила семечко в саду и каждый день поливала его. Но проходили дни, а ничего не появлялось. Она забеспокоилась: 'Дедушка, почему ничего не растёт?'\n\n'Наберись терпения, доченька,' — ответил дедушка. 'Всё прекрасное требует времени.' Нилуфар продолжала заботиться о семечке — поливала, выносила на солнце, убирала сорняки.\n\nЧерез несколько недель из земли показался зелёный росток! Нилуфар очень обрадовалась. Она наблюдала за ним каждый день, пока он не превратился в прекрасный алый цветок.\n\nВ тот день Нилуфар поняла: с терпением и заботой даже самое маленькое семечко может стать самым красивым цветком."
+                },
+                {
+                    title: "Маленькая Яркая Звёздочка",
+                    text: "На небе жила маленькая звёздочка по имени Огонёк. Среди больших и ярких звёзд она чувствовала себя совсем незаметной. 'Я такая маленькая, мой свет никто не видит,' — грустила она каждую ночь.\n\nОднажды маленькая девочка на земле смотрела в небо, ища не самую яркую, а самую близкую и добрую на вид звезду. Её взгляд остановился на Огоньке.\n\n'Ты сияешь просто чудесно!' — прошептала девочка, закрыв глаза и загадав желание. Огонёк удивился — она считала себя такой маленькой, а кто-то всё же заметил её и полюбил.\n\nС той ночи Огонёк поняла: неважно, большая ты звезда или маленькая — важно, что своим светом ты можешь осветить чью-то ночь.\n\nС тех пор Огонёк сияет каждую ночь с гордостью, зная: даже маленький свет может значить очень много для кого-то."
+                },
+                {
+                    title: "Мост Дружбы",
+                    text: "На двух берегах большой реки жили две семьи зверей — на одном берегу зайцы, на другом белки. Они видели друг друга издалека, но река их разделяла.\n\nОднажды маленький зайчонок Азиз играл у реки и познакомился с белочкой Маликой с другого берега. Они разговорились и очень захотели играть вместе, но переплыть реку было невозможно.\n\n'А давай построим мост?' — предложил Азиз. Малике идея очень понравилась. Они собрали зверей и позвали всех работать вместе — зайцы носили камни, белки крепко связывали ветки, а бобры помогали строить с мастерством.\n\nЧерез несколько дней прочный и красивый мост был готов! Теперь семьи с обоих берегов могли свободно переходить и играть вместе.\n\nАзиз и Малика поняли: если работать сообща, никакая преграда — даже большая река — не сможет помешать дружбе."
+                },
+                {
+                    title: "Храбрая Птичка",
+                    text: "На высоком дереве в гнезде жил маленький птенец ласточки по имени Сардор. Его крылья уже окрепли, но он очень боялся своего первого полёта. 'А вдруг я упаду?' — думал он каждый день.\n\nМама нежно подбадривала его: 'Сардор, каждая птица сначала боится. Но пока ты не почувствуешь полёт, не узнаешь, как это прекрасно.'\n\nОднажды подул сильный ветер, и Сардор невольно соскользнул с гнезда. Его сердце забилось быстро-быстро — но вдруг он расправил крылья и... полетел! Сначала неуверенно, а потом свободно и легко.\n\nОн парил в небе и видел внизу лес, реку и своё гнездо. Это было потрясающе! Сардор радостно защебетал.\n\nВернувшись в гнездо, он понял: страх — это лишь чувство перед первым шагом, но шаг, сделанный смело, всегда открывает новый мир."
+                },
+                {
+                    title: "Путешествие по Четырём Временам Года",
+                    text: "Весной маленькое семечко пробилось из земли и превратилось в молодой росток. Солнце согревало его тёплыми лучами. 'Здравствуй, мир!' — радостно сказал росток, раскрывая первый листок.\n\nК лету росток превратился в высокое дерево. На его ветвях свили гнёзда птицы, а в его тени играли дети. Дни были тёплыми и долгими, а дерево становилось всё сильнее.\n\nОсенью листья дерева окрасились в жёлтый, красный и оранжевый цвета. Когда дул ветер, листья кружились в танце и медленно опускались на землю. Дерево наблюдало за этой красотой и гордилось собой.\n\nЗимой дерево укуталось снегом и тихо отдыхало. Несмотря на холодные ветра, его корни глубоко в земле оставались крепкими и тёплыми — оно терпеливо ждало весны.\n\nИ вот снова пришла весна, и дерево вновь покрылось молодыми листьями. Оно поняло: у каждого времени года есть своя красота, а перемены — самая естественная и прекрасная часть жизни."
                 }
             ],
             en: [
@@ -843,11 +895,46 @@ class GameManager {
                 {
                     title: "The Wise Tortoise",
                     text: "By the shore of a beautiful lake lived a tortoise named Tilly. Tilly walked very slowly, but she knew a great many things about the world.\n\nOne day, a rabbit ran up to her and laughed. 'Hey, tortoise! You're so slow — you'll never get anywhere in life!' Tilly smiled calmly and said: 'We shall see.'\n\nThe next morning, they decided to have a race. All the animals came to watch. The race began. The rabbit shot off like a rocket, while Tilly walked slowly but steadily.\n\nHalfway through, the rabbit decided to rest under a shady tree. 'I'm so fast, I can easily catch up,' he thought, and fell asleep. But Tilly kept walking, one step at a time.\n\nAs the sun was setting, Tilly crossed the finish line first. The rabbit woke up and realized he had lost. He felt very ashamed.\n\nTilly said to him kindly: 'Dear friend, it's not speed that matters — it's persistence. Whoever never gives up will always reach their goal.' The rabbit remembered this lesson for the rest of his life."
+                },
+                {
+                    title: "The Kind Little Bear",
+                    text: "In a forest at the foot of the mountains lived a little bear cub named Buzzy. On the last days of autumn, he found the sweetest berries and filled his whole basket.\n\nOn his way home, he saw a tired little rabbit — winter was coming, and food in the forest was growing scarce. Buzzy thought for a moment, then held out half of his berries. 'Here, friend, let's share!' he said with a smile.\n\nWhile they were eating, a hungry little squirrel came along too. Buzzy shared with her as well. Soon the three of them were picking new berries together and sharing them equally.\n\nThat evening, Buzzy came home with an empty basket, but a very full heart — he had made two new friends. His mother said warmly, 'Sharing never makes you have less — it only makes you have more.'\n\nFrom that day on, Buzzy always loved sharing with others, because he knew: kindness is sweeter than even the sweetest berry."
+                },
+                {
+                    title: "Ocean Secrets",
+                    text: "On a coral reef lived a curious little fish named Lola. She loved discovering something new every single day.\n\nOne day, Lola swam off her usual path and into an unfamiliar cave. Inside, she got lost — everything around her was dark and strange. Lola became very frightened.\n\nJust then, she met a kind sea turtle named Karim. 'What's wrong, little one?' he asked. Lola, sobbing, told him she was lost. Karim decided to help her.\n\nTogether they swam toward the light, following the glowing sea plants. Along the way, an octopus named Rustam and a starfish named Zebo joined them — all helping Lola find her way home.\n\nWhen she finally reached home, Lola realized: it's much better to ask for help and trust your friends than to be scared all alone. From then on, she always swam together with her friends — because the ocean, and life, are more beautiful together."
+                },
+                {
+                    title: "The Little Gardener",
+                    text: "A girl named Nilufar received a tiny seed from her grandfather. 'Plant it and take care of it, and it will become a wonderful gift for you,' he said with a smile.\n\nNilufar planted the seed in the garden and watered it every day. But days passed, and nothing grew. Worried, she asked, 'Grandpa, why isn't anything growing?'\n\n'Be patient, my dear,' he said. 'Every beautiful thing takes time.' Nilufar kept caring for it — watering it, giving it sunlight, and clearing away weeds.\n\nAfter a few weeks, a little green sprout finally poked through the soil! Nilufar was overjoyed. She watched it grow every day until it became a beautiful red flower.\n\nThat day, Nilufar understood: with patience and care, even the smallest seed can become the most beautiful flower."
+                },
+                {
+                    title: "The Little Bright Star",
+                    text: "High in the sky lived a little star named Sparkle. Among all the big, bright stars, she felt completely unnoticed. 'I'm so small, no one will ever see my light,' she sighed every night.\n\nOne night, a little girl on Earth looked up at the sky, searching not for the brightest star, but for the one that looked closest and kindest. Her eyes landed on Sparkle.\n\n'You're shining so beautifully!' the girl whispered, closing her eyes to make a wish. Sparkle was amazed — she had always thought herself too small, yet someone had noticed and loved her light.\n\nFrom that night on, Sparkle understood: it doesn't matter if you're big or small — what matters is that your light can brighten someone's night.\n\nEver since, Sparkle shines proudly every night, knowing that even a small light can mean a great deal to someone."
+                },
+                {
+                    title: "The Bridge of Friendship",
+                    text: "On two sides of a great river lived two animal families — rabbits on one side, squirrels on the other. They could see each other from afar, but the river kept them apart.\n\nOne day, a little rabbit named Aziz was playing by the river and met a squirrel named Malika from the other side. They talked and both wished they could play together, but crossing the river seemed impossible.\n\n'Why don't we build a bridge?' Aziz suggested. Malika loved the idea. They gathered all the animals to work together — rabbits carried stones, squirrels tied branches tightly, and beavers helped build it with skill.\n\nAfter a few days, a strong, beautiful bridge was finished! Now families from both sides could cross freely and play together.\n\nAziz and Malika learned something important: when everyone works together, no obstacle — not even a great river — can stand in the way of friendship."
+                },
+                {
+                    title: "The Brave Little Bird",
+                    text: "High in a tree lived a little swallow named Sardor. His wings were already strong, but he was terrified of his very first flight. 'What if I fall?' he worried every day.\n\nHis mother gently encouraged him: 'Sardor, every bird is scared at first. But until you feel yourself flying, you won't know how beautiful it truly is.'\n\nOne day, a strong wind blew and Sardor slipped from the nest without meaning to. His heart raced — but suddenly he spread his wings and... he flew! Wobbly at first, then free and light.\n\nHe soared through the sky and saw the forest, the river, and his home below. It was amazing! Sardor chirped with joy.\n\nWhen he returned to the nest, he understood: fear is only the feeling before the first step, but a step taken with courage always opens a new world."
+                },
+                {
+                    title: "Journey Through the Four Seasons",
+                    text: "In spring, a tiny seed pushed up from the earth and became a young sprout. The sun warmed it with gentle rays. 'Hello, world!' the sprout said joyfully, unfurling its very first leaf.\n\nBy summer, the sprout had grown into a tall tree. Birds built nests in its branches, and children played in its shade. The days were warm and long, and the tree grew stronger every day.\n\nWhen autumn came, the tree's leaves turned yellow, red, and orange. When the wind blew, the leaves danced and slowly drifted to the ground. The tree watched this beautiful sight, proud of itself.\n\nIn winter, the tree wrapped itself in snow and rested quietly. Despite the cold winds, its roots stayed deep, strong, and warm — patiently waiting for spring.\n\nAnd then spring came again, and the tree grew fresh new leaves once more. It understood: every season has its own beauty, and change is the most natural and wonderful part of life."
                 }
             ]
         };
         const list = stories[lang] || stories.en;
-        return list[Math.floor(Math.random() * list.length)];
+        let pool = list;
+        if (list.length > 1 && this._lastAiStoryTitle) {
+            const filtered = list.filter(s => s.title !== this._lastAiStoryTitle);
+            if (filtered.length) pool = filtered;
+        }
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        this._lastAiStoryTitle = pick.title;
+        return pick;
     }
 }
 
