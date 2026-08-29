@@ -4,13 +4,14 @@
 }
 -keepattributes JavascriptInterface
 
-# Firebase
+# Firebase (Android & KMP GitLive)
 -keep class com.google.firebase.** { *; }
+-keep class dev.gitlive.firebase.** { *; }
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 
-# KidZone public API
--keep public class uz.kidzone.app.** { public *; }
+# KidZone Models (Only keep data classes if reflection is used, otherwise obfuscate them too)
+-keep class uz.kidzone.app.data.** { *; }
 
 # Room
 -keep class * extends androidx.room.RoomDatabase

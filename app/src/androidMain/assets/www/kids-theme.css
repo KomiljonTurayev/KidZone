@@ -1,0 +1,139 @@
+/* KidZone — Toca Boca Design System */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap');
+
+/* ── TOKENS ──────────────────────────────────────── */
+:root {
+  --kt-bg:           #FFF8F0;
+  --kt-surface:      #FFFFFF;
+  --kt-text:         #2D2D2D;
+  --kt-text-dim:     #8A8A8A;
+  --kt-accent:       #FF6B35;
+  --kt-accent-dark:  #C94F20;
+  --kt-radius-card:  24px;
+  --kt-radius-btn:   20px;
+  --kt-font-h:       'Fredoka One', cursive;
+  --kt-font-b:       'Nunito', sans-serif;
+  --kt-spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+  --kt-hdr-h:        52px;
+}
+
+/* ── GAME BODY BASE ─────────────────────────────── */
+body {
+  background: var(--kt-bg);
+  font-family: var(--kt-font-b);
+  /* Make WebViews feel like native games */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* A handful of older games draw their own in-body #topbar (score/title/level
+   pills). That duplicates the app's own #gv-top header shown above the game
+   iframe, so it's hidden here rather than removed per-file — the games' JS
+   still writes into its child elements (#score, #lv-val, etc.), so hiding via
+   CSS avoids touching 13 files' worth of divergent markup/IDs. */
+#topbar {
+  display: none !important;
+}
+
+/* ── GAME HEADER ────────────────────────────────── */
+#kt-header {
+  height: var(--kt-hdr-h);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 10px;
+  flex-shrink: 0;
+  /* background set inline per game */
+}
+
+.kt-back {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.28);
+  border: none; border-radius: 50%;
+  font-size: 18px; color: white;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.12s;
+  touch-action: manipulation;
+}
+.kt-back:active { transform: scale(0.86); }
+
+.kt-title {
+  flex: 1;
+  font-family: var(--kt-font-h);
+  font-size: 17px; color: white;
+  text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.kt-lv {
+  background: rgba(255,255,255,0.28);
+  color: white;
+  font-family: var(--kt-font-b);
+  font-weight: 900; font-size: 11px;
+  padding: 4px 11px;
+  border-radius: 50px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ── OVERRIDE: kzl level-up card ────────────────── */
+.kzl-lup-card {
+  background: #FFFFFF !important;
+  color: var(--kt-text) !important;
+}
+.kzl-lup-stars { color: #FFB300 !important; }
+.kzl-lup-num   { color: var(--kt-accent) !important; }
+.kzl-lup-txt   { color: var(--kt-text-dim) !important; }
+.kzl-lup-btn {
+  background: var(--kt-accent) !important;
+  color: white !important;
+  box-shadow: 0 4px 0 var(--kt-accent-dark) !important;
+}
+.kzl-lup-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 1px 0 var(--kt-accent-dark) !important;
+}
+
+/* ── OVERRIDE: shape-match overlay ──────────────── */
+.rd-card {
+  background: var(--kt-surface) !important;
+  background-image: none !important;
+  color: var(--kt-text) !important;
+}
+.rd-title { color: var(--kt-accent) !important; }
+.rd-sub   { color: var(--kt-text-dim) !important; }
+.rd-btn {
+  background: var(--kt-accent) !important;
+  color: white !important;
+  box-shadow: 0 4px 0 var(--kt-accent-dark) !important;
+}
+.rd-btn:active { transform: translateY(3px) scale(0.98) !important; }
+
+/* ── OVERRIDE: maze level-up card ───────────────── */
+#level-up-card {
+  background: var(--kt-surface) !important;
+  background-image: none !important;
+  border: none !important;
+  color: var(--kt-text) !important;
+}
+#level-up-em  { display: block; text-align: center; margin-bottom: 8px; }
+#level-up-msg { color: var(--kt-accent) !important; }
+#level-up-sub { color: var(--kt-text-dim) !important; }
+/* Scoped to maze level-up overlay only — other games (animals, body, shadow, weather)
+   also use #btn-next but must keep their own purple/white styles. */
+#level-up #btn-next {
+  background: var(--kt-accent) !important;
+  border-color: var(--kt-accent) !important;
+  box-shadow: 0 4px 0 var(--kt-accent-dark) !important;
+}
+
+/* ── OVERRIDE: memory-match container ───────────── */
+/* Scoped via data-game attribute — jump-rope.html also uses #game-container
+   (full-viewport black canvas) and must not be affected. */
+body[data-game="memory-match"] #game-container {
+  background: var(--kt-surface) !important;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.10) !important;
+}
