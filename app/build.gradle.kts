@@ -50,6 +50,10 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
                 implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha06")
                 implementation("io.coil-kt.coil3:coil-network-ktor:3.0.0-alpha06")
+                
+                // Embedded Offline Web Server for HTML5 games
+                implementation("io.ktor:ktor-server-core:2.3.11")
+                implementation("io.ktor:ktor-server-cio:2.3.11")
             }
         }
         val commonTest by getting {

@@ -61,6 +61,9 @@ class KidZoneApplication : Application() {
         }
         createNotificationChannel()
         CoroutineScope(Dispatchers.IO).launch { migrateToProfilesIfNeeded() }
+        
+        GameServer.init(this)
+        GameServer.start()
     }
 
     private fun syncToFirestore(uid: String) {

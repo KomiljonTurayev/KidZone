@@ -69,6 +69,11 @@ class KidWebViewManager(private val webView: WebView) {
         webView.addJavascriptInterface(obj, name)
     }
 
+    fun loadGame(gameId: String) {
+        val url = GameServer.getGameUrl(gameId)
+        webView.loadUrl(url)
+    }
+
     fun loadUrl(url: String) {
         webView.loadUrl(url)
     }
