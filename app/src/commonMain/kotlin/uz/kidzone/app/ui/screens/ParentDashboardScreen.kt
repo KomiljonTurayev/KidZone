@@ -363,7 +363,56 @@ internal fun PinGate(
     var lastAttemptFailed by remember { mutableStateOf(false) }
 
     if (!hasPinSet) {
-        LaunchedEffect(Unit) { onPinCorrect("") }
+        var a by remember { mutableIntStateOf((5..12).random()) }
+        var b by remember { mutableIntStateOf((5..12).random()) }
+        var answer by remember { mutableStateOf("") }
+        var error by remember { mutableStateOf(false) }
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Ota-ona qulfi", style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(8.dp))
+            Text("Kattalar ekanligingizni tasdiqlash uchun masalani yeching:", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(24.dp))
+            Text("$a × $b = ?", style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(24.dp))
+            
+            OutlinedTextField(
+                value = answer,
+                onValueChange = { answer = it.filter { char -> char.isDigit() }.take(3) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.width(120.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(textAlign = TextAlign.Center, fontSize = 24.sp)
+            )
+            
+            if (error) {
+                Spacer(Modifier.height(8.dp))
+                Text("Xato! Qaytadan urinib ko'ring.", color = MaterialTheme.colorScheme.error)
+            }
+            
+            Spacer(Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    if (answer.toIntOrNull() == a * b) {
+                        onPinCorrect("")
+                    } else {
+                        error = true
+                        answer = ""
+                        a = (5..12).random()
+                        b = (5..12).random()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(0.6f)
+            ) {
+                Text("Tasdiqlash")
+            }
+            Spacer(Modifier.height(16.dp))
+            TextButton(onClick = onBack) { Text("Bekor qilish") }
+        }
         return
     }
 
