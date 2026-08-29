@@ -159,6 +159,27 @@ class DashboardViewModel(
 
     // --- Suspend Wrappers (Callbacklarni Coroutines'ga aylantirish) ---
 
+    fun deleteAccount(onDone: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            _state.update { it.copy(isSyncing = true, loginError = null) }
+            try {
+                suspendDeleteAccount()
+                _state.update {
+                    it.copy(
+                        firebaseUid = null,
+                        firebaseEmail = null,
+                        isSyncing = false,
+                        loginError = null,
+                    )
+                }
+                onDone(true)
+            } catch (e: Exception) {
+                _state.update { it.copy(loginError = e.message, isSyncing = false) }
+                onDone(false)
+            }
+        }
+    }
+
     private suspend fun suspendSignIn(email: String, password: String): FirebaseUser {
         return suspendCancellableCoroutine { cont ->
             FirebaseManager.getInstance().signInWithEmail(email, password, object : FirebaseManager.AuthCallback {
@@ -177,6 +198,19 @@ class DashboardViewModel(
             FirebaseManager.getInstance().createAccountWithEmail(email, password, object : FirebaseManager.AuthCallback {
                 override fun onSuccess(user: FirebaseUser) {
                     cont.resume(user)
+                }
+                override fun onError(message: String) {
+                    cont.resumeWithException(Exception(message))
+                }
+            })
+        }
+    }
+
+    private suspend fun suspendDeleteAccount() {
+        return suspendCancellableCoroutine { cont ->
+            FirebaseManager.getInstance().deleteAccount(object : FirebaseManager.DeleteCallback {
+                override fun onSuccess() {
+                    cont.resume(Unit)
                 }
                 override fun onError(message: String) {
                     cont.resumeWithException(Exception(message))

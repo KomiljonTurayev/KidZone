@@ -55,6 +55,18 @@ class FirebaseManager internal constructor(private val auth: FirebaseAuth?) {
             .addOnFailureListener { cb.onError(it.message ?: "Unknown error") }
     }
 
+    interface DeleteCallback {
+        fun onSuccess()
+        fun onError(message: String)
+    }
+
+    fun deleteAccount(cb: DeleteCallback) {
+        if (auth == null || auth.currentUser == null) { cb.onError("User not found"); return }
+        auth.currentUser!!.delete()
+            .addOnSuccessListener { cb.onSuccess() }
+            .addOnFailureListener { cb.onError(it.message ?: "Unknown error") }
+    }
+
     fun ensureAuthAsync(onReady: Runnable) {
         if (auth == null) { onReady.run(); return }
         if (auth.currentUser != null) { onReady.run(); return }

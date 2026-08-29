@@ -218,6 +218,8 @@ fun ParentDashboardScreen(
             // 6. Cloud status (faqat login bo'lsa)
             if (state.firebaseUid != null) {
                 item {
+                    var showDeleteDialog by remember { mutableStateOf(false) }
+
                     Spacer(Modifier.height(8.dp))
                     Text("Cloud sinxronlash", style = MaterialTheme.typography.titleMedium)
                     Text(
@@ -253,7 +255,42 @@ fun ParentDashboardScreen(
                             Text("Chiqish")
                         }
                     }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = { showDeleteDialog = true },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                        border = BorderStroke(1.dp, Color.Red),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Hisobni butunlay o'chirish")
+                    }
                     Spacer(Modifier.height(16.dp))
+
+                    if (showDeleteDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDeleteDialog = false },
+                            title = { Text("Diqqat!") },
+                            text = { Text("Barcha ma'lumotlaringiz, statistika va profillar serverdan butunlay o'chirib tashlanadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?") },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        vm.deleteAccount { success ->
+                                            if (success) cloudResolved = false
+                                            showDeleteDialog = false
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                                ) {
+                                    Text("O'chirish", color = Color.White)
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDeleteDialog = false }) {
+                                    Text("Bekor qilish")
+                                }
+                            }
+                        )
+                    }
                 }
             }
 
