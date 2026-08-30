@@ -66,6 +66,8 @@ kotlin {
                 implementation("androidx.activity:activity-compose:1.9.0")
                 implementation("androidx.appcompat:appcompat:1.7.0")
                 implementation("androidx.core:core-ktx:1.13.1")
+                implementation("com.google.android.material:material:1.12.0")
+                implementation("androidx.core:core-splashscreen:1.0.1")
                 
                 implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.7.0"))
                 implementation("com.google.firebase:firebase-auth")
@@ -81,7 +83,8 @@ kotlin {
                 implementation("androidx.webkit:webkit:1.11.0")
             }
         }
-        val iosMain by getting {
+        val iosMain by creating {
+            dependsOn(commonMain)
             dependencies {}
         }
     }
@@ -119,8 +122,14 @@ android {
         buildConfig = true
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.11"
+    }
     dependencies {
         debugImplementation("androidx.compose.ui:ui-tooling")
+        // Note: Adding pure Android revenuecat here because KMP version requires specific setup.
+        implementation("com.revenuecat.purchases:purchases:8.4.0")
+        implementation("com.revenuecat.purchases:purchases-ui:8.4.0")
     }
 }
 

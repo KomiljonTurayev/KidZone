@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -110,6 +112,10 @@ fun KidzoSheet(
                         if (inputText.isNotBlank()) {
                             viewModel.sendMessage(inputText)
                             inputText = ""
+                            // Oddiy counter o'rniga haqiqiy paywall counter qo'shiladi
+                            val prefs = uz.kidzone.app.arch.AppPreferences.getInstance()
+                            val limit = prefs.getInt("daily_ai_limit", 0)
+                            prefs.putInt("daily_ai_limit", limit + 1)
                         }
                     },
                     shape = RoundedCornerShape(20.dp),
@@ -117,6 +123,54 @@ fun KidzoSheet(
                 ) {
                     Text("→")
                 }
+            }
+        }
+        
+        // PAYWALL LOGIC
+        val prefs = uz.kidzone.app.arch.AppPreferences.getInstance()
+        var dailyLimit by remember { mutableStateOf(prefs.getInt("daily_ai_limit", 0)) }
+        var showPaywall by remember { mutableStateOf(false) }
+        var showPinGate by remember { mutableStateOf(false) }
+        
+        // Agar limit 1 dan oshsa va Premium bo'lmasa, oynani yopish
+        if (dailyLimit >= 1 && !uz.kidzone.app.RevenueCatManager.isPremium()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.9f)),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                    Text("Bugungi ertaklar tugadi! 🌙", style = MaterialTheme.typography.titleLarge)
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { showPinGate = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = KidZoneOrange)
+                    ) {
+                        Text("🔒 Ota-onalar uchun")
+                    }
+                }
+            }
+            
+            if (showPinGate) {
+                uz.kidzone.app.ui.screens.PinGate(
+                    hasPinSet = prefs.getString("kz_pin", "")?.isNotEmpty() == true,
+                    onPinCorrect = { 
+                        showPinGate = false
+                        showPaywall = true
+                    },
+                    onBack = { showPinGate = false }
+                )
+            }
+            
+            if (showPaywall) {
+                uz.kidzone.app.ui.screens.PaywallScreen(
+                    onDismiss = { showPaywall = false },
+                    onSuccess = { 
+                        showPaywall = false
+                        dailyLimit = 0
+                    }
+                )
             }
         }
     }
