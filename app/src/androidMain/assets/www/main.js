@@ -698,6 +698,9 @@ class GameManager {
     generateAiStory(childName, scenario) {
         if (this._aiStoryPending) return;
 
+        this._lastChildName = childName !== undefined ? (childName || "") : (this._lastChildName || "");
+        this._lastScenario = scenario !== undefined ? (scenario || "") : (this._lastScenario || "");
+
         const viewer = document.getElementById("ai-viewer");
         const loading = document.getElementById("aiv-loading");
         const content = document.getElementById("aiv-content-wrap");
@@ -709,13 +712,11 @@ class GameManager {
 
         if (window.AndroidBridge && window.AndroidBridge.generateStory) {
             this._aiStoryPending = true;
-            window.AndroidBridge.generateStory(this.translator.lang, this.age, childName || "", scenario || "");
+            window.AndroidBridge.generateStory(this.translator.lang, this.age, this._lastChildName, this._lastScenario);
             return;
         }
 
-        // No native bridge (e.g. a plain browser preview) — use the offline pool directly.
-        // Personalization needs the real model, so a name/scenario here is silently ignored.
-        setTimeout(() => this._showAiStory(this.getAiStory(this.translator.lang)), 500);
+        setTimeout(() => this._showAiStory(this.getAiStory(this.translator.lang, this._lastChildName, this._lastScenario)), 500);
     }
 
     _showAiStory(story) {
@@ -826,10 +827,114 @@ class GameManager {
     }
 
     openAiMusic() {
-        this.openGame({id:"piano", em:"🎹", name:this.translator.get("aiBtnMusic"), file:"instrument.html", pts:15});
+        if (typeof window.openSleep === 'function') {
+            window.openSleep();
+            return;
+        }
+        this.openGame({id:"sleep-well", em:"🌙", name:this.translator.get("aiBtnMusic"), file:"sleep-well.html", pts:25});
     }
 
-    getAiStory(lang) {
+    generatePersonalizedStory(lang, childName, scenario) {
+        this._storyVariant = ((this._storyVariant || 0) + 1) % 5;
+        const variant = this._storyVariant;
+        const name = (childName || "").trim() || (lang === "ru" ? "Максим" : lang === "en" ? "Leo" : "Jasur");
+        const sc = (scenario || "").trim();
+        const scTitle = sc ? sc.replace(/[.,!?;:]/g, "").split(" ").filter(Boolean).slice(0, 4).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "";
+
+        if (lang === "ru") {
+            if (variant === 0) {
+                const title = sc ? `${name} и Тайна ${scTitle}` : `${name} и Золотой Ключик`;
+                const p1 = `В один прекрасный день ${name} нашёл старинную карту в любимой книге сказок. Любознательный ${name} сразу понял: впереди ждёт настоящее приключение!`;
+                const p2 = sc ? `Стрелки на карте указывали путь к заветной цели — "${sc}". С горящими глазами ${name} собрал походный рюкзачок и сделал первый решительный шаг.` : `Карта вела к таинственной изумрудной двери на опушке леса.`;
+                const p3 = `На пути возникла сложная загадка. Но ${name} проявил сообразительность и терпение, сумев разгадать древний секрет и открыть заветную дверь.`;
+                const p4 = sc ? `За дверью открылось удивительное зрелище! Задумка "${sc}" исполнилась наилучшим образом. Все вокруг аплодировали находчивости ${name}.` : `Внутри оказалась волшебная библиотека знаний, сияющая мягким светом.`;
+                const p5 = `${name} вернулся домой счастливым. Он понял: самое ценное сокровище — это знания, ум и верность своим добрым мечтам!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else if (variant === 1) {
+                const title = sc ? `${name} и Дружная Команда: ${scTitle}` : `${name} и Верные Друзья`;
+                const p1 = `Утреннее солнце ласково заглянуло в окно, и ${name} вышел во двор с отличным настроением. Сегодня предстоял день настоящей дружбы!`;
+                const p2 = sc ? `Собрав своих верных друзей, ${name} поделился грандиозной идеей — "${sc}". Ребята дружно поддержали план.` : `В парке ${name} заметил грустного птенца и сразу решил помочь малышу.`;
+                const p3 = `Вскоре путь преградила бурная река. ${name} объединил усилия друзей: вместе они построили надежный мостик.`;
+                const p4 = sc ? `Благодаря сплоченности цель "${sc}" была с триумфом достигнута! Радостный смех озарил лица всех участников.` : `Птенец был бережно возвращен в гнездо к маме.`;
+                const p5 = `Вечером ${name} понял: в одиночку путь бывает труден, но с верными друзьями любая вершина покоряется легко!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else {
+                const title = sc ? `${name} и Чудесное ${scTitle}` : `${name} и Волшебное Приключение`;
+                const p1 = `В одном уютном городке жил замечательный ребенок по имени ${name}. ${name} отличался добрым сердцем и любовью к приключениям.`;
+                const p2 = sc ? `Однажды с ${name} произошло удивительное событие. Всё началось с давней мечты — "${sc}".` : `Однажды ${name} увидел маленькую птичку с золотистыми перьями.`;
+                const p3 = `На этом пути ${name} проявил смекалку, храбрость и доброту, помогая всем, кто встречался на пути.`;
+                const p4 = sc ? `Преодолев все испытания, ${name} успешно завершил приключение "${sc}" полной победой!` : `Вместе они вышли на чудесную поляну дружбы.`;
+                const p5 = `Этот день научил главному: настоящие чудеса случаются там, где есть доброта, смелость и вера в свои силы!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            }
+        } else if (lang === "en") {
+            if (variant === 0) {
+                const title = sc ? `${name} and the Mystery of ${scTitle}` : `${name} and the Golden Compass`;
+                const p1 = `One morning, while exploring an old book, ${name} discovered a fascinating treasure map full of secrets.`;
+                const p2 = sc ? `The compass pointed straight toward "${sc}". Without hesitation, ${name} packed a bag and took the first brave step.` : `The map led toward an enchanted green archway deep inside the woods.`;
+                const p3 = `A clever riddle stood in the path. ${name} thought carefully, used great patience, and solved the mystery with a bright smile.`;
+                const p4 = sc ? `Beyond the archway lay the grand result! The goal of "${sc}" was achieved with flying colors.` : `The door opened to reveal a dazzling library of starlight wisdom.`;
+                const p5 = `${name} returned home knowing that the greatest treasure of all is wisdom, courage, and a curious mind!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else {
+                const title = sc ? `${name} and ${scTitle}` : `${name}'s Magical Adventure`;
+                const p1 = `Once upon a time, in a bright town, lived a curious and kind-hearted child named ${name}.`;
+                const p2 = sc ? `One sunny morning, the adventure of "${sc}" began. ${name} stepped forward with high spirits.` : `While walking through a green meadow, ${name} discovered a tiny sparkling key.`;
+                const p3 = `Throughout the journey, ${name} showed clever thinking, helping friends along the trail.`;
+                const p4 = sc ? `Through teamwork and perseverance, the adventure of "${sc}" was a magnificent success!` : `At the end of the path stood the magical Garden of Joy.`;
+                const p5 = `As the sun set, ${name} realized that true magic lives within kindness, courage, and believing in dreams!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            }
+        } else {
+            // Uzbek variants
+            if (variant === 0) {
+                const title = sc ? `${name} va ${scClean}: Sirli Topilma` : `${name} va Oltin Kalit Sirlari`;
+                const p1 = `Kunlarning birida ${name} o'zining shinam uyida kitob varaqlab o'tirib, g'aroyib bir xaritaga ko'zi tushdi. ${name} darhol bu sirni o'rganishga qaror qildi.`;
+                const p2 = sc ? `Xaritadagi belgilar to'g'ridan-to'g'ri "${sc}" tomon yetaklardi. ${name} sumkachasini olib, dadil qadamlar bilan yo'lga otlandi.` : `Xarita qalin o'rmon qa'ridagi sirli yashil darvozani ko'rsatardi.`;
+                const p3 = `Yo'lda ${name}ga chigal jumboq duch keldi. Lekin aqlli qahramonimiz shoshilmadi — u topqirlik bilan sirli eshikning kalitini topdi.`;
+                const p4 = sc ? `Eshik ortida esa haqiqiy mo'jiza yashiringan ekan! ${name} "${sc}" orqali ko'zlangan buyuk maqsadiga to'liq erishdi!` : `Eshik ochilgach, ichkarida minglab porloq kitoblar bilan to'la sirli kutubxona paydo bo'ldi.`;
+                const p5 = `Uyga qaytgan ${name}ning qalbi quvonchga to'ldi. U tushundiki, eng katta xazina — bu topqirlik, teran aql va yangi bilimlardir!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else if (variant === 1) {
+                const title = sc ? `${name} va Do'stlar: ${scClean}` : `${name} va Quvnoq Jamoa`;
+                const p1 = `Ertalabki quyosh nurlari zaminni yoritganda, ${name} quvnoq kayfiyatda ko'chaga chiqdi. Bugun haqiqiy do'stlik sinovidan o'tadigan sarguzasht kuni edi.`;
+                const p2 = sc ? `Do'stlari bilan to'plangan ${name} ularga o'zining ajoyib rejasi — "${sc}" haqida so'zlab berdi va ular birgalikda ishga kirishdilar.` : `Bog'da sayr qilib yurgan ${name} yordamga muhtoj mittivoy sincobchani ko'rib qoldi.`;
+                const p3 = `Sayohat davomida kutilmagan to'siq chiqdi: daryodan o'tish lozim edi. ${name} darhol jamoani birlashtirib, xavfsiz ko'prik barpo qildi.`;
+                const p4 = sc ? `Ahil jamoa bir yoqadan bosh chiqarib, "${sc}" orzusini to'liq ro'yobga chiqardi! Do'stlar ${name}ning yetakchiligidan faxrlandilar.` : `Mittivoy sincobcha xavfsiz o'z oilasiga yetkazildi.`;
+                const p5 = `Kechki salqinda uyga qaytgan ${name} shuni angladiki: sadoqatli do'stlar bilan har qanday qiyinchilik zavqli g'alabaga aylanadi!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else if (variant === 2) {
+                const title = sc ? `${name}: ${scClean} Kashfiyoti` : `${name} va Sehrli Ixtiro`;
+                const p1 = `${name} bolaligidanoq buyumlar qanday tuzilganini bilishga qiziqardi. U yangi kashfiyotlar qilishni juda yoqtirardi.`;
+                const p2 = sc ? `Bir kuni ${name} "${sc}" g'oyasini amalga oshirish uchun maxsus mo'jizakor asbob yasashga kirishdi. U chizdi, o'lchadi va astoydil mehnat qildi.` : `Bir kuni ${name} qushlar tilini tushunadigan kichkina quvnoq robot yasashga qaror qildi.`;
+                const p3 = `Boshida qiyinchiliklar bo'ldi, lekin ${name} taslim bo'lmadi! U xatolarini qunt bilan to'g'rilab, yangi usullarni sinab ko'rdi.`;
+                const p4 = sc ? `Mo'jizakor ixtiro charaqlab ishga tushdi va "${sc}" jarayonini misli ko'rilmagan darajada oson va hayratlanarli qildi!` : `Mitti robot ishga tushib, qushlar bilan chiroyli suhbat qura boshladi.`;
+                const p5 = `${name} bildiki: mehnatsevarlik, qunt va sabr har qanday ezgu orzuni haqiqatga aylantirishga qodir!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else if (variant === 3) {
+                const title = sc ? `${name} va Koinotdagi ${scClean}` : `${name} va Yulduzlar Oroli`;
+                const p1 = `Kechqurun osmonga qarab, miltillagan yulduzlarni sanashni ${name} juda sevardi.`;
+                const p2 = sc ? `Shu kecha uning xonasiga kumush rang nurlar tushdi va unga orzuidagi "${sc}" sayohatini boshlash uchun sehrli imkoniyat taqdim etildi.` : `Shu kecha uning derazasiga mitti yulduzcha kelib, samoviy sayohatga chorladi.`;
+                const p3 = `Bulutlar ustida sayr qilar ekan, ${name} o'zining zukkoligi va mehribonligi bilan yo'ldan adashgan mittivoy yulduzchaga yo'l ko'rsatdi.`;
+                const p4 = sc ? `Yulduzlar shukuhida "${sc}" sarguzashtining eng qiziqarli marrasi zabt etildi! Butun fazo quvonch nurlariga to'ldi.` : `Yulduzlar oroliga yetib, barcha bolalarga shodlik taratuvchi ezgu orzular daraxtini ko'rdi.`;
+                const p5 = `Ertalab uyg'ongan ${name}ning yuzida tabassum porlardi. U tushundiki, eng go'zal mo'jizalar bizning ezgu niyatlarimizdan boshlanadi!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            } else {
+                const title = sc ? `${name} va Mo'jizaviy ${scClean}` : `${name} va Tabiat Saxovati`;
+                const p1 = `Bahor tongida butun tabiat uyg'onib, gullar xushbo'y ifor taratayotgan edi. ${name} tabiat bag'rida sayr qilishni sevardi.`;
+                const p2 = sc ? `Bu safargi sayr ajoyib reja bilan boshlandi: ${name} "${sc}" maqsadini amalga oshirish uchun chiroyli vodiy sari yo'l oldi.` : `Sayr chog'ida ${name} chanqagan gulzorga duch kelib, uni mehr bilan sug'ordi.`;
+                const p3 = `Yo'lda u turli jonzotlarni uchratib, barchasiga ko'maklashdi. Mayin shabada esa ${name}ga yo'l ko'rsatib turdi.`;
+                const p4 = sc ? `Mehr-oqibat tufayli "${sc}" sarguzashti kutilgandanda a'lo darajada amalga oshdi! Jonajon o'lka gullab-yashnadi.` : `Gullar minnatdor bo'lib yaproqlarini yozdi va atrof go'zallikka to'ldi.`;
+                const p5 = `Kechqurun ufqqa qarab, ${name} chuqur haqiqatni his etdi: ezgulik hech qachon yo'qolmaydi, u albatta mehr bo'lib qaytadi!`;
+                return { title, text: `${p1}\n\n${p2}\n\n${p3}\n\n${p4}\n\n${p5}` };
+            }
+        }
+    }
+
+    getAiStory(lang, childName, scenario) {
+        if (childName || scenario) {
+            return this.generatePersonalizedStory(lang, childName, scenario);
+        }
         const stories = {
             uz: [
                 {
@@ -1238,12 +1343,12 @@ window.addEventListener("load", () => {
         try {
             app._showAiStory(JSON.parse(payloadJson));
         } catch (e) {
-            app._showAiStory(app.getAiStory(app.translator.lang));
+            app._showAiStory(app.getAiStory(app.translator.lang, app._lastChildName, app._lastScenario));
         }
     };
     window.onAiStoryError = function() {
         app._aiStoryPending = false;
-        app._showAiStory(app.getAiStory(app.translator.lang));
+        app._showAiStory(app.getAiStory(app.translator.lang, app._lastChildName, app._lastScenario));
     };
 
     // NativeBridge.speakText(...) callbacks (see _doSpeak in GameManager).

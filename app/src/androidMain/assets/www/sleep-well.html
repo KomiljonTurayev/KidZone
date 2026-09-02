@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sehrli Uyqu & Allalar 🌙</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; user-select:none; }
+  :root {
+    --night-bg: radial-gradient(circle at 50% 15%, #1a1e38 0%, #0d1124 55%, #050711 100%);
+    --accent: #FDE68A;
+    --primary: #FF6B35;
+  }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    background: var(--night-bg);
+    color: #F3F4F6;
+    font-family: 'Arial Rounded MT Bold', 'Nunito', -apple-system, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    overflow-x: hidden; padding: 14px 14px 28px; position: relative;
+    transition: filter 0.4s ease;
+  }
+
+  /* Starry background canvas */
+  #sky-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+  }
+
+  /* Main Container */
+  .container {
+    width: 100%; max-width: 440px; z-index: 1; display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* Header */
+  .top-row {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .title-pill {
+    background: rgba(255,255,255,0.1); backdrop-filter: blur(12px);
+    border-radius: 24px; padding: 8px 18px; font-size: 15px; font-weight: 900;
+    color: var(--accent); display: flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .status-badge {
+    font-size: 12px; font-weight: 900; color: #10B981;
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(16, 185, 129, 0.12); padding: 6px 12px; border-radius: 16px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  /* Moon / Bedtime Center Hero */
+  .moon-hero {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 6px 0; position: relative;
+  }
+  .moon-orb {
+    width: 105px; height: 105px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #FFFBEB 0%, #FDE68A 65%, #F59E0B 100%);
+    box-shadow: 0 0 45px rgba(253, 230, 138, 0.45);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px; cursor: pointer;
+    animation: moonFloat 4s ease-in-out infinite alternate;
+    transition: transform 0.2s, filter 0.3s;
+  }
+  .moon-orb:active { transform: scale(0.92); }
+  @keyframes moonFloat {
+    0% { transform: translateY(0) rotate(-2deg); }
+    100% { transform: translateY(-10px) rotate(3deg); }
+  }
+  .hero-msg {
+    margin-top: 10px; font-size: 17px; font-weight: 900; color: #E0E7FF; text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .hero-sub {
+    font-size: 12px; color: #94A3B8; margin-top: 2px; text-align: center;
+  }
+
+  /* Master Controls Deck */
+  .main-ctrl-deck {
+    display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 10px; width: 100%;
+  }
+  .btn-play-toggle {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+    color: white; border: none; border-radius: 22px; padding: 12px 24px;
+    font-size: 14px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(255, 107, 53, 0.35); font-family: inherit; transition: transform 0.15s;
+    flex: 1.2; justify-content: center;
+  }
+  .btn-play-toggle:active { transform: scale(0.95); }
+  .btn-stop-deck {
+    background: rgba(255,255,255,0.1); color: #E2E8F0; border: 1.5px solid rgba(255,255,255,0.18);
+    border-radius: 22px; padding: 12px 18px; font-size: 14px; font-weight: 800; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; font-family: inherit; transition: transform 0.15s;
+    justify-content: center;
+  }
+  .btn-stop-deck:active { transform: scale(0.95); }
+
+  /* Volume Row */
+  .vol-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px; padding: 8px 14px; margin-top: 4px; width: 100%;
+  }
+  .vol-lbl { font-size: 12px; font-weight: 800; color: #CBD5E1; display: flex; align-items: center; gap: 6px; }
+  .vol-slider {
+    -webkit-appearance: none; appearance: none; width: 150px; height: 6px;
+    border-radius: 3px; background: rgba(255,255,255,0.2); outline: none;
+  }
+  .vol-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: #FDE68A; cursor: pointer;
+    box-shadow: 0 0 10px rgba(253,230,138,0.8);
+  }
+
+  /* Category Pills Bar */
+  .cat-pills-bar {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .cat-pills-bar::-webkit-scrollbar { display: none; }
+  .cat-pill {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px; padding: 8px 14px; font-size: 13px; font-weight: 900;
+    color: #CBD5E1; cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  }
+  .cat-pill:active { transform: scale(0.95); }
+  .cat-pill.active {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    border-color: #A5B4FC; color: #FFFFFF;
+    box-shadow: 0 3px 12px rgba(99, 102, 241, 0.4);
+  }
+
+  /* Sound Cards Grid (4 per category) */
+  .sounds-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  }
+  .sound-card {
+    background: rgba(255,255,255,0.07); border: 1.8px solid rgba(255,255,255,0.11);
+    border-radius: 18px; padding: 12px 10px; box-sizing: border-box;
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    transition: all 0.2s ease; position: relative; overflow: hidden;
+  }
+  .sound-card:active { transform: scale(0.96); }
+  .sound-card.active {
+    background: linear-gradient(135deg, rgba(67, 56, 202, 0.5), rgba(124, 58, 237, 0.5));
+    border-color: #818CF8; box-shadow: 0 0 20px rgba(129, 140, 248, 0.35);
+  }
+  .sound-card.active::after {
+    content: "●"; position: absolute; top: 8px; right: 10px; font-size: 10px; color: #10B981;
+    animation: pulseDot 1.5s infinite;
+  }
+  @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .sc-icon { font-size: 30px; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sc-info { display: flex; flex-direction: column; text-align: left; }
+  .sc-name { font-size: 13px; font-weight: 900; color: #F8FAFC; line-height: 1.2; }
+  .sound-card.active .sc-name { color: #FDE68A; }
+  .sc-sub { font-size: 10.5px; color: #94A3B8; margin-top: 2px; }
+
+  /* Mixer / Sound Layering Section */
+  .mixer-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 12px 14px;
+  }
+  .mixer-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+  }
+  .section-label {
+    font-size: 12.5px; font-weight: 900; color: #CBD5E1; text-transform: uppercase;
+    letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px;
+  }
+  .mixer-chips {
+    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+  }
+  .m-chip {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px; padding: 6px 11px; font-size: 11.5px; font-weight: 800;
+    color: #CBD5E1; cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  }
+  .m-chip.active {
+    background: #10B981; color: white; border-color: #10B981;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+  }
+
+  /* Timer Controls */
+  .timer-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 12px 16px; display: flex; align-items: center;
+    justify-content: space-between;
+  }
+  .timer-left { display: flex; align-items: center; gap: 10px; }
+  .timer-icon { font-size: 24px; }
+  .timer-text { font-size: 13.5px; font-weight: 900; color: #E5E7EB; }
+  .timer-sub { font-size: 11px; color: #94A3B8; }
+  .timer-chips { display: flex; gap: 6px; }
+  .t-chip {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px; padding: 6px 10px; font-size: 11.5px; font-weight: 900;
+    color: #D1D5DB; cursor: pointer; transition: all 0.15s;
+  }
+  .t-chip.active {
+    background: #6366F1; color: #FFFFFF; border-color: #A5B4FC;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+  }
+
+  /* Bedtime Routine Checklist & Todo */
+  .routine-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 12px 14px;
+  }
+  .routine-list { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; }
+  .routine-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.04); border-radius: 12px; padding: 7px 10px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .routine-item.done {
+    background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .ri-left { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; }
+  .ri-check {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 11px;
+    transition: all 0.2s;
+  }
+  .routine-item.done .ri-check {
+    background: #10B981; border-color: #10B981; color: white;
+  }
+
+  /* Bottom Dimmer Slider */
+  .dimmer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.05); border-radius: 18px; padding: 8px 14px;
+  }
+  .dimmer-lbl { font-size: 12px; font-weight: 800; color: #D1D5DB; display: flex; align-items: center; gap: 6px; }
+  .dimmer-slider {
+    -webkit-appearance: none; appearance: none; width: 140px; height: 6px;
+    border-radius: 3px; background: rgba(255,255,255,0.2); outline: none;
+  }
+  .dimmer-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+    border-radius: 50%; background: #FDE68A; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="sky-canvas"></canvas>
+
+<div class="container">
+  <!-- Top Row -->
+  <div class="top-row">
+    <div class="title-pill">
+      <span>🌙</span> <span id="ui-title">Sehrli Uyqu</span>
+    </div>
+    <div class="status-badge" id="play-status">
+      💤 Tinch orom oling
+    </div>
+  </div>
+
+  <!-- Moon Hero -->
+  <div class="moon-hero">
+    <div class="moon-orb" id="moon-btn" onclick="togglePlay()">
+      <span id="moon-face">😴</span>
+    </div>
+    <div class="hero-msg" id="hero-status">Orom Baxsh Allalar</div>
+    <div class="hero-sub" id="hero-timer">Har qanday tovushni bosing — darhol yangraydi!</div>
+
+    <!-- Master Controls Deck -->
+    <div class="main-ctrl-deck">
+      <button class="btn-play-toggle" id="main-play-btn" onclick="togglePlay()">
+        <span id="main-play-ic">▶️</span> <span id="main-play-txt">Ovozni Yoqish</span>
+      </button>
+      <button class="btn-stop-deck" id="main-stop-btn" onclick="stopAudio()">
+        <span>⏹️</span> <span id="main-stop-txt">To'xtatish</span>
+      </button>
+    </div>
+
+    <!-- Volume Row -->
+    <div class="vol-row">
+      <div class="vol-lbl">
+        <span>🔉</span> <span id="ui-vol-lbl">Ovoz Balandligi</span>
+      </div>
+      <input type="range" min="0" max="100" value="85" class="vol-slider" oninput="setMasterVolume(this.value)">
+    </div>
+  </div>
+
+  <!-- Category Filter Bar (4 Distinct Themes) -->
+  <div class="cat-pills-bar">
+    <div class="cat-pill active" onclick="selectCategory('allalar', this)" id="cat-allalar">
+      <span>🎶</span> <span id="c-allalar-txt">Allalar</span>
+    </div>
+    <div class="cat-pill" onclick="selectCategory('suv', this)" id="cat-suv">
+      <span>🌧️</span> <span id="c-suv-txt">Yomg'ir & Suv</span>
+    </div>
+    <div class="cat-pill" onclick="selectCategory('tabiat', this)" id="cat-tabiat">
+      <span>🍃</span> <span id="c-tabiat-txt">Tabiat</span>
+    </div>
+    <div class="cat-pill" onclick="selectCategory('orom', this)" id="cat-orom">
+      <span>🤍</span> <span id="c-orom-txt">Orom & Yurak</span>
+    </div>
+  </div>
+
+  <!-- 16 Real Organic Sound Cards Grid -->
+  <div>
+    <div class="section-label" style="margin-bottom: 8px;">
+      <span>🎵</span> <span id="ui-sounds-lbl">Uyqu Ovozlarini Tanlang</span>
+    </div>
+    <div class="sounds-grid" id="sounds-container">
+      <!-- Injected by JS based on active category -->
+    </div>
+  </div>
+
+  <!-- Layering / Background Sound Mixer -->
+  <div class="mixer-card">
+    <div class="mixer-header">
+      <div class="section-label">
+        <span>🎧</span> <span id="ui-mixer-lbl">Fon Tovushi (Qatlam qo'shish)</span>
+      </div>
+    </div>
+    <div class="mixer-chips">
+      <div class="m-chip active" onclick="setLayer('none', this)" id="m-none">🚫 O'chiq</div>
+      <div class="m-chip" onclick="setLayer('rain', this)" id="m-rain">🌧️ Yomg'ir</div>
+      <div class="m-chip" onclick="setLayer('waves', this)" id="m-waves">🌊 To'lqin</div>
+      <div class="m-chip" onclick="setLayer('fire', this)" id="m-fire">🪵 Olov</div>
+      <div class="m-chip" onclick="setLayer('wind', this)" id="m-wind">💨 Shamol</div>
+    </div>
+  </div>
+
+  <!-- Sleep Timer -->
+  <div class="timer-card">
+    <div class="timer-left">
+      <div class="timer-icon">⏳</div>
+      <div>
+        <div class="timer-text" id="ui-timer-lbl">Uyqu Taymeri</div>
+        <div class="timer-sub" id="timer-left-txt">Avtomatik o'chadi</div>
+      </div>
+    </div>
+    <div class="timer-chips">
+      <div class="t-chip" onclick="setTimer(15, this)">15m</div>
+      <div class="t-chip active" onclick="setTimer(30, this)">30m</div>
+      <div class="t-chip" onclick="setTimer(60, this)">60m</div>
+      <div class="t-chip" onclick="setTimer(0, this)">∞</div>
+    </div>
+  </div>
+
+  <!-- Bedtime Routine Checklist & Todo Manager -->
+  <div class="routine-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div class="section-label">
+        <span>🧸</span> <span id="ui-routine-lbl">Uyqu Odobi & Vazifalar</span>
+      </div>
+      <div id="routine-progress" style="font-size: 11.5px; font-weight: 900; color: #10B981; background: rgba(16, 185, 129, 0.15); padding: 3px 9px; border-radius: 12px;">
+        0/4
+      </div>
+    </div>
+
+    <!-- Dynamic Tasks List -->
+    <div class="routine-list" id="routine-tasks-list">
+      <!-- Injected by JavaScript -->
+    </div>
+
+    <!-- Quick Preset Suggestion Chips -->
+    <div style="margin-top: 10px;">
+      <div style="font-size: 11px; color: #94A3B8; font-weight: 800; margin-bottom: 5px;" id="lbl-presets">
+        Tezkor tavsiyalar:
+      </div>
+      <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;" id="preset-chips-bar">
+        <!-- Preset chips injected by JS -->
+      </div>
+    </div>
+
+    <!-- Add Custom Task Row -->
+    <div style="display: flex; gap: 8px; margin-top: 10px; align-items: center;">
+      <input type="text" id="new-task-input" placeholder="Yangi vazifa yozing..." style="
+        flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 16px; padding: 10px 14px; font-size: 12.5px; color: #FFFFFF; outline: none;
+        font-family: inherit;
+      " onkeydown="if(event.key==='Enter') addNewRoutineTask()">
+      <button onclick="addNewRoutineTask()" id="btn-add-task" style="
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+        border: none; border-radius: 16px; padding: 10px 18px; color: white;
+        font-size: 12.5px; font-weight: 900; cursor: pointer; font-family: inherit; white-space: nowrap;
+        box-shadow: 0 3px 10px rgba(255,107,53,0.35); transition: transform 0.15s;
+      ">+ Qo'shish</button>
+    </div>
+  </div>
+
+  <!-- Dimmer / Night Light -->
+  <div class="dimmer-row">
+    <div class="dimmer-lbl">
+      <span>💡</span> <span id="ui-dim-lbl">Tungi Chiroq Nuri</span>
+    </div>
+    <input type="range" min="30" max="100" value="100" class="dimmer-slider" oninput="adjustBrightness(this.value)">
+  </div>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const lang = urlParams.get('lang') || 'uz';
+
+const T = {
+  uz: {
+    title: "Sehrli Uyqu",
+    play: "Ovozni Yoqish",
+    pause: "Pauza",
+    stop: "To'xtatish",
+    volume: "Ovoz Balandligi",
+    playingPrefix: "Yangramoqda: ",
+    paused: "To'xtatildi",
+    peaceful: "💤 Tinch orom oling",
+    heroMsg: "Orom Baxsh Allalar",
+    heroSub: "Har qanday tovushni bosing — darhol yangraydi!",
+    catAllalar: "Allalar",
+    catSuv: "Yomg'ir & Suv",
+    catTabiat: "Tabiat",
+    catOrom: "Orom & Yurak",
+    sounds: "Uyqu Ovozlarini Tanlang",
+    mixer: "Fon Tovushi (Qatlam qo'shish)",
+    timer: "Uyqu Taymeri",
+    autoOff: "Avtomatik o'chadi",
+    routine: "Uyqu Odobi & Vazifalar (Todo)",
+    presets: "Tezkor tavsiyalar:",
+    addBtn: "+ Qo'shish",
+    placeholder: "Yangi vazifa yozing...",
+    allDone: "Barchasi bajarildi! 🌟",
+    nightLight: "Tungi Chiroq Nuri",
+    mNone: "🚫 O'chiq",
+    mRain: "🌧️ Yomg'ir",
+    mWaves: "🌊 To'lqin",
+    mFire: "🪵 Olov",
+    mWind: "💨 Shamol"
+  },
+  ru: {
+    title: "Спокойной Ночи",
+    play: "Включить Звук",
+    pause: "Пауза",
+    stop: "Остановить",
+    volume: "Громкость Звука",
+    playingPrefix: "Играет: ",
+    paused: "Остановлено",
+    peaceful: "💤 Спокойного отдыха",
+    heroMsg: "Успокаивающая Мелодия",
+    heroSub: "Нажмите на любой звук — включится сразу!",
+    catAllalar: "Колыбельные",
+    catSuv: "Дождь и Вода",
+    catTabiat: "Природа",
+    catOrom: "Покой и Сердце",
+    sounds: "Выберите Звук для Сна",
+    mixer: "Фоновый Слой (Микс звуков)",
+    timer: "Таймер Сна",
+    autoOff: "Выключится сам",
+    routine: "План ко Сну & Задачи (Todo)",
+    presets: "Быстрые задачи:",
+    addBtn: "+ Добавить",
+    placeholder: "Напишите задачу...",
+    allDone: "Всё выполнено! 🌟",
+    nightLight: "Ночник",
+    mNone: "🚫 Выкл",
+    mRain: "🌧️ Дождик",
+    mWaves: "🌊 Волны",
+    mFire: "🪵 Костёр",
+    mWind: "💨 Ветерок"
+  },
+  en: {
+    title: "Magic Sleep",
+    play: "Play Sound",
+    pause: "Pause",
+    stop: "Stop",
+    volume: "Sound Volume",
+    playingPrefix: "Playing: ",
+    paused: "Stopped",
+    peaceful: "💤 Rest peacefully",
+    heroMsg: "Soothing Sleep Melody",
+    heroSub: "Tap any sound — it plays immediately!",
+    catAllalar: "Lullabies",
+    catSuv: "Rain & Water",
+    catTabiat: "Nature",
+    catOrom: "Comfort & Heart",
+    sounds: "Select Sleep Sound",
+    mixer: "Background Layer (Sound Mix)",
+    timer: "Sleep Timer",
+    autoOff: "Auto shuts off",
+    routine: "Bedtime Routine & Tasks (Todo)",
+    presets: "Quick suggestions:",
+    addBtn: "+ Add",
+    placeholder: "Write new task...",
+    allDone: "All tasks done! 🌟",
+    nightLight: "Night Light",
+    mNone: "🚫 Off",
+    mRain: "🌧️ Rain",
+    mWaves: "🌊 Waves",
+    mFire: "🪵 Campfire",
+    mWind: "💨 Breeze"
+  }
+}[lang] || {};
+
+// 16 Real Organic Sound Varieties Catalog with Authentic Audio Files
+const REAL_SOUNDS = {
+  allalar: [
+    {
+      id: "alla1",
+      em: "🎶",
+      file: `audio/songs/${lang === 'ru' ? 'ru' : (lang === 'en' ? 'en' : 'uz')}/song-001.mp3`,
+      name: { uz: "Ona Allasi", ru: "Колыбельная Мамы", en: "Mother's Lullaby" },
+      sub: { uz: "Jonli xalq alla kuyi", ru: "Нежная мелодия мамы", en: "Acoustic gentle lullaby" }
+    },
+    {
+      id: "alla2",
+      em: "✨",
+      file: `audio/songs/${lang === 'ru' ? 'ru' : (lang === 'en' ? 'en' : 'uz')}/song-002.mp3`,
+      name: { uz: "Yoqimli Tush", ru: "Сладкий Сон", en: "Sweet Dream" },
+      sub: { uz: "Sehrli orom qo'shig'i", ru: "Убаюкивающая песня", en: "Soothing dream melody" }
+    },
+    {
+      id: "alla3",
+      em: "🌙",
+      file: `audio/songs/${lang === 'ru' ? 'ru' : (lang === 'en' ? 'en' : 'uz')}/song-003.mp3`,
+      name: { uz: "Oy Botdi", ru: "Луна Зашла", en: "Moon Is Down" },
+      sub: { uz: "Oqshom osoyishtaligi", ru: "Тихая ночь и луна", en: "Peaceful night tune" }
+    },
+    {
+      id: "chimes",
+      em: "🎐",
+      file: "audio/sleep/wind-chimes.mp3",
+      name: { uz: "Sehrli Qo'ng'iroq", ru: "Музыка Ветра", en: "Wind Chimes" },
+      sub: { uz: "Yengil kumush qo'ng'iroqlar", ru: "Кристальный перезвон", en: "Crystal chime bells" }
+    }
+  ],
+  suv: [
+    {
+      id: "rain_leaves",
+      em: "🌧️",
+      file: "audio/sleep/rain-on-leaves.mp3",
+      name: { uz: "Mayin Yomg'ir", ru: "Тёплый Дождик", en: "Gentle Rain" },
+      sub: { uz: "Barglarga tushgan tomchilar", ru: "Шорох капель по листьям", en: "Real rain on leaves" }
+    },
+    {
+      id: "rain_window",
+      em: "🪟",
+      file: "audio/sleep/rain-on-window.mp3",
+      name: { uz: "Deraza Yomg'iri", ru: "Дождь за Окном", en: "Window Rain" },
+      sub: { uz: "Shinam xona derazasida", ru: "Уютные капли по стеклу", en: "Real rain on windowpane" }
+    },
+    {
+      id: "river",
+      em: "🏞️",
+      file: "audio/sleep/river.mp3",
+      name: { uz: "Tog' Soyi", ru: "Горный Ручей", en: "Mountain Creek" },
+      sub: { uz: "Shildiragan toza suv oqimi", ru: "Живое журчание ручья", en: "Real flowing river stream" }
+    },
+    {
+      id: "waves",
+      em: "🌊",
+      file: "audio/sleep/waves.mp3",
+      name: { uz: "Dengiz To'lqini", ru: "Морской Прибой", en: "Ocean Waves" },
+      sub: { uz: "Haqiqiy sokin okean sadosi", ru: "Настоящий шум морских волн", en: "Real ocean surf swell" }
+    }
+  ],
+  tabiat: [
+    {
+      id: "crickets",
+      em: "🦗",
+      file: "audio/sleep/crickets.mp3",
+      name: { uz: "Tungi Chigirtkalar", ru: "Ночные Сверчки", en: "Night Crickets" },
+      sub: { uz: "Jonli tungi tabiat sadosi", ru: "Живой стрекот сверчков", en: "Real crickets at night" }
+    },
+    {
+      id: "wind",
+      em: "🍃",
+      file: "audio/sleep/wind-in-trees.mp3",
+      name: { uz: "Daraxtlar Shamoli", ru: "Ветер в Деревьях", en: "Wind in Trees" },
+      sub: { uz: "Shoxlardagi mayin epkin", ru: "Шёпот ветра в кронах", en: "Real rustling wind" }
+    },
+    {
+      id: "fire",
+      em: "🪵",
+      file: "audio/sleep/campfire.mp3",
+      name: { uz: "Kamin Olovi", ru: "Тёплый Костёр", en: "Cozy Campfire" },
+      sub: { uz: "O'tinlarning chirsillashi", ru: "Уютный треск дров", en: "Real crackling wood fire" }
+    },
+    {
+      id: "village",
+      em: "🏡",
+      file: "audio/sleep/night-village.mp3",
+      name: { uz: "Qishloq Oqshomi", ru: "Деревенская Ночь", en: "Night Village" },
+      sub: { uz: "Sokin qishloq tinchligi", ru: "Атмосфера тихой ночи", en: "Peaceful village night" }
+    }
+  ],
+  orom: [
+    {
+      id: "heartbeat",
+      em: "💓",
+      file: "audio/sleep/heartbeat.wav",
+      name: { uz: "Ona Yuragi", ru: "Сердце Мамы", en: "Mother's Heartbeat" },
+      sub: { uz: "60 BPM ona bag'ri urishi", ru: "Успокаивающий ритм 60 BPM", en: "Real 60 BPM maternal pulse" }
+    },
+    {
+      id: "cat",
+      em: "🐱",
+      file: "audio/sleep/cat-purring.mp3",
+      name: { uz: "Mushukcha Oromi", ru: "Мурчание Кота", en: "Cat Purring" },
+      sub: { uz: "Iliq va tinchlantiruvchi", ru: "Уютное мурлыканье", en: "Real rhythmic cat purr" }
+    },
+    {
+      id: "clock",
+      em: "🕰️",
+      file: "audio/sleep/clock.mp3",
+      name: { uz: "Sokin Soat", ru: "Тиканье Часов", en: "Ticking Clock" },
+      sub: { uz: "Bir tekis ritmik sado", ru: "Мерный ход времени", en: "Rhythmic antique tick-tock" }
+    },
+    {
+      id: "bowl",
+      em: "🥣",
+      file: "audio/sleep/singing-bowl.mp3",
+      name: { uz: "Meditatsiya Kosasi", ru: "Поющая Чаша", en: "Singing Bowl" },
+      sub: { uz: "Chuqur rezonans tebranishi", ru: "Глубокая релаксация", en: "Deep resonant tone" }
+    }
+  ]
+};
+
+const LAYER_FILES = {
+  rain: "audio/sleep/rain-on-leaves.mp3",
+  waves: "audio/sleep/waves.mp3",
+  fire: "audio/sleep/campfire.mp3",
+  wind: "audio/sleep/wind-in-trees.mp3"
+};
+
+let currentCategory = 'allalar';
+let currentSoundId = 'alla1';
+let activeLayer = 'none';
+
+let primaryAudio = new Audio();
+primaryAudio.loop = true;
+let layerAudio = new Audio();
+layerAudio.loop = true;
+
+let isPlaying = false;
+let masterVolume = 0.85;
+
+function renderSounds() {
+  const container = document.getElementById('sounds-container');
+  const items = REAL_SOUNDS[currentCategory] || [];
+  container.innerHTML = '';
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    const isSel = (item.id === currentSoundId && isPlaying);
+    card.className = 'sound-card' + (isSel ? ' active' : '');
+    card.onclick = () => selectSound(item.id, card);
+
+    const sName = item.name[lang] || item.name.uz;
+    const sSub = item.sub[lang] || item.sub.uz;
+
+    card.innerHTML = `
+      <div class="sc-icon">${item.em}</div>
+      <div class="sc-info">
+        <div class="sc-name">${sName}</div>
+        <div class="sc-sub">${sSub}</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function selectCategory(cat, el) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderSounds();
+}
+
+function getSoundObject(id) {
+  for (let c in REAL_SOUNDS) {
+    const s = REAL_SOUNDS[c].find(item => item.id === id);
+    if (s) return s;
+  }
+  return REAL_SOUNDS.allalar[0];
+}
+
+function playSound(id) {
+  const soundObj = getSoundObject(id);
+  currentSoundId = id;
+  isPlaying = true;
+
+  try {
+    primaryAudio.pause();
+    primaryAudio.src = soundObj.file;
+    primaryAudio.volume = masterVolume;
+    primaryAudio.currentTime = 0;
+    primaryAudio.play().catch(e => console.log('Playback error:', e));
+  } catch (e) {
+    console.log('Audio play error:', e);
+  }
+
+  // Update layer volume if active
+  if (activeLayer !== 'none' && layerAudio.src) {
+    layerAudio.volume = masterVolume * 0.45;
+  }
+}
+
+function selectSound(id, el) {
+  playSound(id);
+  document.querySelectorAll('.sound-card').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  const soundObj = getSoundObject(id);
+  const sName = soundObj.name[lang] || soundObj.name.uz;
+
+  document.getElementById('moon-face').textContent = '✨';
+  document.getElementById('hero-status').textContent = (T.playingPrefix || "Yangramoqda: ") + sName;
+  document.getElementById('play-status').textContent = '🎵 ' + sName;
+  updateControlsUi(true);
+}
+
+function setLayer(layerType, el) {
+  activeLayer = layerType;
+  document.querySelectorAll('.m-chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  if (layerType === 'none') {
+    layerAudio.pause();
+    layerAudio.src = '';
+  } else {
+    const file = LAYER_FILES[layerType];
+    if (file) {
+      layerAudio.pause();
+      layerAudio.src = file;
+      layerAudio.volume = masterVolume * 0.45;
+      layerAudio.currentTime = 0;
+      layerAudio.play().catch(e => console.log('Layer error:', e));
+    }
+  }
+}
+
+function setMasterVolume(val) {
+  masterVolume = parseFloat((val / 100).toFixed(2));
+  primaryAudio.volume = masterVolume;
+  if (activeLayer !== 'none') {
+    layerAudio.volume = masterVolume * 0.45;
+  }
+}
+
+function stopAudio() {
+  primaryAudio.pause();
+  layerAudio.pause();
+  layerAudio.src = '';
+
+  document.querySelectorAll('.m-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('m-none')?.classList.add('active');
+  activeLayer = 'none';
+
+  isPlaying = false;
+  document.getElementById('moon-face').textContent = '😴';
+  document.getElementById('hero-status').textContent = T.paused || "To'xtatildi";
+  document.getElementById('play-status').textContent = T.peaceful || '💤 Tinch orom oling';
+  document.querySelectorAll('.sound-card').forEach(c => c.classList.remove('active'));
+  updateControlsUi(false);
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    stopAudio();
+  } else {
+    selectSound(currentSoundId, document.querySelector(`.sound-card[onclick*="${currentSoundId}"]`));
+  }
+}
+
+function updateControlsUi(active) {
+  const playBtnTxt = document.getElementById('main-play-txt');
+  const playBtnIc = document.getElementById('main-play-ic');
+  if (active) {
+    if (playBtnTxt) playBtnTxt.textContent = T.pause || "Pauza";
+    if (playBtnIc) playBtnIc.textContent = "⏸️";
+  } else {
+    if (playBtnTxt) playBtnTxt.textContent = T.play || "Ovozni Yoqish";
+    if (playBtnIc) playBtnIc.textContent = "▶️";
+  }
+}
+
+// ════════════════════════════════════════════════════
+// SLEEP TIMER
+// ════════════════════════════════════════════════════
+let timerMinutes = 30;
+let timerSecondsLeft = 30 * 60;
+let timerInterval = null;
+
+function setTimer(minutes, el) {
+  document.querySelectorAll('.t-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  timerMinutes = minutes;
+  timerSecondsLeft = minutes * 60;
+
+  if (minutes === 0) {
+    document.getElementById('timer-left-txt').textContent = "Cheksiz ijro (∞)";
+    if (timerInterval) clearInterval(timerInterval);
+  } else {
+    document.getElementById('timer-left-txt').textContent = minutes + " daqiqa qoldi";
+    startTimerCountdown();
+  }
+}
+
+function startTimerCountdown() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (isPlaying && timerMinutes > 0) {
+      timerSecondsLeft--;
+      const m = Math.floor(timerSecondsLeft / 60);
+      const s = timerSecondsLeft % 60;
+      document.getElementById('timer-left-txt').textContent = `${m}m ${s}s qoldi`;
+
+      // 30 seconds smooth fade out
+      if (timerSecondsLeft <= 30) {
+        const fade = (timerSecondsLeft / 30) * masterVolume;
+        primaryAudio.volume = Math.max(0, fade);
+        if (activeLayer !== 'none') layerAudio.volume = Math.max(0, fade * 0.45);
+      }
+      if (timerSecondsLeft <= 0) {
+        stopAudio();
+        clearInterval(timerInterval);
+        document.getElementById('timer-left-txt').textContent = "Taymer tugadi 💤";
+      }
+    }
+  }, 1000);
+}
+
+// ════════════════════════════════════════════════════
+// BEDTIME ROUTINE & CUSTOM TODO TASK MANAGER
+// ════════════════════════════════════════════════════
+const DEFAULT_ROUTINES = [
+  { id: 'teeth', text: { uz: "Tishlarni tozalash 🪥", ru: "Почистить зубки 🪥", en: "Brush teeth 🪥" }, done: false, isCustom: false },
+  { id: 'toys', text: { uz: "O'yinchoqlarni yig'ish 🧸", ru: "Собрать игрушки 🧸", en: "Put toys away 🧸" }, done: false, isCustom: false },
+  { id: 'milk', text: { uz: "Iliq sut / suv ichish 🥛", ru: "Тёплое молоко 🥛", en: "Warm milk 🥛" }, done: false, isCustom: false },
+  { id: 'bed', text: { uz: "O'ringa yotish 🛏️", ru: "Лечь в кроватку 🛏️", en: "Go to bed 🛏️" }, done: false, isCustom: false }
+];
+
+const PRESET_SUGGESTIONS = [
+  { text: { uz: "📖 Ertak tinglash", ru: "📖 Послушать сказку", en: "📖 Bedtime story" } },
+  { text: { uz: "👕 Pijamani kiyish", ru: "👕 Надеть пижаму", en: "👕 Put on pajamas" } },
+  { text: { uz: "🧼 Qo'l-yuzni yuvish", ru: "🧼 Умыть ручки и лицо", en: "🧼 Wash hands & face" } },
+  { text: { uz: "🤗 Ota-onani quchoqlash", ru: "🤗 Обнять родителей", en: "🤗 Hug parents" } },
+  { text: { uz: "🙏 Rahmat aytish / Duo", ru: "🙏 Поблагодарить за день", en: "🙏 Evening thank you" } }
+];
+
+let routineTasks = [];
+
+function loadRoutineTasks() {
+  try {
+    const saved = localStorage.getItem('kz_sleep_routines_v3');
+    if (saved) {
+      routineTasks = JSON.parse(saved);
+    } else {
+      routineTasks = JSON.parse(JSON.stringify(DEFAULT_ROUTINES));
+    }
+  } catch (e) {
+    routineTasks = JSON.parse(JSON.stringify(DEFAULT_ROUTINES));
+  }
+}
+
+function saveRoutineTasks() {
+  try {
+    localStorage.setItem('kz_sleep_routines_v3', JSON.stringify(routineTasks));
+  } catch (e) {}
+}
+
+function renderRoutineTasks() {
+  const container = document.getElementById('routine-tasks-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  let doneCount = 0;
+  routineTasks.forEach((task, idx) => {
+    if (task.done) doneCount++;
+
+    const taskText = (typeof task.text === 'object') ? (task.text[lang] || task.text.uz) : task.text;
+
+    const item = document.createElement('div');
+    item.className = 'routine-item' + (task.done ? ' done' : '');
+
+    item.innerHTML = `
+      <div class="ri-left" onclick="toggleTask(${idx})">
+        <span>${taskText}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="ri-check" onclick="toggleTask(${idx})">${task.done ? '✓' : ''}</div>
+        ${task.isCustom ? `<button onclick="deleteTask(${idx}, event)" style="
+          background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4);
+          color: #F87171; border-radius: 50%; width: 22px; height: 22px; display: flex;
+          align-items: center; justify-content: center; cursor: pointer; font-size: 11px;
+        ">✕</button>` : ''}
+      </div>
+    `;
+    container.appendChild(item);
+  });
+
+  const progressEl = document.getElementById('routine-progress');
+  if (progressEl) {
+    if (doneCount === routineTasks.length && routineTasks.length > 0) {
+      progressEl.textContent = T.allDone || "Barchasi bajarildi! 🌟";
+      progressEl.style.color = "#FDE68A";
+      progressEl.style.background = "rgba(253, 230, 138, 0.2)";
+    } else {
+      progressEl.textContent = `${doneCount}/${routineTasks.length}`;
+      progressEl.style.color = "#10B981";
+      progressEl.style.background = "rgba(16, 185, 129, 0.15)";
+    }
+  }
+}
+
+function toggleTask(idx) {
+  if (routineTasks[idx]) {
+    routineTasks[idx].done = !routineTasks[idx].done;
+    saveRoutineTasks();
+    renderRoutineTasks();
+  }
+}
+
+function addNewRoutineTask(customText) {
+  const input = document.getElementById('new-task-input');
+  const text = (customText || (input ? input.value : '')).trim();
+  if (!text) return;
+
+  routineTasks.push({
+    id: 'custom_' + Date.now(),
+    text: text,
+    done: false,
+    isCustom: true
+  });
+
+  if (input) input.value = '';
+  saveRoutineTasks();
+  renderRoutineTasks();
+}
+
+function deleteTask(idx, ev) {
+  if (ev) ev.stopPropagation();
+  routineTasks.splice(idx, 1);
+  saveRoutineTasks();
+  renderRoutineTasks();
+}
+
+function renderPresetChips() {
+  const bar = document.getElementById('preset-chips-bar');
+  if (!bar) return;
+  bar.innerHTML = '';
+
+  PRESET_SUGGESTIONS.forEach(p => {
+    const chip = document.createElement('div');
+    chip.style.cssText = `
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px; padding: 5px 10px; font-size: 11px; font-weight: 800;
+      color: #E2E8F0; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: all 0.15s;
+    `;
+    const label = p.text[lang] || p.text.uz;
+    chip.textContent = '+ ' + label;
+    chip.onclick = () => {
+      addNewRoutineTask(label);
+      chip.style.transform = 'scale(0.92)';
+      setTimeout(() => chip.style.transform = '', 150);
+    };
+    bar.appendChild(chip);
+  });
+}
+
+function adjustBrightness(val) {
+  const percent = val / 100;
+  document.body.style.filter = `brightness(${percent})`;
+}
+
+// ════════════════════════════════════════════════════
+// INITIAL SETUP & TRANSLATIONS
+// ════════════════════════════════════════════════════
+function applyTranslations() {
+  if (!T || !T.title) return;
+  const setTxt = (id, txt) => { const el = document.getElementById(id); if (el && txt) el.textContent = txt; };
+  setTxt('ui-title', T.title);
+  setTxt('play-status', T.peaceful);
+  setTxt('hero-status', T.heroMsg);
+  setTxt('hero-timer', T.heroSub);
+  setTxt('main-play-txt', T.play);
+  setTxt('main-stop-txt', T.stop);
+  setTxt('ui-vol-lbl', T.volume);
+  setTxt('c-allalar-txt', T.catAllalar);
+  setTxt('c-suv-txt', T.catSuv);
+  setTxt('c-tabiat-txt', T.catTabiat);
+  setTxt('c-orom-txt', T.catOrom);
+  setTxt('ui-sounds-lbl', T.sounds);
+  setTxt('ui-mixer-lbl', T.mixer);
+  setTxt('ui-timer-lbl', T.timer);
+  setTxt('timer-left-txt', T.autoOff);
+  setTxt('ui-routine-lbl', T.routine);
+  setTxt('lbl-presets', T.presets);
+  setTxt('btn-add-task', T.addBtn);
+  const inputEl = document.getElementById('new-task-input');
+  if (inputEl && T.placeholder) inputEl.placeholder = T.placeholder;
+  setTxt('ui-dim-lbl', T.nightLight);
+  setTxt('m-none', T.mNone);
+  setTxt('m-rain', T.mRain);
+  setTxt('mWaves', T.mWaves);
+  setTxt('m-fire', T.mFire);
+  setTxt('m-wind', T.mWind);
+}
+
+window.updateLang = function(newLang) {
+  if (!newLang) return;
+  lang = newLang;
+  const ALL_T = {
+    uz: {
+      title: "Sehrli Uyqu", play: "Ovozni Yoqish", pause: "Pauza", stop: "To'xtatish", volume: "Ovoz Balandligi",
+      playingPrefix: "Yangramoqda: ", paused: "To'xtatildi", peaceful: "💤 Tinch orom oling",
+      heroMsg: "Orom Baxsh Allalar", heroSub: "Har qanday tovushni bosing — darhol yangraydi!",
+      catAllalar: "Allalar", catSuv: "Yomg'ir & Suv", catTabiat: "Tabiat", catOrom: "Orom & Yurak",
+      sounds: "Uyqu Ovozlarini Tanlang", mixer: "Fon Tovushi (Qatlam qo'shish)", timer: "Uyqu Taymeri",
+      autoOff: "Avtomatik o'chadi", routine: "Uyqu Odobi & Vazifalar (Todo)", presets: "Tezkor tavsiyalar:",
+      addBtn: "+ Qo'shish", placeholder: "Yangi vazifa yozing...", allDone: "Barchasi bajarildi! 🌟",
+      nightLight: "Tungi Chiroq Nuri", mNone: "🚫 O'chiq", mRain: "🌧️ Yomg'ir", mWaves: "🌊 To'lqin",
+      mFire: "🪵 Olov", mWind: "💨 Shamol"
+    },
+    ru: {
+      title: "Спокойной Ночи", play: "Включить Звук", pause: "Пауза", stop: "Остановить", volume: "Громкость Звука",
+      playingPrefix: "Играет: ", paused: "Остановлено", peaceful: "💤 Спокойного отдыха",
+      heroMsg: "Успокаивающая Мелодия", heroSub: "Нажмите на любой звук — включится сразу!",
+      catAllalar: "Колыбельные", catSuv: "Дождь и Вода", catTabiat: "Природа", catOrom: "Покой и Сердце",
+      sounds: "Выберите Звук для Сна", mixer: "Фоновый Слой (Микс звуков)", timer: "Таймер Сна",
+      autoOff: "Выключится сам", routine: "План ко Сну & Задачи (Todo)", presets: "Быстрые задачи:",
+      addBtn: "+ Добавить", placeholder: "Напишите задачу...", allDone: "Всё выполнено! 🌟",
+      nightLight: "Ночник", mNone: "🚫 Выкл", mRain: "🌧️ Дождик", mWaves: "🌊 Волны",
+      mFire: "🪵 Костёр", mWind: "💨 Ветерок"
+    },
+    en: {
+      title: "Magic Sleep", play: "Play Sound", pause: "Pause", stop: "Stop", volume: "Sound Volume",
+      playingPrefix: "Playing: ", paused: "Stopped", peaceful: "💤 Rest peacefully",
+      heroMsg: "Soothing Sleep Melody", heroSub: "Tap any sound — it plays immediately!",
+      catAllalar: "Lullabies", catSuv: "Rain & Water", catTabiat: "Nature", catOrom: "Comfort & Heart",
+      sounds: "Select Sleep Sound", mixer: "Background Layer (Sound Mix)", timer: "Sleep Timer",
+      autoOff: "Auto shuts off", routine: "Bedtime Routine & Tasks (Todo)", presets: "Quick suggestions:",
+      addBtn: "+ Add", placeholder: "Write new task...", allDone: "All tasks done! 🌟",
+      nightLight: "Night Light", mNone: "🚫 Off", mRain: "🌧️ Rain", mWaves: "🌊 Waves",
+      mFire: "🪵 Campfire", mWind: "💨 Breeze"
+    }
+  };
+  T = ALL_T[lang] || ALL_T.uz;
+  applyTranslations();
+  renderSounds();
+  renderPresetChips();
+  renderRoutineTasks();
+};
+
+applyTranslations();
+loadRoutineTasks();
+renderRoutineTasks();
+renderPresetChips();
+renderSounds();
+
+// Starry Sky Canvas
+const canvas = document.getElementById('sky-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeSky() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  stars = [];
+  for (let i = 0; i < 55; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.8 + 0.8,
+      a: Math.random() * 0.7 + 0.2,
+      speed: Math.random() * 0.02 + 0.005
+    });
+  }
+}
+window.addEventListener('resize', resizeSky);
+resizeSky();
+
+function drawSky() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a += s.speed;
+    if (s.a > 0.95 || s.a < 0.2) s.speed = -s.speed;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(253, 230, 138, ${s.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawSky);
+}
+drawSky();
+</script>
+</body>
+</html>

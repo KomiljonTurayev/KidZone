@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Glow Snake 🐍</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body { min-height: 100vh; background: #0F172A; font-family: 'Arial Rounded MT Bold', sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-around; }
+  canvas { width: 90vw; max-width: 380px; aspect-ratio: 1; background: #1E293B; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+  #score-box { font-size: 26px; font-weight: 900; color: #4ADE80; }
+</style>
+</head>
+<body>
+<div id="score-box">🍎 <span id="score">0</span></div>
+<canvas id="c"></canvas>
+<div style="font-weight:900; color:#94A3B8;">Boshqarish uchun suring! 👆</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+canvas.width = 380; canvas.height = 380;
+const GRID = 19, TILE = 20;
+
+let snake = [{x: 9, y: 9}], dir = {x: 1, y: 0}, food = {x: 5, y: 5}, score = 0;
+
+let touchStart = null;
+window.addEventListener('touchstart', e => { touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
+window.addEventListener('touchend', e => {
+  if (!touchStart) return;
+  const dx = e.changedTouches[0].clientX - touchStart.x;
+  const dy = e.changedTouches[0].clientY - touchStart.y;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 0 && dir.x === 0) dir = {x: 1, y: 0};
+    else if (dx < 0 && dir.x === 0) dir = {x: -1, y: 0};
+  } else {
+    if (dy > 0 && dir.y === 0) dir = {x: 0, y: 1};
+    else if (dy < 0 && dir.y === 0) dir = {x: 0, y: -1};
+  }
+});
+
+function gameLoop() {
+  const head = { x: (snake[0].x + dir.x + GRID) % GRID, y: (snake[0].y + dir.y + GRID) % GRID };
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    score += 10;
+    document.getElementById('score').textContent = score;
+    food = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
+  } else {
+    snake.pop();
+  }
+
+  ctx.clearRect(0, 0, 380, 380);
+  // Food
+  ctx.font = '18px sans-serif';
+  ctx.fillText('🍎', food.x * TILE, food.y * TILE + 16);
+
+  // Snake
+  snake.forEach((s, idx) => {
+    ctx.fillStyle = idx === 0 ? '#4ADE80' : '#22C55E';
+    ctx.fillRect(s.x * TILE, s.y * TILE, TILE - 2, TILE - 2);
+  });
+}
+setInterval(gameLoop, 150);
+</script>
+</body>
+</html>

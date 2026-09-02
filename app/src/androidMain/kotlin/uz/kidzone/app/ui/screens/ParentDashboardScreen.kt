@@ -1,5 +1,6 @@
 package uz.kidzone.app.ui.screens
 
+import android.content.SharedPreferences
 import uz.kidzone.app.arch.AppPreferences
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -80,7 +81,7 @@ fun ParentDashboardScreen(
 ) {
     val context = LocalContext.current
     val statsManager = remember { ParentalStatsManager(context) }
-    val vm = remember { DashboardViewModel(statsManager, prefs) }
+    val vm = remember { DashboardViewModel(statsManager, AppPreferences(context)) }
     val state by vm.state.collectAsState()
 
     // PIN gate

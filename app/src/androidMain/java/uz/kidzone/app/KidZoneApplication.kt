@@ -34,10 +34,14 @@ class KidZoneApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) {
-            FirebaseFirestore.setLoggingEnabled(true)
+        try {
+            if (BuildConfig.DEBUG) {
+                FirebaseFirestore.setLoggingEnabled(true)
+            }
+            DebugAppCheckInit.install()
+        } catch (e: Exception) {
+            Log.w("KZ_DEBUG", "Firebase debug setup skipped: ${e.message}")
         }
-        DebugAppCheckInit.install()
 
         try {
             val auth = FirebaseAuth.getInstance()

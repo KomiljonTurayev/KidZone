@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rangli Suvlar 🧪</title>
+<link rel="stylesheet" href="kids-theme.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: radial-gradient(circle, #E0F2FE 0%, #BAE6FD 100%);
+    font-family: 'Fredoka One', cursive, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 10px;
+  }
+  .header { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 400px; }
+  .lvl-badge { background: #0284C7; color: white; border-radius: 16px; padding: 6px 14px; font-size: 14px; }
+  .rst-btn { background: white; color: #0284C7; border: 2px solid #0284C7; border-radius: 14px; padding: 6px 12px; font-size: 14px; cursor: pointer; }
+  #tubes-wrap { display: flex; gap: 14px; justify-content: center; align-items: flex-end; flex-wrap: wrap; margin: 30px 0; max-width: 420px; }
+  .tube {
+    width: 52px; height: 170px; border: 4px solid #fff; border-top: none;
+    border-radius: 0 0 26px 26px; background: rgba(255,255,255,0.45);
+    display: flex; flex-direction: column-reverse; overflow: hidden;
+    cursor: pointer; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  }
+  .tube.selected { transform: translateY(-18px); border-color: #FDE68A; box-shadow: 0 12px 24px rgba(2, 132, 199, 0.25); }
+  .liquid { width: 100%; height: 25%; transition: height 0.25s ease; }
+
+  /* Victory Modal */
+  .win-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .win-overlay.h { display: none; }
+  .win-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .win-btn {
+    background: #0284C7; color: white; border: none; border-radius: 20px;
+    padding: 12px 24px; font-size: 16px; font-family: inherit; cursor: pointer;
+    margin-top: 14px; box-shadow: 0 4px 0 #0369A1;
+  }
+  .win-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0369A1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="lvl-badge" id="lvl-txt">⭐ 1-Bosqich</div>
+  <h1 style="color:#0284C7; font-size:20px;">Rangli Suvlar 🧪</h1>
+  <button class="rst-btn" onclick="resetLevel()">🔄 Qayta</button>
+</div>
+
+<div id="tubes-wrap"></div>
+
+<p style="font-weight:900; color:#0369A1; font-size:13px; text-align:center;">
+  Bir xil ranglarni bitta idishga to'plang!
+</p>
+
+<!-- Win Overlay -->
+<div class="win-overlay h" id="win-modal">
+  <div class="win-box">
+    <div style="font-size: 54px;">🎉🌟🧪</div>
+    <h2 style="color: #0284C7; margin: 10px 0 6px;">Barakalla!</h2>
+    <p style="color: #64748B; font-size: 14px;" id="win-msg">Barcha ranglar saralandi!</p>
+    <button class="win-btn" onclick="nextLevel()">Keyingi Bosqich ➡️</button>
+  </div>
+</div>
+
+<script>
+const LEVELS = [
+  // Level 1: 3 tubes, 2 colors (Red, Blue) + 1 empty
+  [
+    ['#EF4444', '#3B82F6', '#EF4444', '#3B82F6'],
+    ['#3B82F6', '#EF4444', '#3B82F6', '#EF4444'],
+    []
+  ],
+  // Level 2: 4 tubes, 3 colors (Red, Blue, Green) + 1 empty
+  [
+    ['#EF4444', '#3B82F6', '#10B981', '#EF4444'],
+    ['#10B981', '#EF4444', '#3B82F6', '#10B981'],
+    ['#3B82F6', '#10B981', '#EF4444', '#3B82F6'],
+    []
+  ],
+  // Level 3: 5 tubes, 4 colors (Red, Blue, Green, Yellow) + 1 empty
+  [
+    ['#EF4444', '#F59E0B', '#3B82F6', '#10B981'],
+    ['#F59E0B', '#10B981', '#EF4444', '#3B82F6'],
+    ['#3B82F6', '#EF4444', '#F59E0B', '#10B981'],
+    ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'],
+    []
+  ],
+  // Level 4: 5 tubes, 3 colors + 2 empty
+  [
+    ['#EF4444', '#3B82F6', '#10B981', '#EF4444'],
+    ['#10B981', '#EF4444', '#3B82F6', '#10B981'],
+    ['#3B82F6', '#10B981', '#EF4444', '#3B82F6'],
+    [],
+    []
+  ]
+];
+
+let currentLevel = 0;
+let tubes = [];
+let selected = null;
+
+// Sound synthesis
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function playTone(freq, dur = 0.08) {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+    osc.start(); osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+function loadLevel(lvl) {
+  currentLevel = lvl % LEVELS.length;
+  document.getElementById('lvl-txt').textContent = '⭐ ' + (currentLevel + 1) + '-Bosqich';
+  document.getElementById('win-modal').classList.add('h');
+  selected = null;
+  tubes = JSON.parse(JSON.stringify(LEVELS[currentLevel]));
+  render();
+}
+
+function resetLevel() {
+  loadLevel(currentLevel);
+}
+
+function nextLevel() {
+  loadLevel(currentLevel + 1);
+}
+
+function render() {
+  const wrap = document.getElementById('tubes-wrap');
+  wrap.innerHTML = '';
+  tubes.forEach((tube, idx) => {
+    const el = document.createElement('div');
+    el.className = 'tube' + (selected === idx ? ' selected' : '');
+    tube.forEach(color => {
+      const l = document.createElement('div');
+      l.className = 'liquid';
+      l.style.backgroundColor = color;
+      el.appendChild(l);
+    });
+    el.onclick = () => onTubeClick(idx);
+    wrap.appendChild(el);
+  });
+}
+
+function onTubeClick(idx) {
+  if (selected === null) {
+    if (tubes[idx].length > 0) {
+      selected = idx;
+      playTone(480, 0.06);
+      render();
+    }
+  } else {
+    if (selected !== idx) {
+      pour(selected, idx);
+    }
+    selected = null;
+    render();
+  }
+}
+
+function pour(from, to) {
+  const f = tubes[from], t = tubes[to];
+  if (f.length === 0 || t.length >= 4) return;
+  const color = f[f.length - 1];
+  if (t.length === 0 || t[t.length - 1] === color) {
+    t.push(f.pop());
+    playTone(620, 0.1);
+    if (checkWin()) {
+      playTone(880, 0.25);
+      setTimeout(() => {
+        document.getElementById('win-msg').textContent = (currentLevel + 1) + '-bosqich muvaffaqiyatli yakunlandi!';
+        document.getElementById('win-modal').classList.remove('h');
+      }, 300);
+    }
+  }
+}
+
+function checkWin() {
+  return tubes.every(t => t.length === 0 || (t.length === 4 && t.every(c => c === t[0])));
+}
+
+loadLevel(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Poygachi Mashina 🏎️</title>
+<link rel="stylesheet" href="kids-theme.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: #334155; font-family: 'Fredoka One', cursive, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .score-bar { position: absolute; top: 16px; color: white; font-size: 20px; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  canvas { background: #1E293B; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+  .ctrls { display: flex; gap: 40px; margin-top: 16px; }
+  .btn { width: 75px; height: 75px; border-radius: 50%; border: none; background: #F59E0B; color: white; font-size: 32px; cursor: pointer; box-shadow: 0 6px 0 #D97706; }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #D97706; }
+
+  .over-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .over-overlay.h { display: none; }
+  .over-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+  }
+  .restart-btn {
+    background: #F59E0B; color: white; border: none; border-radius: 20px;
+    padding: 12px 26px; font-size: 16px; font-family: inherit; cursor: pointer; margin-top: 14px;
+    box-shadow: 0 4px 0 #D97706;
+  }
+  .restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #D97706; }
+</style>
+</head>
+<body>
+<div class="score-bar">⭐ Ball: <span id="score">0</span></div>
+<canvas id="c" width="360" height="480"></canvas>
+<div class="ctrls">
+  <button class="btn" id="left">⬅️</button>
+  <button class="btn" id="right">➡️</button>
+</div>
+
+<div class="over-overlay h" id="over-modal">
+  <div class="over-box">
+    <div style="font-size: 54px;">💥🏎️</div>
+    <h2 style="color: #E11D48; margin: 10px 0 6px;">To'qnashuv!</h2>
+    <p style="color: #64748B; font-size: 15px;">To'plangan ball: <b id="final-score" style="color:#0F172A;">0</b></p>
+    <button class="restart-btn" onclick="restartGame()">Qayta O'ynash 🔄</button>
+  </div>
+</div>
+
+<script>
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d');
+let carX = 180;
+let score = 0;
+let active = true;
+const enemies = [];
+
+document.getElementById('left').onpointerdown = () => { if (carX > 60) carX -= 60; };
+document.getElementById('right').onpointerdown = () => { if (carX < 300) carX += 60; };
+
+function spawnEnemy() {
+  if (!active) return;
+  const lanes = [60, 120, 180, 240, 300];
+  enemies.push({ x: lanes[Math.floor(Math.random() * lanes.length)], y: -50, speed: 3.5 + Math.min(score / 50, 4) });
+  setTimeout(spawnEnemy, 1200);
+}
+
+function restartGame() {
+  score = 0;
+  carX = 180;
+  enemies.length = 0;
+  active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('over-modal').classList.add('h');
+  spawnEnemy();
+  update();
+}
+
+function update() {
+  ctx.clearRect(0, 0, 360, 480);
+
+  // Road lines
+  ctx.strokeStyle = '#475569';
+  ctx.lineWidth = 4;
+  ctx.setLineDash([20, 20]);
+  ctx.beginPath();
+  ctx.moveTo(120, 0); ctx.lineTo(120, 480);
+  ctx.moveTo(240, 0); ctx.lineTo(240, 480);
+  ctx.stroke();
+
+  // Player car
+  ctx.font = '40px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏎️', carX, 420);
+
+  // Enemies
+  if (active) {
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const e = enemies[i];
+      e.y += e.speed;
+      ctx.fillText('🚗', e.x, e.y);
+
+      if (Math.hypot(carX - e.x, 420 - e.y) < 36) {
+        active = false;
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('over-modal').classList.remove('h');
+        return;
+      }
+
+      if (e.y > 510) {
+        enemies.splice(i, 1);
+        score += 10;
+        document.getElementById('score').textContent = score;
+      }
+    }
+    requestAnimationFrame(update);
+  }
+}
+spawnEnemy();
+update();
+</script>
+</body>
+</html>

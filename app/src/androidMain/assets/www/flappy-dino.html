@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Flappy Dino 🦖</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; user-select:none; }
+  body {
+    min-height: 100vh; background: #70c5ce;
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    overflow: hidden; display: flex; flex-direction: column; align-items: center;
+  }
+  canvas { width: 100vw; height: 100vh; display: block; }
+  #score-box {
+    position: absolute; top: 16px; font-size: 32px; font-weight: 900;
+    color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10;
+  }
+  #overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; z-index: 20; text-align: center; padding: 20px;
+  }
+  .btn {
+    background: #4CAF50; color: white; border: none; border-radius: 30px;
+    padding: 16px 42px; font-size: 22px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 8px 0 #2E7D32; margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div id="score-box">⭐ <span id="score">0</span></div>
+<canvas id="c"></canvas>
+
+<div id="overlay">
+  <div style="font-size: 70px;">🦖✨</div>
+  <h1 id="title" style="font-size: 30px; margin: 10px 0;">Flappy Dino</h1>
+  <p id="hint" style="opacity: 0.9; font-size: 16px;">Uchish uchun ekranni bosing!</p>
+  <button class="btn" onclick="start()">BOSHLASH</button>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+window.onresize = resize; resize();
+
+let dino = { y: H / 2, vy: 0, gravity: 0.45, jump: -7.5, size: 44 };
+let pipes = [];
+let score = 0, active = false;
+
+function flap() {
+  if (!active) return;
+  dino.vy = dino.jump;
+}
+window.addEventListener('pointerdown', flap);
+
+function spawnPipe() {
+  if (!active) return;
+  const gap = 170;
+  const topH = Math.random() * (H - gap - 160) + 60;
+  pipes.push({ x: W + 20, top: topH, bottom: topH + gap, width: 65, passed: false });
+  setTimeout(spawnPipe, 1700);
+}
+
+function update() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background clouds
+  ctx.fillStyle = '#bbf2f6';
+  ctx.fillRect(0, 0, W, H);
+
+  if (active) {
+    dino.vy += dino.gravity;
+    dino.y += dino.vy;
+
+    // Pipes
+    for (let i = pipes.length - 1; i >= 0; i--) {
+      const p = pipes[i];
+      p.x -= 3;
+
+      // Draw pipes (candy pillars)
+      ctx.fillStyle = '#73BF2E';
+      ctx.fillRect(p.x, 0, p.width, p.top);
+      ctx.fillRect(p.x, p.bottom, p.width, H - p.bottom);
+
+      ctx.fillStyle = '#558B2F';
+      ctx.fillRect(p.x - 4, p.top - 20, p.width + 8, 20);
+      ctx.fillRect(p.x - 4, p.bottom, p.width + 8, 20);
+
+      // Score check
+      if (!p.passed && p.x + p.width < W / 3) {
+        p.passed = true;
+        score++;
+        document.getElementById('score').textContent = score;
+      }
+
+      // Collision
+      const dinoX = W / 3;
+      if (dinoX + dino.size / 2 > p.x && dinoX - dino.size / 2 < p.x + p.width) {
+        if (dino.y - dino.size / 2 < p.top || dino.y + dino.size / 2 > p.bottom) {
+          end();
+        }
+      }
+
+      if (p.x < -80) pipes.splice(i, 1);
+    }
+
+    // Floor / ceiling collision
+    if (dino.y + dino.size / 2 > H - 20 || dino.y < 0) end();
+  }
+
+  // Draw Dino
+  ctx.save();
+  ctx.translate(W / 3, dino.y);
+  ctx.rotate(Math.min(Math.PI / 4, Math.max(-Math.PI / 4, dino.vy * 0.05)));
+  ctx.font = dino.size + 'px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🦖', 0, 0);
+  ctx.restore();
+
+  // Draw ground
+  ctx.fillStyle = '#ded895';
+  ctx.fillRect(0, H - 20, W, 20);
+  ctx.fillStyle = '#73bf2e';
+  ctx.fillRect(0, H - 20, W, 6);
+
+  requestAnimationFrame(update);
+}
+
+function start() {
+  dino.y = H / 2; dino.vy = 0; pipes = []; score = 0; active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('overlay').style.display = 'none';
+  spawnPipe();
+}
+
+function end() {
+  active = false;
+  document.getElementById('overlay').style.display = 'flex';
+  document.getElementById('title').textContent = 'O\'yin Tugadi!';
+  document.getElementById('hint').textContent = 'Natijangiz: ' + score + ' ball ⭐';
+}
+
+update();
+</script>
+</body>
+</html>

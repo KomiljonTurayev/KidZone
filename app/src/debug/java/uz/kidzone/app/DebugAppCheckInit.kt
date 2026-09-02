@@ -13,8 +13,12 @@ import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
  */
 object DebugAppCheckInit {
     fun install() {
-        Firebase.appCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance(),
-        )
+        try {
+            Firebase.appCheck.installAppCheckProviderFactory(
+                DebugAppCheckProviderFactory.getInstance(),
+            )
+        } catch (e: Exception) {
+            android.util.Log.w("DebugAppCheckInit", "Firebase AppCheck not initialized: ${e.message}")
+        }
     }
 }

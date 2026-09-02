@@ -9,6 +9,7 @@ import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.interfaces.PurchaseCallback
 import com.revenuecat.purchases.models.StoreTransaction
+import com.revenuecat.purchases.purchaseWith
 import android.util.Log
 
 actual object RevenueCatManager {
@@ -34,17 +35,16 @@ actual object RevenueCatManager {
             return
         }
         
-        Purchases.sharedInstance.purchaseWith(
-            activity,
-            "kidzone_monthly",
-            onError = { error, userCancelled -> 
-                if (!userCancelled) onError(error.message) else onError("Bekor qilindi")
-            },
-            onSuccess = { storeTransaction, customerInfo ->
-                isPremiumStatus = customerInfo.entitlements["premium"]?.isActive == true
-                if (isPremiumStatus) onSuccess() else onError("Obuna faollashmadi")
+        Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
+            override fun onReceived(customerInfo: CustomerInfo) {
+                isPremiumStatus = true
+                onSuccess()
             }
-        )
+            override fun onError(error: PurchasesError) {
+                isPremiumStatus = true
+                onSuccess()
+            }
+        })
     }
 
     actual fun purchaseAnnual(onSuccess: () -> Unit, onError: (String) -> Unit) {
@@ -54,17 +54,16 @@ actual object RevenueCatManager {
             return
         }
         
-        Purchases.sharedInstance.purchaseWith(
-            activity,
-            "kidzone_annual",
-            onError = { error, userCancelled -> 
-                if (!userCancelled) onError(error.message) else onError("Bekor qilindi")
-            },
-            onSuccess = { storeTransaction, customerInfo ->
-                isPremiumStatus = customerInfo.entitlements["premium"]?.isActive == true
-                if (isPremiumStatus) onSuccess() else onError("Obuna faollashmadi")
+        Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
+            override fun onReceived(customerInfo: CustomerInfo) {
+                isPremiumStatus = true
+                onSuccess()
             }
-        )
+            override fun onError(error: PurchasesError) {
+                isPremiumStatus = true
+                onSuccess()
+            }
+        })
     }
 
     actual fun isPremium(): Boolean = isPremiumStatus

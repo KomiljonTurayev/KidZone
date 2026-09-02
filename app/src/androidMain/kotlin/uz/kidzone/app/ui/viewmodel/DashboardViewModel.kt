@@ -2,8 +2,7 @@ package uz.kidzone.app.ui.viewmodel
 
 import uz.kidzone.app.arch.AppPreferences
 import uz.kidzone.app.arch.ViewModel
-import uz.kidzone.app.arch.ViewModelScope
-import dev.gitlive.firebase.auth.FirebaseUser
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

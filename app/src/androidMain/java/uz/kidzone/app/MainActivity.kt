@@ -80,8 +80,7 @@ class MainActivity : ComponentActivity() {
 
     private fun banUser() {
         if (isFinishing) return
-        kzPrefs.edit().putBoolean("kz_onboarding_done", false).apply()
-        recreate()
+        mainViewModel.setBanned(true)
     }
 
     override fun onResume() {

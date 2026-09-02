@@ -6,12 +6,14 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
+    kotlin("kapt")
 }
 
 val localProps = Properties()
 val localPropsFile = rootProject.file("local.properties")
 if (localPropsFile.exists()) localProps.load(FileInputStream(localPropsFile))
 val aishaTtsApiKey = System.getenv("AISHA_TTS_API_KEY") ?: localProps.getProperty("AISHA_TTS_API_KEY", "")
+val geminiApiKey = System.getenv("GEMINI_API_KEY") ?: localProps.getProperty("GEMINI_API_KEY", "")
 
 kotlin {
     androidTarget {
@@ -62,8 +64,12 @@ kotlin {
             }
         }
         val androidMain by getting {
+            kotlin.srcDirs("src/androidMain/java")
             dependencies {
                 implementation("androidx.activity:activity-compose:1.9.0")
+                implementation("androidx.navigation:navigation-compose:2.7.7")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+                implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
                 implementation("androidx.appcompat:appcompat:1.7.0")
                 implementation("androidx.core:core-ktx:1.13.1")
                 implementation("com.google.android.material:material:1.12.0")
@@ -79,6 +85,9 @@ kotlin {
                 implementation("androidx.work:work-runtime-ktx:2.9.0")
                 implementation("androidx.room:room-runtime:2.6.1")
                 implementation("androidx.room:room-ktx:2.6.1")
+                
+                implementation("com.google.firebase:firebase-ai:16.0.0")
+                implementation("com.squareup.okhttp3:okhttp:4.12.0")
                 
                 implementation("androidx.webkit:webkit:1.11.0")
             }
@@ -105,6 +114,7 @@ android {
         versionCode = 14
         versionName = "1.4.0"
         buildConfigField("String", "AISHA_TTS_API_KEY", "\"${aishaTtsApiKey}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${geminiApiKey}\"")
     }
 
     buildTypes {
@@ -127,9 +137,11 @@ android {
     }
     dependencies {
         debugImplementation("androidx.compose.ui:ui-tooling")
+        debugImplementation("com.google.firebase:firebase-appcheck-debug")
         // Note: Adding pure Android revenuecat here because KMP version requires specific setup.
         implementation("com.revenuecat.purchases:purchases:8.4.0")
         implementation("com.revenuecat.purchases:purchases-ui:8.4.0")
+        add("kapt", "androidx.room:room-compiler:2.6.1")
     }
 }
 

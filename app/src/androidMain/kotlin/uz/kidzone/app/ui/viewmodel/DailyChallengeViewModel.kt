@@ -2,8 +2,7 @@
 package uz.kidzone.app.ui.viewmodel
 
 import uz.kidzone.app.arch.ViewModel
-import uz.kidzone.app.arch.ViewModelProvider
-import uz.kidzone.app.arch.ViewModelScope
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -84,6 +83,6 @@ class DailyChallengeViewModelFactory(
     private val repository: DailyChallengeRepository,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
         DailyChallengeViewModel(repository) as T
 }

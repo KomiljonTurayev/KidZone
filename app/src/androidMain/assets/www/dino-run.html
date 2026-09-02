@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dino Yugurish 🦖</title>
+<link rel="stylesheet" href="kids-theme.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: #FEF3C7; font-family: 'Fredoka One', cursive, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .score-bar { position: absolute; top: 20px; font-size: 22px; color: #B45309; }
+  canvas { background: #FFFBEB; border-radius: 20px; box-shadow: 0 10px 25px rgba(180, 83, 9, 0.15); }
+  p { margin-top: 15px; font-size: 15px; color: #92400E; }
+
+  .over-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .over-overlay.h { display: none; }
+  .over-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+  }
+  .restart-btn {
+    background: #059669; color: white; border: none; border-radius: 20px;
+    padding: 12px 26px; font-size: 16px; font-family: inherit; cursor: pointer; margin-top: 14px;
+    box-shadow: 0 4px 0 #047857;
+  }
+  .restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #047857; }
+</style>
+</head>
+<body>
+<div class="score-bar">⭐ Ball: <span id="score">0</span></div>
+<canvas id="c" width="360" height="280"></canvas>
+<p>Sakrash uchun ekranni bosing! 👆</p>
+
+<div class="over-overlay h" id="over-modal">
+  <div class="over-box">
+    <div style="font-size: 54px;">🌵💥</div>
+    <h2 style="color: #DC2626; margin: 10px 0 6px;">O'yin tugadi!</h2>
+    <p style="color: #64748B; font-size: 15px;">To'plangan ball: <b id="final-score" style="color:#0F172A;">0</b></p>
+    <button class="restart-btn" onclick="restartGame()">Qayta O'ynash 🔄</button>
+  </div>
+</div>
+
+<script>
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d');
+let score = 0;
+let active = true;
+
+const dino = { x: 40, y: 190, vy: 0, gravity: 0.8, onGround: true };
+const cacti = [];
+
+window.addEventListener('pointerdown', () => {
+  if (dino.onGround && active) {
+    dino.vy = -13;
+    dino.onGround = false;
+  }
+});
+
+function spawnCactus() {
+  if (!active) return;
+  cacti.push({ x: 380, y: 200 });
+  setTimeout(spawnCactus, Math.random() * 1200 + 1400);
+}
+
+function restartGame() {
+  score = 0;
+  dino.y = 190;
+  dino.vy = 0;
+  dino.onGround = true;
+  cacti.length = 0;
+  active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('over-modal').classList.add('h');
+  spawnCactus();
+  update();
+}
+
+function update() {
+  ctx.clearRect(0, 0, 360, 280);
+
+  // Ground line
+  ctx.fillStyle = '#CBD5E1';
+  ctx.fillRect(0, 230, 360, 4);
+
+  if (active) {
+    dino.vy += dino.gravity;
+    dino.y += dino.vy;
+    if (dino.y >= 190) { dino.y = 190; dino.vy = 0; dino.onGround = true; }
+
+    for (let i = cacti.length - 1; i >= 0; i--) {
+      const c = cacti[i];
+      c.x -= 4.5;
+      ctx.font = '32px sans-serif';
+      ctx.fillText('🌵', c.x, c.y + 26);
+
+      if (Math.hypot((dino.x + 16) - (c.x + 14), (dino.y + 16) - (c.y + 14)) < 26) {
+        active = false;
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('over-modal').classList.remove('h');
+        return;
+      }
+      if (c.x < -30) {
+        cacti.splice(i, 1);
+        score += 10;
+        document.getElementById('score').textContent = score;
+      }
+    }
+    // Dino
+    ctx.font = '38px sans-serif';
+    ctx.fillText('🦖', dino.x, dino.y + 30);
+    requestAnimationFrame(update);
+  }
+}
+spawnCactus();
+update();
+</script>
+</body>
+</html>

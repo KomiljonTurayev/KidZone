@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Fruit Slice 🍉</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    background: radial-gradient(circle at center, #2C3E50 0%, #0F2027 100%);
+    font-family: 'Arial Rounded MT Bold', 'Nunito', sans-serif;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  #header {
+    position: absolute; top: 12px; left: 16px; right: 16px; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    color: white; pointer-events: none;
+  }
+  .score-box { background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border-radius: 20px; padding: 8px 18px; font-size: 20px; font-weight: 900; }
+  .lives-box { font-size: 24px; }
+  canvas { width: 100vw; height: 100vh; display: block; }
+  #start-screen {
+    position: fixed; inset: 0; background: rgba(15,32,39,0.85); backdrop-filter: blur(10px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; z-index: 50; text-align: center; padding: 20px;
+  }
+  .btn-start {
+    background: linear-gradient(135deg, #FF5252, #FF7A00);
+    color: white; border: none; border-radius: 30px; padding: 16px 48px;
+    font-size: 22px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 24px rgba(255,82,82,0.4);
+    margin-top: 24px; transition: transform 0.1s;
+  }
+  .btn-start:active { transform: scale(0.95); }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="score-box">🍉 <span id="score">0</span></div>
+  <div class="lives-box" id="lives">❤️❤️❤️</div>
+</div>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="start-screen">
+  <div style="font-size: 80px; margin-bottom: 12px;">🍉🍍🍌</div>
+  <h1 id="title-txt" style="font-size: 32px; font-weight: 900; margin-bottom: 8px;">Meva Kesish!</h1>
+  <p id="desc-txt" style="font-size: 16px; opacity: 0.85;">Uchib chiqqan mevalarni barmog'ingiz bilan kesing!</p>
+  <button class="btn-start" onclick="startGame()">O'YNASH</button>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const lang = urlParams.get('lang') || 'uz';
+const T = {
+  uz: { title: "Meva Kesish! 🍉", desc: "Uchib chiqqan mevalarni barmog'ingiz bilan kesing!", play: "O'YNASH", over: "O'yin Tugadi!" },
+  ru: { title: "Фруктовый Ниндзя! 🍉", desc: "Разрезайте летящие фрукты пальцем!", play: "ИГРАТЬ", over: "Игра окончена!" },
+  en: { title: "Fruit Slice! 🍉", desc: "Swipe to slice the flying fruits!", play: "PLAY", over: "Game Over!" }
+}[lang] || { title: "Meva Kesish! 🍉", desc: "Uchib chiqqan mevalarni barmog'ingiz bilan kesing!", play: "O'YNASH" };
+
+document.getElementById('title-txt').textContent = T.title;
+document.getElementById('desc-txt').textContent = T.desc;
+document.querySelector('.btn-start').textContent = T.play;
+
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+window.onresize = resize;
+resize();
+
+let score = 0, lives = 3, gameActive = false;
+let fruits = [], particles = [], blade = [];
+
+const FRUIT_EMOJIS = ['🍉', '🍊', '🍌', '🍓', '🍍', '🥝', '🍎'];
+
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function playSliceSound() {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+  } catch(e) {}
+}
+
+function spawnFruit() {
+  if (!gameActive) return;
+  const emoji = FRUIT_EMOJIS[Math.floor(Math.random() * FRUIT_EMOJIS.length)];
+  fruits.push({
+    emoji,
+    x: Math.random() * (W - 120) + 60,
+    y: H + 30,
+    vx: (Math.random() - 0.5) * 6,
+    vy: -(Math.random() * 5 + 13),
+    size: 54,
+    sliced: false,
+    rot: 0,
+    vRot: (Math.random() - 0.5) * 0.1
+  });
+  setTimeout(spawnFruit, Math.random() * 900 + 700);
+}
+
+function spawnParticles(x, y, color) {
+  for (let i = 0; i < 16; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 6 + 2;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      color: color || '#FF5252',
+      size: Math.random() * 6 + 3
+    });
+  }
+}
+
+function update() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw blade trail
+  if (blade.length > 1) {
+    ctx.beginPath();
+    ctx.moveTo(blade[0].x, blade[0].y);
+    for (let i = 1; i < blade.length; i++) ctx.lineTo(blade[i].x, blade[i].y);
+    ctx.strokeStyle = '#00E5FF';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00E5FF';
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // Update fruits
+  for (let i = fruits.length - 1; i >= 0; i--) {
+    const f = fruits[i];
+    f.x += f.vx;
+    f.y += f.vy;
+    f.vy += 0.35; // gravity
+    f.rot += f.vRot;
+
+    ctx.save();
+    ctx.translate(f.x, f.y);
+    ctx.rotate(f.rot);
+    ctx.font = f.size + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f.emoji, 0, 0);
+    ctx.restore();
+
+    if (f.y > H + 60 && f.vy > 0) {
+      if (!f.sliced && gameActive) {
+        lives--;
+        document.getElementById('lives').textContent = '❤️'.repeat(Math.max(0, lives));
+        if (lives <= 0) gameOver();
+      }
+      fruits.splice(i, 1);
+    }
+  }
+
+  // Update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.life -= 0.03;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.life;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  requestAnimationFrame(update);
+}
+
+function checkSlice(x, y) {
+  blade.push({ x, y });
+  if (blade.length > 8) blade.shift();
+
+  for (let i = 0; i < fruits.length; i++) {
+    const f = fruits[i];
+    if (!f.sliced) {
+      const dist = Math.hypot(f.x - x, f.y - y);
+      if (dist < f.size * 0.75) {
+        f.sliced = true;
+        score += 10;
+        document.getElementById('score').textContent = score;
+        playSliceSound();
+        spawnParticles(f.x, f.y, '#FFEB3B');
+        fruits.splice(i, 1);
+        break;
+      }
+    }
+  }
+}
+
+window.addEventListener('pointermove', (e) => { if (e.buttons > 0) checkSlice(e.clientX, e.clientY); });
+window.addEventListener('pointerdown', (e) => { checkSlice(e.clientX, e.clientY); });
+window.addEventListener('pointerup', () => { blade = []; });
+
+function startGame() {
+  score = 0; lives = 3; gameActive = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('lives').textContent = '❤️❤️❤️';
+  document.getElementById('start-screen').style.display = 'none';
+  fruits = []; particles = [];
+  spawnFruit();
+}
+
+function gameOver() {
+  gameActive = false;
+  document.getElementById('start-screen').style.display = 'flex';
+  document.getElementById('title-txt').textContent = T.over;
+  document.getElementById('desc-txt').textContent = 'Siz ' + score + ' ball to\'pladingiz! 🌟';
+}
+
+update();
+</script>
+</body>
+</html>

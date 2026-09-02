@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pop It 3D 🌈</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    background: radial-gradient(circle at center, #FFE5EC 0%, #D8B4E2 100%);
+    font-family: 'Arial Rounded MT Bold', 'Nunito', sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    overflow: hidden; padding: 12px 10px;
+  }
+  #top-bar {
+    width: 100%; max-width: 420px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(8px);
+    border-radius: 20px; padding: 8px 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  .pill { font-size: 16px; font-weight: 900; color: #7B1FA2; display: flex; align-items: center; gap: 6px; }
+  #shape-selector { display: flex; gap: 8px; }
+  .shape-btn {
+    background: #fff; border: 2px solid #E1BEE7; border-radius: 12px;
+    padding: 6px 10px; font-size: 18px; cursor: pointer; transition: transform 0.1s;
+  }
+  .shape-btn.active { background: #BA68C8; border-color: #BA68C8; transform: scale(1.1); }
+
+  #board-wrap {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    width: 100%; max-width: 400px; position: relative;
+  }
+  .pop-board {
+    background: #ffffff; border-radius: 36px; padding: 16px;
+    box-shadow: 0 16px 32px rgba(123, 31, 162, 0.15), inset 0 -6px 0 rgba(0,0,0,0.06);
+    display: grid; gap: 12px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .grid-square { grid-template-columns: repeat(6, 1fr); }
+  .grid-heart { grid-template-columns: repeat(5, 1fr); }
+
+  .bubble {
+    width: 46px; height: 46px; border-radius: 50%;
+    position: relative; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: inset 0 -4px 6px rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.15);
+  }
+  .bubble:active { transform: scale(0.92); }
+  .bubble.popped {
+    box-shadow: inset 0 4px 6px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.1);
+    transform: scale(0.94);
+    filter: brightness(0.92);
+  }
+  .bubble.popped::after {
+    content: ''; position: absolute; inset: 6px; border-radius: 50%;
+    background: rgba(0,0,0,0.12);
+  }
+
+  #bottom-bar {
+    width: 100%; max-width: 420px; display: flex; gap: 12px; justify-content: center;
+  }
+  .action-btn {
+    background: linear-gradient(135deg, #FF4081, #E91E63);
+    color: white; border: none; border-radius: 25px; padding: 12px 28px;
+    font-size: 16px; font-weight: 900; box-shadow: 0 6px 16px rgba(233, 30, 99, 0.3);
+    cursor: pointer; display: flex; align-items: center; gap: 8px; transition: transform 0.1s;
+  }
+  .action-btn:active { transform: scale(0.95); }
+</style>
+</head>
+<body>
+
+<div id="top-bar">
+  <div class="pill">🎈 <span id="pop-count">0</span></div>
+  <div id="shape-selector">
+    <button class="shape-btn active" onclick="setShape('square')">🟦</button>
+    <button class="shape-btn" onclick="setShape('circle')">🟡</button>
+    <button class="shape-btn" onclick="setShape('heart')">💖</button>
+  </div>
+</div>
+
+<div id="board-wrap">
+  <div id="board" class="pop-board grid-square"></div>
+</div>
+
+<div id="bottom-bar">
+  <button class="action-btn" onclick="flipBoard()">
+    <span>🔄</span> <span id="lbl-flip">Aylantirish</span>
+  </button>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const lang = urlParams.get('lang') || 'uz';
+const T = {
+  uz: { flip: "Aylantirish", won: "Barakalla! Hammasi bosildi! 🌟" },
+  ru: { flip: "Перевернуть", won: "Отлично! Все лопнули! 🌟" },
+  en: { flip: "Flip Board", won: "Awesome! All popped! 🌟" }
+}[lang] || { flip: "Aylantirish", won: "Barakalla!" };
+
+document.getElementById('lbl-flip').textContent = T.flip;
+
+let totalPopped = 0;
+let currentShape = 'square';
+const colors = ['#FF5252', '#FF9800', '#FFEB3B', '#4CAF50', '#2196F3', '#9C27B0'];
+
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function playPopSound(isHigh) {
+  try {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const freq = isHigh ? 380 + Math.random() * 80 : 260 + Math.random() * 60;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioCtx.currentTime + 0.08);
+
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.09);
+  } catch(e) {}
+}
+
+function createBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  board.className = 'pop-board ' + (currentShape === 'circle' ? 'grid-square' : currentShape === 'heart' ? 'grid-heart' : 'grid-square');
+  if (currentShape === 'circle') board.style.borderRadius = '50%';
+  else board.style.borderRadius = '36px';
+
+  const count = currentShape === 'heart' ? 25 : 36;
+  for (let i = 0; i < count; i++) {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const rowIdx = Math.floor(i / 6);
+    bubble.style.backgroundColor = colors[rowIdx % colors.length];
+
+    bubble.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      popBubble(bubble);
+    });
+    board.appendChild(bubble);
+  }
+}
+
+function popBubble(el) {
+  const wasPopped = el.classList.contains('popped');
+  el.classList.toggle('popped');
+  playPopSound(!wasPopped);
+  if (navigator.vibrate) navigator.vibrate(15);
+
+  totalPopped++;
+  document.getElementById('pop-count').textContent = totalPopped;
+
+  const bubbles = document.querySelectorAll('.bubble');
+  const allPopped = Array.from(bubbles).every(b => b.classList.contains('popped'));
+  if (allPopped) {
+    if (window.KZL && KZL.spawnConfetti) KZL.spawnConfetti();
+    setTimeout(() => {
+      flipBoard();
+    }, 400);
+  }
+}
+
+function flipBoard() {
+  const board = document.getElementById('board');
+  board.style.transform = 'scale(0.8) rotateY(180deg)';
+  setTimeout(() => {
+    document.querySelectorAll('.bubble').forEach(b => b.classList.remove('popped'));
+    board.style.transform = 'scale(1) rotateY(0deg)';
+  }, 250);
+}
+
+function setShape(shape) {
+  currentShape = shape;
+  document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  createBoard();
+}
+
+window.onload = createBoard;
+</script>
+</body>
+</html>

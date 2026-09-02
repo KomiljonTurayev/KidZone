@@ -1,6 +1,7 @@
 package uz.kidzone.app.ui
 
 import android.app.Activity
+import android.content.SharedPreferences
 import uz.kidzone.app.arch.AppPreferences
 import android.net.Uri
 import android.util.Log
@@ -98,6 +99,7 @@ fun MainScreen(
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
     onOpenDashboard: () -> Unit,
+    onOpenSleep: () -> Unit = {},
 ) {
     // Yaxshilangan: collectAsState o'rniga collectAsStateWithLifecycle ishlatildi. 
     // Bu orqafon (background) da batareya isrofgarchiligini oldini oladi.
@@ -150,14 +152,14 @@ fun MainScreen(
                         val mgr = KidWebViewManager(this)
                         val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
                         val age = prefs.getString("kz_age", "2-4") ?: "2-4"
-                        val nativeBridge = NativeBridge(mainViewModel, onOpenDashboard, mgr::evaluateJavascript, context as Activity)
+                        val nativeBridge = NativeBridge(mainViewModel, onOpenDashboard, onOpenSleep, mgr::evaluateJavascript, context as Activity)
                         mgr.setup(nativeBridge, "AndroidBridge")
                         mgr.addInterface(
                             ChallengeBridge(challengeViewModel, context),
                             "AndroidChallenge",
                         )
                         mgr.loadUrl(
-                            "file:///android_asset/www/index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}"
+                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}"
                         )
                         webMgrRef.value = mgr
                         addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
@@ -313,6 +315,8 @@ fun MainScreen(
         val mgr = webMgrRef.value
         webMgrRef.value?.evaluateJavascript(
             """(function(){
+                var sv=document.getElementById('sleep-view');
+                if(sv&&!sv.classList.contains('h')){closeSleep();return 'overlay';}
                 var lv=document.getElementById('lyrics-viewer');
                 if(lv&&!lv.classList.contains('h')){closeLyrics();return 'overlay';}
                 var ai=document.getElementById('ai-viewer');
@@ -453,6 +457,7 @@ fun PlayTimeCountdownBadge(
 private class NativeBridge(
     private val viewModel: MainViewModel,
     private val onOpenDashboard: () -> Unit,
+    private val onOpenSleep: () -> Unit,
     private val evalJs: (String) -> Unit,
     activity: Activity,
 ) {
@@ -606,6 +611,11 @@ private class NativeBridge(
     @android.webkit.JavascriptInterface
     fun openParentalDashboard() {
         onMain { onOpenDashboard() }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun openSleepScreen() {
+        onMain { onOpenSleep() }
     }
 
     @android.webkit.JavascriptInterface

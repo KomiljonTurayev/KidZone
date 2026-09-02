@@ -20,6 +20,7 @@ data class MainUiState(
     val promoBanner: PromoBannerData? = null,
     val isLocked: Boolean = false,
     val pendingDeepLinkContentId: String? = null,
+    val isBanned: Boolean = false,
 )
 
 class MainViewModel : ViewModel() {
@@ -35,4 +36,5 @@ class MainViewModel : ViewModel() {
     fun showLock() { _state.update { it.copy(isLocked = true) } }
     fun hideLock() { _state.update { it.copy(isLocked = false) } }
     fun setPendingDeepLinkContentId(contentId: String?) { _state.update { it.copy(pendingDeepLinkContentId = contentId) } }
+    fun setBanned(banned: Boolean) { _state.update { it.copy(isBanned = banned) } }
 }

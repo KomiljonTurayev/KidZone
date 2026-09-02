@@ -9,6 +9,7 @@ import io.ktor.server.response.respondBytes
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.ContentType
 import io.ktor.server.response.respond
+import io.ktor.server.application.call
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

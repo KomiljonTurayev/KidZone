@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sichqoncha Uring 🐹</title>
+<link rel="stylesheet" href="kids-theme.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: #86EFAC; font-family: 'Fredoka One', cursive, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 16px;
+  }
+  .hud { display: flex; justify-content: space-between; width: 100%; max-width: 340px; font-size: 20px; color: #166534; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 340px; }
+  .hole {
+    height: 100px; background: #78350F; border-radius: 50%;
+    position: relative; overflow: hidden; box-shadow: inset 0 8px 12px rgba(0,0,0,0.5);
+  }
+  .mole {
+    position: absolute; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px; bottom: -100%; transition: bottom 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+  }
+  .mole.up { bottom: 0; }
+  .mole.hit { transform: scale(1.3) rotate(20deg); filter: grayscale(0.5); }
+
+  .over-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .over-overlay.h { display: none; }
+  .over-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+  }
+  .restart-btn {
+    background: #16A34A; color: white; border: none; border-radius: 20px;
+    padding: 12px 26px; font-size: 16px; font-family: inherit; cursor: pointer; margin-top: 14px;
+    box-shadow: 0 4px 0 #15803D;
+  }
+  .restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #15803D; }
+</style>
+</head>
+<body>
+<div class="hud">
+  <div>⭐ Ball: <span id="score">0</span></div>
+  <div>⏳ Vaqt: <span id="time">30</span>s</div>
+</div>
+<div class="grid">
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+  <div class="hole"><div class="mole">🐹</div></div>
+</div>
+<p style="color:#166534; font-size:14px; font-weight:bold;">Chiqib kelgan sichqonchalarni tezda uring!</p>
+
+<div class="over-overlay h" id="over-modal">
+  <div class="over-box">
+    <div style="font-size: 54px;">🏆🐹🎉</div>
+    <h2 style="color: #16A34A; margin: 10px 0 6px;">O'yin yakunlandi!</h2>
+    <p style="color: #64748B; font-size: 15px;">To'plangan ball: <b id="final-score" style="color:#0F172A;">0</b></p>
+    <button class="restart-btn" onclick="restartGame()">Qayta O'ynash 🔄</button>
+  </div>
+</div>
+
+<script>
+let score = 0;
+let timeLeft = 30;
+let activeMole = null;
+let moleTimer = null;
+let gameTimer = null;
+const moles = document.querySelectorAll('.mole');
+
+function randomMole() {
+  moles.forEach(m => { m.classList.remove('up'); m.classList.remove('hit'); });
+  const idx = Math.floor(Math.random() * moles.length);
+  activeMole = moles[idx];
+  activeMole.classList.add('up');
+}
+
+moles.forEach(m => {
+  m.addEventListener('pointerdown', () => {
+    if (m === activeMole && !m.classList.contains('hit')) {
+      m.classList.add('hit');
+      score += 10;
+      document.getElementById('score').textContent = score;
+      if (navigator.vibrate) navigator.vibrate(20);
+    }
+  });
+});
+
+function startGame() {
+  moleTimer = setInterval(randomMole, 750);
+  gameTimer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('time').textContent = timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(moleTimer);
+      clearInterval(gameTimer);
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('over-modal').classList.remove('h');
+    }
+  }, 1000);
+}
+
+function restartGame() {
+  score = 0;
+  timeLeft = 30;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('time').textContent = '30';
+  document.getElementById('over-modal').classList.add('h');
+  clearInterval(moleTimer);
+  clearInterval(gameTimer);
+  startGame();
+}
+
+startGame();
+</script>
+</body>
+</html>

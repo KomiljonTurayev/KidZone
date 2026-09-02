@@ -16,11 +16,14 @@ import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileRepository
 import uz.kidzone.app.data.ProfileSyncManager
 import uz.kidzone.app.ui.screens.AddEditProfileScreen
+import uz.kidzone.app.ui.screens.BannedScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
 import uz.kidzone.app.ui.screens.ProfileSelectScreen
+import uz.kidzone.app.ui.screens.SleepScreen
 import uz.kidzone.app.ui.theme.KidZoneTheme
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
+import android.content.SharedPreferences
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModelFactory
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
@@ -32,6 +35,14 @@ fun KidZoneApp(
     mainViewModel: MainViewModel,
     statsManager: ParentalStatsManager,
 ) {
+    val mainUiState by mainViewModel.state.collectAsState()
+    if (mainUiState.isBanned) {
+        KidZoneTheme {
+            BannedScreen()
+        }
+        return
+    }
+
     val navController = rememberNavController()
     val onboardingDone = prefs.getBoolean("kz_onboarding_done", false)
     val context = LocalContext.current
@@ -39,7 +50,7 @@ fun KidZoneApp(
     val profileRepository = remember {
         val db = KidZoneDatabase.getInstance(context)
         val syncManager = ProfileSyncManager(
-            runCatching { dev.gitlive.firebase.firestore.FirebaseFirestore.getInstance() }.getOrNull()
+            runCatching { com.google.firebase.firestore.FirebaseFirestore.getInstance() }.getOrNull()
         )
         ProfileRepository(db.profileDao(), db.profileStatsDao(), prefs, syncManager)
     }
@@ -100,6 +111,14 @@ fun KidZoneApp(
                     profileViewModel = profileViewModel,
                     challengeViewModel = challengeViewModel,
                     onOpenDashboard = { navController.navigate("dashboard") },
+                    onOpenSleep = { navController.navigate("sleep") },
+                )
+            }
+            composable("sleep") {
+                val curLang = prefs.getString("kz_lang", "uz") ?: "uz"
+                SleepScreen(
+                    lang = curLang,
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable("dashboard") {

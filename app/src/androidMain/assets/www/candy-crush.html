@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Candy Match 3 🍬</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: radial-gradient(circle, #FDE2E4 0%, #FFCAD4 100%);
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 16px 12px; overflow: hidden;
+  }
+  #header {
+    width: 100%; max-width: 400px; display: flex; justify-content: space-between;
+    align-items: center; background: white; border-radius: 20px; padding: 10px 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06); font-weight: 900; color: #E91E63;
+  }
+  #board {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+    width: 100%; max-width: 380px; aspect-ratio: 1; background: rgba(255,255,255,0.6);
+    padding: 10px; border-radius: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+  .candy {
+    background: white; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 34px; cursor: pointer; transition: transform 0.15s, background 0.15s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  }
+  .candy.selected { transform: scale(1.15); background: #FFF0F5; border: 3px solid #E91E63; }
+  .candy.matched { transform: scale(0); opacity: 0; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div>🍬 <span id="score">0</span></div>
+  <div>⏳ <span id="moves">25</span> qadam</div>
+</div>
+
+<div id="board"></div>
+
+<div style="font-size: 14px; color: #888; font-weight: 900;">Bir xil 3 ta konfetni birlashtiring!</div>
+
+<script>
+const CANDIES = ['🍭', '🍬', '🧁', '🍩', '🍫', '🍓'];
+const GRID = 6;
+let board = [];
+let selected = null;
+let score = 0, moves = 25;
+
+function createBoard() {
+  const container = document.getElementById('board');
+  container.innerHTML = '';
+  board = [];
+
+  for (let r = 0; r < GRID; r++) {
+    board[r] = [];
+    for (let c = 0; c < GRID; c++) {
+      let candy;
+      do {
+        candy = CANDIES[Math.floor(Math.random() * CANDIES.length)];
+      } while ((c >= 2 && board[r][c-1] === candy && board[r][c-2] === candy) ||
+               (r >= 2 && board[r-1][c] === candy && board[r-2][c] === candy));
+
+      board[r][c] = candy;
+      const el = document.createElement('div');
+      el.className = 'candy';
+      el.textContent = candy;
+      el.dataset.r = r; el.dataset.c = c;
+      el.addEventListener('pointerdown', () => onCandyClick(r, c, el));
+      container.appendChild(el);
+    }
+  }
+}
+
+function onCandyClick(r, c, el) {
+  if (!selected) {
+    selected = { r, c, el };
+    el.classList.add('selected');
+  } else {
+    const dR = Math.abs(selected.r - r);
+    const dC = Math.abs(selected.c - c);
+    if ((dR === 1 && dC === 0) || (dR === 0 && dC === 1)) {
+      swapCandies(selected.r, selected.c, r, c);
+    }
+    selected.el.classList.remove('selected');
+    selected = null;
+  }
+}
+
+function swapCandies(r1, c1, r2, c2) {
+  const temp = board[r1][c1];
+  board[r1][c1] = board[r2][c2];
+  board[r2][c2] = temp;
+  render();
+
+  if (checkMatches()) {
+    moves--;
+    document.getElementById('moves').textContent = moves;
+  } else {
+    // swap back
+    setTimeout(() => {
+      const t = board[r1][c1];
+      board[r1][c1] = board[r2][c2];
+      board[r2][c2] = t;
+      render();
+    }, 200);
+  }
+}
+
+function checkMatches() {
+  let matched = [];
+  // Rows
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c < GRID - 2; c++) {
+      const type = board[r][c];
+      if (type && board[r][c+1] === type && board[r][c+2] === type) {
+        matched.push({r, c}, {r, c: c+1}, {r, c: c+2});
+      }
+    }
+  }
+  // Cols
+  for (let c = 0; c < GRID; c++) {
+    for (let r = 0; r < GRID - 2; r++) {
+      const type = board[r][c];
+      if (type && board[r+1][c] === type && board[r+2][c] === type) {
+        matched.push({r, c}, {r: r+1, c}, {r: r+2, c});
+      }
+    }
+  }
+
+  if (matched.length > 0) {
+    score += matched.length * 10;
+    document.getElementById('score').textContent = score;
+    matched.forEach(m => board[m.r][m.c] = null);
+    dropCandies();
+    return true;
+  }
+  return false;
+}
+
+function dropCandies() {
+  for (let c = 0; c < GRID; c++) {
+    for (let r = GRID - 1; r >= 0; r--) {
+      if (board[r][c] === null) {
+        for (let k = r - 1; k >= 0; k--) {
+          if (board[k][c] !== null) {
+            board[r][c] = board[k][c];
+            board[k][c] = null;
+            break;
+          }
+        }
+        if (board[r][c] === null) {
+          board[r][c] = CANDIES[Math.floor(Math.random() * CANDIES.length)];
+        }
+      }
+    }
+  }
+  render();
+  setTimeout(checkMatches, 250);
+}
+
+function render() {
+  const container = document.getElementById('board');
+  const els = container.children;
+  let idx = 0;
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c < GRID; c++) {
+      els[idx].textContent = board[r][c] || '';
+      idx++;
+    }
+  }
+}
+
+createBoard();
+</script>
+</body>
+</html>

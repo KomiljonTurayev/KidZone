@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Nishon Yulduz ⭐</title>
+<link rel="stylesheet" href="kids-theme.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: #4C1D95; font-family: 'Fredoka One', cursive, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .score-bar { position: absolute; top: 20px; font-size: 22px; color: #FDE68A; }
+  canvas { background: #5B21B6; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+  p { margin-top: 15px; font-size: 15px; color: #DDD6FE; }
+
+  .over-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .over-overlay.h { display: none; }
+  .over-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+  }
+  .restart-btn {
+    background: #8B5CF6; color: white; border: none; border-radius: 20px;
+    padding: 12px 26px; font-size: 16px; font-family: inherit; cursor: pointer; margin-top: 14px;
+    box-shadow: 0 4px 0 #6D28D9;
+  }
+  .restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #6D28D9; }
+</style>
+</head>
+<body>
+<div class="score-bar">⭐ Ball: <span id="score">0</span></div>
+<canvas id="c" width="340" height="420"></canvas>
+<p>Yulduzchani otish uchun bosing! 🎯</p>
+
+<div class="over-overlay h" id="over-modal">
+  <div class="over-box">
+    <div style="font-size: 54px;">⭐💥</div>
+    <h2 style="color: #7C3AED; margin: 10px 0 6px;">Tegib ketdi!</h2>
+    <p style="color: #64748B; font-size: 15px;">To'plangan ball: <b id="final-score" style="color:#0F172A;">0</b></p>
+    <button class="restart-btn" onclick="restartGame()">Qayta O'ynash 🔄</button>
+  </div>
+</div>
+
+<script>
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d');
+let rot = 0;
+let stars = [];
+let activeStar = null;
+let score = 0;
+let active = true;
+
+window.addEventListener('pointerdown', () => {
+  if (!activeStar && active) {
+    activeStar = { y: 360, vy: -12 };
+  }
+});
+
+function restartGame() {
+  score = 0;
+  stars.length = 0;
+  activeStar = null;
+  active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('over-modal').classList.add('h');
+  update();
+}
+
+function update() {
+  ctx.clearRect(0, 0, 340, 420);
+
+  // Rotating target wheel
+  rot += 0.03;
+  ctx.save();
+  ctx.translate(170, 130);
+  ctx.rotate(rot);
+
+  ctx.fillStyle = '#F59E0B';
+  ctx.beginPath();
+  ctx.arc(0, 0, 55, 0, Math.PI * 2);
+  ctx.fill();
+
+  stars.forEach(angle => {
+    ctx.save();
+    ctx.rotate(angle);
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⭐', 0, -60);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  // Active flying star
+  if (activeStar) {
+    activeStar.y += activeStar.vy;
+    ctx.font = '28px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⭐', 170, activeStar.y);
+
+    if (activeStar.y <= 190) {
+      const hitAngle = -rot;
+      const collided = stars.some(a => {
+        let diff = Math.abs((a - hitAngle) % (Math.PI * 2));
+        if (diff > Math.PI) diff = Math.PI * 2 - diff;
+        return diff < 0.28;
+      });
+
+      if (collided) {
+        active = false;
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('over-modal').classList.remove('h');
+        return;
+      } else {
+        stars.push(hitAngle);
+        score++;
+        document.getElementById('score').textContent = score;
+      }
+      activeStar = null;
+    }
+  }
+
+  if (active) requestAnimationFrame(update);
+}
+update();
+</script>
+</body>
+</html>

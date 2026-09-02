@@ -8,9 +8,11 @@ import android.webkit.ConsoleMessage
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.webkit.WebViewAssetLoader
 
 /**
  * Manages WebView configuration and operations.
@@ -20,7 +22,12 @@ class KidWebViewManager(private val webView: WebView) {
 
     companion object {
         private const val TAG = "KidWebViewManager"
+        const val ASSET_BASE_URL = "https://appassets.androidplatform.net/assets/www/"
     }
+
+    private val assetLoader = WebViewAssetLoader.Builder()
+        .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(webView.context))
+        .build()
 
     var currentLanguage: String = "en"
 
@@ -47,6 +54,10 @@ class KidWebViewManager(private val webView: WebView) {
                 Log.d("KZ-JS", "${cm.messageLevel()} [${cm.sourceId()}:${cm.lineNumber()}] ${cm.message()}")
                 return true
             }
+            override fun onJsAlert(view: WebView?, url: String?, message: String?, result: android.webkit.JsResult?): Boolean {
+                result?.confirm()
+                return true
+            }
         }
     }
 
@@ -70,7 +81,8 @@ class KidWebViewManager(private val webView: WebView) {
     }
 
     fun loadGame(gameId: String) {
-        val url = GameServer.getGameUrl(gameId)
+        val cleanId = if (gameId.endsWith(".html")) gameId else "$gameId.html"
+        val url = "$ASSET_BASE_URL$cleanId"
         webView.loadUrl(url)
     }
 
@@ -102,9 +114,18 @@ class KidWebViewManager(private val webView: WebView) {
     }
 
     private inner class InternalWebViewClient : WebViewClient() {
+        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+            val intercepted = assetLoader.shouldInterceptRequest(request.url)
+            return intercepted ?: super.shouldInterceptRequest(view, request)
+        }
+
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val url = request.url.toString()
-            if (url.startsWith("file://")) return false
+            if (url.startsWith("https://appassets.androidplatform.net") ||
+                url.startsWith("file://") ||
+                url.startsWith("http://localhost")) {
+                return false
+            }
             try {
                 view.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             } catch (e: Exception) {

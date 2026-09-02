@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tower Stack 🏗️</title>
+<link rel="stylesheet" href="kids-theme.css">
+<script src="kz-ui.js"></script>
+<script src="kids-ui.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
+  body {
+    min-height: 100vh; background: linear-gradient(180deg, #1E1B4B 0%, #312E81 100%);
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    overflow: hidden; display: flex; flex-direction: column; align-items: center;
+  }
+  #score-box { position: absolute; top: 16px; font-size: 32px; font-weight: 900; color: #FCD34D; z-index: 10; }
+  canvas { width: 100vw; height: 100vh; display: block; }
+  #start-screen {
+    position: fixed; inset: 0; background: rgba(30,27,75,0.85); backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; z-index: 20; text-align: center; padding: 20px;
+  }
+  .btn {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white; border: none; border-radius: 30px; padding: 16px 44px;
+    font-size: 22px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 24px rgba(245,158,11,0.4);
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div id="score-box">🏢 <span id="score">0</span></div>
+<canvas id="c"></canvas>
+
+<div id="start-screen">
+  <div style="font-size: 70px;">🏗️✨</div>
+  <h1 id="title" style="font-size: 30px; margin: 10px 0;">Minora Qurish!</h1>
+  <p id="desc" style="opacity: 0.9; font-size: 16px;">Bloklarni bir-birining ustiga aniq joylashtiring!</p>
+  <button class="btn" onclick="start()">BOSHLASH</button>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+window.onresize = resize; resize();
+
+let stack = [], cur = null;
+let score = 0, active = false;
+const colors = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#6366F1', '#8B5CF6', '#EC4899'];
+
+function initStack() {
+  stack = [];
+  const baseW = 180, h = 32;
+  stack.push({ x: W / 2 - baseW / 2, y: H - 120, w: baseW, h, color: colors[0] });
+  spawnCur();
+}
+
+function spawnCur() {
+  const last = stack[stack.length - 1];
+  const color = colors[stack.length % colors.length];
+  cur = {
+    x: 0,
+    y: last.y - last.h,
+    w: last.w,
+    h: last.h,
+    color,
+    dir: 1,
+    speed: 3 + stack.length * 0.15
+  };
+}
+
+function place() {
+  if (!active || !cur) return;
+  const last = stack[stack.length - 1];
+  const diff = cur.x - last.x;
+
+  if (Math.abs(diff) < 5) {
+    cur.x = last.x; // perfect bonus
+  } else if (Math.abs(diff) >= cur.w) {
+    end(); // missed completely
+    return;
+  } else {
+    // chop off
+    if (diff > 0) {
+      cur.w -= diff;
+    } else {
+      cur.x = last.x;
+      cur.w += diff;
+    }
+  }
+
+  stack.push(cur);
+  score++;
+  document.getElementById('score').textContent = score;
+
+  // Scroll camera down if stack gets high
+  if (stack.length > 8) {
+    stack.forEach(b => b.y += cur.h);
+  }
+
+  spawnCur();
+}
+window.addEventListener('pointerdown', place);
+
+function update() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw stack
+  stack.forEach(b => {
+    ctx.fillStyle = b.color;
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(b.x, b.y, b.w, 4);
+  });
+
+  // Draw moving cur
+  if (active && cur) {
+    cur.x += cur.speed * cur.dir;
+    if (cur.x + cur.w > W || cur.x < 0) cur.dir *= -1;
+
+    ctx.fillStyle = cur.color;
+    ctx.fillRect(cur.x, cur.y, cur.w, cur.h);
+  }
+
+  requestAnimationFrame(update);
+}
+
+function start() {
+  score = 0; active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('start-screen').style.display = 'none';
+  initStack();
+}
+
+function end() {
+  active = false;
+  document.getElementById('start-screen').style.display = 'flex';
+  document.getElementById('title').textContent = 'O\'yin Tugadi!';
+  document.getElementById('desc').textContent = 'Minora balandligi: ' + score + ' qavat! 🏆';
+}
+
+update();
+</script>
+</body>
+</html>

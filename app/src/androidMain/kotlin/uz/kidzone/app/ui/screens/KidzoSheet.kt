@@ -1,6 +1,8 @@
 package uz.kidzone.app.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +50,8 @@ fun KidzoSheet(
     onContentSelected: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val prefs = remember(context) { uz.kidzone.app.arch.AppPreferences(context) }
     val cards by viewModel.cards.collectAsStateWithLifecycle()
     val messages by viewModel.chatMessages.collectAsStateWithLifecycle()
     var inputText by remember { mutableStateOf("") }
@@ -71,7 +75,7 @@ fun KidzoSheet(
 
             // Content cards
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(cards) { card ->
+                items(cards) { card: ContentCard ->
                     KidzoCardItem(card = card, onClick = {
                         onContentSelected(card.contentId)
                         onDismiss()
@@ -82,7 +86,7 @@ fun KidzoSheet(
             Spacer(Modifier.height(12.dp))
 
             // Chat messages (last 3)
-            messages.takeLast(3).forEach { msg ->
+            messages.takeLast(3).forEach { msg: String ->
                 Text(
                     text = msg,
                     style = MaterialTheme.typography.bodySmall,
@@ -113,7 +117,6 @@ fun KidzoSheet(
                             viewModel.sendMessage(inputText)
                             inputText = ""
                             // Oddiy counter o'rniga haqiqiy paywall counter qo'shiladi
-                            val prefs = uz.kidzone.app.arch.AppPreferences.getInstance()
                             val limit = prefs.getInt("daily_ai_limit", 0)
                             prefs.putInt("daily_ai_limit", limit + 1)
                         }
@@ -127,7 +130,6 @@ fun KidzoSheet(
         }
         
         // PAYWALL LOGIC
-        val prefs = uz.kidzone.app.arch.AppPreferences.getInstance()
         var dailyLimit by remember { mutableStateOf(prefs.getInt("daily_ai_limit", 0)) }
         var showPaywall by remember { mutableStateOf(false) }
         var showPinGate by remember { mutableStateOf(false) }
