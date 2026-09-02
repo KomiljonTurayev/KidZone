@@ -52,6 +52,21 @@
 </div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { bar: '⭐ Ball: ', over: "To'qnashuv!", res: "To'plangan ball: ", restart: "Qayta O'ynash 🔄" },
+  ru: { bar: '⭐ Очки: ', over: 'Авария!', res: 'Набранные очки: ', restart: 'Играть Снова 🔄' },
+  en: { bar: '⭐ Score: ', over: 'Crash!', res: 'Total Score: ', restart: 'Play Again 🔄' }
+};
+const T = I18N[lang] || I18N.uz;
+window.addEventListener('load', () => {
+  document.querySelector('.score-bar').childNodes[0].textContent = T.bar;
+  document.querySelector('.over-box h2').textContent = T.over;
+  document.querySelector('.over-box p').childNodes[0].textContent = T.res;
+  document.querySelector('.restart-btn').textContent = T.restart;
+});
+
 const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d');
 let carX = 180;

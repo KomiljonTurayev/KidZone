@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Glow Magic Draw ✨</title>
 <link rel="stylesheet" href="kids-theme.css">
-<script src="kz-ui.js"></script>
-<script src="kids-ui.js"></script>
+
 <style>
   * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
   body { min-height: 100vh; background: #000; overflow: hidden; display: flex; flex-direction: column; }
@@ -30,6 +29,13 @@
 </div>
 
 <script>
+const pLang = new URLSearchParams(location.search).get('lang') || 'uz';
+const clearMap = { uz: '🗑️ Tozalash', ru: '🗑️ Очистить', en: '🗑️ Clear' };
+window.addEventListener('load', () => {
+  document.querySelector('.btn-clear').textContent = clearMap[pLang] || clearMap.uz;
+});
+let strokeCount = 0;
+
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight - 70; }
@@ -57,7 +63,13 @@ canvas.addEventListener('pointermove', e => {
   ctx.stroke();
   lastX = e.clientX; lastY = e.clientY;
 });
-window.addEventListener('pointerup', () => isDrawing = false);
+window.addEventListener('pointerup', () => {
+  isDrawing = false;
+  strokeCount++;
+  if (strokeCount === 8 && window.parent && window.parent.onRewardGranted) {
+    window.parent.onRewardGranted(20);
+  }
+});
 </script>
 </body>
 </html>

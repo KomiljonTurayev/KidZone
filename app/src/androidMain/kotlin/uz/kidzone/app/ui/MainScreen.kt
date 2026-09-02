@@ -615,7 +615,7 @@ private class NativeBridge(
 
     @android.webkit.JavascriptInterface
     fun openSleepScreen() {
-        onMain { onOpenSleep() }
+        evalJs("window.openSleep && window.openSleep()")
     }
 
     @android.webkit.JavascriptInterface
@@ -626,12 +626,14 @@ private class NativeBridge(
     @android.webkit.JavascriptInterface
     fun generateStory(lang: String, ageRange: String, childName: String, scenario: String) {
         scope.launch {
-            val story = StoryGenerator.generate(lang, ageRange, childName, scenario)
-            onMain {
-                if (story != null) {
+            try {
+                val story = StoryGenerator.generate(lang, ageRange, childName, scenario)
+                onMain {
                     val payload = JSONObject().put("title", story.title).put("text", story.text).toString()
                     evalJs("window.onAiStoryReady(${JSONObject.quote(payload)})")
-                } else {
+                }
+            } catch (e: Exception) {
+                onMain {
                     evalJs("window.onAiStoryError && window.onAiStoryError()")
                 }
             }

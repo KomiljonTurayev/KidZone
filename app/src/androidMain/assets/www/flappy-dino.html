@@ -44,6 +44,19 @@
 </div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { hint: 'Uchish uchun ekranni bosing!', start: 'BOSHLASH', over: 'O\'yin Tugadi!', res: 'Natijangiz: ' },
+  ru: { hint: 'Нажимайте на экран для полета!', start: 'СТАРТ', over: 'Игра Окончена!', res: 'Ваш результат: ' },
+  en: { hint: 'Tap screen to flap and fly!', start: 'START', over: 'Game Over!', res: 'Your Score: ' }
+};
+const T = I18N[lang] || I18N.uz;
+window.addEventListener('load', () => {
+  document.getElementById('hint').textContent = T.hint;
+  document.querySelector('.btn').textContent = T.start;
+});
+
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 let W, H;

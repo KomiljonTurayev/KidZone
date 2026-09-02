@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Candy Match 3 🍬</title>
 <link rel="stylesheet" href="kids-theme.css">
-<script src="kz-ui.js"></script>
-<script src="kids-ui.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
   body {
@@ -32,25 +30,64 @@
   }
   .candy.selected { transform: scale(1.15); background: #FFF0F5; border: 3px solid #E91E63; }
   .candy.matched { transform: scale(0); opacity: 0; }
+
+  .over-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .over-overlay.h { display: none; }
+  .over-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+  }
+  .restart-btn {
+    background: #E91E63; color: white; border: none; border-radius: 20px;
+    padding: 12px 26px; font-size: 16px; font-family: inherit; cursor: pointer; margin-top: 14px;
+    box-shadow: 0 4px 0 #C2185B;
+  }
+  .restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #C2185B; }
 </style>
 </head>
 <body>
 
 <div id="header">
   <div>🍬 <span id="score">0</span></div>
-  <div>⏳ <span id="moves">25</span> qadam</div>
+  <div>⏳ <span id="moves">20</span> <span id="moves-txt">qadam</span></div>
 </div>
 
 <div id="board"></div>
 
-<div style="font-size: 14px; color: #888; font-weight: 900;">Bir xil 3 ta konfetni birlashtiring!</div>
+<div id="hint-txt" style="font-size: 14px; color: #888; font-weight: 900;">Bir xil 3 ta konfetni birlashtiring!</div>
+
+<div class="over-overlay h" id="over-modal">
+  <div class="over-box">
+    <div style="font-size: 54px;">🍬🎉</div>
+    <h2 id="over-title" style="color: #E91E63; margin: 10px 0 6px;">Barakalla!</h2>
+    <p style="color: #64748B; font-size: 15px;"><span id="over-score-txt">To'plangan ball:</span> <b id="final-score" style="color:#0F172A;">0</b></p>
+    <button class="restart-btn" id="btn-restart" onclick="restartGame()">Qayta O'ynash 🔄</button>
+  </div>
+</div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { moves: 'qadam', hint: 'Bir xil 3 ta konfetni birlashtiring!', win: 'Barakalla! 🎉', score: "To'plangan ball:", restart: "Qayta O'ynash 🔄" },
+  ru: { moves: 'ходов', hint: 'Соберите 3 одинаковые конфеты в ряд!', win: 'Отлично! 🎉', score: 'Набранные очки:', restart: 'Играть Снова 🔄' },
+  en: { moves: 'moves', hint: 'Match 3 candies in a row!', win: 'Well done! 🎉', score: 'Total Score:', restart: 'Play Again 🔄' }
+};
+const T = I18N[lang] || I18N.uz;
+document.getElementById('moves-txt').textContent = T.moves;
+document.getElementById('hint-txt').textContent = T.hint;
+document.getElementById('over-title').textContent = T.win;
+document.getElementById('over-score-txt').textContent = T.score;
+document.getElementById('btn-restart').textContent = T.restart;
+
 const CANDIES = ['🍭', '🍬', '🧁', '🍩', '🍫', '🍓'];
 const GRID = 6;
 let board = [];
 let selected = null;
-let score = 0, moves = 25;
+let score = 0, moves = 20, active = true;
 
 function createBoard() {
   const container = document.getElementById('board');
@@ -63,84 +100,93 @@ function createBoard() {
       let candy;
       do {
         candy = CANDIES[Math.floor(Math.random() * CANDIES.length)];
-      } while ((c >= 2 && board[r][c-1] === candy && board[r][c-2] === candy) ||
-               (r >= 2 && board[r-1][c] === candy && board[r-2][c] === candy));
-
+      } while (
+        (c >= 2 && board[r][c - 1] === candy && board[r][c - 2] === candy) ||
+        (r >= 2 && board[r - 1][c] === candy && board[r - 2][c] === candy)
+      );
       board[r][c] = candy;
       const el = document.createElement('div');
       el.className = 'candy';
       el.textContent = candy;
-      el.dataset.r = r; el.dataset.c = c;
-      el.addEventListener('pointerdown', () => onCandyClick(r, c, el));
+      el.dataset.r = r;
+      el.dataset.c = c;
+      el.onclick = () => onCandyClick(r, c);
       container.appendChild(el);
     }
   }
 }
 
-function onCandyClick(r, c, el) {
+function onCandyClick(r, c) {
+  if (!active) return;
   if (!selected) {
-    selected = { r, c, el };
-    el.classList.add('selected');
+    selected = { r, c };
+    highlight(r, c, true);
   } else {
-    const dR = Math.abs(selected.r - r);
-    const dC = Math.abs(selected.c - c);
-    if ((dR === 1 && dC === 0) || (dR === 0 && dC === 1)) {
-      swapCandies(selected.r, selected.c, r, c);
+    highlight(selected.r, selected.c, false);
+    const d = Math.abs(selected.r - r) + Math.abs(selected.c - c);
+    if (d === 1) {
+      swap(selected.r, selected.c, r, c);
+      moves--;
+      document.getElementById('moves').textContent = moves;
+      setTimeout(() => {
+        const matches = findMatches();
+        if (matches.length > 0) {
+          handleMatches(matches);
+        } else {
+          swap(selected.r, selected.c, r, c);
+        }
+        selected = null;
+        if (moves <= 0) checkGameOver();
+      }, 150);
+    } else {
+      selected = { r, c };
+      highlight(r, c, true);
     }
-    selected.el.classList.remove('selected');
-    selected = null;
   }
 }
 
-function swapCandies(r1, c1, r2, c2) {
+function highlight(r, c, on) {
+  const idx = r * GRID + c;
+  const el = document.getElementById('board').children[idx];
+  if (el) el.classList.toggle('selected', on);
+}
+
+function swap(r1, c1, r2, c2) {
   const temp = board[r1][c1];
   board[r1][c1] = board[r2][c2];
   board[r2][c2] = temp;
   render();
-
-  if (checkMatches()) {
-    moves--;
-    document.getElementById('moves').textContent = moves;
-  } else {
-    // swap back
-    setTimeout(() => {
-      const t = board[r1][c1];
-      board[r1][c1] = board[r2][c2];
-      board[r2][c2] = t;
-      render();
-    }, 200);
-  }
 }
 
-function checkMatches() {
-  let matched = [];
-  // Rows
+function findMatches() {
+  const matches = [];
   for (let r = 0; r < GRID; r++) {
     for (let c = 0; c < GRID - 2; c++) {
-      const type = board[r][c];
-      if (type && board[r][c+1] === type && board[r][c+2] === type) {
-        matched.push({r, c}, {r, c: c+1}, {r, c: c+2});
+      const v = board[r][c];
+      if (v && v === board[r][c + 1] && v === board[r][c + 2]) {
+        matches.push({ r, c }, { r, c: c + 1 }, { r, c: c + 2 });
       }
     }
   }
-  // Cols
   for (let c = 0; c < GRID; c++) {
     for (let r = 0; r < GRID - 2; r++) {
-      const type = board[r][c];
-      if (type && board[r+1][c] === type && board[r+2][c] === type) {
-        matched.push({r, c}, {r: r+1, c}, {r: r+2, c});
+      const v = board[r][c];
+      if (v && v === board[r + 1][c] && v === board[r + 2][c]) {
+        matches.push({ r, c }, { r: r + 1, c }, { r: r + 2, c });
       }
     }
   }
+  return matches;
+}
 
-  if (matched.length > 0) {
-    score += matched.length * 10;
-    document.getElementById('score').textContent = score;
-    matched.forEach(m => board[m.r][m.c] = null);
-    dropCandies();
-    return true;
-  }
-  return false;
+function handleMatches(matches) {
+  matches.forEach(m => {
+    board[m.r][m.c] = null;
+  });
+  score += matches.length * 5;
+  document.getElementById('score').textContent = score;
+  render();
+  setTimeout(dropCandies, 200);
 }
 
 function dropCandies() {
@@ -161,7 +207,11 @@ function dropCandies() {
     }
   }
   render();
-  setTimeout(checkMatches, 250);
+  setTimeout(() => {
+    const nextMatches = findMatches();
+    if (nextMatches.length > 0) handleMatches(nextMatches);
+    else if (moves <= 0) checkGameOver();
+  }, 250);
 }
 
 function render() {
@@ -174,6 +224,25 @@ function render() {
       idx++;
     }
   }
+}
+
+function checkGameOver() {
+  active = false;
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('over-modal').classList.remove('h');
+  if (window.parent && window.parent.onRewardGranted) {
+    window.parent.onRewardGranted(Math.min(50, Math.max(10, Math.floor(score / 5))));
+  }
+}
+
+function restartGame() {
+  score = 0;
+  moves = 20;
+  active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('moves').textContent = '20';
+  document.getElementById('over-modal').classList.add('h');
+  createBoard();
 }
 
 createBoard();

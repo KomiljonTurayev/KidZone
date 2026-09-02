@@ -5,32 +5,69 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Glow Snake 🐍</title>
 <link rel="stylesheet" href="kids-theme.css">
-<script src="kz-ui.js"></script>
-<script src="kids-ui.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
-  body { min-height: 100vh; background: #0F172A; font-family: 'Arial Rounded MT Bold', sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-around; }
+  body { min-height: 100vh; background: #0F172A; font-family: 'Arial Rounded MT Bold', sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 12px; }
   canvas { width: 90vw; max-width: 380px; aspect-ratio: 1; background: #1E293B; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
   #score-box { font-size: 26px; font-weight: 900; color: #4ADE80; }
+  
+  .over-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .over-overlay.h { display: none; }
+  .over-box {
+    background: white; border-radius: 28px; padding: 24px; text-align: center;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.2); max-width: 320px; width: 90%;
+  }
+  .restart-btn {
+    background: #10B981; color: white; border: none; border-radius: 20px;
+    padding: 12px 26px; font-size: 16px; font-family: inherit; cursor: pointer; margin-top: 14px;
+    box-shadow: 0 4px 0 #059669;
+  }
+  .restart-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #059669; }
 </style>
 </head>
 <body>
 <div id="score-box">🍎 <span id="score">0</span></div>
 <canvas id="c"></canvas>
-<div style="font-weight:900; color:#94A3B8;">Boshqarish uchun suring! 👆</div>
+<div id="hint-txt" style="font-weight:900; color:#94A3B8;">Boshqarish uchun suring! 👆</div>
+
+<div class="over-overlay h" id="over-modal">
+  <div class="over-box">
+    <div style="font-size: 54px;">🐍💥</div>
+    <h2 id="over-title" style="color: #10B981; margin: 10px 0 6px;">O'yin tugadi!</h2>
+    <p style="color: #64748B; font-size: 15px;"><span id="over-score-txt">To'plangan olma:</span> <b id="final-score" style="color:#0F172A;">0</b></p>
+    <button class="restart-btn" id="btn-restart" onclick="restartGame()">Qayta O'ynash 🔄</button>
+  </div>
+</div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { hint: 'Boshqarish uchun barmog\'ingizni suring! 👆', over: 'O\'yin tugadi!', score: 'To\'plangan olma:', restart: 'Qayta O\'ynash 🔄' },
+  ru: { hint: 'Проведите пальцем для управления! 👆', over: 'Игра окончена!', score: 'Собрано яблок:', restart: 'Играть Снова 🔄' },
+  en: { hint: 'Swipe to control the snake! 👆', over: 'Game Over!', score: 'Apples collected:', restart: 'Play Again 🔄' }
+};
+const T = I18N[lang] || I18N.uz;
+document.getElementById('hint-txt').textContent = T.hint;
+document.getElementById('over-title').textContent = T.over;
+document.getElementById('over-score-txt').textContent = T.score;
+document.getElementById('btn-restart').textContent = T.restart;
+
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 canvas.width = 380; canvas.height = 380;
 const GRID = 19, TILE = 20;
 
 let snake = [{x: 9, y: 9}], dir = {x: 1, y: 0}, food = {x: 5, y: 5}, score = 0;
+let active = true;
 
 let touchStart = null;
 window.addEventListener('touchstart', e => { touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
 window.addEventListener('touchend', e => {
-  if (!touchStart) return;
+  if (!touchStart || !active) return;
   const dx = e.changedTouches[0].clientX - touchStart.x;
   const dy = e.changedTouches[0].clientY - touchStart.y;
   if (Math.abs(dx) > Math.abs(dy)) {
@@ -43,7 +80,15 @@ window.addEventListener('touchend', e => {
 });
 
 function gameLoop() {
+  if (!active) return;
   const head = { x: (snake[0].x + dir.x + GRID) % GRID, y: (snake[0].y + dir.y + GRID) % GRID };
+  
+  // Check self-collision
+  if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+    gameOver();
+    return;
+  }
+  
   snake.unshift(head);
 
   if (head.x === food.x && head.y === food.y) {
@@ -65,6 +110,26 @@ function gameLoop() {
     ctx.fillRect(s.x * TILE, s.y * TILE, TILE - 2, TILE - 2);
   });
 }
+
+function gameOver() {
+  active = false;
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('over-modal').classList.remove('h');
+  if (window.parent && window.parent.onRewardGranted && score > 0) {
+    window.parent.onRewardGranted(Math.min(50, Math.max(10, Math.floor(score / 2))));
+  }
+}
+
+function restartGame() {
+  snake = [{x: 9, y: 9}];
+  dir = {x: 1, y: 0};
+  food = {x: 5, y: 5};
+  score = 0;
+  active = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('over-modal').classList.add('h');
+}
+
 setInterval(gameLoop, 150);
 </script>
 </body>

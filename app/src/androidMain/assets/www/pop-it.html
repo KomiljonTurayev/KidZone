@@ -163,6 +163,9 @@ function popBubble(el) {
   const bubbles = document.querySelectorAll('.bubble');
   const allPopped = Array.from(bubbles).every(b => b.classList.contains('popped'));
   if (allPopped) {
+    if (window.parent && window.parent.onRewardGranted) {
+      window.parent.onRewardGranted(20);
+    }
     if (window.KZL && KZL.spawnConfetti) KZL.spawnConfetti();
     setTimeout(() => {
       flipBoard();

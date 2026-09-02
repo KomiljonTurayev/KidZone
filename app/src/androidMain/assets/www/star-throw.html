@@ -47,6 +47,22 @@
 </div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { bar: '⭐ Ball: ', hint: 'Yulduzchani otish uchun bosing! 🎯', over: 'Tegib ketdi!', res: "To'plangan ball: ", restart: "Qayta O'ynash 🔄" },
+  ru: { bar: '⭐ Очки: ', hint: 'Нажмите для броска звезды! 🎯', over: 'Столкновение!', res: 'Набранные очки: ', restart: 'Играть Снова 🔄' },
+  en: { bar: '⭐ Score: ', hint: 'Tap to throw the star! 🎯', over: 'Collision!', res: 'Total Score: ', restart: 'Play Again 🔄' }
+};
+const T = I18N[lang] || I18N.uz;
+window.addEventListener('load', () => {
+  document.querySelector('.score-bar').childNodes[0].textContent = T.bar;
+  document.querySelector('p').textContent = T.hint;
+  document.querySelector('.over-box h2').textContent = T.over;
+  document.querySelector('.over-box p').childNodes[0].textContent = T.res;
+  document.querySelector('.restart-btn').textContent = T.restart;
+});
+
 const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d');
 let rot = 0;

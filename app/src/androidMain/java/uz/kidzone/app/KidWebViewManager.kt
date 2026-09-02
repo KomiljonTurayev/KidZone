@@ -73,6 +73,7 @@ class KidWebViewManager(private val webView: WebView) {
         settings.allowUniversalAccessFromFileURLs = true
         settings.mediaPlaybackRequiresUserGesture = false
         settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        webView.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
     }
 
     @SuppressLint("JavascriptInterface")

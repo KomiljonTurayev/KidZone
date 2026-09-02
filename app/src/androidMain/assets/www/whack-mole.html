@@ -71,6 +71,22 @@
 </div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { score: '⭐ Ball: ', time: '⏳ Vaqt: ', over: 'Vaqt tugadi!', res: "To'plangan ball: ", restart: "Qayta O'ynash 🔄" },
+  ru: { score: '⭐ Очки: ', time: '⏳ Время: ', over: 'Время вышло!', res: 'Набранные очки: ', restart: 'Играть Снова 🔄' },
+  en: { score: '⭐ Score: ', time: '⏳ Time: ', over: 'Time Up!', res: 'Total Score: ', restart: 'Play Again 🔄' }
+};
+const T = I18N[lang] || I18N.uz;
+window.addEventListener('load', () => {
+  document.querySelector('.hud div:first-child').childNodes[0].textContent = T.score;
+  document.querySelector('.hud div:last-child').childNodes[0].textContent = T.time;
+  document.querySelector('.over-box h2').textContent = T.over;
+  document.querySelector('.over-box p').childNodes[0].textContent = T.res;
+  document.querySelector('.restart-btn').textContent = T.restart;
+});
+
 let score = 0;
 let timeLeft = 30;
 let activeMole = null;
@@ -106,6 +122,9 @@ function startGame() {
       clearInterval(gameTimer);
       document.getElementById('final-score').textContent = score;
       document.getElementById('over-modal').classList.remove('h');
+      if (window.parent && window.parent.onRewardGranted && score > 0) {
+        window.parent.onRewardGranted(Math.min(50, Math.max(10, Math.floor(score / 5))));
+      }
     }
   }, 1000);
 }

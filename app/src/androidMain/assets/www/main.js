@@ -1306,6 +1306,7 @@ window.addEventListener("load", () => {
     const translator = new TranslationManager(T);
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);
+    window.app = app;
 
     const audioPlayer = new AudioPlayer();
     app.storyManager = new StoryManager(audioPlayer, translator, ui);

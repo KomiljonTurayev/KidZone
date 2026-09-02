@@ -42,6 +42,20 @@
 </div>
 
 <script>
+const params = new URLSearchParams(location.search);
+const lang = params.get('lang') || 'uz';
+const I18N = {
+  uz: { title: 'Minora Qurish!', desc: 'Bloklarni bir-birining ustiga aniq joylashtiring!', start: 'BOSHLASH', over: 'O\'yin Tugadi!', res: 'Minora balandligi: ' },
+  ru: { title: 'Построй Башню!', desc: 'Ставьте блоки точно друг на друга!', start: 'СТАРТ', over: 'Игра Окончена!', res: 'Высота башни: ' },
+  en: { title: 'Tower Stack!', desc: 'Stack blocks accurately on top of each other!', start: 'START', over: 'Game Over!', res: 'Tower height: ' }
+};
+const T = I18N[lang] || I18N.uz;
+window.addEventListener('load', () => {
+  document.getElementById('title').textContent = T.title;
+  document.getElementById('desc').textContent = T.desc;
+  document.querySelector('.btn').textContent = T.start;
+});
+
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 let W, H;

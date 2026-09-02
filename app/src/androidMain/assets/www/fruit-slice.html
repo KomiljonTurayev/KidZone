@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Fruit Slice 🍉</title>
 <link rel="stylesheet" href="kids-theme.css">
-<script src="kz-ui.js"></script>
-<script src="kids-ui.js"></script>
+
 <style>
   * { margin:0; padding:0; box-sizing:border-box; touch-action:none; user-select:none; }
   body {
@@ -225,7 +224,18 @@ function gameOver() {
   gameActive = false;
   document.getElementById('start-screen').style.display = 'flex';
   document.getElementById('title-txt').textContent = T.over;
-  document.getElementById('desc-txt').textContent = 'Siz ' + score + ' ball to\'pladingiz! 🌟';
+  
+  const pLang = new URLSearchParams(location.search).get('lang') || 'uz';
+  const descMap = {
+    uz: 'Siz ' + score + ' ball to\'pladingiz! 🌟',
+    ru: 'Вы набрали ' + score + ' очков! 🌟',
+    en: 'You scored ' + score + ' points! 🌟'
+  };
+  document.getElementById('desc-txt').textContent = descMap[pLang] || descMap.uz;
+  if (window.parent && window.parent.onRewardGranted && score > 0) {
+    window.parent.onRewardGranted(Math.min(50, Math.max(10, Math.floor(score / 5))));
+  }
+
 }
 
 update();
