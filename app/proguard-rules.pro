@@ -17,3 +17,7 @@
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *
 -dontwarn androidx.room.paging.**
+
+# Ktor & Coroutines
+-dontwarn java.lang.management.**
+-dontwarn io.ktor.**

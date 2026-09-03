@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
+    <!-- Hardware feature optional declarations for maximum tablet & device compatibility -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
+
     <!-- Tablet support -->
     <supports-screens
         android:smallScreens="true"
@@ -27,6 +30,14 @@
         android:hardwareAccelerated="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="false">
+
+        <!-- Google Play Families Policy: Disables Advertising ID (AAID) collection for COPPA compliance -->
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="google_analytics_default_allow_ad_personalization_signals"
+            android:value="false" />
 
         <!-- MAIN ACTIVITY -->
         <activity
