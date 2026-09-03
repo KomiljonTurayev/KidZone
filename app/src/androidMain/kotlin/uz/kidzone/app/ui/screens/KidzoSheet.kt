@@ -47,6 +47,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,13 +93,42 @@ fun KidzoSheet(
 
     var inputText by remember { mutableStateOf("") }
 
+    // Speech recognizer launcher (standard system dialog)
+    val speechLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val spokenText = result.data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+            if (!spokenText.isNullOrBlank()) {
+                viewModel.askKidzo(spokenText, lang, childName, context)
+            }
+        }
+    }
+
     // Audio permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            viewModel.startVoiceInput(context, lang, childName)
+            val locale = when (lang.lowercase()) {
+                "ru" -> "ru-RU"
+                "en" -> "en-US"
+                else -> "uz-UZ"
+            }
+            val intent = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, locale)
+            }
+            try {
+                speechLauncher.launch(intent)
+            } catch (e: Exception) {
+                viewModel.startVoiceInput(context, lang, childName)
+            }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.repeatSpeech(context, lang)
     }
 
     DisposableEffect(Unit) {
@@ -432,7 +462,21 @@ fun KidzoSheet(
                         if (!hasPerm) {
                             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                         } else {
-                            viewModel.startVoiceInput(context, lang, childName)
+                            val locale = when (lang.lowercase()) {
+                                "ru" -> "ru-RU"
+                                "en" -> "en-US"
+                                else -> "uz-UZ"
+                            }
+                            val intent = android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, locale)
+                                putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, i18n["listening"] as String)
+                            }
+                            try {
+                                speechLauncher.launch(intent)
+                            } catch (e: Exception) {
+                                viewModel.startVoiceInput(context, lang, childName)
+                            }
                         }
                     },
                 contentAlignment = Alignment.Center

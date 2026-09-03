@@ -3,9 +3,13 @@ package uz.kidzone.app.ui.viewmodel
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +28,15 @@ import java.util.Locale
 class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     private val TAG = "KidzoViewModel"
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val state: StateFlow<KidzoState> = agent.state
     val cards: StateFlow<List<ContentCard>> = agent.cards
 
+    private val initialGreeting = "Salom, do'stim! 🐥 Men Kidzo bo'laman. Nima haqida gaplashamiz?"
+
     private val _messages = MutableStateFlow<List<Pair<Boolean, String>>>(
-        listOf(false to "Salom, do'stim! 🐥 Men Kidzo bo'laman. Nima haqida gaplashamiz?")
+        listOf(false to initialGreeting)
     )
     val messages: StateFlow<List<Pair<Boolean, String>>> = _messages.asStateFlow()
 
@@ -42,7 +49,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     private val _isSpeaking = MutableStateFlow(false)
     val isSpeaking: StateFlow<Boolean> = _isSpeaking.asStateFlow()
 
-    private val _lastSpokenText = MutableStateFlow("")
+    private val _lastSpokenText = MutableStateFlow(initialGreeting)
     val lastSpokenText: StateFlow<String> = _lastSpokenText.asStateFlow()
 
     private val _rmsLevel = MutableStateFlow(0f)
@@ -57,6 +64,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     fun askKidzo(query: String, lang: String, childName: String, context: Context) {
         if (query.isBlank()) return
+        Log.d(TAG, "askKidzo requested: query='$query', lang='$lang', childName='$childName'")
         stopVoiceInput()
         stopSpeaking()
 
@@ -64,13 +72,15 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         _messages.value = _messages.value + (true to query)
         _isThinking.value = true
 
-        viewModelScope.launch {
+        scope.launch {
             val reply = try {
                 KidzoCompanionEngine.ask(query, lang, childName)
             } catch (e: Exception) {
+                Log.e(TAG, "Error in KidzoCompanionEngine: ${e.message}", e)
                 "Seni eshitdim, $childName! 🐥 Keling, birgalikda quvnoq o'yin o'ynaymiz! ✨"
             }
 
+            Log.d(TAG, "Kidzo replied: '$reply'")
             _isThinking.value = false
             _messages.value = _messages.value + (false to reply)
             _lastSpokenText.value = reply
@@ -90,6 +100,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         recognizer = KidzoVoiceRecognizer(
             context = context,
             onSpeechResult = { text ->
+                Log.d(TAG, "Speech recognized: $text")
                 _isListening.value = false
                 askKidzo(text, lang, childName, context)
             },
@@ -99,7 +110,8 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
             onRmsChanged = { rms ->
                 _rmsLevel.value = (rms.coerceAtLeast(0f) / 10f).coerceIn(0f, 1f)
             },
-            onError = { _ ->
+            onError = { err ->
+                Log.w(TAG, "Recognizer error: $err")
                 _isListening.value = false
             }
         )
@@ -114,20 +126,22 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     }
 
     fun speakText(text: String, lang: String, context: Context) {
+        if (text.isBlank()) return
+        Log.d(TAG, "speakText: text='$text', lang='$lang'")
         stopSpeaking()
         _isSpeaking.value = true
 
-        viewModelScope.launch {
+        scope.launch {
+            var cloudPlayed = false
             if (lang == "uz") {
-                // Try Aisha TTS first
                 val cacheDir = context.cacheDir
                 val audioFile = AishaSpeechGenerator.synthesize(text, cacheDir)
-                val played = audioFile != null && playAudioFile(audioFile)
-                if (!played) {
+                cloudPlayed = audioFile != null && playAudioFile(audioFile)
+            }
+            if (!cloudPlayed) {
+                withContext(Dispatchers.Main) {
                     speakViaDeviceTts(text, lang, context)
                 }
-            } else {
-                speakViaDeviceTts(text, lang, context)
             }
         }
     }
@@ -174,6 +188,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
                     ttsReady = true
                     performDeviceSpeak(text, lang)
                 } else {
+                    Log.w(TAG, "TTS initialization failed: status=$status")
                     _isSpeaking.value = false
                 }
             }
@@ -184,19 +199,50 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     private fun performDeviceSpeak(text: String, lang: String) {
         val engine = ttsEngine ?: return
-        val locale = when (lang.lowercase()) {
+        val targetLocale = when (lang.lowercase()) {
             "ru" -> Locale("ru", "RU")
             "en" -> Locale.US
             else -> Locale("uz", "UZ")
         }
-        engine.language = locale
-        engine.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
-            override fun onStart(utteranceId: String?) { _isSpeaking.value = true }
-            override fun onDone(utteranceId: String?) { _isSpeaking.value = false }
+
+        fun unsupported(r: Int) =
+            r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED
+
+        var result = engine.setLanguage(targetLocale)
+        // Fallback for Uzbek since Android Google TTS does not ship an Uzbek voice
+        if (lang != "ru" && lang != "en" && unsupported(result)) {
+            result = engine.setLanguage(Locale("tr", "TR"))
+            if (unsupported(result)) result = engine.setLanguage(Locale("ru", "RU"))
+        }
+        if (unsupported(result)) {
+            engine.setLanguage(Locale.getDefault())
+        }
+
+        engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {
+                Log.d(TAG, "TTS onStart: $utteranceId")
+                _isSpeaking.value = true
+            }
+            override fun onDone(utteranceId: String?) {
+                Log.d(TAG, "TTS onDone: $utteranceId")
+                _isSpeaking.value = false
+            }
             @Suppress("DEPRECATION")
-            override fun onError(utteranceId: String?) { _isSpeaking.value = false }
+            override fun onError(utteranceId: String?) {
+                Log.w(TAG, "TTS onError: $utteranceId")
+                _isSpeaking.value = false
+            }
         })
-        engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "kidzoVoice")
+
+        // Clean emojis from text so TTS engine pronounces words cleanly
+        val cleanText = text.replace(Regex("[\\p{So}\\p{Cn}]"), "").trim()
+        val speechText = cleanText.ifBlank { text }
+
+        val params = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
+        }
+        engine.stop()
+        engine.speak(speechText, TextToSpeech.QUEUE_FLUSH, params, "kidzoVoice_${System.currentTimeMillis()}")
     }
 
     fun stopSpeaking() {
@@ -214,10 +260,8 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     }
 
     fun repeatSpeech(context: Context, lang: String) {
-        val text = _lastSpokenText.value
-        if (text.isNotBlank()) {
-            speakText(text, lang, context)
-        }
+        val text = _lastSpokenText.value.ifBlank { initialGreeting }
+        speakText(text, lang, context)
     }
 
     override fun onCleared() {
