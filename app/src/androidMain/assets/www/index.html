@@ -174,8 +174,7 @@
       background:rgba(255,255,255,0.2); padding:4px 10px;
       border-radius:10px; font-size:10px; font-weight:900; text-transform:uppercase;
     }
-    .ai-title{font-family:'Fredoka One',cursive; font-size:20px}
-    .ai-btns{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+    .ai-btns{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px}
     .ai-btn{
       background:white; color:#3F51B5; border:none; border-radius:18px;
       padding:12px 6px 10px; min-height:84px; box-sizing:border-box;
@@ -1133,6 +1132,10 @@
         <div class="ai-title" id="ai-studio-title">AI Bolalar Studiyasi</div>
       </div>
       <div class="ai-btns">
+        <button class="ai-btn" onclick="openKidzo()">
+          <span class="ai-btn-ic">🐥</span>
+          <span class="ai-btn-lb" id="ai-btn-kidzo">Aqlli Kidzo</span>
+        </button>
         <button class="ai-btn" onclick="generateAiStory()">
           <span class="ai-btn-ic">📚</span>
           <span class="ai-btn-lb" id="ai-btn-story">Ertak To'qish</span>
@@ -1597,6 +1600,11 @@
       if (sv) sv.classList.add('h');
       if (window.AndroidBridge) window.AndroidBridge.showBanner();
     }
+    function openKidzo() {
+      if (window.AndroidBridge && window.AndroidBridge.openKidzo) {
+        window.AndroidBridge.openKidzo();
+      }
+    }
     function closeLyrics() { document.getElementById('lyrics-viewer').classList.add('h'); }
     function speakStory() { app.speakStory(); }
     function openAiMusic() { app.openAiMusic(); }
@@ -1847,6 +1855,8 @@
 
         // AI Studio
         document.getElementById("ai-studio-title").textContent = t.aiStudioTitle;
+        const kidzoBtn = document.getElementById("ai-btn-kidzo");
+        if (kidzoBtn) kidzoBtn.textContent = { uz: "Aqlli Kidzo", ru: "Умный Кидзо", en: "Smart Kidzo" }[curLang] || "Aqlli Kidzo";
         document.getElementById("ai-btn-story").textContent = t.aiBtnStory;
         document.getElementById("ai-btn-music").textContent = t.aiBtnMusic;
         document.getElementById("ai-btn-personal").textContent = t.aiBtnPersonal;

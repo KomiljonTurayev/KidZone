@@ -152,7 +152,17 @@ fun MainScreen(
                         val mgr = KidWebViewManager(this)
                         val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
                         val age = prefs.getString("kz_age", "2-4") ?: "2-4"
-                        val nativeBridge = NativeBridge(mainViewModel, onOpenDashboard, onOpenSleep, mgr::evaluateJavascript, context as Activity)
+                        val nativeBridge = NativeBridge(
+                            viewModel = mainViewModel,
+                            onOpenDashboard = onOpenDashboard,
+                            onOpenSleep = onOpenSleep,
+                            onOpenKidzo = {
+                                kidzoViewModel?.requestRecommendations()
+                                showKidzoSheet = true
+                            },
+                            evalJs = mgr::evaluateJavascript,
+                            activity = context as Activity
+                        )
                         mgr.setup(nativeBridge, "AndroidBridge")
                         mgr.addInterface(
                             ChallengeBridge(challengeViewModel, context),
@@ -387,12 +397,20 @@ fun MainScreen(
 
     // Kidzo sheet
     if (showKidzoSheet && kidzoViewModel != null) {
+        val currentLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
+        val childName = activeProfile?.name ?: ""
         KidzoSheet(
             viewModel = kidzoViewModel,
+            childName = childName,
+            lang = currentLang,
             onContentSelected = { contentId ->
                 webMgrRef.value?.evaluateJavascript("if(window.playContent)playContent('$contentId')")
             },
-            onDismiss = { showKidzoSheet = false },
+            onDismiss = {
+                kidzoViewModel.stopSpeaking()
+                kidzoViewModel.stopVoiceInput()
+                showKidzoSheet = false
+            },
         )
     }
 }
@@ -458,6 +476,7 @@ private class NativeBridge(
     private val viewModel: MainViewModel,
     private val onOpenDashboard: () -> Unit,
     private val onOpenSleep: () -> Unit,
+    private val onOpenKidzo: () -> Unit,
     private val evalJs: (String) -> Unit,
     activity: Activity,
 ) {
@@ -611,6 +630,11 @@ private class NativeBridge(
     @android.webkit.JavascriptInterface
     fun openParentalDashboard() {
         onMain { onOpenDashboard() }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun openKidzo() {
+        onMain { onOpenKidzo() }
     }
 
     @android.webkit.JavascriptInterface
