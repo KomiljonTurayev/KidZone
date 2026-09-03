@@ -131,8 +131,13 @@ android {
     signingConfigs {
         create("release") {
             val envKeystore = System.getenv("KEYSTORE_FILE")
-            if (envKeystore != null && file(envKeystore).exists()) {
-                storeFile = file(envKeystore)
+            val resolvedEnv = envKeystore?.let {
+                file(it).takeIf { f -> f.exists() }
+                    ?: rootProject.file(it).takeIf { f -> f.exists() }
+                    ?: file("app/$it").takeIf { f -> f.exists() }
+            }
+            if (resolvedEnv != null) {
+                storeFile = resolvedEnv
                 storePassword = System.getenv("STORE_PASSWORD") ?: ""
                 keyAlias = System.getenv("KEY_ALIAS") ?: ""
                 keyPassword = System.getenv("KEY_PASSWORD") ?: ""
