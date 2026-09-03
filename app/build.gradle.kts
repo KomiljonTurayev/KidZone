@@ -111,14 +111,52 @@ android {
         applicationId = "uz.kidzone.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 14
-        versionName = "1.4.0"
+        val propVersionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull()
+        val propVersionName = project.findProperty("versionName")?.toString()
+        versionCode = propVersionCode ?: 15
+        versionName = propVersionName ?: "1.5.0"
         buildConfigField("String", "AISHA_TTS_API_KEY", "\"${aishaTtsApiKey}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${geminiApiKey}\"")
     }
 
+    val keystoreProps = Properties()
+    val keystoreFile = file("keystore.properties")
+    val rootKeystoreFile = rootProject.file("keystore.properties")
+    if (keystoreFile.exists()) {
+        keystoreProps.load(FileInputStream(keystoreFile))
+    } else if (rootKeystoreFile.exists()) {
+        keystoreProps.load(FileInputStream(rootKeystoreFile))
+    }
+
+    signingConfigs {
+        create("release") {
+            val envKeystore = System.getenv("KEYSTORE_FILE")
+            if (envKeystore != null && file(envKeystore).exists()) {
+                storeFile = file(envKeystore)
+                storePassword = System.getenv("STORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            } else if (keystoreProps.containsKey("storeFile")) {
+                val sFile = keystoreProps.getProperty("storeFile")
+                val resolved = file(sFile).takeIf { it.exists() }
+                    ?: rootProject.file(sFile).takeIf { it.exists() }
+                    ?: file("app/$sFile").takeIf { it.exists() }
+                if (resolved != null) {
+                    storeFile = resolved
+                    storePassword = keystoreProps.getProperty("storePassword", "")
+                    keyAlias = keystoreProps.getProperty("keyAlias", "")
+                    keyPassword = keystoreProps.getProperty("keyPassword", "")
+                }
+            }
+        }
+    }
+
     buildTypes {
         getByName("release") {
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile != null && releaseSigning.storeFile!!.exists()) {
+                signingConfig = releaseSigning
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
