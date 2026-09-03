@@ -78,20 +78,28 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
             "displayName" to (displayName ?: ""),
             "email" to (email ?: ""),
             "ageGroup" to normalizeAgeGroup(ageGroup),
-            "status" to "active",
             "lastActiveAt" to FieldValue.serverTimestamp()
         )
         val ref: DocumentReference = db!!.collection("users").document(uid)
         ref.get()
             .addOnSuccessListener { snap ->
-                if (!snap.exists() || !snap.contains("createdAt")) {
+                if (!snap.exists()) {
+                    data["status"] = "active"
                     data["createdAt"] = FieldValue.serverTimestamp()
+                } else {
+                    if (!snap.contains("createdAt")) {
+                        data["createdAt"] = FieldValue.serverTimestamp()
+                    }
+                    if (!snap.contains("status")) {
+                        data["status"] = "active"
+                    }
                 }
                 ref.set(data, SetOptions.merge())
                     .addOnFailureListener { e -> Log.w(TAG, "syncUserProfile failed: $e") }
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "syncUserProfile get() failed, skipping createdAt: $e")
+                Log.w(TAG, "syncUserProfile get() failed: $e")
+                // Do not set 'status' here to ensure existing ban status is never overwritten on network failure
                 ref.set(data, SetOptions.merge())
                     .addOnFailureListener { e2 -> Log.w(TAG, "syncUserProfile set failed: $e2") }
             }

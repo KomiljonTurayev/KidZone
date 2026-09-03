@@ -13,13 +13,18 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() && (
         request.auth.token.admin == true ||
-        request.auth.token.email == "admin@kidzone.uz"
+        (request.auth.token.email == "admin@kidzone.uz" && request.auth.token.email_verified == true)
       );
     }
 
     // User document and all child subcollections (profiles, daily_challenges, stats)
     match /users/{uid} {
-      allow read, write: if isOwner(uid) || isAdmin();
+      allow read: if isOwner(uid) || isAdmin();
+      // Owner can initialize their profile with status=active or no status; cannot forge other statuses
+      allow create: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == 'active')) || isAdmin();
+      // Owner cannot alter status field once set (cannot unban themselves); only admin can change status
+      allow update: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status)) || isAdmin();
+      allow delete: if isAdmin();
 
       match /{allSubcollections=**} {
         allow read, write: if isOwner(uid) || isAdmin();
@@ -46,7 +51,9 @@ service cloud.firestore {
     // Daily aggregate stats recorded by client sessions
     match /stats/{dateKey} {
       allow read: if isAdmin();
-      allow create, update: if isAuthenticated();
+      allow create, update: if isAuthenticated() &&
+        request.resource.data.keys().hasOnly(['dau', 'totalMinutes', 'totalSessions', 'gameBreakdown']) &&
+        dateKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
       allow delete: if isAdmin();
     }
 
