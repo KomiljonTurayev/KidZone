@@ -233,7 +233,7 @@ function startGame() {
 
   // Grid columns
   document.getElementById('choices').style.gridTemplateColumns =
-    cfg.c <= 2 ? '1fr 1fr' : '1fr 1fr';
+    cfg.c <= 2 ? '1fr 1fr' : cfg.c === 3 ? '1fr 1fr 1fr' : '1fr 1fr 1fr 1fr';
 
   // Tools
   const toolsRow = document.getElementById('tools-row');
@@ -328,7 +328,7 @@ function loadQ() {
 
   // Timer
   if (cfg.timer > 0) {
-    if (timerObj) timerObj.stop();
+    if (timerObj) clearInterval(timerObj);
     const C = 2 * Math.PI * 18;
     const fg = document.getElementById('t-fg');
     const tx = document.getElementById('timer-txt');

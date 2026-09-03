@@ -151,7 +151,7 @@ const ITEMS = [
   {id:27, e:"🦄", uz:"Yakshoh",     ru:"Единорог",   en:"Unicorn"},
   {id:28, e:"🌺", uz:"Gulxayri",    ru:"Гибискус",   en:"Hibiscus"},
   {id:29, e:"🎭", uz:"Teatr",       ru:"Театр",      en:"Theatre"},
-  {id:30, e:"🏆", uz:"Kubog",       ru:"Кубок",      en:"Trophy"},
+  {id:30, e:"🏆", uz:"Kubok",       ru:"Кубок",      en:"Trophy"},
 ];
 
 /* ═══════════════════════════════════════════════
@@ -169,6 +169,7 @@ const T = {
   nextLvl:  {uz:"Keyingi daraja →",    ru:"Следующий уровень →",en:"Next Level →"},
   retry:    {uz:"Qayta urinish",       ru:"Попробовать снова",  en:"Try Again"},
   great:    {uz:"Ajoyib! 🌟",          ru:"Отлично! 🌟",        en:"Great! 🌟"},
+  gameOver: {uz:"O'yin tugadi",        ru:"Игра окончена",     en:"Game Over"},
   selectLvl:{uz:"Daraja tanlang",      ru:"Выберите уровень",   en:"Select Level"},
   howTitle: {uz:"Qanday o'ynash?",     ru:"Как играть?",        en:"How to play?"},
   howSteps: {
@@ -383,7 +384,7 @@ function levelDone() {
 
 function showGameOver() {
   showEnd({
-    icon:'💔', title:'Game Over',
+    icon:'💔', title:t('gameOver'),
     msg:`${_matched} / ${_pairs} ${t('matched')}`,
     btn:t('retry'),
     action: () => init(),
@@ -429,10 +430,6 @@ function closeLevelSelector() {
 
 /* ── start ── */
 init();
-
-window.addEventListener('beforeunload', () => {
-  localStorage.setItem('kz-prog-match', '100');
-});
 </script>
 </body>
 </html>

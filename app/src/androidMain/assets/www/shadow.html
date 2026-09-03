@@ -92,7 +92,7 @@ const DATA = [
   {id:"key",     em:"🔑", nm:{uz:"Kalit",   ru:"Ключ",     en:"Key"}},
   /* 17-24 Hard */
   {id:"dragon",  em:"🐉", nm:{uz:"Ajdaho",  ru:"Дракон",   en:"Dragon"}},
-  {id:"unicorn", em:"🦄", nm:{uz:"Unicorn", ru:"Единорог", en:"Unicorn"}},
+  {id:"unicorn", em:"🦄", nm:{uz:"Yakkashox", ru:"Единорог", en:"Unicorn"}},
   {id:"cactus",  em:"🌵", nm:{uz:"Kaktus",  ru:"Кактус",   en:"Cactus"}},
   {id:"mushroom",em:"🍄", nm:{uz:"Qo'ziqorin",ru:"Гриб",  en:"Mushroom"}},
   {id:"crown",   em:"👑", nm:{uz:"Toj",     ru:"Корона",   en:"Crown"}},
@@ -104,7 +104,7 @@ const DATA = [
   {id:"spider",  em:"🕷️", nm:{uz:"O'rgimchak",ru:"Паук",  en:"Spider"}},
   {id:"octopus", em:"🐙", nm:{uz:"Sakkizoyoq",ru:"Осьминог",en:"Octopus"}},
   {id:"crab",    em:"🦀", nm:{uz:"Qisqichbaqa",ru:"Краб",  en:"Crab"}},
-  {id:"scorpion",em:"🦂", nm:{uz:"Chayonbaliq",ru:"Скорпион",en:"Scorpion"}},
+  {id:"scorpion",em:"🦂", nm:{uz:"Chayon",ru:"Скорпион",en:"Scorpion"}},
   {id:"bat",     em:"🦇", nm:{uz:"Ko'rshapalak",ru:"Летучая мышь",en:"Bat"}},
 ];
 
@@ -209,8 +209,8 @@ function showResult(){
   _btnNext.textContent = _showNext ? t.next : t.again;
   _btnNext.style.display = _showNext ? '' : 'none';
   document.getElementById('result-screen').classList.remove('hidden');
-  engine.reportScore(Math.round(_score/2));
   if(pct>=.6){
+    engine.reportScore(Math.round(_score/2));
     engine.spawnConfetti();
     if(KZL.getLevel(GAME_ID)===_level&&_level<20){
       const nl=KZL.nextLevel(GAME_ID);

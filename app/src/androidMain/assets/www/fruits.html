@@ -147,7 +147,7 @@ const ITEMS = [
   {em:"🫒", name:{uz:"Zaytun",         ru:"Олива",       en:"Olive"}},
   {em:"🥜", name:{uz:"Yeryong'oq",     ru:"Арахис",      en:"Peanut"}},
   {em:"🌰", name:{uz:"Kashtan",        ru:"Каштан",      en:"Chestnut"}},
-  {em:"🫚", name:{uz:"Sabzi (sariq)",  ru:"Репа",        en:"Turnip"}},
+  {em:"🫚", name:{uz:"Zanjabil",       ru:"Имбирь",      en:"Ginger"}},
 ];
 
 const t = T[lang] || T.en;
@@ -304,8 +304,8 @@ function showResult() {
   document.getElementById("result-ttl").textContent = pct >= 0.8 ? t.great : pct >= 0.5 ? t.good : t.tryAgain;
   document.getElementById("result-sc").textContent  = `${t.result} ${score}/${maxScore}`;
   document.getElementById("result").classList.remove("h");
-  game.reportScore(Math.round(score / 2));
   if (pct >= 0.6) {
+    game.reportScore(Math.round(score / 2));
     game.spawnConfetti();
     const savedLv = KZL.getLevel(GAME_ID);
     if (savedLv === _level && _level < 20) {

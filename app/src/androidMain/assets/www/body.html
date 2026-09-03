@@ -85,7 +85,7 @@ const DATA = [
   {id:"tooth",  em:"🦷",  nm:{uz:"Tish",      ru:"Зуб",      en:"Tooth"}},
   /* 9-16 Medium */
   {id:"tongue", em:"👅",  nm:{uz:"Til",       ru:"Язык",     en:"Tongue"}},
-  {id:"arm",    em:"💪",  nm:{uz:"Mushaк",    ru:"Мышца",    en:"Muscle"}},
+  {id:"arm",    em:"💪",  nm:{uz:"Mushak",    ru:"Мышца",    en:"Muscle"}},
   {id:"finger", em:"☝️",  nm:{uz:"Barmoq",    ru:"Палец",    en:"Finger"}},
   {id:"thumb",  em:"👍",  nm:{uz:"Bosh barmoq",ru:"Большой палец",en:"Thumb"}},
   {id:"knee",   em:"🦵",  nm:{uz:"Tizza",     ru:"Колено",   en:"Knee"}},
@@ -211,8 +211,8 @@ function showResult(){
   document.getElementById('res-sc').textContent  = _score+' / '+max;
   document.getElementById('btn-next').textContent= (pct>=.6&&_level<20)?t.next:t.again;
   document.getElementById('result-screen').classList.remove('hidden');
-  engine.reportScore(Math.round(_score/2));
   if(pct>=.6){
+    engine.reportScore(Math.round(_score/2));
     engine.spawnConfetti();
     if(KZL.getLevel(GAME_ID)===_level&&_level<20){
       const nl=KZL.nextLevel(GAME_ID);

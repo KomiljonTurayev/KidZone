@@ -5,6 +5,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.application")
     id("org.jetbrains.compose")
+    kotlin("plugin.compose")
     kotlin("plugin.serialization")
     kotlin("kapt")
 }
@@ -83,8 +84,8 @@ kotlin {
                 implementation("com.google.firebase:firebase-analytics")
                 
                 implementation("androidx.work:work-runtime-ktx:2.9.0")
-                implementation("androidx.room:room-runtime:2.6.1")
-                implementation("androidx.room:room-ktx:2.6.1")
+                implementation("androidx.room:room-runtime:2.8.4")
+                implementation("androidx.room:room-ktx:2.8.4")
                 
                 implementation("com.google.firebase:firebase-ai:16.0.0")
                 implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -101,7 +102,7 @@ kotlin {
 
 android {
     namespace = "uz.kidzone.app"
-    compileSdk = 35
+    compileSdk = 36
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -110,10 +111,10 @@ android {
     defaultConfig {
         applicationId = "uz.kidzone.app"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         val propVersionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull()
         val propVersionName = project.findProperty("versionName")?.toString()
-        versionCode = propVersionCode ?: 15
+        versionCode = propVersionCode ?: 16
         versionName = propVersionName ?: "1.5.0"
         buildConfigField("String", "AISHA_TTS_API_KEY", "\"${aishaTtsApiKey}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${geminiApiKey}\"")
@@ -165,6 +166,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
     compileOptions {
@@ -175,16 +179,13 @@ android {
         buildConfig = true
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
-    }
     dependencies {
         debugImplementation("androidx.compose.ui:ui-tooling")
         debugImplementation("com.google.firebase:firebase-appcheck-debug")
         // Note: Adding pure Android revenuecat here because KMP version requires specific setup.
-        implementation("com.revenuecat.purchases:purchases:8.4.0")
-        implementation("com.revenuecat.purchases:purchases-ui:8.4.0")
-        add("kapt", "androidx.room:room-compiler:2.6.1")
+        implementation("com.revenuecat.purchases:purchases:10.20.0")
+        implementation("com.revenuecat.purchases:purchases-ui:10.20.0")
+        add("kapt", "androidx.room:room-compiler:2.8.4")
     }
 }
 

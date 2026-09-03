@@ -271,7 +271,7 @@ function renderQuestion() {
 
   const grid = document.getElementById('choices');
   grid.innerHTML = '';
-  grid.style.gridTemplateColumns = numChoices <= 2 ? '1fr 1fr' : '1fr 1fr';
+  grid.style.gridTemplateColumns = numChoices <= 2 ? '1fr 1fr' : numChoices === 3 ? '1fr 1fr 1fr' : '1fr 1fr 1fr 1fr';
 
   opts.forEach(opt => {
     const btn = document.createElement('button');
@@ -355,6 +355,7 @@ function levelDone() {
 
   if (passed && KZL.getLevel(GAME_ID) === _level) {
     KZL.nextLevel(GAME_ID);
+    localStorage.setItem('kz-prog-plants', '100');
   }
 
   const nextL = KZL.getLevel(GAME_ID);
@@ -429,10 +430,6 @@ function closeLevelSelector() {
 
 /* ── start ── */
 init();
-
-window.addEventListener('beforeunload', () => {
-  localStorage.setItem('kz-prog-plants', '100');
-});
 </script>
 </body>
 </html>

@@ -93,7 +93,7 @@ const DATA = [
   {id:"sunset",   em:"🌅",  nm:{uz:"Quyosh botishi", ru:"Закат",       en:"Sunset"}},
   {id:"night",    em:"🌙",  nm:{uz:"Tunggi",        ru:"Ночь",        en:"Night"}},
   /* 17-24 Hard */
-  {id:"blizzard", em:"🌬️❄️",nm:{uz:"Bo'ron",        ru:"Метель",      en:"Blizzard"}},
+  {id:"blizzard", em:"🌬️❄️",nm:{uz:"Qor bo'roni",   ru:"Метель",      en:"Blizzard"}},
   {id:"drought",  em:"🏜️",  nm:{uz:"Qurg'oqchilik", ru:"Засуха",      en:"Drought"}},
   {id:"flood",    em:"🌊",  nm:{uz:"Suv toshqini",  ru:"Наводнение",  en:"Flood"}},
   {id:"spring",   em:"🌸",  nm:{uz:"Bahor",         ru:"Весна",       en:"Spring"}},
@@ -102,7 +102,7 @@ const DATA = [
   {id:"winter",   em:"⛄",  nm:{uz:"Qish",          ru:"Зима",        en:"Winter"}},
   {id:"storm",    em:"⛈️",  nm:{uz:"Bo'ron",        ru:"Шторм",       en:"Storm"}},
   /* 25-30 Expert */
-  {id:"aurora",   em:"🌌",  nm:{uz:"Shimoliy siyoh",ru:"Северное сияние",en:"Aurora"}},
+  {id:"aurora",   em:"🌌",  nm:{uz:"Shimoliy yog'du",ru:"Северное сияние",en:"Aurora"}},
   {id:"cyclone",  em:"🌀",  nm:{uz:"Tsiklon",       ru:"Циклон",      en:"Cyclone"}},
   {id:"haze",     em:"😶‍🌫️",nm:{uz:"Tutunli",       ru:"Дымка",       en:"Haze"}},
   {id:"monsoon",  em:"🌧️🌿",nm:{uz:"Musson",        ru:"Муссон",      en:"Monsoon"}},
@@ -203,8 +203,8 @@ function showResult(){
   document.getElementById('res-sc').textContent = _score+' / '+max;
   document.getElementById('btn-next').textContent=(pct>=.6&&_level<20)?t.next:t.again;
   document.getElementById('result-screen').classList.remove('hidden');
-  engine.reportScore(Math.round(_score/2));
   if(pct>=.6){
+    engine.reportScore(Math.round(_score/2));
     engine.spawnConfetti();
     if(KZL.getLevel(GAME_ID)===_level&&_level<20){
       const nl=KZL.nextLevel(GAME_ID);

@@ -7,8 +7,12 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.sin
@@ -32,7 +36,11 @@ class SleepAudioSynthesizer {
     private val sampleRate = 22050
     private var audioTrack: AudioTrack? = null
     private var synthesisJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    // Serializes AudioTrack creation/teardown so play()/stop() calls issued back-to-back
+    // (e.g. rapidly tapping different sound cards) never touch audioTrack concurrently.
+    private val trackMutex = Mutex()
 
     @Volatile
     private var volume = 0.85f
@@ -45,10 +53,44 @@ class SleepAudioSynthesizer {
         440.00f, 392.00f, 329.63f, 293.66f, 261.63f, 329.63f, 392.00f, 523.25f,
     )
 
+    /**
+     * Returns immediately — AudioTrack setup/teardown is native/blocking work, so it all
+     * runs on [scope] (Dispatchers.Default) instead of whatever thread calls this
+     * (typically the UI thread, from a Compose click handler). The previous synthesis job
+     * is fully joined before the old track is torn down, so there's no window where two
+     * coroutines can write to the same AudioTrack at once.
+     */
     fun play(type: SleepSoundType) {
-        stop()
         isPlaying = true
+        val previousJob = synthesisJob
+        synthesisJob = scope.launch {
+            previousJob?.cancelAndJoin()
+            trackMutex.withLock {
+                // Switching between sounds while already playing reuses the existing
+                // AudioTrack (just flushed) instead of destroying and recreating the
+                // native track on every tap — cheaper and switches sounds faster.
+                val existing = audioTrack
+                if (existing != null) {
+                    existing.flush()
+                } else {
+                    startTrackLocked()
+                }
+            }
+            try {
+                when (type) {
+                    SleepSoundType.LULLABY, SleepSoundType.TWINKLE -> synthesizeLullaby(type == SleepSoundType.TWINKLE)
+                    SleepSoundType.RAIN -> synthesizeRain()
+                    SleepSoundType.WAVES -> synthesizeWaves()
+                    SleepSoundType.FOREST -> synthesizeForest()
+                    SleepSoundType.WHITE_NOISE -> synthesizeWhiteNoise()
+                }
+            } catch (e: Exception) {
+                Log.w("SleepSynthesizer", "Playback stopped: ${e.message}")
+            }
+        }
+    }
 
+    private fun startTrackLocked() {
         val minBufferSize = AudioTrack.getMinBufferSize(
             sampleRate,
             AudioFormat.CHANNEL_OUT_MONO,
@@ -56,7 +98,7 @@ class SleepAudioSynthesizer {
         ).coerceAtLeast(sampleRate / 2)
 
         try {
-            audioTrack = AudioTrack.Builder()
+            val track = AudioTrack.Builder()
                 .setAudioAttributes(
                     AudioAttributes.Builder()
                         .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -74,35 +116,25 @@ class SleepAudioSynthesizer {
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build()
 
-            audioTrack?.setVolume(1.0f)
-            audioTrack?.play()
+            track.setVolume(1.0f)
+            track.play()
+            audioTrack = track
         } catch (e: Exception) {
             Log.e("SleepSynthesizer", "Error initializing AudioTrack: ${e.message}")
         }
-
-        synthesisJob = scope.launch {
-            try {
-                when (type) {
-                    SleepSoundType.LULLABY, SleepSoundType.TWINKLE -> synthesizeLullaby(type == SleepSoundType.TWINKLE)
-                    SleepSoundType.RAIN -> synthesizeRain()
-                    SleepSoundType.WAVES -> synthesizeWaves()
-                    SleepSoundType.FOREST -> synthesizeForest()
-                    SleepSoundType.WHITE_NOISE -> synthesizeWhiteNoise()
-                }
-            } catch (e: Exception) {
-                Log.w("SleepSynthesizer", "Playback stopped: ${e.message}")
-            }
-        }
     }
 
-    private suspend fun synthesizeLullaby(isTwinkle: Boolean) {
+    // Extension functions on CoroutineScope so `isActive` below reflects THIS synthesis
+    // job's own cancellation state (from cancelAndJoin in play()/stop()), not just whether
+    // the shared `scope` is alive — otherwise cancelling one job never actually stops its loop.
+    private suspend fun CoroutineScope.synthesizeLullaby(isTwinkle: Boolean) {
         val bufferSize = 1024
         val buffer = ShortArray(bufferSize)
         val noteDurationSamples = if (isTwinkle) (sampleRate * 0.75f).toInt() else (sampleRate * 1.3f).toInt()
         var noteIdx = 0
         var sampleInNote = 0
 
-        while (scope.isActive && isPlaying) {
+        while (isActive && isPlaying) {
             val freq = lullabyNotes[noteIdx % lullabyNotes.size]
             val omega = (2.0 * PI * freq / sampleRate).toFloat()
 
@@ -124,12 +156,12 @@ class SleepAudioSynthesizer {
         }
     }
 
-    private suspend fun synthesizeRain() {
+    private suspend fun CoroutineScope.synthesizeRain() {
         val bufferSize = 1024
         val buffer = ShortArray(bufferSize)
         var lastOut = 0.0f
 
-        while (scope.isActive && isPlaying) {
+        while (isActive && isPlaying) {
             for (i in 0 until bufferSize) {
                 val white = (Random.nextFloat() * 2f - 1f)
                 // Filtered pink noise with audible amplitude
@@ -141,13 +173,13 @@ class SleepAudioSynthesizer {
         }
     }
 
-    private suspend fun synthesizeWaves() {
+    private suspend fun CoroutineScope.synthesizeWaves() {
         val bufferSize = 1024
         val buffer = ShortArray(bufferSize)
         var sampleCount = 0L
         var lastOut = 0.0f
 
-        while (scope.isActive && isPlaying) {
+        while (isActive && isPlaying) {
             for (i in 0 until bufferSize) {
                 val white = (Random.nextFloat() * 2f - 1f)
                 lastOut = (lastOut + 0.025f * white) / 1.025f
@@ -161,13 +193,13 @@ class SleepAudioSynthesizer {
         }
     }
 
-    private suspend fun synthesizeForest() {
+    private suspend fun CoroutineScope.synthesizeForest() {
         val bufferSize = 1024
         val buffer = ShortArray(bufferSize)
         var sampleCount = 0L
         var lastOut = 0.0f
 
-        while (scope.isActive && isPlaying) {
+        while (isActive && isPlaying) {
             for (i in 0 until bufferSize) {
                 val white = (Random.nextFloat() * 2f - 1f)
                 lastOut = (lastOut + 0.025f * white) / 1.025f
@@ -186,12 +218,12 @@ class SleepAudioSynthesizer {
         }
     }
 
-    private suspend fun synthesizeWhiteNoise() {
+    private suspend fun CoroutineScope.synthesizeWhiteNoise() {
         val bufferSize = 1024
         val buffer = ShortArray(bufferSize)
         var lastOut = 0.0f
 
-        while (scope.isActive && isPlaying) {
+        while (isActive && isPlaying) {
             for (i in 0 until bufferSize) {
                 val white = (Random.nextFloat() * 2f - 1f)
                 lastOut = (lastOut + 0.08f * white) / 1.08f
@@ -206,17 +238,28 @@ class SleepAudioSynthesizer {
         volume = vol.coerceIn(0f, 1f)
     }
 
+    /** Returns immediately — teardown runs on [scope], never blocking the caller. */
     fun stop() {
         isPlaying = false
-        synthesisJob?.cancel()
+        val previousJob = synthesisJob
         synthesisJob = null
-        try {
-            audioTrack?.pause()
-            audioTrack?.flush()
-            audioTrack?.stop()
-            audioTrack?.release()
-        } catch (ignored: Exception) {}
+        scope.launch {
+            previousJob?.cancelAndJoin()
+            trackMutex.withLock {
+                stopTrackLocked()
+            }
+        }
+    }
+
+    private fun stopTrackLocked() {
+        val track = audioTrack ?: return
         audioTrack = null
+        try {
+            track.pause()
+            track.flush()
+            track.stop()
+            track.release()
+        } catch (ignored: Exception) {}
     }
 
     fun release() {

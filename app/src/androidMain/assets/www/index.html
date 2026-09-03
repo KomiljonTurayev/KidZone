@@ -501,7 +501,7 @@
     #gv.h{display:none}
     #sleep-view{
       position:fixed;inset:0;z-index:200;
-      background:#050711;display:flex;flex-direction:column;
+      background:var(--bg);display:flex;flex-direction:column;
     }
     #sleep-view.h{display:none !important}
     @keyframes gvIn{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -997,16 +997,16 @@
 
 <!-- PRELOADED DEDICATED SLEEP VIEWER (0ms INSTANT LAUNCH) -->
 <div id="sleep-view" class="h">
-  <div id="sleep-top" style="height:50px;background:#0d1124;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;">
-    <button id="sv-back" onclick="closeSleep()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:14px;padding:7px 14px;color:white;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;touch-action:manipulation;">
+  <div id="sleep-top" style="height:50px;background:var(--surface);border-bottom:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;">
+    <button id="sv-back" onclick="closeSleep()" style="background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:7px 14px;color:var(--text);font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;touch-action:manipulation;">
       <span>←</span> <span id="sv-back-txt">Orqaga</span>
     </button>
-    <div style="font-family:'Fredoka One',cursive,'Nunito',sans-serif;font-size:16px;font-weight:900;color:#FDE68A;flex:1;text-align:center;">
+    <div style="font-family:'Fredoka One',cursive,'Nunito',sans-serif;font-size:16px;font-weight:900;color:var(--accent);flex:1;text-align:center;">
       🌙 <span id="sv-title-txt">Sehrli Uyqu</span>
     </div>
     <div style="width:70px;"></div>
   </div>
-  <iframe id="sleep-frame" src="sleep-well.html" style="flex:1;width:100%;border:none;background:#050711;" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+  <iframe id="sleep-frame" src="sleep-well.html" style="flex:1;width:100%;border:none;background:#FFF8F0;" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
 </div>
 
   <!-- PERSONAL STORY MODAL -->
@@ -1324,7 +1324,7 @@
       {id:"shapes3d",   em:"🔷", name:{uz:"Geometrik Shakllar", ru:"Геометрические фигуры", en:"Geometric Shapes"},cat:"math", age:"4+", tag:"Matematika",tc:"#673AB7",bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)",stars:4, plays:"4K", badge:"new", file:"colors-shapes.html?mode=shape", pts:25},
       {id:"shape-match", em:"🔷", name:{uz:"Shakllarni Moslashtir", ru:"Подбери форму", en:"Shape Match"}, cat:"learn", age:"4+", tag:{uz:"Shakllar", ru:"Фигуры", en:"Shapes"}, tc:"#6C63FF", bg:"linear-gradient(135deg,#EDE7F6,#D1C4E9)", stars:4, plays:"0", badge:"new", file:"shape-match.html", pts:25},
       {id:"clock",      em:"⏰", name:{uz:"Soat O'qish", ru:"Учимся определять время", en:"Learn to Read Clock"},    cat:"math",   age:"6+", tag:"Matematik",tc:"#795548",bg:"linear-gradient(135deg,#EFEBE9,#D7CCC8)", stars:3, plays:"3K",  badge:"pro", file:"clock.html", pts:35},
-      {id:"money",      em:"💰", name:{uz:"Pul Sanoq", ru:"Счет денег", en:"Counting Money"},      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:"math-kids.html", pts:40},
+      {id:"money",      em:"💰", name:{uz:"Pul Sanoq", ru:"Счет денег", en:"Counting Money"},      cat:"math",   age:"7+", tag:"Matematik",tc:"#4CAF50",bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:4, plays:"4K",  badge:"pro", file:"math-kids.html?mode=money", pts:40},
 
       // ── COLORS ──────────────────────────────────────
       {id:"paint",      em:"🖌️", name:{uz:"Bo'yash Kitobi", ru:"Книжка-раскраска", en:"Coloring Book"},  cat:"colors", age:"2+", tag:"Ijodkorlik",tc:"#FF9800",bg:"linear-gradient(135deg,#FFF8E1,#FFECB3)", stars:5, plays:"14K",badge:"hot", file:"paint.html", pts:15},
@@ -1604,6 +1604,9 @@
         if (sf && sf.contentWindow && sf.contentWindow.updateLang) {
           sf.contentWindow.updateLang(curLang);
         }
+        if (sf && sf.contentWindow && sf.contentWindow.resumeSky) {
+          sf.contentWindow.resumeSky();
+        }
         if (window.AndroidBridge) window.AndroidBridge.hideBanner();
         return;
       }
@@ -1612,6 +1615,10 @@
     function closeSleep() {
       const sv = document.getElementById('sleep-view');
       if (sv) sv.classList.add('h');
+      const sf = document.getElementById('sleep-frame');
+      if (sf && sf.contentWindow && sf.contentWindow.pauseAll) {
+        sf.contentWindow.pauseAll();
+      }
       if (window.AndroidBridge) window.AndroidBridge.showBanner();
     }
     function openKidzo() {

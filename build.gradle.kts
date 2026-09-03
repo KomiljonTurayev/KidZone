@@ -1,9 +1,10 @@
 plugins {
-    id("com.android.application") version "8.2.2" apply false
-    id("com.android.library") version "8.2.2" apply false
-    kotlin("multiplatform") version "1.9.23" apply false
-    kotlin("plugin.serialization") version "1.9.23" apply false
-    id("org.jetbrains.compose") version "1.6.2" apply false
+    id("com.android.application") version "8.13.2" apply false
+    id("com.android.library") version "8.13.2" apply false
+    kotlin("multiplatform") version "2.0.21" apply false
+    kotlin("plugin.serialization") version "2.0.21" apply false
+    kotlin("plugin.compose") version "2.0.21" apply false
+    id("org.jetbrains.compose") version "1.7.3" apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.firebase.crashlytics") version "3.0.1" apply false
 }

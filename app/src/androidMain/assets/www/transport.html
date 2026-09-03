@@ -87,7 +87,7 @@ body {
 <script>
 const GAME_ID = 'transport';
 const TRANSLATIONS = {
-  en: { title:"Transport", score:"SCORE", quest:"SAVOL", where:"Where does it belong?", land:"Land", water:"Water", air:"Air", correct:"✅ Correct!", wrong:"❌ Wrong!", great:"Great!", good:"Good!", try:"Try again!", again:"PLAY AGAIN" },
+  en: { title:"Transport", score:"SCORE", quest:"QUEST", where:"Where does it belong?", land:"Land", water:"Water", air:"Air", correct:"✅ Correct!", wrong:"❌ Wrong!", great:"Great!", good:"Good!", try:"Try again!", again:"PLAY AGAIN" },
   uz: { title:"Transport", score:"BALL",  quest:"SAVOL", where:"Bu qaysi toifaga kiradi?", land:"Quruqlik", water:"Dengiz", air:"Havo", correct:"✅ To'g'ri!", wrong:"❌ Noto'g'ri!", great:"Ajoyib!", good:"Yaxshi!", try:"Harakat qiling!", again:"QAYTA O'YNASH" },
   ru: { title:"Транспорт", score:"СЧЕТ",  quest:"ВОПРОС",where:"К какой категории относится?", land:"Земля", water:"Вода", air:"Воздух", correct:"✅ Верно!", wrong:"❌ Неверно!", great:"Отлично!", good:"Хорошо!", try:"Попробуй еще!", again:"ИГРАТЬ СНОВА" }
 };
@@ -229,8 +229,10 @@ function showResult() {
   document.getElementById("rttl").textContent=pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById("rsc").textContent=`${t.score}: ${score}/${max}`;
   document.getElementById("result").classList.remove("h");
-  engine.gameOver(Math.round(score/2));
-  if(pct>=.6&&engine.spawnConfetti){engine.spawnConfetti();}
+  if(pct>=.6){
+    engine.gameOver(Math.round(score/2));
+    if(engine.spawnConfetti){engine.spawnConfetti();}
+  }
   if(pct>=.6&&KZL.getLevel(GAME_ID)===_level&&_level<20){
     const nl=KZL.nextLevel(GAME_ID);
     setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,engine.lang),500);

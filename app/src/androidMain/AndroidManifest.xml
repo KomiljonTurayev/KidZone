@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
+    <!-- Firebase Analytics pulls in AD_ID permissions transitively; app does not use advertising ID -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove"/>
+
     <!-- Hardware feature optional declarations for maximum tablet & device compatibility -->
     <uses-feature android:name="android.hardware.microphone" android:required="false"/>
 
