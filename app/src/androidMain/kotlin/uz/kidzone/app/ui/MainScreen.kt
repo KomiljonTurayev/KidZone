@@ -160,6 +160,12 @@ fun MainScreen(
                                 kidzoViewModel?.requestRecommendations()
                                 showKidzoSheet = true
                             },
+                            onAskKidzo = { query ->
+                                val curLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
+                                val cName = activeProfile?.name ?: ""
+                                kidzoViewModel?.askKidzo(query, curLang, cName, context)
+                                showKidzoSheet = true
+                            },
                             evalJs = mgr::evaluateJavascript,
                             activity = context as Activity
                         )
@@ -477,6 +483,7 @@ private class NativeBridge(
     private val onOpenDashboard: () -> Unit,
     private val onOpenSleep: () -> Unit,
     private val onOpenKidzo: () -> Unit,
+    private val onAskKidzo: (String) -> Unit,
     private val evalJs: (String) -> Unit,
     activity: Activity,
 ) {
@@ -635,6 +642,11 @@ private class NativeBridge(
     @android.webkit.JavascriptInterface
     fun openKidzo() {
         onMain { onOpenKidzo() }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun askKidzo(query: String) {
+        onMain { onAskKidzo(query) }
     }
 
     @android.webkit.JavascriptInterface
