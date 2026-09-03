@@ -499,6 +499,11 @@
       animation:gvIn .25s var(--spring);
     }
     #gv.h{display:none}
+    #sleep-view{
+      position:fixed;inset:0;z-index:200;
+      background:#050711;display:flex;flex-direction:column;
+    }
+    #sleep-view.h{display:none !important}
     @keyframes gvIn{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
     #gv-top{
       height:52px;background:var(--accent);
@@ -860,6 +865,12 @@
     <div class="ld-dot"></div><div class="ld-dot"></div><div class="ld-dot"></div>
   </div>
 </div>
+<script>
+  setTimeout(() => {
+    const ld = document.getElementById("loader");
+    if (ld) ld.classList.add("h");
+  }, 1200);
+</script>
 
 <!-- BLOBS -->
 <div id="blobs">
@@ -985,7 +996,7 @@
 </div>
 
 <!-- PRELOADED DEDICATED SLEEP VIEWER (0ms INSTANT LAUNCH) -->
-<div id="sleep-view" class="h" style="position:fixed;inset:0;z-index:200;background:#050711;display:flex;flex-direction:column;">
+<div id="sleep-view" class="h">
   <div id="sleep-top" style="height:50px;background:#0d1124;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;">
     <button id="sv-back" onclick="closeSleep()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:14px;padding:7px 14px;color:white;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;touch-action:manipulation;">
       <span>←</span> <span id="sv-back-txt">Orqaga</span>
@@ -1393,6 +1404,7 @@
         learnMode: "O'rganish rejimi",
         yourStars: "Yutuqlaringiz",
         aiStudioTitle: "✨ AI Bolalar Studiyasi",
+        aiBtnKidzo: "Aqlli Kidzo",
         aiBtnStory: "Ertak To'qish",
         aiBtnMusic: "Sehrli Uyqu",
         aiLoading: "AI ertak to'qimoqda...",
@@ -1456,6 +1468,7 @@
         learnMode: "Режим обучения",
         yourStars: "Ваши звезды",
         aiStudioTitle: "✨ AI Студия",
+        aiBtnKidzo: "Умный Кидзо",
         aiBtnStory: "Создать Сказку",
         aiBtnMusic: "Сладкий Сон",
         aiLoading: "AI сочиняет сказку...",
@@ -1519,6 +1532,7 @@
         learnMode: "Learn mode",
         yourStars: "Your stars",
         aiStudioTitle: "✨ AI Kids Studio",
+        aiBtnKidzo: "Smart Kidzo",
         aiBtnStory: "Create Story",
         aiBtnMusic: "Magic Sleep",
         aiLoading: "AI is creating a story...",
@@ -1863,7 +1877,7 @@
         // AI Studio
         document.getElementById("ai-studio-title").textContent = t.aiStudioTitle;
         const kidzoBtn = document.getElementById("ai-btn-kidzo");
-        if (kidzoBtn) kidzoBtn.textContent = { uz: "Aqlli Kidzo", ru: "Умный Кидзо", en: "Smart Kidzo" }[curLang] || "Aqlli Kidzo";
+        if (kidzoBtn) kidzoBtn.textContent = t.aiBtnKidzo || "Aqlli Kidzo";
         document.getElementById("ai-btn-story").textContent = t.aiBtnStory;
         document.getElementById("ai-btn-music").textContent = t.aiBtnMusic;
         document.getElementById("ai-btn-personal").textContent = t.aiBtnPersonal;
