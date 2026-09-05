@@ -30,6 +30,9 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
             .addOnFailureListener { e -> Log.w(TAG, "pushProfile failed: $e") }
     }
 
+    // Historical/analytics data only (parent dashboard charts) — not authoritative for the
+    // daily play-time limit. That decision comes from the backend's /playtime/heartbeat
+    // (PlaytimeApiClient), which tracks elapsedSeconds under profiles/{id}/playtime/{date}.
     open fun pushStats(stats: ProfileStatsEntity) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val db = db ?: return

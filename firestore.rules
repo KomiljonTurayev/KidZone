@@ -26,6 +26,18 @@ service cloud.firestore {
       allow update: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status)) || isAdmin();
       allow delete: if isAdmin();
 
+      match /profiles/{profileId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+
+        // Server-authoritative daily play-time counters (written only by the backend via
+        // the Firebase Admin SDK, which bypasses these rules). The client must never write
+        // its own elapsedSeconds — that would defeat the point of moving the limit off-device.
+        match /playtime/{date} {
+          allow read: if isOwner(uid) || isAdmin();
+          allow write: if isAdmin();
+        }
+      }
+
       match /{allSubcollections=**} {
         allow read, write: if isOwner(uid) || isAdmin();
       }
