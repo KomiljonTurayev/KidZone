@@ -18,14 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,10 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,11 +44,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
@@ -61,14 +54,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.text.style.TextAlign
 import uz.kidzone.app.ui.viewmodel.DashboardState
-import uz.kidzone.app.data.ProfileEntity
 import uz.kidzone.app.data.AppClock
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
-
-// Matches the WebView games' --kt-accent (app/src/main/assets/www/kids-theme.css)
-// so native dialogs feel consistent with the rest of the UI.
-private val KidZoneOrange = Color(0xFFFF6B35)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -350,340 +338,6 @@ private fun WeeklyChart(weeklyMinutes: List<Int>) {
                 topLeft = Offset(i * barWidth + 4f, size.height - barHeight),
                 size = Size(barWidth - 8f, barHeight),
             )
-        }
-    }
-}
-
-@Composable
-internal fun PinGate(
-    hasPinSet: Boolean,
-    onPinCorrect: (String) -> Unit,
-    onBack: () -> Unit,
-) {
-    var entered by remember { mutableStateOf("") }
-    var lastAttemptFailed by remember { mutableStateOf(false) }
-
-    if (!hasPinSet) {
-        var a by remember { mutableIntStateOf((5..12).random()) }
-        var b by remember { mutableIntStateOf((5..12).random()) }
-        var answer by remember { mutableStateOf("") }
-        var error by remember { mutableStateOf(false) }
-
-        Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Ota-ona qulfi", style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(8.dp))
-            Text("Kattalar ekanligingizni tasdiqlash uchun masalani yeching:", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(24.dp))
-            Text("$a × $b = ?", style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(24.dp))
-            
-            OutlinedTextField(
-                value = answer,
-                onValueChange = { answer = it.filter { char -> char.isDigit() }.take(3) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier.width(120.dp),
-                textStyle = androidx.compose.ui.text.TextStyle(textAlign = TextAlign.Center, fontSize = 24.sp)
-            )
-            
-            if (error) {
-                Spacer(Modifier.height(8.dp))
-                Text("Xato! Qaytadan urinib ko'ring.", color = MaterialTheme.colorScheme.error)
-            }
-            
-            Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = {
-                    if (answer.toIntOrNull() == a * b) {
-                        onPinCorrect("")
-                    } else {
-                        error = true
-                        answer = ""
-                        a = (5..12).random()
-                        b = (5..12).random()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(0.6f)
-            ) {
-                Text("Tasdiqlash")
-            }
-            Spacer(Modifier.height(16.dp))
-            TextButton(onClick = onBack) { Text("Bekor qilish") }
-        }
-        return
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text("PIN kiriting", style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(24.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            repeat(4) { i ->
-                Box(
-                    modifier = Modifier.size(20.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        if (i < entered.length) "●" else "○",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        if (lastAttemptFailed) {
-            Text(
-                "PIN noto'g'ri ❌",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-        Spacer(Modifier.height(16.dp))
-        PinKeypad(
-            onDigit = { d ->
-                if (entered.length < 4) {
-                    entered += d
-                    lastAttemptFailed = false
-                    if (entered.length == 4) {
-                        onPinCorrect(entered)
-                        entered = ""
-                        lastAttemptFailed = true
-                    }
-                }
-            },
-            onBackspace = {
-                if (entered.isNotEmpty()) {
-                    entered = entered.dropLast(1)
-                    lastAttemptFailed = false
-                }
-            },
-        )
-        Spacer(Modifier.height(16.dp))
-        TextButton(onClick = onBack) { Text("Bekor qilish") }
-    }
-}
-
-@Composable
-private fun PinKeypad(onDigit: (String) -> Unit, onBackspace: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        listOf(
-            listOf("1", "2", "3"),
-            listOf("4", "5", "6"),
-            listOf("7", "8", "9"),
-            listOf("", "0", "←"),
-        ).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                row.forEach { key ->
-                    if (key.isEmpty()) {
-                        Box(Modifier.size(64.dp))
-                    } else {
-                        FilledTonalButton(
-                            onClick = { if (key == "←") onBackspace() else onDigit(key) },
-                            modifier = Modifier.size(64.dp),
-                        ) { Text(key) }
-                    }
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-        }
-    }
-}
-
-@Composable
-private fun ChangePinDialog(
-    prefs: SharedPreferences,
-    currentHash: String?,
-    onDismiss: () -> Unit,
-) {
-    var step by remember { mutableIntStateOf(0) }
-    var currentPin by remember { mutableStateOf("") }
-    var newPin by remember { mutableStateOf("") }
-    var confirmPin by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        shape = RoundedCornerShape(24.dp),
-        containerColor = Color.White,
-        icon = { Text("🔐", fontSize = 40.sp) },
-        title = {
-            Text(
-                "PIN o'zgartirish",
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        text = {
-            Column {
-                when (step) {
-                    0 -> {
-                        Text("Joriy PINni kiriting")
-                        OutlinedTextField(
-                            value = currentPin,
-                            onValueChange = {
-                                if (it.length <= 4 && it.all(Char::isDigit)) currentPin = it
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                            visualTransformation = PasswordVisualTransformation(),
-                        )
-                    }
-                    1 -> {
-                        Text("Yangi PINni kiriting")
-                        OutlinedTextField(
-                            value = newPin,
-                            onValueChange = {
-                                if (it.length <= 4 && it.all(Char::isDigit)) newPin = it
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                            visualTransformation = PasswordVisualTransformation(),
-                        )
-                    }
-                    2 -> {
-                        Text("Yangi PINni tasdiqlang")
-                        OutlinedTextField(
-                            value = confirmPin,
-                            onValueChange = {
-                                if (it.length <= 4 && it.all(Char::isDigit)) {
-                                    confirmPin = it
-                                    if (it.length == 4) {
-                                        if (it == newPin) {
-                                            prefs.edit()
-                                                .putString("kz_pin", PinUtil.hash(newPin))
-                                                .apply()
-                                            onDismiss()
-                                        } else {
-                                            error = "PIN mos kelmadi"
-                                            step = 1
-                                            newPin = ""
-                                            confirmPin = ""
-                                        }
-                                    }
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                            visualTransformation = PasswordVisualTransformation(),
-                        )
-                    }
-                }
-                if (error.isNotEmpty()) {
-                    Text(error, color = MaterialTheme.colorScheme.error)
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    when (step) {
-                        0 -> {
-                            if (currentHash.isNullOrEmpty() || PinUtil.matches(currentPin, currentHash)) {
-                                step = 1
-                                error = ""
-                            } else {
-                                error = "PIN noto'g'ri"
-                            }
-                        }
-                        1 -> {
-                            if (newPin.length == 4) {
-                                step = 2
-                                error = ""
-                            }
-                        }
-                    }
-                },
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = KidZoneOrange),
-            ) { Text("Keyingi") }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = onDismiss,
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = KidZoneOrange),
-                border = BorderStroke(1.dp, KidZoneOrange),
-            ) { Text("Bekor") }
-        },
-    )
-}
-
-private val MILESTONE_COPY: Map<Int, Pair<String, String>> = mapOf(
-    3 to ("🔥" to "3 kun ketma-ket! Ajoyib boshlanish!"),
-    7 to ("🔥🔥" to "Bir hafta ketma-ket! Zo'r!"),
-    14 to ("🔥🔥🔥" to "Ikki hafta ketma-ket!"),
-    30 to ("🔥🔥🔥🔥" to "Bir oy ketma-ket! Sen chempion!"),
-)
-
-@Composable
-private fun ProfileListItem(
-    profile: ProfileEntity,
-    isActive: Boolean,
-    streakCount: Int,
-    doneToday: Boolean,
-    celebrateMilestone: Int?,
-    onCelebrationShown: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-    onSwitch: () -> Unit,
-) {
-    LaunchedEffect(celebrateMilestone) {
-        if (celebrateMilestone != null) {
-            kotlinx.coroutines.delay(2500)
-            onCelebrationShown()
-        }
-    }
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            ProfileInitialAvatar(name = profile.name, size = 40.dp)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(profile.name, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    "${profile.language.uppercase()} | ${if (profile.timeLimitMinutes == 0) "Cheksiz" else "${profile.timeLimitMinutes} daq"}",
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                if (isActive) Text("✓ Faol", style = MaterialTheme.typography.bodySmall)
-                // Streak satri
-                val milestoneCopy = celebrateMilestone?.let { MILESTONE_COPY[it] }
-                if (milestoneCopy != null) {
-                    Text(
-                        "${milestoneCopy.first} ${milestoneCopy.second}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                } else {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 2.dp),
-                    ) {
-                        Text(
-                            "🔥 $streakCount kun streak",
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                        Spacer(Modifier.weight(1f))
-                        Text(
-                            if (doneToday) "Bugun: ✅" else "Bugun: ⏳",
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    }
-                }
-            }
-            TextButton(onClick = onSwitch) { Text("Tanlash") }
-            TextButton(onClick = onEdit) { Text("Tahrir") }
-            TextButton(onClick = onDelete) { Text("O'chir") }
         }
     }
 }

@@ -13,6 +13,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
+import uz.kidzone.app.BuildConfig
 
 /**
  * Manages WebView configuration and operations.
@@ -42,8 +43,10 @@ class KidWebViewManager(private val webView: WebView) {
     // ChallengeBridge in MainScreen.kt), this is a lint false positive on the wrapper shape.
     @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     fun setup(jsInterface: Any, interfaceName: String) {
-        // Enable remote debugging via chrome://inspect
-        WebView.setWebContentsDebuggingEnabled(true)
+        // Remote debugging via chrome://inspect — debug builds only. Leaving this on
+        // in release lets anyone with ADB/USB access to the device inspect and
+        // manipulate the WebView contents (e.g. bypass the parental PIN gate JS).
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
         applySettings(webView.settings)
 

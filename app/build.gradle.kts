@@ -10,12 +10,6 @@ plugins {
     kotlin("kapt")
 }
 
-val localProps = Properties()
-val localPropsFile = rootProject.file("local.properties")
-if (localPropsFile.exists()) localProps.load(FileInputStream(localPropsFile))
-val aishaTtsApiKey = System.getenv("AISHA_TTS_API_KEY") ?: localProps.getProperty("AISHA_TTS_API_KEY", "")
-val geminiApiKey = System.getenv("GEMINI_API_KEY") ?: localProps.getProperty("GEMINI_API_KEY", "")
-
 kotlin {
     androidTarget {
         compilations.all {
@@ -116,8 +110,6 @@ android {
         val propVersionName = project.findProperty("versionName")?.toString()
         versionCode = propVersionCode ?: 16
         versionName = propVersionName ?: "1.5.0"
-        buildConfigField("String", "AISHA_TTS_API_KEY", "\"${aishaTtsApiKey}\"")
-        buildConfigField("String", "GEMINI_API_KEY", "\"${geminiApiKey}\"")
     }
 
     val keystoreProps = Properties()

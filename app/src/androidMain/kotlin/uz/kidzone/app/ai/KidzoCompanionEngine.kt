@@ -1,20 +1,27 @@
 package uz.kidzone.app.ai
 
 import android.util.Log
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
 import org.json.JSONObject
-import uz.kidzone.app.BuildConfig
 import java.util.concurrent.TimeUnit
 
+/**
+ * Talks to Kidzo's cloud brain via the KidZone backend, never Gemini directly:
+ * embedding a Gemini API key in the client APK lets anyone decompile it and
+ * drain the quota/billing. The backend holds the key server-side and forwards
+ * the child's Firebase ID token so it can rate-limit / attribute usage.
+ */
 object KidzoCompanionEngine {
 
     private const val TAG = "KidzoCompanion"
+    private const val BACKEND_URL = "https://kidzone-backend-s7to.onrender.com/ai/ask"
 
     private val httpClient by lazy {
         OkHttpClient.Builder()
@@ -36,104 +43,55 @@ object KidzoCompanionEngine {
             else -> "uz"
         }
 
-        // Try Gemini 1.5 Flash if API key is present
-        val apiKey = BuildConfig.GEMINI_API_KEY
-        if (apiKey.isNotBlank()) {
-            try {
-                val geminiAnswer = callGemini(apiKey, trimmed, targetLang, childName, ageRange)
-                if (!geminiAnswer.isNullOrBlank()) {
-                    return@withContext geminiAnswer
-                }
-            } catch (e: Exception) {
-                Log.w(TAG, "Gemini companion failed: ${e.message}, falling back to offline brain")
+        try {
+            val backendAnswer = callBackend(trimmed, targetLang, childName, ageRange)
+            if (!backendAnswer.isNullOrBlank()) {
+                return@withContext backendAnswer
             }
+        } catch (e: Exception) {
+            Log.w(TAG, "Backend companion call failed: ${e.message}, falling back to offline brain")
         }
 
         // Fallback to rich Offline Companion Brain
         OfflineKidzoBrain.respond(trimmed, targetLang, childName)
     }
 
-    private fun callGemini(
-        apiKey: String,
+    private fun callBackend(
         query: String,
         lang: String,
         childName: String,
         ageRange: String
     ): String? {
-        val systemPrompt = when (lang) {
-            "ru" -> """
-                Ты — Кидзо (Kidzo), добрый, веселый и умный цыплёнок-друг для детей возраста $ageRange лет.
-                Имя ребенка: ${childName.ifBlank { "Малыш" }}.
-                ПРАВИЛА:
-                1. Отвечай очень по-доброму, просто, ласково и весело.
-                2. Твой ответ должен быть КОРОТКИМ: ровно 2-3 простых предложения.
-                3. Используй дружелюбные смайлики (🐥, ✨, 🌟, 🎈).
-                4. Если ребёнок просит загадку — загадай легкую детскую загадку с ответом.
-                5. Объясняй мир простыми словами без заумных терминов.
-            """.trimIndent()
-
-            "en" -> """
-                You are Kidzo, a cheerful, kind, and smart little chick friend for kids aged $ageRange years old.
-                Child's name: ${childName.ifBlank { "Little friend" }}.
-                RULES:
-                1. Speak very kindly, simply, warmly, and playfully.
-                2. Keep your answer SHORT: strictly 2-3 simple sentences.
-                3. Use cute friendly emojis (🐥, ✨, 🌟, 🎈).
-                4. If the child asks for a riddle, give a fun easy riddle with the answer.
-                5. Explain things simply so a young toddler easily understands.
-            """.trimIndent()
-
-            else -> """
-                Sen — Kidzo, 2-7 yoshli bolalar uchun eng sevimli, aqlli va mehribon jo'ja-do'stsan.
-                Bolaning ismi: ${childName.ifBlank { "Bolajonim" }}.
-                QOIDALAR:
-                1. Juda muloyim, sodda, quvnoq va mehr bilan gapir.
-                2. Javobing QISQA bo'lsin: aynan 2-3 ta sodda gapdan oshmasin.
-                3. Qiziqarli emojilardan foydalan (🐥, ✨, 🌟, 🎈).
-                4. Agar bola topishmoq so'rasa — chiroyli topishmoq va javobini ayt.
-                5. Savollarga bolalarga mos, ertakmonand va tushunarli javob ber.
-            """.trimIndent()
-        }
+        val idToken = currentIdToken() ?: return null
 
         val requestJson = JSONObject().apply {
-            put(
-                "contents",
-                JSONArray().put(
-                    JSONObject().put(
-                        "parts",
-                        JSONArray().put(JSONObject().put("text", "$systemPrompt\n\nBolaning savoli: $query")),
-                    ),
-                ),
-            )
-            put(
-                "generationConfig",
-                JSONObject().apply {
-                    put("temperature", 0.75)
-                    put("maxOutputTokens", 150)
-                },
-            )
+            put("query", query)
+            put("lang", lang)
+            put("childName", childName)
+            put("ageRange", ageRange)
         }
 
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val body = requestJson.toString().toRequestBody(mediaType)
-        val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
-
         val request = Request.Builder()
-            .url(url)
+            .url(BACKEND_URL)
+            .addHeader("Authorization", "Bearer $idToken")
             .post(body)
             .build()
 
-        val response = httpClient.newCall(request).execute()
-        if (!response.isSuccessful) return null
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return null
+            val respBody = response.body?.string() ?: return null
+            return JSONObject(respBody).optString("answer").ifBlank { null }
+        }
+    }
 
-        val respBody = response.body?.string() ?: return null
-        val root = JSONObject(respBody)
-        val candidates = root.optJSONArray("candidates") ?: return null
-        if (candidates.length() == 0) return null
-        val parts = candidates.getJSONObject(0)
-            .getJSONObject("content")
-            .getJSONArray("parts")
-        return parts.getJSONObject(0).getString("text").trim()
+    private fun currentIdToken(): String? = try {
+        val user = FirebaseAuth.getInstance().currentUser ?: return null
+        Tasks.await(user.getIdToken(false)).token
+    } catch (e: Exception) {
+        Log.w(TAG, "getIdToken failed: ${e.message}")
+        null
     }
 }
 

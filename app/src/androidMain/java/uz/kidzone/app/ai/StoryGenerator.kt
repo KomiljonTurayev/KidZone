@@ -1,13 +1,13 @@
 package uz.kidzone.app.ai
 
 import android.util.Log
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
 import org.json.JSONObject
-import uz.kidzone.app.BuildConfig
 import java.util.concurrent.TimeUnit
 
 data class GeneratedStory(val title: String, val text: String)
@@ -16,14 +16,15 @@ data class GeneratedStory(val title: String, val text: String)
  * Generates children's stories for KidZone.
  *
  * Generation priority:
- * 1. Direct Google Gemini 1.5 Flash via Gemini REST API if GEMINI_API_KEY is provided in BuildConfig/local.properties.
- * 2. Firebase AI Logic if Firebase is initialized and configured.
- * 3. High-quality Offline PersonalizedStoryEngine that dynamically crafts stories in Uzbek, Russian, and English
+ * 1. KidZone backend's /ai/story endpoint (backend holds the Gemini key server-side —
+ *    never embed it in the client, it's trivially extractable from the APK).
+ * 2. High-quality Offline PersonalizedStoryEngine that dynamically crafts stories in Uzbek, Russian, and English
  *    incorporating the child's name and specified scenario.
  */
 object StoryGenerator {
 
     private const val TAG = "StoryGenerator"
+    private const val BACKEND_URL = "https://kidzone-backend-s7to.onrender.com/ai/story"
 
     private val httpClient by lazy {
         OkHttpClient.Builder()
@@ -41,117 +42,66 @@ object StoryGenerator {
         val safeName = childName.trim().take(30)
         val safeScenario = scenario.trim().take(200)
 
-        // 1. If GEMINI_API_KEY is configured, try calling Gemini REST API directly
-        val apiKey = BuildConfig.GEMINI_API_KEY
-        if (apiKey.isNotBlank()) {
-            val geminiStory = generateViaGeminiApi(apiKey, lang, ageRange, safeName, safeScenario)
-            if (geminiStory != null) {
-                Log.d(TAG, "Story successfully generated via Gemini API")
-                return geminiStory
-            }
+        val backendStory = generateViaBackend(lang, ageRange, safeName, safeScenario)
+        if (backendStory != null) {
+            Log.d(TAG, "Story successfully generated via backend")
+            return backendStory
         }
 
-        // 2. Robust PersonalizedStoryEngine (always succeeds and respects childName & scenario)
+        // Robust PersonalizedStoryEngine (always succeeds and respects childName & scenario)
         Log.d(TAG, "Generating story via PersonalizedStoryEngine for name='$safeName', scenario='$safeScenario'")
         return PersonalizedStoryEngine.generate(lang, ageRange, safeName, safeScenario)
     }
 
-    private fun generateViaGeminiApi(
-        apiKey: String,
+    private fun generateViaBackend(
         lang: String,
         ageRange: String,
         childName: String,
         scenario: String,
     ): GeneratedStory? {
         return try {
-            val prompt = buildPrompt(lang, ageRange, childName, scenario)
+            val idToken = currentIdToken() ?: return null
+
             val requestJson = JSONObject().apply {
-                put(
-                    "contents",
-                    JSONArray().put(
-                        JSONObject().put(
-                            "parts",
-                            JSONArray().put(JSONObject().put("text", prompt)),
-                        ),
-                    ),
-                )
-                put(
-                    "generationConfig",
-                    JSONObject().apply {
-                        put("responseMimeType", "application/json")
-                        put("temperature", 0.85)
-                    },
-                )
+                put("lang", lang)
+                put("ageRange", ageRange)
+                put("childName", childName)
+                put("scenario", scenario)
             }
 
             val mediaType = "application/json; charset=utf-8".toMediaType()
             val body = requestJson.toString().toRequestBody(mediaType)
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
-
             val request = Request.Builder()
-                .url(url)
+                .url(BACKEND_URL)
+                .addHeader("Authorization", "Bearer $idToken")
                 .post(body)
                 .build()
 
-            val response = httpClient.newCall(request).execute()
-            if (!response.isSuccessful) {
-                Log.w(TAG, "Gemini API HTTP failed: ${response.code} ${response.message}")
-                return null
-            }
-
-            val respBody = response.body?.string() ?: return null
-            val root = JSONObject(respBody)
-            val candidates = root.optJSONArray("candidates") ?: return null
-            if (candidates.length() == 0) return null
-            val parts = candidates.getJSONObject(0)
-                .getJSONObject("content")
-                .getJSONArray("parts")
-            val textContent = parts.getJSONObject(0).getString("text").trim()
-
-            val storyJson = JSONObject(textContent)
-            val title = storyJson.optString("title").trim()
-            val text = storyJson.optString("text").trim()
-            if (title.isNotEmpty() && text.isNotEmpty()) {
-                GeneratedStory(title, text)
-            } else {
-                null
+            httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.w(TAG, "Backend story HTTP failed: ${response.code}")
+                    return null
+                }
+                val respBody = response.body?.string() ?: return null
+                val root = JSONObject(respBody)
+                val title = root.optString("title").trim()
+                val text = root.optString("text").trim()
+                if (title.isNotEmpty() && text.isNotEmpty()) GeneratedStory(title, text) else null
             }
         } catch (e: Exception) {
-            Log.w(TAG, "Gemini API call failed: ${e.message}")
+            Log.w(TAG, "Backend story call failed: ${e.message}")
             null
         }
     }
 
-    private fun buildPrompt(lang: String, ageRange: String, childName: String, scenario: String): String {
-        val languageName = when (lang) {
-            "ru" -> "Russian"
-            "en" -> "English"
-            else -> "Uzbek"
-        }
-        val personalization = buildString {
-            if (childName.isNotEmpty()) {
-                append("\n- Make the main character a kind, brave child named \"$childName\".")
-            }
-            if (scenario.isNotEmpty()) {
-                append(
-                    "\n- The story must center around this idea/adventure: \"$scenario\". " +
-                        "Incorporate this theme warmly and creatively into the plot.",
-                )
-            }
-        }
-        return """
-            You are a children's story writer for the KidZone app.
-            Write ONE original, warm, gentle short story in $languageName for a child aged $ageRange.
-            Requirements:
-            - 150 to 250 words.
-            - Simple vocabulary appropriate for young children.
-            - A clear, kind moral or lesson at the end.
-            - No violence, fear, or inappropriate content.
-            - Use paragraph breaks (\n\n) between paragraphs, 4 to 5 paragraphs total.
-            - Give the story a short, appealing title in $languageName.$personalization
-            Respond with ONLY a JSON object: {"title": "Story Title", "text": "Story text..."}
-        """.trimIndent()
+    private fun currentIdToken(): String? = try {
+        val user = FirebaseAuth.getInstance().currentUser ?: return null
+        Tasks.await(user.getIdToken(false)).token
+    } catch (e: Exception) {
+        Log.w(TAG, "getIdToken failed: ${e.message}")
+        null
     }
+
 }
 
 /**
