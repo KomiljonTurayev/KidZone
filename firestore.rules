@@ -36,10 +36,21 @@ service cloud.firestore {
           allow read: if isOwner(uid) || isAdmin();
           allow write: if isAdmin();
         }
-      }
 
-      match /{allSubcollections=**} {
-        allow read, write: if isOwner(uid) || isAdmin();
+        // Parent sync data written by the client (daily-challenge completion, stats charts).
+        // Named explicitly rather than via a recursive {name=**} wildcard: Firestore unions
+        // permissions across every match block whose pattern matches a path, so a catch-all
+        // here would also match /users/{uid} and /profiles/{profileId}/playtime/{date}
+        // themselves — silently overriding their admin-only delete/write restrictions with
+        // owner access (this exact bug let an owner self-unban and forge their own playtime
+        // counter; caught by firestore-tests/firestore.rules.test.js).
+        match /daily_challenges/{date} {
+          allow read, write: if isOwner(uid) || isAdmin();
+        }
+
+        match /stats/{date} {
+          allow read, write: if isOwner(uid) || isAdmin();
+        }
       }
     }
 

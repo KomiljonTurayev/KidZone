@@ -1,0 +1,14 @@
+{
+  "name": "kidzone-firestore-rules-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Firebase Emulator-backed unit tests for the project's firestore.rules",
+  "scripts": {
+    "test": "firebase emulators:exec --config ../firebase.json --project=kidzone-rules-test --only firestore \"jest --runInBand\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase-tools": "^13.29.1",
+    "jest": "^29.7.0"
+  }
+}
