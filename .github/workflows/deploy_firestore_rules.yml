@@ -1,0 +1,40 @@
+name: Deploy Firestore Rules
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'firestore.rules'
+      - 'firestore.indexes.json'
+      - 'firebase.json'
+  workflow_dispatch: {}
+
+jobs:
+  deploy-rules:
+    name: "🔥 Deploy Firestore Rules"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      # Requires the FIREBASE_SERVICE_ACCOUNT repo secret: a Firebase/GCP service account
+      # JSON key with rights to deploy Firestore rules & indexes (Firebase Console → Project
+      # Settings → Service Accounts → Generate new private key). Paste the whole JSON file
+      # content as the secret value. Without this secret configured, this job fails at this
+      # step rather than silently skipping — a rules change with no deploy is exactly the
+      # gap that let firestore.rules and production drift apart before.
+      - name: Write service account credentials
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" > "${{ runner.temp }}/firebase-service-account.json"
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Deploy Firestore rules & indexes
+        run: npx firebase-tools@13.29.1 deploy --only firestore --project kidzone-9cc89 --non-interactive
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
