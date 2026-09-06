@@ -47,6 +47,17 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kidzone-test-results-${{ github.run_number }}
+          path: app/build/reports/tests/testDebugUnitTest/
+          retention-days: 14
+
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
