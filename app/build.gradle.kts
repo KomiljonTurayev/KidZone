@@ -58,6 +58,20 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation("junit:junit:4.13.2")
+                implementation("org.mockito:mockito-core:5.14.2")
+                implementation("org.robolectric:robolectric:4.14.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+                // AGP's stub android.jar makes every org.json.JSONObject/JSONArray constructor
+                // throw "not mocked" (isReturnDefaultValues doesn't cover constructors). This
+                // real, non-Android org.json implementation shares the same package/class names
+                // and — per Gradle's test runtime classpath ordering — takes precedence over
+                // the stub, so ContentFilter/DailyChallengeRepository's real JSON parsing runs.
+                implementation("org.json:json:20240303")
+            }
+        }
         val androidMain by getting {
             dependencies {
                 implementation("androidx.activity:activity-compose:1.9.0")
@@ -166,6 +180,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    testOptions {
+        unitTests {
+            // AGP's default unit-test android.jar throws "not mocked" from every framework
+            // method (e.g. android.util.Log.d/w) instead of running real logic. Most of this
+            // module's tests only rely on Log not crashing, not on what it logs.
+            isReturnDefaultValues = true
+        }
+    }
     buildFeatures {
         buildConfig = true
         compose = true
@@ -177,6 +199,14 @@ android {
         implementation("com.revenuecat.purchases:purchases:10.20.0")
         implementation("com.revenuecat.purchases:purchases-ui:10.20.0")
         add("kapt", "androidx.room:room-compiler:2.8.4")
+
+        // src/test/java's FirebaseManagerTest/PinUtilTest/ParentalStatsManagerTest/
+        // KidZoneFirebaseMessagingServiceTest have referenced these since before this
+        // module's history starts, but nothing ever declared them — silently broken because
+        // CI never runs testDebugUnitTest, only assembleDebug/bundleRelease.
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.mockito:mockito-core:5.14.2")
+        testImplementation("org.robolectric:robolectric:4.14.1")
     }
 }
 

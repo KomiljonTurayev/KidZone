@@ -8,7 +8,6 @@ import android.os.Build
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,20 +60,15 @@ class KidZoneApplication : Application() {
         CoroutineScope(Dispatchers.IO).launch { migrateToProfilesIfNeeded() }
     }
 
+    // FCM token registration (Firestore + backend + topic subscription) is owned solely by
+    // MainActivity's FcmTokenManager.registerToken() call, which always runs right after this
+    // on cold start (MainActivity is the launcher activity) — doing it here too just meant
+    // every launch fired two Firestore writes and two backend HTTP POSTs for the same token.
     private fun syncToFirestore(uid: String) {
         val prefs: SharedPreferences = getSharedPreferences("kz_prefs", MODE_PRIVATE)
         prefs.edit().putString("kz_uid", uid).apply()
         val ageGroup = prefs.getString("kz_age_filter", "3-5") ?: "3-5"
         FirestoreSync.init(this).syncUserProfile(uid, null, null, ageGroup)
-        FirebaseMessaging.getInstance().token
-            .addOnSuccessListener { token ->
-                prefs.edit().putString("kz_fcm_token", token).apply()
-                FirestoreSync.getInstance().updateFcmToken(uid, token)
-                BackendClient.registerToken(token)
-            }
-            .addOnFailureListener { e ->
-                Log.w("KZ_DEBUG", "FCM token fetch failed: ${e.message}")
-            }
     }
 
     private fun createNotificationChannel() {
