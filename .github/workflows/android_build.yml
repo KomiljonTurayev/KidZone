@@ -126,7 +126,9 @@ jobs:
       - name: Decode keystore
         if: ${{ env.KEYSTORE_BASE64 != '' }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > app/kidzone-release.jks
+          # --ignore-garbage: the secret was pasted through the GitHub UI, which can leave
+          # stray whitespace/newlines in the value that strict `base64 -d` rejects outright.
+          echo "$KEYSTORE_BASE64" | base64 -d -i > app/kidzone-release.jks
           echo "KEYSTORE_FILE=kidzone-release.jks" >> $GITHUB_ENV
 
       - name: Build release AAB
