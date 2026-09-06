@@ -28,7 +28,7 @@ data class HeartbeatResult(
 object PlaytimeApiClient {
 
     private const val TAG = "PlaytimeApiClient"
-    private const val BACKEND_URL = "https://kidzone-backend-s7to.onrender.com/playtime/heartbeat"
+    private val BACKEND_URL = "${BackendConfig.BASE_URL}/playtime/heartbeat"
 
     // Short timeouts so a slow/sleeping backend (e.g. a cold-started free-tier dyno) falls
     // back to local tracking quickly instead of stalling the countdown badge.

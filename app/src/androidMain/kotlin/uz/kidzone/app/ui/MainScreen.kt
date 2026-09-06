@@ -205,11 +205,10 @@ fun MainScreen(
                 if (showUnlockPin) {
                     PinGate(
                         hasPinSet = !savedPinHash.isNullOrEmpty(),
-                        onPinCorrect = { pin ->
-                            if (savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash)) {
-                                mainViewModel.hideLock()
-                                showUnlockPin = false
-                            }
+                        onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+                        onSuccess = {
+                            mainViewModel.hideLock()
+                            showUnlockPin = false
                         },
                         onBack = { showUnlockPin = false },
                     )

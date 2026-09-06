@@ -83,11 +83,8 @@ fun ParentDashboardScreen(
     if (!pinVerified) {
         PinGate(
             hasPinSet = !savedPinHash.isNullOrEmpty(),
-            onPinCorrect = { pin ->
-                if (savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash)) {
-                    pinVerified = true
-                }
-            },
+            onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+            onSuccess = { pinVerified = true },
             onBack = onBack,
         )
         return

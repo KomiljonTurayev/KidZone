@@ -12,15 +12,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileEntity
-import java.io.IOException
 import java.util.UUID
 
 class KidZoneApplication : Application() {
@@ -65,9 +59,6 @@ class KidZoneApplication : Application() {
         }
         createNotificationChannel()
         CoroutineScope(Dispatchers.IO).launch { migrateToProfilesIfNeeded() }
-        
-        GameServer.init(this)
-        GameServer.start()
     }
 
     private fun syncToFirestore(uid: String) {
@@ -79,37 +70,10 @@ class KidZoneApplication : Application() {
             .addOnSuccessListener { token ->
                 prefs.edit().putString("kz_fcm_token", token).apply()
                 FirestoreSync.getInstance().updateFcmToken(uid, token)
-                registerTokenWithBackend(token)
+                BackendClient.registerToken(token)
             }
             .addOnFailureListener { e ->
                 Log.w("KZ_DEBUG", "FCM token fetch failed: ${e.message}")
-            }
-    }
-
-    private fun registerTokenWithBackend(fcmToken: String) {
-        FirebaseAuth.getInstance().currentUser
-            ?.getIdToken(false)
-            ?.addOnSuccessListener { result ->
-                val idToken = result.token ?: return@addOnSuccessListener
-                val json = """{"fcmToken":"$fcmToken"}"""
-                val body = json.toRequestBody("application/json".toMediaType())
-                val request = Request.Builder()
-                    .url("https://kidzone-backend-s7to.onrender.com/push/register-token")
-                    .addHeader("Authorization", "Bearer $idToken")
-                    .post(body)
-                    .build()
-                httpClient.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        Log.w("KZ_DEBUG", "registerToken failed: ${e.message}")
-                    }
-                    override fun onResponse(call: Call, response: okhttp3.Response) {
-                        Log.d("KZ_DEBUG", "registerToken HTTP ${response.code}")
-                        response.close()
-                    }
-                })
-            }
-            ?.addOnFailureListener { e ->
-                Log.w("KZ_DEBUG", "getIdToken failed: ${e.message}")
             }
     }
 

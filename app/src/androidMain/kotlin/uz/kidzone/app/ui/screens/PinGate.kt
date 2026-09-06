@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,16 +27,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import uz.kidzone.app.arch.AppPreferences
+
+// Lockout after repeated wrong PINs: a 4-digit PIN only has 10k combinations, so the real
+// defense isn't the hash — it's throttling guesses. Escalating cooldown (30s, 60s, 120s, ...)
+// persisted in prefs so it survives leaving/reopening the dashboard or killing the app.
+private const val KEY_PIN_FAIL_COUNT = "pin_fail_count"
+private const val KEY_PIN_LOCK_UNTIL = "pin_lock_until_ms"
+private const val MAX_ATTEMPTS_PER_TIER = 5
+private const val BASE_LOCKOUT_SECONDS = 30
+private const val MAX_LOCKOUT_SECONDS = 300
+
+private fun AppPreferences.pinFailCount(): Int = getString(KEY_PIN_FAIL_COUNT, "0").toIntOrNull() ?: 0
+private fun AppPreferences.setPinFailCount(v: Int) = putString(KEY_PIN_FAIL_COUNT, v.toString())
+private fun AppPreferences.pinLockUntil(): Long = getString(KEY_PIN_LOCK_UNTIL, "0").toLongOrNull() ?: 0L
+private fun AppPreferences.setPinLockUntil(v: Long) = putString(KEY_PIN_LOCK_UNTIL, v.toString())
 
 @Composable
 internal fun PinGate(
     hasPinSet: Boolean,
-    onPinCorrect: (String) -> Unit,
+    onVerifyPin: (String) -> Boolean,
+    onSuccess: () -> Unit,
     onBack: () -> Unit,
 ) {
     var entered by remember { mutableStateOf("") }
@@ -77,7 +96,7 @@ internal fun PinGate(
             Button(
                 onClick = {
                     if (answer.toIntOrNull() == a * b) {
-                        onPinCorrect("")
+                        onSuccess()
                     } else {
                         error = true
                         answer = ""
@@ -93,6 +112,23 @@ internal fun PinGate(
             TextButton(onClick = onBack) { Text("Bekor qilish") }
         }
         return
+    }
+
+    val context = LocalContext.current
+    val prefs = remember { AppPreferences(context) }
+    var lockUntil by remember { mutableStateOf(prefs.pinLockUntil()) }
+    var nowMs by remember { mutableStateOf(System.currentTimeMillis()) }
+    val remainingLockSeconds = ((lockUntil - nowMs) / 1000L + 1).coerceAtLeast(0L)
+    val isLocked = remainingLockSeconds > 0
+
+    // Ticks nowMs once a second while locked so the keypad re-enables itself the moment the
+    // cooldown expires, with no action needed from the user.
+    LaunchedEffect(lockUntil) {
+        while (System.currentTimeMillis() < lockUntil) {
+            delay(1000)
+            nowMs = System.currentTimeMillis()
+        }
+        nowMs = System.currentTimeMillis()
     }
 
     Column(
@@ -118,8 +154,14 @@ internal fun PinGate(
             }
         }
         Spacer(Modifier.height(8.dp))
-        if (lastAttemptFailed) {
-            Text(
+        when {
+            isLocked -> Text(
+                "Juda ko'p xato urinish. $remainingLockSeconds soniyadan keyin qayta urinib ko'ring ⏳",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+            )
+            lastAttemptFailed -> Text(
                 "PIN noto'g'ri ❌",
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
@@ -127,19 +169,36 @@ internal fun PinGate(
         }
         Spacer(Modifier.height(16.dp))
         PinKeypad(
+            enabled = !isLocked,
             onDigit = { d ->
-                if (entered.length < 4) {
+                if (!isLocked && entered.length < 4) {
                     entered += d
                     lastAttemptFailed = false
                     if (entered.length == 4) {
-                        onPinCorrect(entered)
+                        val attempt = entered
                         entered = ""
-                        lastAttemptFailed = true
+                        if (onVerifyPin(attempt)) {
+                            prefs.setPinFailCount(0)
+                            prefs.setPinLockUntil(0L)
+                            onSuccess()
+                        } else {
+                            lastAttemptFailed = true
+                            val failCount = prefs.pinFailCount() + 1
+                            prefs.setPinFailCount(failCount)
+                            if (failCount % MAX_ATTEMPTS_PER_TIER == 0) {
+                                val tier = failCount / MAX_ATTEMPTS_PER_TIER
+                                val lockoutSeconds = (BASE_LOCKOUT_SECONDS * (1 shl (tier - 1).coerceAtMost(4)))
+                                    .coerceAtMost(MAX_LOCKOUT_SECONDS)
+                                val until = System.currentTimeMillis() + lockoutSeconds * 1000L
+                                prefs.setPinLockUntil(until)
+                                lockUntil = until
+                            }
+                        }
                     }
                 }
             },
             onBackspace = {
-                if (entered.isNotEmpty()) {
+                if (!isLocked && entered.isNotEmpty()) {
                     entered = entered.dropLast(1)
                     lastAttemptFailed = false
                 }
@@ -151,7 +210,7 @@ internal fun PinGate(
 }
 
 @Composable
-private fun PinKeypad(onDigit: (String) -> Unit, onBackspace: () -> Unit) {
+private fun PinKeypad(enabled: Boolean = true, onDigit: (String) -> Unit, onBackspace: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         listOf(
             listOf("1", "2", "3"),
@@ -165,6 +224,7 @@ private fun PinKeypad(onDigit: (String) -> Unit, onBackspace: () -> Unit) {
                         Box(Modifier.size(64.dp))
                     } else {
                         FilledTonalButton(
+                            enabled = enabled,
                             onClick = { if (key == "←") onBackspace() else onDigit(key) },
                             modifier = Modifier.size(64.dp),
                         ) { Text(key) }

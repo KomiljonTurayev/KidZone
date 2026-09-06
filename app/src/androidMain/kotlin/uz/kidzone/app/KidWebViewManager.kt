@@ -68,12 +68,12 @@ class KidWebViewManager(private val webView: WebView) {
     private fun applySettings(settings: WebSettings) {
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
-        settings.allowFileAccess = true
-        // Allow JS inside file:// pages to fetch/XHR other local assets
-        @Suppress("DEPRECATION")
-        settings.allowFileAccessFromFileURLs = true
-        @Suppress("DEPRECATION")
-        settings.allowUniversalAccessFromFileURLs = true
+        // Games are served exclusively via WebViewAssetLoader over the synthetic
+        // https://appassets.androidplatform.net origin (see ASSET_BASE_URL) — the WebView
+        // never navigates to a file:// URL. file access (and its cross-file-origin variants)
+        // stay off so a bug in any bundled game's JS can't be leveraged to read arbitrary
+        // local files; this is Google's documented WebView hardening baseline.
+        settings.allowFileAccess = false
         settings.mediaPlaybackRequiresUserGesture = false
         settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)

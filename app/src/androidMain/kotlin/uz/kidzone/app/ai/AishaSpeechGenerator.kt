@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
  */
 object AishaSpeechGenerator {
     private const val TAG = "AishaSpeechGenerator"
-    private const val BACKEND_URL = "https://kidzone-backend-s7to.onrender.com/ai/tts"
+    private val BACKEND_URL = "${uz.kidzone.app.BackendConfig.BASE_URL}/ai/tts"
 
     suspend fun synthesize(text: String, cacheDir: File?): File? {
         if (cacheDir == null) return null

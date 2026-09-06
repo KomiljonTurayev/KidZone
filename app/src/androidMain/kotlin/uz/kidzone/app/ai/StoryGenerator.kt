@@ -24,7 +24,7 @@ data class GeneratedStory(val title: String, val text: String)
 object StoryGenerator {
 
     private const val TAG = "StoryGenerator"
-    private const val BACKEND_URL = "https://kidzone-backend-s7to.onrender.com/ai/story"
+    private val BACKEND_URL = "${uz.kidzone.app.BackendConfig.BASE_URL}/ai/story"
 
     private val httpClient by lazy {
         OkHttpClient.Builder()

@@ -17,7 +17,7 @@ import java.io.IOException
 object BackendClient {
 
     private const val TAG = "BackendClient"
-    private const val BASE_URL = "https://kidzone-backend-s7to.onrender.com"
+    private val BASE_URL = BackendConfig.BASE_URL
 
     /**
      * Registers the FCM token with the backend so push notifications reach this device.

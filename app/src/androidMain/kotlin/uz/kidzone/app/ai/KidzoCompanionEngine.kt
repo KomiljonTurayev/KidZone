@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 object KidzoCompanionEngine {
 
     private const val TAG = "KidzoCompanion"
-    private const val BACKEND_URL = "https://kidzone-backend-s7to.onrender.com/ai/ask"
+    private val BACKEND_URL = "${uz.kidzone.app.BackendConfig.BASE_URL}/ai/ask"
 
     private val httpClient by lazy {
         OkHttpClient.Builder()
