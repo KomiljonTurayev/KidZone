@@ -220,6 +220,76 @@ describe('users/{uid}/profiles/{profileId}', () => {
     await seed((db) => db.doc(profilePath()).set({ name: 'Child' }));
     await assertSucceeds(claimAdminCtx().firestore().doc(profilePath()).get());
   });
+
+  test('owner can set timeLimitMinutes within range', async () => {
+    await assertSucceeds(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', timeLimitMinutes: 30 })
+    );
+  });
+
+  test('owner CANNOT set a negative timeLimitMinutes', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', timeLimitMinutes: -5 })
+    );
+  });
+
+  test('owner CANNOT set timeLimitMinutes above one day (1440)', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', timeLimitMinutes: 999999 })
+    );
+  });
+
+  test('owner CANNOT set timeLimitMinutes to a non-integer type', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', timeLimitMinutes: '30' })
+    );
+  });
+
+  test('owner CANNOT set an empty name', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: '' })
+    );
+  });
+
+  test('owner CANNOT set an unsupported language', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', language: 'fr' })
+    );
+  });
+
+  test('owner can set a supported language', async () => {
+    await assertSucceeds(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', language: 'ru' })
+    );
+  });
+
+  test('owner CANNOT write a field outside the known profile schema', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', role: 'admin' })
+    );
+  });
+
+  test('owner can merge-write a valid streak map', async () => {
+    await seed((db) => db.doc(profilePath()).set({ name: 'Child' }));
+    await assertSucceeds(
+      ownerCtx().firestore().doc(profilePath())
+        .set({ streak: { count: 3, lastCompletedDate: '2026-09-06' } }, { merge: true })
+    );
+  });
+
+  test('owner CANNOT write a streak with a non-integer count', async () => {
+    await seed((db) => db.doc(profilePath()).set({ name: 'Child' }));
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath())
+        .set({ streak: { count: 'three', lastCompletedDate: '2026-09-06' } }, { merge: true })
+    );
+  });
+
+  test('admin can set an out-of-range timeLimitMinutes (admin override, not schema-restricted)', async () => {
+    await assertSucceeds(
+      claimAdminCtx().firestore().doc(profilePath()).set({ name: 'Child', timeLimitMinutes: 999999 })
+    );
+  });
 });
 
 // ---- users/{uid}/profiles/{profileId}/playtime/{date} -----------------------
@@ -273,6 +343,48 @@ describe('profiles/{profileId} sync subcollections (daily_challenges, stats)', (
     const p = `users/${OWNER_UID}/profiles/p1/daily_challenges/2026-09-06`;
     await assertFails(
       otherCtx().firestore().doc(p).set({ gameId: 'memory', completed: true })
+    );
+  });
+
+  test('owner CANNOT write a daily_challenges field outside the known schema', async () => {
+    const p = `users/${OWNER_UID}/profiles/p1/daily_challenges/2026-09-06`;
+    await assertFails(
+      ownerCtx().firestore().doc(p).set({ gameId: 'memory', completed: true, bonus: 'unlocked' })
+    );
+  });
+
+  test('owner CANNOT set daily_challenges.completed to a non-boolean', async () => {
+    const p = `users/${OWNER_UID}/profiles/p1/daily_challenges/2026-09-06`;
+    await assertFails(
+      ownerCtx().firestore().doc(p).set({ gameId: 'memory', completed: 'yes' })
+    );
+  });
+
+  test('owner CANNOT set a negative minutesPlayed', async () => {
+    const p = `users/${OWNER_UID}/profiles/p1/stats/2026-09-06`;
+    await assertFails(
+      ownerCtx().firestore().doc(p).set({ minutesPlayed: -1 })
+    );
+  });
+
+  test('owner CANNOT set minutesPlayed above one day (1440)', async () => {
+    const p = `users/${OWNER_UID}/profiles/p1/stats/2026-09-06`;
+    await assertFails(
+      ownerCtx().firestore().doc(p).set({ minutesPlayed: 99999 })
+    );
+  });
+
+  test('owner CANNOT write a stats field outside the known schema', async () => {
+    const p = `users/${OWNER_UID}/profiles/p1/stats/2026-09-06`;
+    await assertFails(
+      ownerCtx().firestore().doc(p).set({ minutesPlayed: 10, hacked: true })
+    );
+  });
+
+  test('owner can write both known stats fields together', async () => {
+    const p = `users/${OWNER_UID}/profiles/p1/stats/2026-09-06`;
+    await assertSucceeds(
+      ownerCtx().firestore().doc(p).set({ minutesPlayed: 10, gamesPlayed: 3 })
     );
   });
 });

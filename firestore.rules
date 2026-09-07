@@ -17,6 +17,44 @@ service cloud.firestore {
       );
     }
 
+    // Client writes to profiles/{id} come from two independent merge() calls
+    // (ProfileSyncManager.pushProfile and FirestoreSync.syncStreak), so the
+    // allowed key set is their union and every field is optional per write —
+    // but any field that IS present must have a sane type/range. This stops a
+    // scripted client (bypassing the app's PIN-gated UI) from writing garbage
+    // or unexpected fields into a profile it legitimately owns.
+    function isValidProfileWrite(data) {
+      return data.keys().hasOnly(['name', 'language', 'timeLimitMinutes', 'pinHash', 'isDefault', 'createdAt', 'streak']) &&
+        (!('name' in data) || (data.name is string && data.name.size() > 0 && data.name.size() <= 100)) &&
+        (!('language' in data) || data.language in ['uz', 'ru', 'en']) &&
+        (!('timeLimitMinutes' in data) || (data.timeLimitMinutes is int && data.timeLimitMinutes >= 0 && data.timeLimitMinutes <= 1440)) &&
+        (!('pinHash' in data) || (data.pinHash is string && data.pinHash.size() <= 64)) &&
+        (!('isDefault' in data) || data.isDefault is bool) &&
+        (!('createdAt' in data) || data.createdAt is int) &&
+        (!('streak' in data) || isValidStreak(data.streak));
+    }
+
+    function isValidStreak(streak) {
+      return streak is map &&
+        streak.keys().hasOnly(['count', 'lastCompletedDate']) &&
+        (!('count' in streak) || (streak.count is int && streak.count >= 0)) &&
+        (!('lastCompletedDate' in streak) || streak.lastCompletedDate is string);
+    }
+
+    function isValidChallengeWrite(data) {
+      return data.keys().hasOnly(['gameId', 'gameTitle', 'completed', 'completedAt']) &&
+        (!('gameId' in data) || (data.gameId is string && data.gameId.size() > 0)) &&
+        (!('gameTitle' in data) || data.gameTitle is string) &&
+        (!('completed' in data) || data.completed is bool) &&
+        (!('completedAt' in data) || data.completedAt is timestamp);
+    }
+
+    function isValidProfileStatsWrite(data) {
+      return data.keys().hasOnly(['minutesPlayed', 'gamesPlayed']) &&
+        (!('minutesPlayed' in data) || (data.minutesPlayed is int && data.minutesPlayed >= 0 && data.minutesPlayed <= 1440)) &&
+        (!('gamesPlayed' in data) || (data.gamesPlayed is int && data.gamesPlayed >= 0 && data.gamesPlayed <= 1000));
+    }
+
     // User document and all child subcollections (profiles, daily_challenges, stats)
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
@@ -27,7 +65,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
 
       match /profiles/{profileId} {
-        allow read, write: if isOwner(uid) || isAdmin();
+        allow read: if isOwner(uid) || isAdmin();
+        allow create, update: if (isOwner(uid) && isValidProfileWrite(request.resource.data)) || isAdmin();
+        allow delete: if isOwner(uid) || isAdmin();
 
         // Server-authoritative daily play-time counters (written only by the backend via
         // the Firebase Admin SDK, which bypasses these rules). The client must never write
@@ -45,11 +85,15 @@ service cloud.firestore {
         // owner access (this exact bug let an owner self-unban and forge their own playtime
         // counter; caught by firestore-tests/firestore.rules.test.js).
         match /daily_challenges/{date} {
-          allow read, write: if isOwner(uid) || isAdmin();
+          allow read: if isOwner(uid) || isAdmin();
+          allow create, update: if (isOwner(uid) && isValidChallengeWrite(request.resource.data)) || isAdmin();
+          allow delete: if isOwner(uid) || isAdmin();
         }
 
         match /stats/{date} {
-          allow read, write: if isOwner(uid) || isAdmin();
+          allow read: if isOwner(uid) || isAdmin();
+          allow create, update: if (isOwner(uid) && isValidProfileStatsWrite(request.resource.data)) || isAdmin();
+          allow delete: if isOwner(uid) || isAdmin();
         }
       }
     }
