@@ -56,8 +56,13 @@ function next() {
   document.getElementById('q-text').textContent = `${current.l} ${T[lang].quest}`;
 
   const options = [current.l];
+  const CHARS_BY_LANG = {
+    en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    uz: "ABDEFGHIJKLMNOQRSTUVXYZ",
+    ru: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+  };
+  const chars = CHARS_BY_LANG[lang] || CHARS_BY_LANG.en;
   while(options.length < 4) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
     const r = chars[Math.floor(Math.random() * chars.length)];
     if (!options.includes(r)) options.push(r);
   }

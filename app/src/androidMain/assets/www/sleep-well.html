@@ -409,9 +409,9 @@
 
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-const lang = urlParams.get('lang') || 'uz';
+let lang = urlParams.get('lang') || 'uz';
 
-const T = {
+let T = {
   uz: {
     title: "Sehrli Uyqu",
     play: "Ovozni Yoqish",

@@ -27,7 +27,7 @@
 </head>
 <body>
 <div id="header">
-    <div onclick="window.parent.closeGame()" style="font-size: 24px; cursor: pointer;">🔙</div>
+    <div onclick="window.parent && window.parent.closeGame && window.parent.closeGame()" style="font-size: 24px; cursor: pointer;">🔙</div>
     <div style="font-weight: 900; color: #777;">⭐ <span id="pts">0</span></div>
     <div style="width: 24px;"></div>
 </div>

@@ -65,7 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function botMove() {
         if (!gameActive && board.includes('')) {
             // Simple AI: tries to win, then block, then random
-            let move = findBestMove(botSign) || findBestMove(playerSign) || getRandomMove();
+            let move = findBestMove(botSign);
+            if (move === null) move = findBestMove(playerSign);
+            if (move === null) move = getRandomMove();
             
             makeMove(move, botSign);
 
