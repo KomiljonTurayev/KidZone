@@ -26,6 +26,8 @@ keystore.properties
 
 ## Firebase – credentials, not the template ##
 app/google-services.json
+*firebase-adminsdk*.json
+serviceAccount*.json
 
 ## Node (firestore-tests) ##
 node_modules/
