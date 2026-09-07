@@ -126,6 +126,8 @@ function spawnParticles(x, y, color) {
 }
 
 function update() {
+  if (!gameActive) { requestAnimationFrame(update); return; }
+
   ctx.clearRect(0, 0, W, H);
 
   // Draw blade trail

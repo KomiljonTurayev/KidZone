@@ -121,6 +121,8 @@ function place() {
 window.addEventListener('pointerdown', place);
 
 function update() {
+  if (!active) { requestAnimationFrame(update); return; }
+
   ctx.clearRect(0, 0, W, H);
 
   // Draw stack

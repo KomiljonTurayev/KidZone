@@ -82,6 +82,8 @@ function spawnPipe() {
 }
 
 function update() {
+  if (!active) { requestAnimationFrame(update); return; }
+
   ctx.clearRect(0, 0, W, H);
 
   // Background clouds
