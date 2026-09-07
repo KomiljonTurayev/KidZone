@@ -126,11 +126,11 @@ function onCandyClick(r, c) {
     const d = Math.abs(selected.r - r) + Math.abs(selected.c - c);
     if (d === 1) {
       swap(selected.r, selected.c, r, c);
-      moves--;
-      document.getElementById('moves').textContent = moves;
       setTimeout(() => {
         const matches = findMatches();
         if (matches.length > 0) {
+          moves--;
+          document.getElementById('moves').textContent = moves;
           handleMatches(matches);
         } else {
           swap(selected.r, selected.c, r, c);

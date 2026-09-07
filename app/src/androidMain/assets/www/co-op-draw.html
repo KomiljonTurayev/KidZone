@@ -53,39 +53,57 @@
         window.addEventListener('resize', resize);
         resize();
 
-        let drawing = false;
         let color = '#FF5252';
-        const points = [];
+        // Each active pointer (mouse, or one finger per touch identifier) gets its own
+        // last-position entry, so two children can draw with two fingers at once without
+        // one finger's strokes jumping to/from the other's position.
+        const strokes = new Map();
 
-        function startDraw(e) {
-            drawing = true;
-            addPoint(e);
+        function startStroke(id, x, y) {
+            strokes.set(id, { x, y });
         }
 
-        function endDraw() {
-            drawing = false;
-            ctx.beginPath();
+        function continueStroke(id, x, y) {
+            const last = strokes.get(id);
+            if (last) {
+                ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(last.x, last.y);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+            strokes.set(id, { x, y });
         }
 
-        function addPoint(e) {
-            if (!drawing) return;
-            const t = e.touches ? e.touches[0] : e;
-            const x = t.clientX;
-            const y = t.clientY;
-
-            ctx.strokeStyle = color;
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+        function endStroke(id) {
+            strokes.delete(id);
         }
 
-        canvas.addEventListener('mousedown', startDraw);
-        canvas.addEventListener('mousemove', addPoint);
-        canvas.addEventListener('mouseup', endDraw);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e); }, {passive:false});
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); addPoint(e); }, {passive:false});
-        canvas.addEventListener('touchend', endDraw);
+        canvas.addEventListener('mousedown', (e) => startStroke('mouse', e.clientX, e.clientY));
+        canvas.addEventListener('mousemove', (e) => { if (strokes.has('mouse')) continueStroke('mouse', e.clientX, e.clientY); });
+        window.addEventListener('mouseup', () => endStroke('mouse'));
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const t = e.changedTouches[i];
+                startStroke(t.identifier, t.clientX, t.clientY);
+            }
+        }, {passive:false});
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const t = e.changedTouches[i];
+                continueStroke(t.identifier, t.clientX, t.clientY);
+            }
+        }, {passive:false});
+        function onTouchEnd(e) {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                endStroke(e.changedTouches[i].identifier);
+            }
+        }
+        canvas.addEventListener('touchend', onTouchEnd);
+        canvas.addEventListener('touchcancel', onTouchEnd);
 
         function setColor(c) { color = c; }
         function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
