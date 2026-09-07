@@ -1,6 +1,12 @@
 import java.util.Properties
 import java.io.FileInputStream
 
+private val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(FileInputStream(f))
+}
+private val revenueCatApiKey = System.getenv("REVENUECAT_API_KEY") ?: localProps.getProperty("REVENUECAT_API_KEY", "")
+
 plugins {
     kotlin("multiplatform")
     id("com.android.application")
@@ -123,6 +129,7 @@ android {
         val propVersionName = project.findProperty("versionName")?.toString()
         versionCode = propVersionCode ?: 16
         versionName = propVersionName ?: "1.5.0"
+        buildConfigField("String", "REVENUECAT_API_KEY", "\"${revenueCatApiKey}\"")
     }
 
     val keystoreProps = Properties()

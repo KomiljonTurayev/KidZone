@@ -28,7 +28,7 @@ actual object GameServer {
         isStarted = true
 
         CoroutineScope(Dispatchers.IO).launch {
-            embeddedServer(CIO, port = PORT) {
+            embeddedServer(CIO, port = PORT, host = "127.0.0.1") {
                 routing {
                     get("/{path...}") {
                         val path = call.parameters.getAll("path")?.joinToString("/") ?: "index.html"
