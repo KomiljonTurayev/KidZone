@@ -20,6 +20,9 @@ class TelegramLoginFlow(
     private val timeout: Duration = 5.minutes,
 ) {
 
+    /** Wakes the backend while the parent is still reading the sign-in screen. */
+    suspend fun prepare() = api.warmUp()
+
     suspend fun start(): TelegramLoginStart {
         auth.ensureGuestSession()
         return api.start(requireIdToken())

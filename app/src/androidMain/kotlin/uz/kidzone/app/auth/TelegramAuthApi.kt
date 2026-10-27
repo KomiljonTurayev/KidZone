@@ -8,6 +8,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 data class TelegramLoginStart(val loginId: String, val botUrl: String)
 
@@ -19,14 +20,36 @@ sealed interface TelegramLoginStatus {
 
 /** The backend's Telegram login endpoints (start, status), authenticated with the guest's ID token. */
 interface TelegramAuthApi {
+    /** Best-effort wake-up of a sleeping backend; never fails. */
+    suspend fun warmUp()
     suspend fun start(idToken: String): TelegramLoginStart
     suspend fun status(idToken: String, loginId: String): TelegramLoginStatus
 }
 
 class OkHttpTelegramAuthApi(
     private val baseUrl: String,
-    private val httpClient: OkHttpClient,
+    sharedClient: OkHttpClient,
 ) : TelegramAuthApi {
+
+    // The backend runs on a free Render instance that sleeps when idle and needs ~50s to
+    // wake. OkHttp's 10s defaults made the first sign-in after a quiet period fail with
+    // "check your internet"; these limits cover a cold start. newBuilder() shares the
+    // connection pool with the app's client.
+    private val httpClient = sharedClient.newBuilder()
+        .connectTimeout(COLD_START_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(COLD_START_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .callTimeout(COLD_START_TIMEOUT_SECONDS + 10, TimeUnit.SECONDS)
+        .build()
+
+    override suspend fun warmUp() {
+        withContext(Dispatchers.IO) {
+            try {
+                httpClient.newCall(Request.Builder().url("$baseUrl/health").get().build()).execute().close()
+            } catch (_: IOException) {
+                // Only a head start for the real request, which reports failures itself.
+            }
+        }
+    }
 
     override suspend fun start(idToken: String): TelegramLoginStart =
         parseStart(send(request("/auth/telegram/start", idToken).post(ByteArray(0).toRequestBody()).build()))
@@ -54,6 +77,8 @@ class OkHttpTelegramAuthApi(
     }
 
     internal companion object {
+        const val COLD_START_TIMEOUT_SECONDS = 60L
+
         fun parseStart(json: String): TelegramLoginStart = parse(json) {
             TelegramLoginStart(loginId = it.getString("loginId"), botUrl = it.getString("botUrl"))
         }
