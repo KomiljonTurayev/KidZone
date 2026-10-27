@@ -48,7 +48,7 @@ class KidZoneFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        val uid = FirebaseManager.getInstance().getUid()
+        val uid = uz.kidzone.app.auth.AuthGraph.currentUid
         if (uid != null) {
             FirestoreSync.getInstance().updateFcmToken(uid, token)
         } else {

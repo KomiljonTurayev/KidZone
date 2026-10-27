@@ -1,8 +1,6 @@
 package uz.kidzone.app.ai
 
 import android.util.Log
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -10,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import uz.kidzone.app.auth.AuthGraph
 import java.util.concurrent.TimeUnit
 
 /**
@@ -56,13 +55,13 @@ object KidzoCompanionEngine {
         OfflineKidzoBrain.respond(trimmed, targetLang, childName)
     }
 
-    private fun callBackend(
+    private suspend fun callBackend(
         query: String,
         lang: String,
         childName: String,
         ageRange: String
     ): String? {
-        val idToken = currentIdToken() ?: return null
+        val idToken = AuthGraph.idTokens.idToken() ?: return null
 
         val requestJson = JSONObject().apply {
             put("query", query)
@@ -84,14 +83,6 @@ object KidzoCompanionEngine {
             val respBody = response.body?.string() ?: return null
             return JSONObject(respBody).optString("answer").ifBlank { null }
         }
-    }
-
-    private fun currentIdToken(): String? = try {
-        val user = FirebaseAuth.getInstance().currentUser ?: return null
-        Tasks.await(user.getIdToken(false)).token
-    } catch (e: Exception) {
-        Log.w(TAG, "getIdToken failed: ${e.message}")
-        null
     }
 }
 

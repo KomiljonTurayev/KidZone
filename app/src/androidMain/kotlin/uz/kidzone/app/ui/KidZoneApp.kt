@@ -15,8 +15,11 @@ import uz.kidzone.app.data.DailyChallengeRepository
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileRepository
 import uz.kidzone.app.data.ProfileSyncManager
+import uz.kidzone.app.auth.AccountFeature
+import uz.kidzone.app.ui.screens.AccountGate
 import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.BannedScreen
+import uz.kidzone.app.ui.screens.PaywallScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
 import uz.kidzone.app.ui.screens.ProfileSelectScreen
@@ -28,6 +31,8 @@ import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModelFactory
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModelFactory
+
+private const val UNLOCKED_FEATURE_KEY = "unlocked_feature"
 
 @Composable
 fun KidZoneApp(
@@ -103,7 +108,12 @@ fun KidZoneApp(
                     onAddNew = { navController.navigate("add_edit_profile/new") },
                 )
             }
-            composable("main") {
+            composable("main") { backStack ->
+                // Set by the "account/{feature}" route after a successful sign-in, so the
+                // feature the child asked for opens right away instead of needing a second tap.
+                val unlocked by backStack.savedStateHandle
+                    .getStateFlow<String?>(UNLOCKED_FEATURE_KEY, null)
+                    .collectAsState()
                 MainScreen(
                     mainViewModel = mainViewModel,
                     prefs = prefs,
@@ -112,6 +122,30 @@ fun KidZoneApp(
                     challengeViewModel = challengeViewModel,
                     onOpenDashboard = { navController.navigate("dashboard") },
                     onOpenSleep = { navController.navigate("sleep") },
+                    onRequireAccount = { feature -> navController.navigate("account/${feature.name}") },
+                    unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
+                    onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },
+                )
+            }
+            composable("account/{feature}") { backStack ->
+                val feature = backStack.arguments?.getString("feature")
+                    ?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } }
+                    ?: AccountFeature.AI_COMPANION
+                val activeProfile by profileViewModel.activeProfile.collectAsState()
+                AccountGate(
+                    feature = feature,
+                    pinHash = activeProfile?.pinHash,
+                    onSignedIn = {
+                        navController.previousBackStackEntry?.savedStateHandle?.set(UNLOCKED_FEATURE_KEY, feature.name)
+                        navController.popBackStack()
+                    },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable("premium") {
+                PaywallScreen(
+                    onDismiss = { navController.popBackStack() },
+                    onSuccess = { navController.popBackStack() },
                 )
             }
             composable("sleep") {
@@ -130,6 +164,8 @@ fun KidZoneApp(
                     onNavigateToAddEdit = { profileId ->
                         navController.navigate("add_edit_profile/${profileId ?: "new"}")
                     },
+                    // Reached only from the signed-in dashboard, so PREMIUM is already unlocked.
+                    onOpenPremium = { navController.navigate("premium") },
                 )
             }
             composable("add_edit_profile/{profileId}") { backStack ->

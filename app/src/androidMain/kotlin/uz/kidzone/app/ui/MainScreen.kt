@@ -69,6 +69,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import kotlin.math.roundToInt
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.KidWebViewManager
+import uz.kidzone.app.auth.AccountFeature
+import uz.kidzone.app.auth.AuthGraph
+import androidx.compose.runtime.rememberUpdatedState
 import uz.kidzone.app.kidzo.ContentFilter
 import uz.kidzone.app.kidzo.KidzoAgent
 import uz.kidzone.app.ui.screens.KidzoSheet
@@ -88,6 +91,9 @@ fun MainScreen(
     challengeViewModel: DailyChallengeViewModel,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
+    onRequireAccount: (AccountFeature) -> Unit = {},
+    unlockedFeature: AccountFeature? = null,
+    onUnlockedFeatureHandled: () -> Unit = {},
 ) {
     // Yaxshilangan: collectAsState o'rniga collectAsStateWithLifecycle ishlatildi. 
     // Bu orqafon (background) da batareya isrofgarchiligini oldini oladi.
@@ -120,6 +126,24 @@ fun MainScreen(
         kidzoAgentRef?.let { KidzoViewModel(it) }
     }
 
+    // Kidzo (AI chat, voice, AI stories) is account-only: guests are sent to the parent
+    // sign-in instead. The WebView bridge below is created once, so it reads these through
+    // rememberUpdatedState rather than capturing a stale lambda.
+    val featureGate = remember { AuthGraph.featureGate }
+    val requireAccount by rememberUpdatedState(onRequireAccount)
+    fun aiAvailable(): Boolean = featureGate.isAvailable(AccountFeature.AI_COMPANION)
+    fun openKidzo() {
+        if (!aiAvailable()) return requireAccount(AccountFeature.AI_COMPANION)
+        kidzoViewModel?.requestRecommendations()
+        showKidzoSheet = true
+    }
+    LaunchedEffect(unlockedFeature) {
+        if (unlockedFeature == AccountFeature.AI_COMPANION) {
+            openKidzo()
+            onUnlockedFeatureHandled()
+        }
+    }
+
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
@@ -144,15 +168,18 @@ fun MainScreen(
                             viewModel = mainViewModel,
                             onOpenDashboard = onOpenDashboard,
                             onOpenSleep = onOpenSleep,
-                            onOpenKidzo = {
-                                kidzoViewModel?.requestRecommendations()
-                                showKidzoSheet = true
-                            },
+                            onOpenKidzo = { openKidzo() },
+                            isAiAvailable = { aiAvailable() },
+                            onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
                             onAskKidzo = { query ->
-                                val curLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
-                                val cName = activeProfile?.name ?: ""
-                                kidzoViewModel?.askKidzo(query, curLang, cName, context)
-                                showKidzoSheet = true
+                                if (aiAvailable()) {
+                                    val curLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
+                                    val cName = activeProfile?.name ?: ""
+                                    kidzoViewModel?.askKidzo(query, curLang, cName, context)
+                                    showKidzoSheet = true
+                                } else {
+                                    requireAccount(AccountFeature.AI_COMPANION)
+                                }
                             },
                             evalJs = mgr::evaluateJavascript,
                             activity = context as Activity
@@ -293,10 +320,7 @@ fun MainScreen(
                                         offsetY = (offsetY + delta.y).coerceIn(minY, 0f)
                                     }
                                 } while (event.changes.any { it.pressed })
-                                if (!dragged) {
-                                    kidzoViewModel.requestRecommendations()
-                                    showKidzoSheet = true
-                                }
+                                if (!dragged) openKidzo()
                             }
                         },
                     shape = CircleShape,

@@ -12,6 +12,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
+import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.ui.KidZoneApp
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.PromoBannerData
@@ -43,29 +48,27 @@ class MainActivity : ComponentActivity() {
 
         requestNotificationPermissionIfNeeded()
 
-        FirebaseManager.init(this)
         firestoreSync = FirestoreSync.init(this)
         val activeProfileId = kzPrefs.getString("active_profile_id", "default") ?: "default"
         statsManager = ParentalStatsManager(this, activeProfileId)
 
-        FirebaseManager.getInstance().ensureAuthAsync {
-            val uid = FirebaseManager.getInstance().getUid()
-            if (uid != null) {
-                FcmTokenManager.registerToken(uid, firestoreSync)
-                BanChecker.checkAsync(uid, firestoreSync) { status ->
-                    if (status == BanChecker.Status.BANNED) runOnUiThread { banUser() }
-                }
-            }
-            BannerChecker.checkAsync(firestoreSync) { banner ->
-                if (banner != null) runOnUiThread {
-                    mainViewModel.setPromoBanner(
-                        PromoBannerData(
-                            title = banner.title,
-                            body = banner.body,
-                            url = banner.url,
-                        )
+        // Push-token registration happens in the Application's AccountSessionCoordinator;
+        // here we only need the UI-facing checks, re-run whenever the account changes.
+        lifecycleScope.launch {
+            AuthGraph.auth.state
+                .mapNotNull { it.uid }
+                .distinctUntilChanged()
+                .collect { uid -> checkAccountStatus(uid) }
+        }
+        BannerChecker.checkAsync(firestoreSync) { banner ->
+            if (banner != null) runOnUiThread {
+                mainViewModel.setPromoBanner(
+                    PromoBannerData(
+                        title = banner.title,
+                        body = banner.body,
+                        url = banner.url,
                     )
-                }
+                )
             }
         }
 
@@ -75,6 +78,12 @@ class MainActivity : ComponentActivity() {
                 mainViewModel = mainViewModel,
                 statsManager = statsManager,
             )
+        }
+    }
+
+    private fun checkAccountStatus(uid: String) {
+        BanChecker.checkAsync(uid, firestoreSync) { status ->
+            if (status == BanChecker.Status.BANNED) runOnUiThread { banUser() }
         }
     }
 
