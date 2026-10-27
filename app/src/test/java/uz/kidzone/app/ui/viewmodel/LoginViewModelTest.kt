@@ -53,6 +53,14 @@ class LoginViewModelTest {
     }
 
     @Test
+    fun `opening the sign-in screen wakes the backend once`() = runTest(dispatcher) {
+        advanceUntilIdle()
+
+        assertEquals(1, telegramApi.warmUps)
+        assertEquals(LoginUiState.Idle, vm.state.value)
+    }
+
+    @Test
     fun `google sign-in exchanges the google token and reports success`() = runTest(dispatcher) {
         vm.signInWithGoogle(activity)
         assertEquals(LoginUiState.SigningInWithGoogle, vm.state.value)
@@ -127,6 +135,11 @@ class LoginViewModelTest {
     /** Stays PENDING until [confirm] is called. */
     private class GatedTelegramApi : TelegramAuthApi {
         private val confirmed = CompletableDeferred<Unit>()
+        var warmUps = 0
+
+        override suspend fun warmUp() {
+            warmUps++
+        }
 
         fun confirm() {
             confirmed.complete(Unit)

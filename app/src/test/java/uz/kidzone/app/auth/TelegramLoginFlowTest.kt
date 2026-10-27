@@ -116,6 +116,8 @@ class TelegramLoginFlowTest {
         val startTokens = mutableListOf<String>()
         var statusCalls = 0
 
+        override suspend fun warmUp() = Unit
+
         override suspend fun start(idToken: String): TelegramLoginStart {
             startTokens += idToken
             return TelegramLoginStart("login-1", "https://t.me/KidZoneBot?start=login-1")

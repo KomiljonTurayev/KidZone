@@ -41,6 +41,10 @@ class LoginViewModel(
 
     private var attempt: Job? = null
 
+    init {
+        viewModelScope.launch { telegramLogin.prepare() }
+    }
+
     fun signInWithGoogle(activity: Activity) = launchAttempt(LoginUiState.SigningInWithGoogle) {
         auth.signInWithGoogle(googleSignIn.requestIdToken(activity))
     }
