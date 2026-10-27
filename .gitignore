@@ -47,3 +47,6 @@ shared/build/
 
 ## Claude Code – local machine settings ##
 .claude/settings.local.json
+
+## Aider (AI coding tool) - local chat history and caches ##
+.aider*
