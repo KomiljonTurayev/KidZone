@@ -6,14 +6,20 @@ import android.app.NotificationManager
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import uz.kidzone.app.auth.AuthException
+import uz.kidzone.app.auth.AuthGraph
+import uz.kidzone.app.auth.CloudUserListener
+import uz.kidzone.app.auth.ProfileCloudSyncListener
+import uz.kidzone.app.auth.PurchasesIdentityListener
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileEntity
+import uz.kidzone.app.data.ProfileSyncManager
 import java.util.UUID
 
 class KidZoneApplication : Application() {
@@ -24,6 +30,8 @@ class KidZoneApplication : Application() {
         @JvmStatic
         val httpClient: OkHttpClient by lazy { OkHttpClient() }
     }
+
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -36,39 +44,31 @@ class KidZoneApplication : Application() {
             Log.w("KZ_DEBUG", "Firebase debug setup skipped: ${e.message}")
         }
 
-        try {
-            val auth = FirebaseAuth.getInstance()
-            val user = auth.currentUser
-            if (user != null) {
-                Log.d("KZ_DEBUG", "Auth OK: uid=${user.uid}")
-                syncToFirestore(user.uid)
-            } else {
-                auth.signInAnonymously()
-                    .addOnSuccessListener { result ->
-                        val uid = result.user?.uid ?: return@addOnSuccessListener
-                        Log.d("KZ_DEBUG", "signInAnonymously OK: uid=$uid")
-                        syncToFirestore(uid)
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("KZ_DEBUG", "signInAnonymously FAILED: ${e.message}")
-                    }
+        val prefs: SharedPreferences = getSharedPreferences("kz_prefs", MODE_PRIVATE)
+        val db = KidZoneDatabase.getInstance(this)
+        val firestore = runCatching { FirebaseFirestore.getInstance() }.getOrNull()
+        // Per-account setup (users/{uid} doc, push token, profile sync, purchase identity)
+        // runs once per account change from here — on first launch, after sign-in and after
+        // sign-out alike — instead of being repeated by each screen that can change the user.
+        AuthGraph.init(
+            context = this,
+            appScope = appScope,
+            listeners = listOf(
+                CloudUserListener({ FirestoreSync.init(this) }, prefs),
+                ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore)),
+                PurchasesIdentityListener(),
+            ),
+        )
+        // Everyone starts as a guest: the app is fully usable without signing in.
+        appScope.launch {
+            try {
+                AuthGraph.auth.ensureGuestSession()
+            } catch (e: AuthException) {
+                Log.e("KZ_DEBUG", "Guest session failed: ${e.reason}")
             }
-        } catch (e: IllegalStateException) {
-            Log.w("KZ_DEBUG", "Firebase not available (test environment?): ${e.message}")
         }
         createNotificationChannel()
-        CoroutineScope(Dispatchers.IO).launch { migrateToProfilesIfNeeded() }
-    }
-
-    // FCM token registration (Firestore + backend + topic subscription) is owned solely by
-    // MainActivity's FcmTokenManager.registerToken() call, which always runs right after this
-    // on cold start (MainActivity is the launcher activity) — doing it here too just meant
-    // every launch fired two Firestore writes and two backend HTTP POSTs for the same token.
-    private fun syncToFirestore(uid: String) {
-        val prefs: SharedPreferences = getSharedPreferences("kz_prefs", MODE_PRIVATE)
-        prefs.edit().putString("kz_uid", uid).apply()
-        val ageGroup = prefs.getString("kz_age_filter", "3-5") ?: "3-5"
-        FirestoreSync.init(this).syncUserProfile(uid, null, null, ageGroup)
+        appScope.launch { migrateToProfilesIfNeeded() }
     }
 
     private fun createNotificationChannel() {

@@ -2,7 +2,6 @@ package uz.kidzone.app.ui.viewmodel
 
 import uz.kidzone.app.arch.AppPreferences
 import uz.kidzone.app.arch.ViewModel
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,13 +9,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import uz.kidzone.app.FirebaseManager
 import uz.kidzone.app.FirestoreSync
 import uz.kidzone.app.ParentalStatsManager
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import uz.kidzone.app.auth.AccountState
+import uz.kidzone.app.auth.AuthException
+import uz.kidzone.app.auth.AuthRepository
+import uz.kidzone.app.auth.userMessage
 
 import androidx.compose.runtime.Immutable
 
@@ -28,24 +27,26 @@ data class DashboardState(
     val age: String = "2-4",
     val pushEnabled: Boolean = true,
     val notifHistory: List<String> = emptyList(),
-    val firebaseUid: String? = null,
-    val firebaseEmail: String? = null,
+    val account: AccountState = AccountState.Unavailable,
     val isSyncing: Boolean = false,
     val lastSyncTime: String? = null,
-    val loginError: String? = null,
+    val accountError: String? = null,
 )
 
 class DashboardViewModel(
     private val statsManager: ParentalStatsManager,
     private val prefs: AppPreferences,
+    private val auth: AuthRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(DashboardState())
+    private val _state = MutableStateFlow(DashboardState(account = auth.state.value))
     val state: StateFlow<DashboardState> = _state.asStateFlow()
 
     init {
         refresh()
-        initFirebase()
+        viewModelScope.launch {
+            auth.state.collect { account -> _state.update { it.copy(account = account) } }
+        }
     }
 
     fun refresh() {
@@ -60,88 +61,26 @@ class DashboardViewModel(
         }
     }
 
-    private fun initFirebase() {
-        val user = FirebaseManager.getInstance().getCurrentUser()
-        _state.update { it.copy(firebaseUid = user?.uid, firebaseEmail = user?.email) }
-    }
+    /** Signing out returns the app to guest mode; the dashboard then asks to sign in again. */
+    fun logout() = runAccountAction { auth.signOut() }
 
-    fun login(email: String, password: String, onDone: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            _state.update { it.copy(isSyncing = true, loginError = null) }
-            try {
-                // "Callback hell" o'rniga suspend funksiya orqali kutamiz
-                val user = suspendSignIn(email, password)
-                _state.update {
-                    it.copy(
-                        firebaseUid = user.uid,
-                        firebaseEmail = user.email,
-                        isSyncing = false,
-                        loginError = null,
-                    )
-                }
-                onDone(true)
-            } catch (e: Exception) {
-                _state.update { it.copy(loginError = e.message, isSyncing = false) }
-                onDone(false)
-            }
-        }
-    }
-
-    fun register(email: String, password: String, onDone: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            _state.update { it.copy(isSyncing = true, loginError = null) }
-            try {
-                val user = suspendCreateAccount(email, password)
-                _state.update {
-                    it.copy(
-                        firebaseUid = user.uid,
-                        firebaseEmail = user.email,
-                        isSyncing = false,
-                        loginError = null,
-                    )
-                }
-                onDone(true)
-            } catch (e: Exception) {
-                _state.update { it.copy(loginError = e.message, isSyncing = false) }
-                onDone(false)
-            }
-        }
-    }
-
-    fun logout() {
-        FirebaseManager.getInstance().signOut()
-        _state.update {
-            it.copy(
-                firebaseUid = null,
-                firebaseEmail = null,
-                lastSyncTime = null,
-                loginError = null,
-                isSyncing = false,
-            )
-        }
-    }
+    fun deleteAccount(onDone: (Boolean) -> Unit) = runAccountAction(onDone) { auth.deleteAccount() }
 
     fun syncNow() {
-        val uid = _state.value.firebaseUid ?: return
-        val email = _state.value.firebaseEmail
-        val ageGroup = prefs.getString("kz_age", "2-4") ?: "2-4"
+        val account = _state.value.account as? AccountState.SignedIn ?: return
+        val ageGroup = prefs.getString("kz_age", "2-4")
 
         viewModelScope.launch {
             _state.update { it.copy(isSyncing = true) }
-            
-            // Tarmoq so'rovlarini asosiy Ui Thread ni qotirmasligi uchun IO ga o'tkazamiz
             withContext(Dispatchers.IO) {
                 val sync = FirestoreSync.getInstance()
-                sync.syncUserProfile(uid, null, email, ageGroup)
+                sync.syncUserProfile(account.uid, account.displayName, null, ageGroup)
                 val minutes = statsManager.getTodayMinutes().toLong()
                 val games = statsManager.getTodayGames().associateWith { "played" }
-                sync.recordSession(uid, minutes, games, false)
-                
-                // Fire-and-forget funksiyalar tez ishlab ketgani uchun UI (Progress Indicator) 
-                // go'zal ishlashi uchun qisqacha sun'iy kutish qo'shildi
+                sync.recordSession(account.uid, minutes, games, false)
+                // The writes above are fire-and-forget; keep the spinner up long enough to read.
                 delay(800)
             }
-            
             _state.update { it.copy(isSyncing = false, lastSyncTime = "Hozirgina") }
         }
     }
@@ -156,65 +95,18 @@ class DashboardViewModel(
         _state.update { it.copy(pushEnabled = enabled) }
     }
 
-    // --- Suspend Wrappers (Callbacklarni Coroutines'ga aylantirish) ---
-
-    fun deleteAccount(onDone: (Boolean) -> Unit) {
+    private fun runAccountAction(onDone: (Boolean) -> Unit = {}, action: suspend () -> Unit) {
         viewModelScope.launch {
-            _state.update { it.copy(isSyncing = true, loginError = null) }
-            try {
-                suspendDeleteAccount()
-                _state.update {
-                    it.copy(
-                        firebaseUid = null,
-                        firebaseEmail = null,
-                        isSyncing = false,
-                        loginError = null,
-                    )
-                }
-                onDone(true)
-            } catch (e: Exception) {
-                _state.update { it.copy(loginError = e.message, isSyncing = false) }
-                onDone(false)
+            _state.update { it.copy(isSyncing = true, accountError = null) }
+            val ok = try {
+                action()
+                true
+            } catch (e: AuthException) {
+                _state.update { it.copy(accountError = e.reason.userMessage()) }
+                false
             }
-        }
-    }
-
-    private suspend fun suspendSignIn(email: String, password: String): FirebaseUser {
-        return suspendCancellableCoroutine { cont ->
-            FirebaseManager.getInstance().signInWithEmail(email, password, object : FirebaseManager.AuthCallback {
-                override fun onSuccess(user: FirebaseUser) {
-                    cont.resume(user)
-                }
-                override fun onError(message: String) {
-                    cont.resumeWithException(Exception(message))
-                }
-            })
-        }
-    }
-
-    private suspend fun suspendCreateAccount(email: String, password: String): FirebaseUser {
-        return suspendCancellableCoroutine { cont ->
-            FirebaseManager.getInstance().createAccountWithEmail(email, password, object : FirebaseManager.AuthCallback {
-                override fun onSuccess(user: FirebaseUser) {
-                    cont.resume(user)
-                }
-                override fun onError(message: String) {
-                    cont.resumeWithException(Exception(message))
-                }
-            })
-        }
-    }
-
-    private suspend fun suspendDeleteAccount() {
-        return suspendCancellableCoroutine { cont ->
-            FirebaseManager.getInstance().deleteAccount(object : FirebaseManager.DeleteCallback {
-                override fun onSuccess() {
-                    cont.resume(Unit)
-                }
-                override fun onError(message: String) {
-                    cont.resumeWithException(Exception(message))
-                }
-            })
+            _state.update { it.copy(isSyncing = false, lastSyncTime = if (ok) null else it.lastSyncTime) }
+            onDone(ok)
         }
     }
 }

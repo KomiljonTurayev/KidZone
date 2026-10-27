@@ -95,7 +95,12 @@ kotlin {
                 implementation("com.google.firebase:firebase-messaging")
                 implementation("com.google.firebase:firebase-crashlytics")
                 implementation("com.google.firebase:firebase-analytics")
-                
+
+                // "Sign in with Google" via Credential Manager (see auth/GoogleSignIn.kt)
+                implementation("androidx.credentials:credentials:1.3.0")
+                implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+                implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
                 implementation("androidx.work:work-runtime-ktx:2.9.0")
                 implementation("androidx.room:room-runtime:2.8.4")
                 implementation("androidx.room:room-ktx:2.8.4")

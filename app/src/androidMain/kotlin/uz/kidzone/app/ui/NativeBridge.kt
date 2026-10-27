@@ -19,6 +19,8 @@ internal class NativeBridge(
     private val onOpenSleep: () -> Unit,
     private val onOpenKidzo: () -> Unit,
     private val onAskKidzo: (String) -> Unit,
+    private val isAiAvailable: () -> Boolean,
+    private val onAiLocked: () -> Unit,
     private val evalJs: (String) -> Unit,
     activity: Activity,
 ) {
@@ -196,6 +198,15 @@ internal class NativeBridge(
 
     @android.webkit.JavascriptInterface
     fun generateStory(lang: String, ageRange: String, childName: String, scenario: String) {
+        // AI stories are account-only; the web page shows its normal error state while the
+        // app asks a parent to sign in.
+        if (!isAiAvailable()) {
+            onMain {
+                evalJs("window.onAiStoryError && window.onAiStoryError()")
+                onAiLocked()
+            }
+            return
+        }
         scope.launch {
             try {
                 val story = StoryGenerator.generate(lang, ageRange, childName, scenario)

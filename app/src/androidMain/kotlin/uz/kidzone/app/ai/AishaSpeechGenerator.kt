@@ -1,8 +1,7 @@
 package uz.kidzone.app.ai
 
 import android.util.Log
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.auth.FirebaseAuth
+import uz.kidzone.app.auth.AuthGraph
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -27,7 +26,7 @@ object AishaSpeechGenerator {
     suspend fun synthesize(text: String, cacheDir: File?): File? {
         if (cacheDir == null) return null
         return try {
-            val idToken = currentIdToken() ?: return null
+            val idToken = AuthGraph.idTokens.idToken() ?: return null
             downloadFromBackend(text.take(1000), idToken, cacheDir)
         } catch (e: Exception) {
             Log.w(TAG, "Speech generation failed: ${e.javaClass.simpleName}: ${e.message}")
@@ -61,12 +60,4 @@ object AishaSpeechGenerator {
             conn.inputStream.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
             file
         }
-
-    private fun currentIdToken(): String? = try {
-        val user = FirebaseAuth.getInstance().currentUser ?: return null
-        Tasks.await(user.getIdToken(false)).token
-    } catch (e: Exception) {
-        Log.w(TAG, "getIdToken failed: ${e.message}")
-        null
-    }
 }

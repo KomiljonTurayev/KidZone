@@ -1,13 +1,12 @@
 package uz.kidzone.app.ai
 
 import android.util.Log
-import com.google.android.gms.tasks.Tasks
-import com.google.firebase.auth.FirebaseAuth
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import uz.kidzone.app.auth.AuthGraph
 import java.util.concurrent.TimeUnit
 
 data class GeneratedStory(val title: String, val text: String)
@@ -53,14 +52,14 @@ object StoryGenerator {
         return PersonalizedStoryEngine.generate(lang, ageRange, safeName, safeScenario)
     }
 
-    private fun generateViaBackend(
+    private suspend fun generateViaBackend(
         lang: String,
         ageRange: String,
         childName: String,
         scenario: String,
     ): GeneratedStory? {
         return try {
-            val idToken = currentIdToken() ?: return null
+            val idToken = AuthGraph.idTokens.idToken() ?: return null
 
             val requestJson = JSONObject().apply {
                 put("lang", lang)
@@ -92,14 +91,6 @@ object StoryGenerator {
             Log.w(TAG, "Backend story call failed: ${e.message}")
             null
         }
-    }
-
-    private fun currentIdToken(): String? = try {
-        val user = FirebaseAuth.getInstance().currentUser ?: return null
-        Tasks.await(user.getIdToken(false)).token
-    } catch (e: Exception) {
-        Log.w(TAG, "getIdToken failed: ${e.message}")
-        null
     }
 
 }

@@ -527,3 +527,16 @@ describe('streak_reminder_runs/{runId}', () => {
     );
   });
 });
+
+describe('telegram_logins/{nonce}', () => {
+  // Login sessions are written and redeemed only by the backend (Admin SDK). A client that
+  // could read one could steal another device's pending Telegram sign-in.
+  test('no client can read or write Telegram login sessions, not even admins', async () => {
+    await seed((db) => db.collection('telegram_logins').doc('n1').set({ requesterUid: OWNER_UID, status: 'CONFIRMED' }));
+    for (const ctx of [ownerCtx(), otherCtx(), claimAdminCtx(), testEnv.unauthenticatedContext()]) {
+      const db = ctx.firestore();
+      await assertFails(db.collection('telegram_logins').doc('n1').get());
+      await assertFails(db.collection('telegram_logins').doc('n2').set({ status: 'PENDING' }));
+    }
+  });
+});

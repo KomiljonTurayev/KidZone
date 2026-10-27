@@ -1,6 +1,10 @@
 package uz.kidzone.app
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -12,12 +16,14 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
+import uz.kidzone.app.auth.AuthGraph
 import java.io.IOException
 
 object BackendClient {
 
     private const val TAG = "BackendClient"
     private val BASE_URL = BackendConfig.BASE_URL
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
      * Registers the FCM token with the backend so push notifications reach this device.
@@ -27,21 +33,17 @@ object BackendClient {
      */
     @JvmStatic
     fun registerToken(fcmToken: String) {
-        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-        if (currentUser == null) {
-            Log.w(TAG, "registerToken: no Firebase user")
-            return
+        scope.launch {
+            val idToken = AuthGraph.idTokens.idToken()
+            if (idToken == null) {
+                Log.w(TAG, "registerToken: no Firebase session")
+                return@launch
+            }
+            doRegisterToken(idToken, fcmToken)
         }
-        currentUser.getIdToken(false)
-            .addOnSuccessListener { result ->
-                doRegisterToken(result.token, fcmToken)
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "registerToken: getIdToken failed: $e")
-            }
     }
 
-    private fun doRegisterToken(idToken: String?, fcmToken: String) {
+    private fun doRegisterToken(idToken: String, fcmToken: String) {
         try {
             val payload = JSONObject().apply {
                 put("fcmToken", fcmToken)

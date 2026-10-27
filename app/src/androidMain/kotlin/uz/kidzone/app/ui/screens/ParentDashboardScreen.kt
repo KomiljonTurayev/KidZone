@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -44,16 +42,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.PinUtil
+import uz.kidzone.app.auth.AccountFeature
+import uz.kidzone.app.auth.AccountState
+import uz.kidzone.app.auth.AuthGraph
+import uz.kidzone.app.auth.AuthProvider
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.ui.text.style.TextAlign
-import uz.kidzone.app.ui.viewmodel.DashboardState
 import uz.kidzone.app.data.AppClock
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
@@ -66,10 +64,11 @@ fun ParentDashboardScreen(
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
     onNavigateToAddEdit: (String?) -> Unit,
+    onOpenPremium: () -> Unit,
 ) {
     val context = LocalContext.current
     val statsManager = remember { ParentalStatsManager(context) }
-    val vm = remember { DashboardViewModel(statsManager, AppPreferences(context)) }
+    val vm = remember { DashboardViewModel(statsManager, AppPreferences(context), AuthGraph.auth) }
     val state by vm.state.collectAsState()
 
     // PIN gate
@@ -90,18 +89,17 @@ fun ParentDashboardScreen(
         return
     }
 
-    // Cloud login gate (optional)
-    var cloudResolved by remember { mutableStateOf(state.firebaseUid != null) }
-    if (!cloudResolved) {
-        CloudLoginSection(
-            state = state,
-            onLogin = { email, pass ->
-                vm.login(email, pass) { success -> if (success) cloudResolved = true }
-            },
-            onRegister = { email, pass ->
-                vm.register(email, pass) { success -> if (success) cloudResolved = true }
-            },
-            onSkip = { cloudResolved = true },
+    // The dashboard is an account-only feature. The PIN gate above already proved a parent is
+    // holding the phone, so the sign-in screen is shown directly; state.account flips to
+    // SignedIn on success and this recomposes into the dashboard.
+    val account = state.account
+    if (account !is AccountState.SignedIn) {
+        AccountGate(
+            feature = AccountFeature.PARENT_DASHBOARD,
+            pinHash = savedPinHash,
+            parentVerified = true,
+            onSignedIn = {},
+            onBack = onBack,
         )
         return
     }
@@ -201,17 +199,23 @@ fun ParentDashboardScreen(
                 }
             }
 
-            // 6. Cloud status (faqat login bo'lsa)
-            if (state.firebaseUid != null) {
-                item {
+            // 6. Hisob va bulutli sinxronlash
+            item {
                     var showDeleteDialog by remember { mutableStateOf(false) }
 
                     Spacer(Modifier.height(8.dp))
-                    Text("Cloud sinxronlash", style = MaterialTheme.typography.titleMedium)
+                    Text("Hisob", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "☁️ Ulangan: ${state.firebaseEmail ?: state.firebaseUid}",
+                        "☁️ ${account.displayName ?: "Ota-ona"} · ${account.provider.label()}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
+                    if (!state.accountError.isNullOrEmpty()) {
+                        Text(
+                            state.accountError.orEmpty(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                     if (!state.lastSyncTime.isNullOrEmpty()) {
                         Text(
                             "Oxirgi sync: ${state.lastSyncTime}",
@@ -234,12 +238,13 @@ fun ParentDashboardScreen(
                                 Text("Sinxronlash")
                             }
                         }
-                        OutlinedButton(onClick = {
-                            vm.logout()
-                            cloudResolved = false
-                        }) {
+                        OutlinedButton(onClick = { vm.logout() }) {
                             Text("Chiqish")
                         }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = onOpenPremium, modifier = Modifier.fillMaxWidth()) {
+                        Text("⭐ Premium obuna")
                     }
                     Spacer(Modifier.height(8.dp))
                     OutlinedButton(
@@ -260,10 +265,7 @@ fun ParentDashboardScreen(
                             confirmButton = {
                                 Button(
                                     onClick = {
-                                        vm.deleteAccount { success ->
-                                            if (success) cloudResolved = false
-                                            showDeleteDialog = false
-                                        }
+                                        vm.deleteAccount { showDeleteDialog = false }
                                     },
                                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                                 ) {
@@ -277,7 +279,6 @@ fun ParentDashboardScreen(
                             }
                         )
                     }
-                }
             }
 
             // 7. Profillar bo'limi
@@ -339,88 +340,9 @@ private fun WeeklyChart(weeklyMinutes: List<Int>) {
     }
 }
 
-@Composable
-private fun CloudLoginSection(
-    state: DashboardState,
-    onLogin: (String, String) -> Unit,
-    onRegister: (String, String) -> Unit,
-    onSkip: () -> Unit,
-) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text("☁️ Cloud Sinxronlash", style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "Statistika va profil ma'lumotlarini bulutga saqlang",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true,
-        )
-        Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Parol") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true,
-        )
-
-        if (!state.loginError.isNullOrEmpty()) {
-            Spacer(Modifier.height(8.dp))
-            Text(
-                state.loginError,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-
-        Spacer(Modifier.height(20.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(
-                onClick = { onLogin(email, password) },
-                enabled = !state.isSyncing && email.isNotBlank() && password.isNotBlank(),
-                modifier = Modifier.weight(1f),
-            ) {
-                if (state.isSyncing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp,
-                    )
-                } else {
-                    Text("Kirish")
-                }
-            }
-            OutlinedButton(
-                onClick = { onRegister(email, password) },
-                enabled = !state.isSyncing && email.isNotBlank() && password.isNotBlank(),
-                modifier = Modifier.weight(1f),
-            ) {
-                Text("Ro'yxat")
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-        TextButton(onClick = onSkip) {
-            Text("O'tkazib yuborish →")
-        }
-    }
+private fun AuthProvider.label(): String = when (this) {
+    AuthProvider.GOOGLE -> "Google"
+    AuthProvider.TELEGRAM -> "Telegram"
+    AuthProvider.EMAIL -> "Email"
+    AuthProvider.UNKNOWN -> "Hisob"
 }
