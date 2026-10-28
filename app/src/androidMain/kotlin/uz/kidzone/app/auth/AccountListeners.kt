@@ -2,6 +2,8 @@ package uz.kidzone.app.auth
 
 import android.content.SharedPreferences
 import com.revenuecat.purchases.Purchases
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import uz.kidzone.app.FcmTokenManager
 import uz.kidzone.app.FirestoreSync
 import uz.kidzone.app.data.ProfileDao
@@ -23,19 +25,28 @@ class CloudUserListener(
 }
 
 /**
- * When a parent signs in, their account may already hold profiles from another device: pull
- * and merge those, then push this device's profiles so the server-side play-time limit
- * (which reads `users/{uid}/profiles/{id}`) works for the new uid too.
+ * Keeps the parent's profiles the same on every device of their account. On sign-in: pull and
+ * merge what other devices saved, push this device's profiles (the server-side play-time limit
+ * reads `users/{uid}/profiles/{id}`), then keep listening so later changes from other devices
+ * arrive while the app is open. Guests and signed-out users don't sync.
  */
 class ProfileCloudSyncListener(
     private val profileDao: ProfileDao,
     private val syncManager: ProfileSyncManager,
+    private val scope: CoroutineScope,
 ) : AccountListener {
+    private var live: AutoCloseable? = null
+
     override suspend fun onAccountChanged(account: AccountState) {
+        live?.close()
+        live = null
         if (account !is AccountState.SignedIn) return
         val remote = syncManager.pullProfiles(account.uid)
         if (remote.isNotEmpty()) profileDao.mergeProfiles(remote)
         profileDao.getAllSync().forEach(syncManager::pushProfile)
+        live = syncManager.listenProfiles(account.uid) { profiles ->
+            scope.launch { profileDao.mergeProfiles(profiles) }
+        }
     }
 }
 

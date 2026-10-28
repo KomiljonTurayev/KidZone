@@ -11,6 +11,8 @@ const {
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
+const firebase = require('firebase/compat/app');
+require('firebase/compat/firestore');
 
 const PROJECT_ID = 'kidzone-rules-test';
 
@@ -282,6 +284,53 @@ describe('users/{uid}/profiles/{profileId}', () => {
     await assertFails(
       ownerCtx().firestore().doc(profilePath())
         .set({ streak: { count: 'three', lastCompletedDate: '2026-09-06' } }, { merge: true })
+    );
+  });
+
+  test('owner can write the Faza 16 sync fields as the app does', async () => {
+    await assertSucceeds(
+      ownerCtx().firestore().doc(profilePath()).set({
+        name: 'Child',
+        createdAt: 1000,
+        updatedAt: 2000,
+        deleted: false,
+        serverUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true })
+    );
+  });
+
+  test('owner can write a tombstone', async () => {
+    await seed((db) => db.doc(profilePath()).set({ name: 'Child' }));
+    await assertSucceeds(
+      ownerCtx().firestore().doc(profilePath()).set({ deleted: true, updatedAt: 3000 }, { merge: true })
+    );
+  });
+
+  test('owner CANNOT write updatedAt as a non-integer', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', updatedAt: '2000' })
+    );
+  });
+
+  test('owner CANNOT write deleted as a non-boolean', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({ name: 'Child', deleted: 'yes' })
+    );
+  });
+
+  test('owner CANNOT forge serverUpdatedAt with a client-chosen time', async () => {
+    await assertFails(
+      ownerCtx().firestore().doc(profilePath()).set({
+        name: 'Child',
+        serverUpdatedAt: firebase.firestore.Timestamp.fromMillis(0),
+      })
+    );
+  });
+
+  test('another user CANNOT write a tombstone into a profile they do not own', async () => {
+    await seed((db) => db.doc(profilePath()).set({ name: 'Child' }));
+    await assertFails(
+      otherCtx().firestore().doc(profilePath()).set({ deleted: true, updatedAt: 3000 }, { merge: true })
     );
   });
 

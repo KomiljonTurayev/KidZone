@@ -13,4 +13,8 @@ data class ProfileEntity(
     val pinHash: String?,
     val isDefault: Boolean,
     val createdAt: Long,
+    /** Last change, ms. Sync keeps whichever copy was changed last (see [profilesToApply]). */
+    val updatedAt: Long = createdAt,
+    /** Tombstone: a deleted profile is kept so the delete can reach the other devices. */
+    val deleted: Boolean = false,
 )

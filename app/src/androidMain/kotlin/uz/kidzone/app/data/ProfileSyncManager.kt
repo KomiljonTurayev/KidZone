@@ -3,6 +3,8 @@ package uz.kidzone.app.data
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
@@ -23,6 +25,10 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
             "pinHash" to (profile.pinHash ?: ""),
             "isDefault" to profile.isDefault,
             "createdAt" to profile.createdAt,
+            "updatedAt" to profile.updatedAt,
+            "deleted" to profile.deleted,
+            // Not read yet: lets the merge move to server time later without a migration.
+            "serverUpdatedAt" to FieldValue.serverTimestamp(),
         )
         db.collection("users").document(uid)
             .collection("profiles").document(profile.id)
@@ -52,22 +58,43 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
         return try {
             val snap = db.collection("users").document(uid)
                 .collection("profiles").get().await()
-            snap.documents.mapNotNull { doc ->
-                val name = doc.getString("name") ?: return@mapNotNull null
-                ProfileEntity(
-                    id = doc.id,
-                    name = name,
-                    avatarPath = null,
-                    language = doc.getString("language") ?: "uz",
-                    timeLimitMinutes = (doc.getLong("timeLimitMinutes") ?: 0L).toInt(),
-                    pinHash = doc.getString("pinHash")?.takeIf { it.isNotEmpty() },
-                    isDefault = doc.getBoolean("isDefault") ?: false,
-                    createdAt = doc.getLong("createdAt") ?: 0L,
-                )
-            }
+            snap.documents.mapNotNull(::toProfile)
         } catch (e: Exception) {
             Log.w(TAG, "pullProfiles failed: $e")
             emptyList()
         }
+    }
+
+    /**
+     * Calls [onChange] with the account's profiles whenever another device changes them. This
+     * device's own writes are skipped until the server has them (they're already in Room).
+     * Close the result to stop listening; null when Firestore isn't available.
+     */
+    open fun listenProfiles(uid: String, onChange: (List<ProfileEntity>) -> Unit): AutoCloseable? {
+        val db = db ?: return null
+        val registration = db.collection("users").document(uid).collection("profiles")
+            .addSnapshotListener { snap, e ->
+                if (e != null) { Log.w(TAG, "listenProfiles failed: $e"); return@addSnapshotListener }
+                if (snap == null || snap.metadata.hasPendingWrites()) return@addSnapshotListener
+                onChange(snap.documents.mapNotNull(::toProfile))
+            }
+        return AutoCloseable { registration.remove() }
+    }
+
+    private fun toProfile(doc: DocumentSnapshot): ProfileEntity? {
+        val name = doc.getString("name") ?: return null
+        return ProfileEntity(
+            id = doc.id,
+            name = name,
+            avatarPath = null,
+            language = doc.getString("language") ?: "uz",
+            timeLimitMinutes = (doc.getLong("timeLimitMinutes") ?: 0L).toInt(),
+            pinHash = doc.getString("pinHash")?.takeIf { it.isNotEmpty() },
+            isDefault = doc.getBoolean("isDefault") ?: false,
+            createdAt = doc.getLong("createdAt") ?: 0L,
+            // Written before Faza 16: treat as last changed when created, and alive.
+            updatedAt = doc.getLong("updatedAt") ?: doc.getLong("createdAt") ?: 0L,
+            deleted = doc.getBoolean("deleted") ?: false,
+        )
     }
 }
