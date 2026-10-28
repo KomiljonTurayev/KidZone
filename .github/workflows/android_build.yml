@@ -52,6 +52,18 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      # google-services.json is gitignored (public repo). Without it the build silently skips
+      # the Firebase plugin, so the APK has no Firebase config and Google Sign-In can't work.
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          else
+            echo "::warning::GOOGLE_SERVICES_JSON secret is not set; building without Firebase config"
+          fi
+
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
@@ -110,6 +122,17 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x gradlew
+
+      # A release without Firebase config would ship with auth, sync and push broken, so fail.
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error::GOOGLE_SERVICES_JSON secret is not set"
+            exit 1
+          fi
+          echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
       - name: Parse version from tag or input
         id: version
