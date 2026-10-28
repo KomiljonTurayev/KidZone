@@ -107,6 +107,10 @@
 
 > Start only after Phase A is released and the spec's open questions are answered.
 
+> **Done (2026-10-29), with deviations:** backend `feat/family-accounts` (6241f78, cefc822, 1ac1ebe); rules 2fcd764.
+> - Not yet done from B1: clearing members' `familyOwner` when the owner deletes their account (account deletion happens client-side today — needs a backend hook or Cloud Function); `FamilyControllerTest`.
+> - Added (security): clients can't write `familyOwner`, and `findOwnerOf` also requires the `members/{uid}` doc.
+
 ### Task B1: Backend — family model and invite codes
 
 **Files (Kidzone_Backend):**
@@ -115,7 +119,7 @@
 - Create: `service/FamilyService.java`, `controller/FamilyController.java`
 - Test: `service/FamilyServiceTest.java`, `controller/FamilyControllerTest.java`
 
-- [ ] **Step 1 (tests first):**
+- [x] **Step 1 (tests first):**
   - an invite is a 6-digit code that expires in 24h;
   - joining works once;
   - expired or used codes fail;
@@ -123,24 +127,24 @@
   - more than 10 attempts per hour per uid are rejected;
   - leave / remove works;
   - deleting the owner's account clears every member's `familyOwner`.
-- [ ] **Step 2:** Endpoints: `POST /family/invite`, `POST /family/join {code}`, `POST /family/leave`, `DELETE /family/members/{uid}`, `GET /family` (members list for the dashboard).
-- [ ] **Step 3:** Joining writes `families/{owner}/members/{member}` and `users/{member}.familyOwner`.
+- [x] **Step 2:** Endpoints: `POST /family/invite`, `POST /family/join {code}`, `POST /family/leave`, `DELETE /family/members/{uid}`, `GET /family` (members list for the dashboard).
+- [x] **Step 3:** Joining writes `families/{owner}/members/{member}` and `users/{member}.familyOwner`.
 
 ### Task B2: Backend — heartbeat uses the effective owner
 
 **Files:** `service/PlaytimeService.java`, `repository/firestore/FirestoreUserRepository.java`
-- [ ] Test first: a member's heartbeat for a family profile reads the limit from, and writes play time under, `users/{owner}/profiles/{id}`.
-- [ ] Implement: resolve `familyOwner ?: uid` once per request.
+- [x] Test first: a member's heartbeat for a family profile reads the limit from, and writes play time under, `users/{owner}/profiles/{id}`.
+- [x] Implement: resolve `familyOwner ?: uid` once per request.
 
 ### Task B3: Rules — members can use the owner's profiles
 
 **Files:** `firestore.rules`, `firestore-tests/firestore.rules.test.js`
-- [ ] Test first:
+- [x] Test first:
   - a member can read/write `users/{owner}/profiles/**`;
   - a non-member can't;
   - a member can't read or modify `users/{owner}` itself, e.g. `status`;
   - clients can't write `families/**`.
-- [ ] Add `isFamilyMember(owner)` = `exists(/databases/$(database)/documents/families/$(owner)/members/$(request.auth.uid))` to the profile, stats and challenge rules.
+- [x] Add `isFamilyMember(owner)` = `exists(/databases/$(database)/documents/families/$(owner)/members/$(request.auth.uid))` to the profile, stats and challenge rules.
 
 ### Task B4: App — effective owner everywhere
 
