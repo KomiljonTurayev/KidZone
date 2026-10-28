@@ -50,3 +50,7 @@ shared/build/
 
 ## Aider (AI coding tool) - local chat history and caches ##
 .aider*
+
+# Project debug key (not secret, password 'android'): gives CI debug APKs a stable
+# SHA-1, which Firebase needs for Google Sign-In.
+!app/debug.keystore

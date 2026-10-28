@@ -147,6 +147,15 @@ android {
     }
 
     signingConfigs {
+        // Committed project debug key (standard "android" passwords, not a secret). Every
+        // machine and every CI run signs debug builds with the same SHA-1, which Firebase
+        // must know for Google Sign-In; the per-machine default key changes on each CI runner.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         create("release") {
             val envKeystore = System.getenv("KEYSTORE_FILE")
             val resolvedEnv = envKeystore?.let {
