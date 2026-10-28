@@ -1,7 +1,7 @@
 # Faza 16 — Ko'p qurilma va oila hisobi: Dizayn spesifikatsiyasi
 
 **Sana:** 2026-10-28
-**Holat:** Draft — ko'rib chiqish kutilmoqda
+**Holat:** Approved — A bosqichi `master`da (PR #14); B bosqichi qarorlari qabul qilindi
 **Bog'liq:** `2026-06-28-faza11-multi-profile-design.md`, `2026-06-23-faza7-firebase-sync-design.md`
 
 ---
@@ -132,11 +132,11 @@ Oila ma'lumotlari ko'chirilmaydi: profillar avvalgidek **oila egasi**ning `users
 
 ---
 
-## Ochiq savollar
+## Qarorlar (2026-10-29)
 
-1. **Premium oila bo'ylab:** B bosqichiga kiritilsinmi yoki alohida spec bo'lsinmi? (Hozirgi taklif: alohida.)
-2. **Bola qurilmasi:** bola planshetida ota-ona hisobi bilan kirish talab qilinsinmi, yoki planshet ham taklif kodi bilan "faqat bola qurilmasi" sifatida ulanadimi? (Hozirgi taklif: ota-ona hisobi bilan kirish — A bosqichi buni allaqachon qo'llab-quvvatlaydi.)
-3. **Taklif kanali:** faqat kod, yoki Telegram/havola orqali yuborish ham kerakmi? (Hozirgi taklif: faqat kod; havola keyinroq.)
+1. **Premium oila bo'ylab** — B bosqichiga kirmaydi; alohida spec. B'da Premium har kimning o'z hisobida qoladi.
+2. **Bola qurilmasi** — planshetda ota-ona o'z hisobi bilan kiradi. A bosqichi buni allaqachon qo'llab-quvvatlaydi; alohida "bola qurilmasi" roli yo'q.
+3. **Taklif kanali** — faqat 6 xonali kod. Havola/deep link keyinroq, kerak bo'lsa.
 
 ---
 
