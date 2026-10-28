@@ -502,12 +502,7 @@ class GameManager {
             window.AndroidBridge.updateLanguage(l);
         }
 
-        document.querySelectorAll('#lang-modal .age-card').forEach(c => c.classList.remove('sel'));
-        document.getElementById('lc-' + l)?.classList.add('sel');
-
-        const flags = {en:"🇬🇧 EN", ru:"🇷🇺 RU", uz:"🇺🇿 UZ"};
-        const curEl = document.getElementById("lang-cur");
-        if (curEl) curEl.textContent = flags[l];
+        this.syncHeader();
 
         if (window.buildFeatured) window.buildFeatured();
         if (window.buildGrid) window.buildGrid(this.cat);
@@ -515,14 +510,28 @@ class GameManager {
         this.ui.showToast(this.translator.get('langSelected') || l);
     }
 
-    setAge(a, el) {
+    setAge(a) {
         this.age = a;
         localStorage.setItem(profileManager.key('age'), a);
-        document.querySelectorAll(".age-card").forEach(x => x.classList.remove("sel"));
-        if (el) el.classList.add("sel");
-        const ageBtn = document.getElementById("age-btn");
-        if (ageBtn) ageBtn.textContent = `👶 ${a} ▾`;
+        // Persist natively too, or the next launch's ?age= would bring the old value back.
+        if (window.AndroidBridge && window.AndroidBridge.updateAge) {
+            window.AndroidBridge.updateAge(a);
+        }
+        this.syncHeader();
         if (window.buildGrid) window.buildGrid(this.cat);
+    }
+
+    /** Shows the current language and age in the header pills and marks them in the pickers. */
+    syncHeader() {
+        const l = this.translator.lang;
+        const flags = {en:"🇬🇧 EN", ru:"🇷🇺 RU", uz:"🇺🇿 UZ"};
+        const curEl = document.getElementById("lang-cur");
+        if (curEl) curEl.textContent = flags[l] || l.toUpperCase();
+        document.querySelectorAll('#lang-modal .age-card').forEach(c => c.classList.toggle('sel', c.id === 'lc-' + l));
+
+        const ageBtn = document.getElementById("age-btn");
+        if (ageBtn) ageBtn.textContent = `👶 ${this.age.replace('-', '–')} ▾`;
+        document.querySelectorAll('#age-modal .age-card').forEach(c => c.classList.toggle('sel', c.dataset.age === this.age));
     }
 
     toggleMusic() {
@@ -1318,6 +1327,7 @@ window.addEventListener("load", () => {
     badgeManager.checkStreak();
     badgeManager.onPointsUpdated(app.pts);
     if (window.updateLangUI) window.updateLangUI();
+    app.syncHeader();
     ui.updateMusicUI(app.isMuted);
 
     if (app.isMuted && window.AndroidBridge?.toggleMusic) {

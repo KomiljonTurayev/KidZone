@@ -171,6 +171,12 @@ fun MainScreen(
                             onOpenKidzo = { openKidzo() },
                             isAiAvailable = { aiAvailable() },
                             onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
+                            // Without these the next launch's ?lang=/?age= would undo the child's pick.
+                            onLanguageChanged = { lang ->
+                                prefs.edit().putString("kz_lang", lang).apply()
+                                profileViewModel.activeProfile.value?.let { profileViewModel.updateProfile(it.copy(language = lang)) }
+                            },
+                            onAgeChanged = { age -> prefs.edit().putString("kz_age", age).apply() },
                             onAskKidzo = { query ->
                                 if (aiAvailable()) {
                                     val curLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
