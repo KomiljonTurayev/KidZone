@@ -55,7 +55,7 @@ class KidZoneApplication : Application() {
             appScope = appScope,
             listeners = listOf(
                 CloudUserListener({ FirestoreSync.init(this) }, prefs),
-                ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore)),
+                ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore), appScope),
                 PurchasesIdentityListener(),
             ),
         )
