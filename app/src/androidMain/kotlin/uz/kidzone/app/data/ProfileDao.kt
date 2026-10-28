@@ -11,17 +11,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProfileDao {
-    @Query("SELECT * FROM profiles ORDER BY createdAt ASC")
+    @Query("SELECT * FROM profiles WHERE deleted = 0 ORDER BY createdAt ASC")
     fun getAll(): Flow<List<ProfileEntity>>
 
-    // Qo'shimcha: Barcha profillarni sinxron olish uchun
+    /** Every row, tombstones included: sync must push deletes too. */
     @Query("SELECT * FROM profiles")
     suspend fun getAllSync(): List<ProfileEntity>
 
-    @Query("SELECT * FROM profiles WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM profiles WHERE id = :id AND deleted = 0 LIMIT 1")
     suspend fun getById(id: String): ProfileEntity?
 
-    @Query("SELECT COUNT(*) FROM profiles")
+    @Query("SELECT COUNT(*) FROM profiles WHERE deleted = 0")
     suspend fun count(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -37,26 +37,25 @@ interface ProfileDao {
     @Delete
     suspend fun delete(profile: ProfileEntity)
 
-    // Qo'shimcha: N+1 muammosini hal qilish uchun Transaction orqali ishlash
+    /** Applies the remote copies that are newer than the local ones (see [profilesToApply]). */
     @Transaction
     suspend fun mergeProfiles(remoteProfiles: List<ProfileEntity>) {
-        // Avval hamma lokal profillarni xotiraga olamiz (faqat 1 ta DB so'rovi)
-        val localProfiles = getAllSync().associateBy { it.id }
-        
-        // Ularni solishtiramiz
-        val toInsert = remoteProfiles.mapNotNull { remote ->
-            val local = localProfiles[remote.id]
-            if (local == null || remote.createdAt > local.createdAt) {
-                // Lokal profil bo'lmasa yoki eskirgan bo'lsa, ro'yxatga qo'shamiz
-                remote.copy(avatarPath = local?.avatarPath)
-            } else {
-                null
-            }
-        }
-        
-        // Yangi/O'zgargan profillarni bir paytning o'zida DB ga yozamiz (Yana 1 ta DB so'rovi)
-        if (toInsert.isNotEmpty()) {
-            insertAll(toInsert)
-        }
+        val toApply = profilesToApply(getAllSync().associateBy { it.id }, remoteProfiles)
+        if (toApply.isNotEmpty()) insertAll(toApply)
     }
 }
+
+/**
+ * Last write wins: a remote copy replaces the local one only if it was changed later. Unknown
+ * remote profiles (tombstones too) are taken as they are. The avatar is local-only, so the
+ * local path is kept.
+ */
+fun profilesToApply(local: Map<String, ProfileEntity>, remote: List<ProfileEntity>): List<ProfileEntity> =
+    remote.mapNotNull { r ->
+        val l = local[r.id]
+        when {
+            l == null -> r
+            r.updatedAt > l.updatedAt -> r.copy(avatarPath = l.avatarPath)
+            else -> null
+        }
+    }

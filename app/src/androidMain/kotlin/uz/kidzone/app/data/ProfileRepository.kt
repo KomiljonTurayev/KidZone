@@ -9,6 +9,7 @@ class ProfileRepository(
     private val profileStatsDao: ProfileStatsDao,
     private val prefs: SharedPreferences,
     private val syncManager: ProfileSyncManager,
+    private val nowMs: () -> Long = System::currentTimeMillis,
 ) {
     val profiles: Flow<List<ProfileEntity>> = profileDao.getAll()
 
@@ -26,17 +27,20 @@ class ProfileRepository(
     suspend fun count(): Int = profileDao.count()
 
     suspend fun insert(profile: ProfileEntity) {
-        profileDao.insert(profile)
-        syncManager.pushProfile(profile)
+        val stamped = profile.copy(updatedAt = nowMs())
+        profileDao.insert(stamped)
+        syncManager.pushProfile(stamped)
     }
 
     suspend fun update(profile: ProfileEntity) {
-        profileDao.update(profile)
-        syncManager.pushProfile(profile)
+        val stamped = profile.copy(updatedAt = nowMs())
+        profileDao.update(stamped)
+        syncManager.pushProfile(stamped)
     }
 
+    /** Keeps a synced tombstone instead of removing the row, so other devices drop it too. */
     suspend fun delete(profile: ProfileEntity) {
-        profileDao.delete(profile)
+        update(profile.copy(deleted = true))
     }
 
     suspend fun upsertStats(stats: ProfileStatsEntity) {

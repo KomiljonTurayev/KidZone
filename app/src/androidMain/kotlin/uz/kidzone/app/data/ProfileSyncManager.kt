@@ -3,6 +3,7 @@ package uz.kidzone.app.data
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
@@ -23,6 +24,10 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
             "pinHash" to (profile.pinHash ?: ""),
             "isDefault" to profile.isDefault,
             "createdAt" to profile.createdAt,
+            "updatedAt" to profile.updatedAt,
+            "deleted" to profile.deleted,
+            // Not read yet: lets the merge move to server time later without a migration.
+            "serverUpdatedAt" to FieldValue.serverTimestamp(),
         )
         db.collection("users").document(uid)
             .collection("profiles").document(profile.id)
@@ -63,6 +68,9 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
                     pinHash = doc.getString("pinHash")?.takeIf { it.isNotEmpty() },
                     isDefault = doc.getBoolean("isDefault") ?: false,
                     createdAt = doc.getLong("createdAt") ?: 0L,
+                    // Written before Faza 16: treat as last changed when created, and alive.
+                    updatedAt = doc.getLong("updatedAt") ?: doc.getLong("createdAt") ?: 0L,
+                    deleted = doc.getBoolean("deleted") ?: false,
                 )
             }
         } catch (e: Exception) {

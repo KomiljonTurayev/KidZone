@@ -24,13 +24,19 @@ service cloud.firestore {
     // scripted client (bypassing the app's PIN-gated UI) from writing garbage
     // or unexpected fields into a profile it legitimately owns.
     function isValidProfileWrite(data) {
-      return data.keys().hasOnly(['name', 'language', 'timeLimitMinutes', 'pinHash', 'isDefault', 'createdAt', 'streak']) &&
+      return data.keys().hasOnly(['name', 'language', 'timeLimitMinutes', 'pinHash', 'isDefault', 'createdAt', 'streak',
+                                  'updatedAt', 'deleted', 'serverUpdatedAt']) &&
         (!('name' in data) || (data.name is string && data.name.size() > 0 && data.name.size() <= 100)) &&
         (!('language' in data) || data.language in ['uz', 'ru', 'en']) &&
         (!('timeLimitMinutes' in data) || (data.timeLimitMinutes is int && data.timeLimitMinutes >= 0 && data.timeLimitMinutes <= 1440)) &&
         (!('pinHash' in data) || (data.pinHash is string && data.pinHash.size() <= 64)) &&
         (!('isDefault' in data) || data.isDefault is bool) &&
         (!('createdAt' in data) || data.createdAt is int) &&
+        // Faza 16 multi-device sync: last-write-wins stamp, tombstone flag, and the server's own
+        // time (only FieldValue.serverTimestamp() passes, so a client can't forge it).
+        (!('updatedAt' in data) || data.updatedAt is int) &&
+        (!('deleted' in data) || data.deleted is bool) &&
+        (!('serverUpdatedAt' in data) || data.serverUpdatedAt == request.time) &&
         (!('streak' in data) || isValidStreak(data.streak));
     }
 
