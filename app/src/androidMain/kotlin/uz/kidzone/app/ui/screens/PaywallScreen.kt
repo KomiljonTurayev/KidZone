@@ -1,21 +1,39 @@
 package uz.kidzone.app.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.kidzone.app.RevenueCatManager
+import uz.kidzone.app.ui.components.Kid
+import uz.kidzone.app.ui.components.KidButton
+import uz.kidzone.app.ui.components.KidCard
+import uz.kidzone.app.ui.components.KidError
+import uz.kidzone.app.ui.components.KidPage
+import uz.kidzone.app.ui.components.KidSubtitle
+import uz.kidzone.app.ui.components.KidTextButton
+import uz.kidzone.app.ui.components.KidTitle
+import uz.kidzone.app.ui.components.MascotBubble
 
 @Composable
 fun PaywallScreen(
@@ -26,89 +44,52 @@ fun PaywallScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var selectedPlan by remember { mutableStateOf("monthly") }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.6f)),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .width(400.dp)
-                .padding(24.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("KidZone Premium 🌟", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF6B35))
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "Cheksiz Sun'iy Intellekt ertaklari va ovozli hikoyalarni oching!",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
+    KidPage {
+        MascotBubble("🌟", size = 120.dp)
+        Spacer(Modifier.height(20.dp))
+        KidTitle("KidZone Premium")
+        Spacer(Modifier.height(6.dp))
+        KidSubtitle("Cheksiz Sun'iy Intellekt ertaklari va ovozli hikoyalarni oching!")
+        Spacer(Modifier.height(24.dp))
+
+        PlanCard(
+            title = "Oylik",
+            price = "$4.99 / oy",
+            isSelected = selectedPlan == "monthly",
+            onClick = { selectedPlan = "monthly" }
+        )
+        Spacer(Modifier.height(14.dp))
+        PlanCard(
+            title = "Yillik",
+            price = "$39.99 / yil",
+            badge = "Tejamkor",
+            isSelected = selectedPlan == "annual",
+            onClick = { selectedPlan = "annual" }
+        )
+
+        Spacer(Modifier.height(24.dp))
+        errorMessage?.let {
+            KidError(it)
+            Spacer(Modifier.height(12.dp))
+        }
+
+        KidButton("Davom etish", busy = isLoading, enabled = !isLoading) {
+            isLoading = true
+            errorMessage = null
+            if (selectedPlan == "monthly") {
+                RevenueCatManager.purchaseMonthly(
+                    onSuccess = { onSuccess() },
+                    onError = { errorMessage = it; isLoading = false }
                 )
-                Spacer(Modifier.height(24.dp))
-
-                // Oylik Reja
-                PlanCard(
-                    title = "Oylik",
-                    price = "$4.99 / oy",
-                    isSelected = selectedPlan == "monthly",
-                    onClick = { selectedPlan = "monthly" }
+            } else {
+                RevenueCatManager.purchaseAnnual(
+                    onSuccess = { onSuccess() },
+                    onError = { errorMessage = it; isLoading = false }
                 )
-                Spacer(Modifier.height(12.dp))
-                // Yillik Reja
-                PlanCard(
-                    title = "Yillik (Tejamkor)",
-                    price = "$39.99 / yil",
-                    isSelected = selectedPlan == "annual",
-                    onClick = { selectedPlan = "annual" }
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                if (errorMessage != null) {
-                    Text(errorMessage!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                Button(
-                    onClick = {
-                        isLoading = true
-                        errorMessage = null
-                        if (selectedPlan == "monthly") {
-                            RevenueCatManager.purchaseMonthly(
-                                onSuccess = { onSuccess() },
-                                onError = { errorMessage = it; isLoading = false }
-                            )
-                        } else {
-                            RevenueCatManager.purchaseAnnual(
-                                onSuccess = { onSuccess() },
-                                onError = { errorMessage = it; isLoading = false }
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B35)),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                    } else {
-                        Text("Davom etish", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-                TextButton(onClick = onDismiss) {
-                    Text("Hozir emas", color = Color.Gray)
-                }
             }
         }
+        Spacer(Modifier.height(8.dp))
+        KidTextButton("Hozir emas", onClick = onDismiss)
     }
 }
 
@@ -117,30 +98,40 @@ private fun PlanCard(
     title: String,
     price: String,
     isSelected: Boolean,
+    badge: String? = null,
     onClick: () -> Unit
 ) {
-    val borderColor = if (isSelected) Color(0xFFFF6B35) else Color.LightGray
-    val bgColor = if (isSelected) Color(0xFFFFF0E5) else Color.White
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, borderColor, RoundedCornerShape(16.dp))
-            .background(bgColor)
-            .clickable { onClick() }
-            .padding(16.dp)
-    ) {
+    KidCard(Modifier.fillMaxWidth(), selected = isSelected, onClick = onClick) {
         Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text(price, color = Color.Gray, fontSize = 14.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(title, style = MaterialTheme.typography.titleLarge, color = Kid.Ink)
+                    if (badge != null) {
+                        Spacer(Modifier.size(8.dp))
+                        Text(
+                            badge,
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Kid.Mint)
+                                .padding(horizontal = 8.dp, vertical = 3.dp),
+                        )
+                    }
+                }
+                Text(price, style = MaterialTheme.typography.bodyLarge, color = Kid.InkSoft)
             }
-            if (isSelected) {
-                Text("✅", fontSize = 24.sp)
+            Box(
+                Modifier
+                    .size(30.dp)
+                    .clip(CircleShape)
+                    .background(if (isSelected) Kid.Orange else Kid.Line),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (isSelected) Text("✓", color = Color.White, fontSize = 16.sp, style = MaterialTheme.typography.titleMedium)
             }
         }
     }

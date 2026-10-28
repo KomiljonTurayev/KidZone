@@ -12,6 +12,8 @@ class AuthException(val reason: Reason, cause: Throwable? = null) : Exception(re
         EXPIRED,
         /** Deleting the account needs a fresh sign-in first. */
         REAUTH_REQUIRED,
+        /** The parent confirmed with a different account than the one signed in. */
+        WRONG_ACCOUNT,
         NO_SESSION,
         FAILED,
     }
@@ -24,6 +26,7 @@ fun AuthException.Reason.userMessage(): String? = when (this) {
     AuthException.Reason.NETWORK -> "Internet aloqasini tekshirib, qayta urinib ko'ring."
     AuthException.Reason.EXPIRED -> "Vaqt tugadi. Qaytadan urinib ko'ring."
     AuthException.Reason.REAUTH_REQUIRED -> "Xavfsizlik uchun avval qaytadan kiring, so'ng hisobni o'chiring."
+    AuthException.Reason.WRONG_ACCOUNT -> "Bu boshqa hisob. Ilovaga kirgan hisobingiz bilan tasdiqlang."
     AuthException.Reason.NO_SESSION -> "Ilova hali tayyor emas. Birozdan so'ng qayta urinib ko'ring."
     AuthException.Reason.FAILED -> "Kirib bo'lmadi. Qayta urinib ko'ring."
 }

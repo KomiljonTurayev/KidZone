@@ -89,6 +89,20 @@ class ProfileViewModelTest {
         assertEquals("Second", switched?.name)
     }
 
+    @Test
+    fun `setParentPin gives every profile the same PIN`() = runTest {
+        val a = makeProfile("a", "Aziz")
+        repo.insert(a)
+        repo.insert(makeProfile("b", "Malika").copy(pinHash = "old-hash"))
+        vm.setActiveProfile(a)
+
+        vm.setParentPin("new-hash")
+        advanceUntilIdle()
+
+        assertEquals(listOf("new-hash", "new-hash"), repo.profiles.first().map { it.pinHash })
+        assertEquals("new-hash", vm.activeProfile.value?.pinHash)
+    }
+
     private fun makeProfile(id: String, name: String) = ProfileEntity(
         id = id, name = name, avatarPath = null, language = "uz",
         timeLimitMinutes = 0, pinHash = null, isDefault = false,

@@ -1,65 +1,67 @@
 package uz.kidzone.app.ui.screens
 
-import android.content.SharedPreferences
-import uz.kidzone.app.arch.AppPreferences
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.PinUtil
+import uz.kidzone.app.arch.AppPreferences
 import uz.kidzone.app.auth.AccountFeature
 import uz.kidzone.app.auth.AccountState
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.auth.AuthProvider
-import uz.kidzone.app.ui.viewmodel.DashboardViewModel
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import uz.kidzone.app.data.AppClock
-import uz.kidzone.app.ui.viewmodel.ProfileViewModel
+import uz.kidzone.app.ui.components.Kid
+import uz.kidzone.app.ui.components.KidButton
+import uz.kidzone.app.ui.components.KidChip
+import uz.kidzone.app.ui.components.KidPage
+import uz.kidzone.app.ui.components.KidSection
+import uz.kidzone.app.ui.components.KidTextButton
+import uz.kidzone.app.ui.components.KidTopBar
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
+import uz.kidzone.app.ui.viewmodel.DashboardViewModel
+import uz.kidzone.app.ui.viewmodel.ProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParentDashboardScreen(
-    prefs: SharedPreferences,
     onBack: () -> Unit,
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
@@ -104,238 +106,249 @@ fun ParentDashboardScreen(
         return
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Ota-ona paneli") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) { Text("←") }
+    var showSetPin by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showSetPin) {
+        SetPinFlow(
+            account = account,
+            hasPin = !savedPinHash.isNullOrEmpty(),
+            onSave = { hash -> profileViewModel.setParentPin(hash); showSetPin = false },
+            onCancel = { showSetPin = false },
+        )
+        return
+    }
+
+    KidPage(top = { KidTopBar("Ota-ona paneli", onBack = onBack) }) {
+        // 1. Statistika
+        KidSection("📊", "Bugun") {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text("${state.todayMinutes}", style = MaterialTheme.typography.displaySmall, color = Kid.Orange)
+                Spacer(Modifier.width(6.dp))
+                Text("daqiqa", style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft,
+                    modifier = Modifier.padding(bottom = 6.dp))
+            }
+            Spacer(Modifier.height(12.dp))
+            WeeklyChart(state.weeklyMinutes)
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 2. Yosh guruhi
+        KidSection("🎂", "Yosh guruhi") {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("2-4", "5-7", "8+").forEach { age ->
+                    KidChip(age, selected = state.age == age, modifier = Modifier.weight(1f)) { vm.setAge(age) }
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 3. Vaqt limiti — activeProfile.timeLimitMinutes ustida ishlaydi, chunki
+        // aynan shu maydonni MainScreen kunlik limitni tekshirish uchun o'qiydi.
+        KidSection("⏰", "Vaqt limiti") {
+            val currentLimit = activeProfile?.timeLimitMinutes ?: 0
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                RoundButton("−") {
+                    activeProfile?.let { p ->
+                        profileViewModel.updateProfile(p.copy(timeLimitMinutes = (p.timeLimitMinutes - 15).coerceAtLeast(0)))
+                    }
+                }
+                Text(
+                    if (currentLimit == 0) "Limit yo'q" else "$currentLimit daqiqa",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Kid.Ink,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f),
+                )
+                RoundButton("+") {
+                    activeProfile?.let { p ->
+                        profileViewModel.updateProfile(p.copy(timeLimitMinutes = (p.timeLimitMinutes + 15).coerceAtMost(180)))
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 4. Xavfsizlik: PIN va push bildirishnomalar
+        KidSection("🔑", "Sozlamalar") {
+            SettingRow(if (savedPinHash.isNullOrEmpty()) "PIN o'rnatish" else "PIN o'zgartirish", onClick = { showSetPin = true }) {
+                Text("›", fontSize = 26.sp, color = Kid.Orange)
+            }
+            SettingRow("Bildirishnomalar") {
+                Switch(
+                    checked = state.pushEnabled,
+                    onCheckedChange = { vm.setPushEnabled(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Kid.Mint,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = Kid.Line,
+                        uncheckedBorderColor = Kid.Line,
+                    ),
+                )
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 5. Hisob va bulutli sinxronlash
+        KidSection("☁️", "Hisob") {
+            Text(
+                "${account.displayName ?: "Ota-ona"} · ${account.provider.label()}",
+                style = MaterialTheme.typography.titleMedium,
+                color = Kid.Ink,
+            )
+            if (!state.accountError.isNullOrEmpty()) {
+                Text(
+                    state.accountError.orEmpty(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+            if (!state.lastSyncTime.isNullOrEmpty()) {
+                Text(
+                    "Oxirgi sync: ${state.lastSyncTime}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Kid.InkSoft,
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                KidChip(
+                    if (state.isSyncing) "⏳ Sinxronlanmoqda" else "🔄 Sinxronlash",
+                    selected = false,
+                    modifier = Modifier.weight(1f),
+                ) { if (!state.isSyncing) vm.syncNow() }
+                KidChip("🚪 Chiqish", selected = false, modifier = Modifier.weight(1f)) { vm.logout() }
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+        KidButton("⭐ Premium obuna", brush = Kid.Royal, onClick = onOpenPremium)
+        Spacer(Modifier.height(8.dp))
+
+        // 6. Profillar bo'limi
+        Spacer(Modifier.height(20.dp))
+        Text(
+            "👧 Profillar",
+            style = MaterialTheme.typography.titleLarge,
+            color = Kid.Ink,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(10.dp))
+
+        profiles.forEach { profile ->
+            val streak = allStreaks.firstOrNull { it.profileId == profile.id }
+            val todayDate = AppClock.today()
+            val isActive = profile.id == activeProfile?.id
+            ProfileListItem(
+                profile = profile,
+                isActive = isActive,
+                streakCount = streak?.count ?: 0,
+                doneToday = streak?.lastCompletedDate == todayDate,
+                // celebrateMilestone tracks whichever profile last closed a game in
+                // MainScreen (challengeViewModel's active profile) — only ever the
+                // currently active profile, since only it can play games.
+                celebrateMilestone = if (isActive) challengeState.celebrateMilestone else null,
+                onCelebrationShown = challengeViewModel::onCelebrationShown,
+                onEdit = { onNavigateToAddEdit(profile.id) },
+                onDelete = {
+                    if (profiles.size > 1) {
+                        profileViewModel.deleteProfile(profile) {}
+                    }
                 },
+                onSwitch = { profileViewModel.setActiveProfile(profile) },
             )
         }
-    ) { padding ->
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.padding(padding),
-        ) {
 
-            // 1. Statistika
-            item {
-                Text(
-                    "Bugun: ${state.todayMinutes} daqiqa",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Spacer(Modifier.height(8.dp))
-                WeeklyChart(state.weeklyMinutes)
-                Spacer(Modifier.height(16.dp))
-            }
+        Spacer(Modifier.height(12.dp))
+        KidButton("➕ Yangi profil qo'shish", brush = Kid.Meadow, onClick = { onNavigateToAddEdit(null) })
 
-            // 2. Yosh guruhi
-            item {
-                Text("Yosh guruhi", style = MaterialTheme.typography.titleMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("2-4", "5-7", "8+").forEach { age ->
-                        FilterChip(
-                            selected = state.age == age,
-                            onClick = { vm.setAge(age) },
-                            label = { Text(age) },
-                        )
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-
-            // 3. Vaqt limiti — activeProfile.timeLimitMinutes ustida ishlaydi, chunki
-            // aynan shu maydonni MainScreen kunlik limitni tekshirish uchun o'qiydi.
-            item {
-                Text("Vaqt limiti", style = MaterialTheme.typography.titleMedium)
-                val currentLimit = activeProfile?.timeLimitMinutes ?: 0
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Button(onClick = {
-                        activeProfile?.let { p ->
-                            profileViewModel.updateProfile(p.copy(timeLimitMinutes = (p.timeLimitMinutes - 15).coerceAtLeast(0)))
-                        }
-                    }) { Text("-") }
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        if (currentLimit == 0) "Limit yo'q" else "$currentLimit daqiqa",
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Button(onClick = {
-                        activeProfile?.let { p ->
-                            profileViewModel.updateProfile(p.copy(timeLimitMinutes = (p.timeLimitMinutes + 15).coerceAtMost(180)))
-                        }
-                    }) { Text("+") }
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-
-            // 4. PIN o'zgartirish
-            item {
-                var showChangePinDialog by remember { mutableStateOf(false) }
-                Button(onClick = { showChangePinDialog = true }) {
-                    Text("PIN o'zgartirish")
-                }
-                if (showChangePinDialog) {
-                    ChangePinDialog(
-                        prefs = prefs,
-                        currentHash = savedPinHash,
-                        onDismiss = { showChangePinDialog = false },
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-
-            // 5. Push bildirishnomalar
-            item {
-                Text("Push bildirishnomalar", style = MaterialTheme.typography.titleMedium)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Bildirishnomalar", modifier = Modifier.weight(1f))
-                    Switch(
-                        checked = state.pushEnabled,
-                        onCheckedChange = { vm.setPushEnabled(it) },
-                    )
-                }
-            }
-
-            // 6. Hisob va bulutli sinxronlash
-            item {
-                    var showDeleteDialog by remember { mutableStateOf(false) }
-
-                    Spacer(Modifier.height(8.dp))
-                    Text("Hisob", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "☁️ ${account.displayName ?: "Ota-ona"} · ${account.provider.label()}",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    if (!state.accountError.isNullOrEmpty()) {
-                        Text(
-                            state.accountError.orEmpty(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                    if (!state.lastSyncTime.isNullOrEmpty()) {
-                        Text(
-                            "Oxirgi sync: ${state.lastSyncTime}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline,
-                        )
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(
-                            onClick = { vm.syncNow() },
-                            enabled = !state.isSyncing,
-                        ) {
-                            if (state.isSyncing) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                )
-                            } else {
-                                Text("Sinxronlash")
-                            }
-                        }
-                        OutlinedButton(onClick = { vm.logout() }) {
-                            Text("Chiqish")
-                        }
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Button(onClick = onOpenPremium, modifier = Modifier.fillMaxWidth()) {
-                        Text("⭐ Premium obuna")
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = { showDeleteDialog = true },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                        border = BorderStroke(1.dp, Color.Red),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Hisobni butunlay o'chirish")
-                    }
-                    Spacer(Modifier.height(16.dp))
-
-                    if (showDeleteDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showDeleteDialog = false },
-                            title = { Text("Diqqat!") },
-                            text = { Text("Barcha ma'lumotlaringiz, statistika va profillar serverdan butunlay o'chirib tashlanadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?") },
-                            confirmButton = {
-                                Button(
-                                    onClick = {
-                                        vm.deleteAccount { showDeleteDialog = false }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                                ) {
-                                    Text("O'chirish", color = Color.White)
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { showDeleteDialog = false }) {
-                                    Text("Bekor qilish")
-                                }
-                            }
-                        )
-                    }
-            }
-
-            // 7. Profillar bo'limi
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("Profillar", style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
-            }
-
-            items(profiles) { profile ->
-                val streak = allStreaks.firstOrNull { it.profileId == profile.id }
-                val todayDate = AppClock.today()
-                val isActive = profile.id == activeProfile?.id
-                ProfileListItem(
-                    profile = profile,
-                    isActive = isActive,
-                    streakCount = streak?.count ?: 0,
-                    doneToday = streak?.lastCompletedDate == todayDate,
-                    // celebrateMilestone tracks whichever profile last closed a game in
-                    // MainScreen (challengeViewModel's active profile) — only ever the
-                    // currently active profile, since only it can play games.
-                    celebrateMilestone = if (isActive) challengeState.celebrateMilestone else null,
-                    onCelebrationShown = challengeViewModel::onCelebrationShown,
-                    onEdit = { onNavigateToAddEdit(profile.id) },
-                    onDelete = {
-                        if (profiles.size > 1) {
-                            profileViewModel.deleteProfile(profile) {}
-                        }
-                    },
-                    onSwitch = { profileViewModel.setActiveProfile(profile) },
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(8.dp))
-                OutlinedButton(
-                    onClick = { onNavigateToAddEdit(null) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text("+ Yangi profil qo'shish") }
-            }
-        }
+        Spacer(Modifier.height(20.dp))
+        KidTextButton("Hisobni butunlay o'chirish", color = MaterialTheme.colorScheme.error) { showDeleteDialog = true }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(28.dp),
+            icon = { Text("⚠️", fontSize = 36.sp) },
+            title = { Text("Diqqat!", color = Kid.Ink) },
+            text = {
+                Text(
+                    "Barcha ma'lumotlaringiz, statistika va profillar serverdan butunlay o'chirib tashlanadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
+                    color = Kid.InkSoft,
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        vm.deleteAccount { showDeleteDialog = false }
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("O'chirish", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Bekor qilish", color = Kid.InkSoft)
+                }
+            }
+        )
+    }
+}
+
+/** One labelled row inside a [KidSection]; the whole row is tappable when [onClick] is set. */
+@Composable
+private fun SettingRow(label: String, onClick: (() -> Unit)? = null, trailing: @Composable () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(vertical = 6.dp),
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyLarge, color = Kid.Ink, modifier = Modifier.weight(1f))
+        trailing()
+    }
+}
+
+@Composable
+private fun RoundButton(label: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(52.dp)
+            .shadow(8.dp, CircleShape, ambientColor = Kid.Orange, spotColor = Kid.Orange)
+            .clip(CircleShape)
+            .background(Kid.Sunset)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { Text(label, color = Color.White, fontSize = 26.sp, style = MaterialTheme.typography.titleLarge) }
 }
 
 @Composable
 private fun WeeklyChart(weeklyMinutes: List<Int>) {
     val maxMin = (weeklyMinutes.maxOrNull() ?: 1).coerceAtLeast(1).toFloat()
-    val barColor = MaterialTheme.colorScheme.primary
-    Canvas(modifier = Modifier.fillMaxWidth().height(80.dp)) {
-        val barWidth = size.width / 7
+    val lastIndex = weeklyMinutes.lastIndex
+    Canvas(modifier = Modifier.fillMaxWidth().height(96.dp)) {
+        val slot = size.width / 7
+        val barWidth = slot * 0.62f
+        val radius = CornerRadius(barWidth / 2, barWidth / 2)
         weeklyMinutes.forEachIndexed { i, minutes ->
-            val barHeight = (minutes / maxMin) * size.height
-            drawRect(
-                color = barColor,
-                topLeft = Offset(i * barWidth + 4f, size.height - barHeight),
-                size = Size(barWidth - 8f, barHeight),
-            )
+            val left = i * slot + (slot - barWidth) / 2
+            // Empty track first, so days with no play still show a soft stub.
+            drawRoundRect(color = Kid.Peach, topLeft = Offset(left, 0f), size = Size(barWidth, size.height), cornerRadius = radius)
+            val barHeight = ((minutes / maxMin) * size.height).coerceAtLeast(if (minutes > 0) barWidth else 0f)
+            if (barHeight > 0f) {
+                drawRoundRect(
+                    brush = if (i == lastIndex) Kid.Sunset else Brush.verticalGradient(listOf(Color(0xFFFFC75F), Kid.Amber)),
+                    topLeft = Offset(left, size.height - barHeight),
+                    size = Size(barWidth, barHeight),
+                    cornerRadius = radius,
+                )
+            }
         }
     }
 }

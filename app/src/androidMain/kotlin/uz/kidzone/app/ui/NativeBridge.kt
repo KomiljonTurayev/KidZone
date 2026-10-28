@@ -21,6 +21,9 @@ internal class NativeBridge(
     private val onAskKidzo: (String) -> Unit,
     private val isAiAvailable: () -> Boolean,
     private val onAiLocked: () -> Unit,
+    /** Persists a language/age the child picked in the WebView header (already validated). */
+    private val onLanguageChanged: (String) -> Unit,
+    private val onAgeChanged: (String) -> Unit,
     private val evalJs: (String) -> Unit,
     activity: Activity,
 ) {
@@ -168,7 +171,20 @@ internal class NativeBridge(
 
     @android.webkit.JavascriptInterface
     fun updateLanguage(lang: String) {
-        onMain { viewModel.setLanguage(lang) }
+        if (lang !in SUPPORTED_LANGUAGES) return
+        onMain {
+            viewModel.setLanguage(lang)
+            onLanguageChanged(lang)
+        }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun updateAge(age: String) {
+        if (age !in AGE_GROUPS) return
+        onMain {
+            viewModel.setAge(age)
+            onAgeChanged(age)
+        }
     }
 
     @android.webkit.JavascriptInterface
@@ -222,3 +238,8 @@ internal class NativeBridge(
         }
     }
 }
+
+private val SUPPORTED_LANGUAGES = setOf("uz", "ru", "en")
+
+/** The age groups shared by onboarding, the parent dashboard and the WebView (kz_age). */
+private val AGE_GROUPS = setOf("2-4", "5-7", "8+")

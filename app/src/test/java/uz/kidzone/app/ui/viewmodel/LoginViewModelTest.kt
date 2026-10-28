@@ -17,7 +17,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import uz.kidzone.app.auth.AccountState
 import uz.kidzone.app.auth.AuthException
+import uz.kidzone.app.auth.AuthProvider
 import uz.kidzone.app.auth.FakeAuthRepository
 import uz.kidzone.app.auth.GoogleIdTokenSource
 import uz.kidzone.app.auth.TelegramAuthApi
@@ -131,6 +133,39 @@ class LoginViewModelTest {
         assertTrue(auth.googleTokensUsed.isEmpty())
         vm.cancel()
     }
+
+    @Test
+    fun `in confirm-only mode google re-checks the signed-in parent instead of signing in`() = runTest(dispatcher) {
+        auth.emit(AccountState.SignedIn("parent-uid", "Parent", AuthProvider.GOOGLE))
+        val confirm = confirmOnlyViewModel()
+
+        confirm.signInWithGoogle(activity)
+        advanceUntilIdle()
+
+        assertEquals(LoginUiState.SignedIn, confirm.state.value)
+        assertEquals(listOf("google-id-token"), auth.googleReauthTokens)
+        assertTrue(auth.googleTokensUsed.isEmpty())
+    }
+
+    @Test
+    fun `in confirm-only mode another google account is refused`() = runTest(dispatcher) {
+        auth.emit(AccountState.SignedIn("parent-uid", "Parent", AuthProvider.GOOGLE))
+        auth.reauthGoogleUid = "someone-else"
+        val confirm = confirmOnlyViewModel()
+
+        confirm.signInWithGoogle(activity)
+        advanceUntilIdle()
+
+        assertEquals(LoginUiState.Failed(AuthException.Reason.WRONG_ACCOUNT.userMessage()!!), confirm.state.value)
+        assertEquals("parent-uid", auth.state.value.uid)
+    }
+
+    private fun confirmOnlyViewModel() = LoginViewModel(
+        auth = auth,
+        telegramLogin = TelegramLoginFlow(telegramApi, auth),
+        googleSignIn = GoogleIdTokenSource { googleResult() },
+        confirmOnly = true,
+    )
 
     /** Stays PENDING until [confirm] is called. */
     private class GatedTelegramApi : TelegramAuthApi {

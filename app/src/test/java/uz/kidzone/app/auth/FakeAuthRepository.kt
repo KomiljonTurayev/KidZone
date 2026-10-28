@@ -15,6 +15,9 @@ class FakeAuthRepository(
     var failNextSignInWith: AuthException? = null
     val customTokensUsed = mutableListOf<String>()
     val googleTokensUsed = mutableListOf<String>()
+    val googleReauthTokens = mutableListOf<String>()
+    /** uid of the Google account the next re-authentication proves; null = the current one. */
+    var reauthGoogleUid: String? = null
     var signOutCount = 0
 
     override suspend fun idToken(): String? = idToken
@@ -27,6 +30,12 @@ class FakeAuthRepository(
         failNextSignInWith?.let { failNextSignInWith = null; throw it }
         googleTokensUsed += googleIdToken
         _state.value = AccountState.SignedIn(_state.value.uid ?: "google-uid", "Parent", AuthProvider.GOOGLE)
+    }
+
+    override suspend fun reauthenticateWithGoogle(googleIdToken: String) {
+        val current = _state.value as? AccountState.SignedIn ?: throw AuthException(AuthException.Reason.NO_SESSION)
+        if ((reauthGoogleUid ?: current.uid) != current.uid) throw AuthException(AuthException.Reason.WRONG_ACCOUNT)
+        googleReauthTokens += googleIdToken
     }
 
     override suspend fun signInWithCustomToken(customToken: String) {

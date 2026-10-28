@@ -423,7 +423,7 @@
     @keyframes shUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .modal-handle{width:34px;height:4px;border-radius:2px;background:#EEE;margin:0 auto 12px}
     .modal-title{font-family:'Fredoka One',cursive;font-size:19px;color:var(--text);margin-bottom:12px;text-align:center}
-    .age-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .age-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     .age-card{
       background:rgba(255,107,53,0.06);border:2px solid transparent;
       border-radius:14px;padding:11px;text-align:center;cursor:pointer;
@@ -886,23 +886,19 @@
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">🎂 Age Selection</div>
+    <!-- Same groups as the native onboarding and parent dashboard (kz_age). -->
     <div class="age-options">
-      <div class="age-card sel" onclick="setAge('2-4',this)">
+      <div class="age-card" data-age="2-4" onclick="setAge('2-4')">
         <div class="ac-em">👶</div>
         <div class="ac-range">2–4 years</div>
         <div class="ac-desc">Colors, shapes, animals</div>
       </div>
-      <div class="age-card" onclick="setAge('4-6',this)">
+      <div class="age-card" data-age="5-7" onclick="setAge('5-7')">
         <div class="ac-em">🧒</div>
-        <div class="ac-range">4–6 years</div>
-        <div class="ac-desc">Numbers, letters, music</div>
+        <div class="ac-range">5–7 years</div>
+        <div class="ac-desc">Numbers, letters, logic</div>
       </div>
-      <div class="age-card" onclick="setAge('6-8',this)">
-        <div class="ac-em">👦</div>
-        <div class="ac-range">6–8 years</div>
-        <div class="ac-desc">Math, logic, tests</div>
-      </div>
-      <div class="age-card" onclick="setAge('8+',this)">
+      <div class="age-card" data-age="8+" onclick="setAge('8+')">
         <div class="ac-em">🧑</div>
         <div class="ac-range">8+ years</div>
         <div class="ac-desc">All games unlocked</div>
@@ -1205,7 +1201,7 @@
     <!-- FEATURED -->
     <div class="sec-hdr">
       <span class="sec-icon">🔥</span>
-      <span class="sec-title">Most Popular</span>
+      <span class="sec-title" id="feat-title">Most Popular</span>
       <span class="sec-badge">Top 5</span>
     </div>
     <div id="featured-row"></div>
@@ -1394,7 +1390,7 @@
         chTitle:"Bugungi Vazifa!", chSub:"5 ta o'yin o'yna → 100 ⭐ yut!", chBtn:"Boshlash",
         lvBall:"BALL", lvNext:"ball yig'ing",
         pbTitle:"Ota-ona Boshqaruvi", pbSub:"O'yin vaqti · Statistika", pbBtn:"Kirish 🔐",
-        ageCards:["2–4 yosh", "Ranglar, shakllar", "4–6 yosh", "Raqamlar, harflar", "6–8 yosh", "Matematika, mantiq", "8+ yosh", "Hammasi ochiq"],
+        ageCards:["2–4 yosh", "Ranglar, shakllar", "5–7 yosh", "Raqamlar, harflar, mantiq", "8+ yosh", "Hammasi ochiq"], mascotMsg:"Keling, o'ynaymiz! 🎉",
         ageSave:"✅ Saqlash", langClose:"✅ Yopish",
         parentTitle:"Ota-ona rejimi", parentDesc:"Farzandingiz o'yin vaqtini boshqaring",
         rewardBtn:"🎮 Davom etish",
@@ -1458,7 +1454,7 @@
         chTitle:"Задача дня!", chSub:"Сыграй 5 игр → 100 ⭐!", chBtn:"Начать",
         lvBall:"БАЛЛ", lvNext:"соберите баллы",
         pbTitle:"Родительский контроль", pbSub:"Время игры · Статистика", pbBtn:"Войти 🔐",
-        ageCards:["2–4 года", "Цвета, формы", "4–6 лет", "Цифры, буквы", "6–8 лет", "Математика, логика", "8+ лет", "Все открыто"],
+        ageCards:["2–4 года", "Цвета, формы", "5–7 лет", "Цифры, буквы, логика", "8+ лет", "Все открыто"], mascotMsg:"Давай играть! 🎉",
         ageSave:"✅ Сохранить", langClose:"✅ Закрыть",
         parentTitle:"Родительский режим", parentDesc:"Управляйте временем игры",
         rewardBtn:"🎮 Продолжить",
@@ -1522,7 +1518,7 @@
         chTitle:"Today's Challenge!", chSub:"Play 5 games → 100 ⭐!", chBtn:"Start",
         lvBall:"POINTS", lvNext:"collect points",
         pbTitle:"Parental Control", pbSub:"Play time · Stats", pbBtn:"Enter 🔐",
-        ageCards:["2–4 years", "Colors, shapes", "4–6 years", "Numbers, letters", "6–8 years", "Math, logic", "8+ years", "All unlocked"],
+        ageCards:["2–4 years", "Colors, shapes", "5–7 years", "Numbers, letters, logic", "8+ years", "All unlocked"], mascotMsg:"Let's play! 🎉",
         ageSave:"✅ Save", langClose:"✅ Close",
         parentTitle:"Parent Mode", parentDesc:"Manage play time",
         rewardBtn:"🎮 Continue",
@@ -1576,7 +1572,7 @@
     function openModal(id) { app.ui.openModal(id); }
     function closeModal(id) { app.ui.closeModal(id); }
     function setLang(l) { app.setLang(l); }
-    function setAge(a, el) { app.setAge(a, el); }
+    function setAge(a) { app.setAge(a); }
     function openGame(g, locked) { app.openGame(g, locked); }
     function closeGame() { app.closeGame(); }
     function closeReward() { app.ui.closeModal('reward-screen'); }
@@ -1835,10 +1831,12 @@
         const t = T[app.translator.lang];
         document.getElementById("hero-h").innerHTML = t.heroH;
         document.getElementById("hero-p").innerHTML = t.heroP;
+        const mascotMsg = document.getElementById("kt-mascot-msg");
+        if (mascotMsg && t.mascotMsg) mascotMsg.textContent = t.mascotMsg;
         document.getElementById("cat-title").textContent = t.catTitle;
         document.getElementById("grid-title").textContent = t.gridTitle;
 
-        const featTitleEl = document.querySelector('.sec-hdr .sec-title');
+        const featTitleEl = document.getElementById('feat-title');
         if (featTitleEl) featTitleEl.textContent = t.featTitle;
 
         // Challenge Bar
@@ -1903,8 +1901,8 @@
         document.getElementById("ps-cancel-btn").textContent = t.psCancelBtn;
 
         // Age cards
-        const acRange = document.querySelectorAll('.age-card .ac-range');
-        const acDesc = document.querySelectorAll('.age-card .ac-desc');
+        const acRange = document.querySelectorAll('#age-modal .age-card .ac-range');
+        const acDesc = document.querySelectorAll('#age-modal .age-card .ac-desc');
         acRange.forEach((el, i) => { if(t.ageCards[i*2]) el.textContent = t.ageCards[i*2]; });
         acDesc.forEach((el, i) => { if(t.ageCards[i*2+1]) el.textContent = t.ageCards[i*2+1]; });
 

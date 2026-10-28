@@ -39,6 +39,7 @@ fun KidZoneApp(
     prefs: SharedPreferences,
     mainViewModel: MainViewModel,
     statsManager: ParentalStatsManager,
+    onOnboardingDone: () -> Unit = {},
 ) {
     val mainUiState by mainViewModel.state.collectAsState()
     if (mainUiState.isBanned) {
@@ -89,7 +90,18 @@ fun KidZoneApp(
             composable("onboarding") {
                 OnboardingScreen(
                     prefs = prefs,
+                    profiles = profiles,
+                    onSaveChild = { name, lang ->
+                        // Every install starts with one default profile; the parent names it here.
+                        val target = profiles.firstOrNull { it.isDefault } ?: profiles.firstOrNull()
+                        if (target != null) {
+                            val named = target.copy(name = name, language = lang)
+                            profileViewModel.updateProfile(named)
+                            profileViewModel.setActiveProfile(named)
+                        }
+                    },
                     onDone = {
+                        onOnboardingDone()
                         navController.navigate("main") {
                             popUpTo("onboarding") { inclusive = true }
                         }
@@ -135,6 +147,7 @@ fun KidZoneApp(
                 AccountGate(
                     feature = feature,
                     pinHash = activeProfile?.pinHash,
+                    lang = prefs.getString("kz_lang", "uz") ?: "uz",
                     onSignedIn = {
                         navController.previousBackStackEntry?.savedStateHandle?.set(UNLOCKED_FEATURE_KEY, feature.name)
                         navController.popBackStack()
@@ -157,7 +170,6 @@ fun KidZoneApp(
             }
             composable("dashboard") {
                 ParentDashboardScreen(
-                    prefs = prefs,
                     onBack = { navController.popBackStack() },
                     profileViewModel = profileViewModel,
                     challengeViewModel = challengeViewModel,
@@ -174,6 +186,8 @@ fun KidZoneApp(
                               else profiles.firstOrNull { it.id == profileId }
                 AddEditProfileScreen(
                     profile = profile,
+                    // New profiles share the parent PIN (see ProfileViewModel.setParentPin).
+                    parentPinHash = profiles.firstNotNullOfOrNull { it.pinHash },
                     onSave = { saved ->
                         if (profile == null) profileViewModel.insertProfile(saved)
                         else profileViewModel.updateProfile(saved)

@@ -1,6 +1,7 @@
 package uz.kidzone.app.auth
 
 import kotlinx.coroutines.delay
+import java.util.Base64
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -30,12 +31,27 @@ class TelegramLoginFlow(
 
     /** @return the Telegram display name of the account that signed in */
     suspend fun awaitConfirmation(loginId: String): String? {
-        // The guest's token is fetched once: it stays valid far longer than [timeout].
-        val idToken = requireIdToken()
-        val confirmed = withTimeoutOrNull(timeout) { pollUntilConfirmed(idToken, loginId) }
-            ?: throw AuthException(AuthException.Reason.EXPIRED)
+        val confirmed = awaitConfirmed(loginId)
         auth.signInWithCustomToken(confirmed.customToken)
         return confirmed.displayName
+    }
+
+    /**
+     * Like [awaitConfirmation], but only checks that the Telegram account that pressed Start is
+     * the one already signed in. It never signs in, so a different account can't take over.
+     */
+    suspend fun awaitReconfirmation(loginId: String) {
+        val confirmed = awaitConfirmed(loginId)
+        if (customTokenUid(confirmed.customToken) != auth.state.value.uid) {
+            throw AuthException(AuthException.Reason.WRONG_ACCOUNT)
+        }
+    }
+
+    private suspend fun awaitConfirmed(loginId: String): TelegramLoginStatus.Confirmed {
+        // The session's token is fetched once: it stays valid far longer than [timeout].
+        val idToken = requireIdToken()
+        return withTimeoutOrNull(timeout) { pollUntilConfirmed(idToken, loginId) }
+            ?: throw AuthException(AuthException.Reason.EXPIRED)
     }
 
     private suspend fun pollUntilConfirmed(idToken: String, loginId: String): TelegramLoginStatus.Confirmed {
@@ -62,3 +78,14 @@ class TelegramLoginFlow(
             if (auth.state.value.uid == null) AuthException.Reason.NO_SESSION else AuthException.Reason.NETWORK,
         )
 }
+
+private val UID_CLAIM = Regex("\"uid\"\\s*:\\s*\"([^\"]+)\"")
+
+/**
+ * The `uid` claim of a Firebase custom token (a JWT). Read without verifying the signature: the
+ * token came from our backend over TLS, and is only compared against the current session.
+ */
+internal fun customTokenUid(customToken: String): String? = runCatching {
+    val payload = String(Base64.getUrlDecoder().decode(customToken.split('.')[1]))
+    UID_CLAIM.find(payload)?.groupValues?.get(1)
+}.getOrNull()
