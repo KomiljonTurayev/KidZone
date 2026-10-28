@@ -218,7 +218,7 @@ fun ParentDashboardScreen(
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 KidChip(
-                    if (state.isSyncing) tr("⏳ Sinxronlanmoqda", "⏳ Синхронизация", "⏳ Syncing") else tr("🔄 Sinxronlash", "🔄 Синхронизировать", "🔄 Sync now"),
+                    if (state.isSyncing) tr("⏳ Sinxronlanmoqda", "⏳ Синхронизация", "⏳ Syncing") else tr("🔄 Sinxronlash", "🔄 Обновить", "🔄 Sync now"),
                     selected = false,
                     modifier = Modifier.weight(1f),
                 ) { if (!state.isSyncing) vm.syncNow() }
