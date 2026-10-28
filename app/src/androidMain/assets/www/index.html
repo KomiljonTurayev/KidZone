@@ -1302,6 +1302,42 @@
     // ════════════════════════════════════════════════════
     // 30 TA MINI-GAME MA'LUMOTLARI
     // ════════════════════════════════════════════════════
+    // Most game tags are written once in Uzbek; this gives them their ru/en names.
+    const TAG_I18N = {
+      "Allalar": {ru:"Колыбельные", en:"Lullabies"},
+      "Antistress": {ru:"Антистресс", en:"Anti-stress"},
+      "Boshqotirma": {ru:"Головоломка", en:"Puzzle"},
+      "Co-op": {ru:"Вместе", en:"Co-op"},
+      "Dinozavr": {ru:"Динозавры", en:"Dinosaurs"},
+      "Epchillik": {ru:"Ловкость", en:"Agility"},
+      "Ijodkorlik": {ru:"Творчество", en:"Creativity"},
+      "Klassik": {ru:"Классика", en:"Classic"},
+      "Mantiq": {ru:"Логика", en:"Logic"},
+      "Match-3": {ru:"Три в ряд", en:"Match-3"},
+      "Matematik": {ru:"Математика", en:"Math"},
+      "Matematika": {ru:"Математика", en:"Math"},
+      "Meva": {ru:"Фрукты", en:"Fruits"},
+      "Minora": {ru:"Башня", en:"Tower"},
+      "Musiqa": {ru:"Музыка", en:"Music"},
+      "Neon": {ru:"Неон", en:"Neon"},
+      "Nishon": {ru:"Меткость", en:"Aim"},
+      "Parvoz": {ru:"Полёт", en:"Flying"},
+      "Poyga": {ru:"Гонки", en:"Racing"},
+      "Qiziqarli": {ru:"Весёлое", en:"Fun"},
+      "Ranglar": {ru:"Цвета", en:"Colors"},
+      "Sport": {ru:"Спорт", en:"Sport"},
+      "Ta'lim": {ru:"Обучение", en:"Learn"},
+      "Tabiat": {ru:"Природа", en:"Nature"},
+      "Tezkorlik": {ru:"Скорость", en:"Speed"},
+      "Til": {ru:"Язык", en:"Language"},
+      "Yuguruvchi": {ru:"Бегалка", en:"Runner"},
+    };
+    function localizeTag(tag) {
+      const lang = app.translator.lang;
+      if (typeof tag === 'object') return tag[lang] || tag.en;
+      return (lang !== 'uz' && TAG_I18N[tag]?.[lang]) || tag;
+    }
+
     const GAMES = [
       // ── LEARN ───────────────────────────────────────
       {id:"animals",    em:"🐾", name:{uz:"Hayvonlar", ru:"Животные", en:"Animals"},      cat:"learn",  age:"2+", tag:{uz:"Ta'lim", ru:"Обучение", en:"Learn"},  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
@@ -1997,7 +2033,7 @@
             div.className = "feat-card";
             div.onclick = () => openGame(g);
             const localizedName = typeof g.name === 'object' ? (g.name[app.translator.lang] || g.name.en) : g.name;
-            const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
+            const localizedTag = localizeTag(g.tag);
             div.innerHTML = `
         ${g.badge==="hot"?'<div class="feat-badge-hot">🔥 TOP</div>':''}
         <div class="feat-art" style="background:${g.bg}">
