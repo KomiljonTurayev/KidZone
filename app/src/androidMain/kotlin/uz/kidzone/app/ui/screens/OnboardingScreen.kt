@@ -14,14 +14,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -29,23 +26,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,8 +47,12 @@ import uz.kidzone.app.auth.isSignedIn
 import uz.kidzone.app.data.ProfileEntity
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidButton
+import uz.kidzone.app.ui.components.DigitBoxes
 import uz.kidzone.app.ui.components.KidCard
+import uz.kidzone.app.ui.components.KidError
+import uz.kidzone.app.ui.components.KidNumberPad
 import uz.kidzone.app.ui.components.KidPage
+import uz.kidzone.app.ui.components.KidTextField
 import uz.kidzone.app.ui.components.KidSubtitle
 import uz.kidzone.app.ui.components.KidTitle
 import uz.kidzone.app.ui.components.MascotBubble
@@ -209,69 +204,19 @@ private fun ParentGateStep(t: OnboardingTexts, onVerified: () -> Unit, onBack: (
         Spacer(Modifier.height(24.dp))
         Text(t.birthYear, style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft)
         Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            repeat(4) { i ->
-                val ch = year.getOrNull(i)
-                val active = i == year.length
-                Box(
-                    modifier = Modifier
-                        .size(width = 58.dp, height = 68.dp)
-                        .shadow(6.dp, RoundedCornerShape(18.dp))
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color.White)
-                        .border(
-                            2.dp,
-                            when { failed -> MaterialTheme.colorScheme.error; active -> Kid.Orange; else -> Color.Transparent },
-                            RoundedCornerShape(18.dp),
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(ch?.toString() ?: "", style = MaterialTheme.typography.headlineMedium, color = Kid.Ink)
-                }
-            }
-        }
+        DigitBoxes(year, length = 4, error = failed)
         if (failed) {
             Spacer(Modifier.height(10.dp))
-            Text(t.askParent, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleSmall,
-                textAlign = TextAlign.Center)
+            KidError(t.askParent)
         }
         Spacer(Modifier.height(20.dp))
-        NumberPad(
+        KidNumberPad(
             onDigit = { d -> if (year.length < 4) { year += d; failed = false } },
             onDelete = { year = year.dropLast(1); failed = false },
         )
         Spacer(Modifier.height(20.dp))
         KidButton(t.next, enabled = year.length == 4) {
             if (isAdultBirthYear(year.toIntOrNull(), currentYear)) onVerified() else { failed = true; year = "" }
-        }
-    }
-}
-
-/** Big friendly keypad, so the year can be typed without the system keyboard covering the screen. */
-@Composable
-private fun NumberPad(onDigit: (Char) -> Unit, onDelete: () -> Unit) {
-    val rows = listOf("123", "456", "789", " 0<")
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.width(276.dp)) {
-        rows.forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                row.forEach { key ->
-                    Box(Modifier.weight(1f).aspectRatio(1.6f)) {
-                        if (key != ' ') {
-                            KidCard(
-                                modifier = Modifier.matchParentSize(),
-                                onClick = { if (key == '<') onDelete() else onDigit(key) },
-                            ) {
-                                Text(
-                                    if (key == '<') "⌫" else key.toString(),
-                                    modifier = Modifier.align(Alignment.Center),
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = if (key == '<') Kid.InkSoft else Kid.Ink,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -291,21 +236,10 @@ private fun ChildStep(t: OnboardingTexts, onSubmit: (name: String, age: String) 
         Spacer(Modifier.height(20.dp))
         KidTitle(t.childTitle)
         Spacer(Modifier.height(24.dp))
-        OutlinedTextField(
+        KidTextField(
             value = name,
             onValueChange = { if (it.length <= 24) name = it },
-            placeholder = { Text(t.childName, style = MaterialTheme.typography.titleMedium) },
-            textStyle = MaterialTheme.typography.titleLarge.copy(color = Kid.Ink),
-            singleLine = true,
-            shape = RoundedCornerShape(24.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedBorderColor = Kid.Orange,
-                unfocusedBorderColor = Kid.Line,
-                cursorColor = Kid.Orange,
-            ),
-            modifier = Modifier.fillMaxWidth().shadow(6.dp, RoundedCornerShape(24.dp)),
+            placeholder = t.childName,
         )
         Spacer(Modifier.height(24.dp))
         Text(t.childAge, style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft)

@@ -20,6 +20,12 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -70,6 +76,7 @@ object Kid {
     val Sunset = Brush.horizontalGradient(listOf(Color(0xFFFF8A3D), Color(0xFFFF5E62)))
     val Ocean = Brush.horizontalGradient(listOf(Sky, Blue))
     val Meadow = Brush.horizontalGradient(listOf(Color(0xFF43E97B), Color(0xFF20C38A)))
+    val Royal = Brush.horizontalGradient(listOf(Color(0xFFA18CFF), Grape))
 }
 
 /** Warm gradient page with a few slow-floating soft bubbles behind the content. */
@@ -244,22 +251,26 @@ fun KidTextButton(label: String, color: Color = Kid.InkSoft, onClick: () -> Unit
     )
 }
 
+/** White round "←" chip. */
+@Composable
+fun BackChip(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .shadow(6.dp, CircleShape)
+            .clip(CircleShape)
+            .background(Color.White)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { Text("←", fontSize = 22.sp, color = Kid.Ink) }
+}
+
 /** Round back chip + progress dots, used as the top bar of a multi-step flow. */
 @Composable
 fun StepHeader(current: Int, total: Int, onBack: (() -> Unit)?) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
-            if (onBack != null) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .shadow(6.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable(onClick = onBack),
-                    contentAlignment = Alignment.Center,
-                ) { Text("←", fontSize = 22.sp, color = Kid.Ink) }
-            }
+            if (onBack != null) BackChip(onBack)
         }
         Row(
             modifier = Modifier.weight(1f),
@@ -281,4 +292,164 @@ fun StepHeader(current: Int, total: Int, onBack: (() -> Unit)?) {
         }
         Box(Modifier.size(44.dp))
     }
+}
+
+/** Back chip + centred title, the top bar of a single native page. */
+@Composable
+fun KidTopBar(title: String, onBack: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        BackChip(onBack)
+        Text(
+            title,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.titleLarge,
+            color = Kid.Ink,
+            textAlign = TextAlign.Center,
+        )
+        Box(Modifier.size(44.dp))
+    }
+}
+
+/** Big friendly keypad, so digits can be typed without the system keyboard covering the screen. */
+@Composable
+fun KidNumberPad(onDigit: (Char) -> Unit, onDelete: () -> Unit, enabled: Boolean = true) {
+    val rows = listOf("123", "456", "789", " 0<")
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.width(276.dp).alpha(if (enabled) 1f else 0.45f),
+    ) {
+        rows.forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                row.forEach { key ->
+                    Box(Modifier.weight(1f).aspectRatio(1.6f)) {
+                        if (key != ' ') {
+                            KidCard(
+                                modifier = Modifier.matchParentSize(),
+                                onClick = if (enabled) ({ if (key == '<') onDelete() else onDigit(key) }) else null,
+                            ) {
+                                Text(
+                                    if (key == '<') "⌫" else key.toString(),
+                                    modifier = Modifier.align(Alignment.Center),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = if (key == '<') Kid.InkSoft else Kid.Ink,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Row of white boxes showing typed digits; [masked] shows them as dots (PINs). */
+@Composable
+fun DigitBoxes(value: String, length: Int, error: Boolean = false, masked: Boolean = false) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        repeat(length) { i ->
+            val ch = value.getOrNull(i)
+            val active = i == value.length
+            val shape = RoundedCornerShape(18.dp)
+            Box(
+                modifier = Modifier
+                    .size(width = 58.dp, height = 68.dp)
+                    .shadow(6.dp, shape)
+                    .clip(shape)
+                    .background(Color.White)
+                    .border(
+                        2.dp,
+                        when { error -> MaterialTheme.colorScheme.error; active -> Kid.Orange; else -> Color.Transparent },
+                        shape,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (ch != null && masked) {
+                    Box(Modifier.size(18.dp).clip(CircleShape).background(Kid.Ink))
+                } else {
+                    Text(ch?.toString() ?: "", style = MaterialTheme.typography.headlineMedium, color = Kid.Ink)
+                }
+            }
+        }
+    }
+}
+
+/** White rounded text field with an orange focus ring. */
+@Composable
+fun KidTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text(placeholder, style = MaterialTheme.typography.titleMedium) },
+        textStyle = MaterialTheme.typography.titleLarge.copy(color = Kid.Ink),
+        singleLine = true,
+        isError = isError,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        shape = RoundedCornerShape(24.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            errorContainerColor = Color.White,
+            focusedBorderColor = Kid.Orange,
+            unfocusedBorderColor = Kid.Line,
+            cursorColor = Kid.Orange,
+        ),
+        modifier = modifier.fillMaxWidth().shadow(6.dp, RoundedCornerShape(24.dp)),
+    )
+}
+
+/** Pill toggle; filled orange when [selected]. */
+@Composable
+fun KidChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val bg by animateColorAsState(if (selected) Kid.Orange else Color.White, label = "chip_bg")
+    val fg by animateColorAsState(if (selected) Color.White else Kid.Ink, label = "chip_fg")
+    val shape = RoundedCornerShape(22.dp)
+    Box(
+        modifier = modifier
+            .shadow(if (selected) 6.dp else 3.dp, shape, ambientColor = Kid.Orange, spotColor = Kid.Orange)
+            .clip(shape)
+            .background(bg)
+            .border(2.dp, if (selected) Kid.Orange else Kid.Line, shape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) { Text(label, color = fg, style = MaterialTheme.typography.titleSmall, maxLines = 1) }
+}
+
+/** Full-width card with an emoji + title header, grouping one settings section. */
+@Composable
+fun KidSection(emoji: String, title: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    KidCard(modifier.fillMaxWidth()) {
+        Column(Modifier.padding(18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier.size(36.dp).clip(CircleShape).background(Kid.Peach),
+                    contentAlignment = Alignment.Center,
+                ) { Text(emoji, fontSize = 18.sp) }
+                Spacer(Modifier.width(10.dp))
+                Text(title, style = MaterialTheme.typography.titleMedium, color = Kid.Ink)
+            }
+            Spacer(Modifier.height(12.dp))
+            content()
+        }
+    }
+}
+
+/** Centred error line. */
+@Composable
+fun KidError(text: String) {
+    Text(
+        text,
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.titleSmall,
+        textAlign = TextAlign.Center,
+    )
 }
