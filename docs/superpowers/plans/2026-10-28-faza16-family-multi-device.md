@@ -149,16 +149,16 @@
 ### Task B4: App — effective owner everywhere
 
 **Files:** `auth/AccountListeners.kt`, `data/ProfileSyncManager.kt`, `FirestoreSync.kt` (streak / challenge paths), `PlaytimeApiClient.kt` (no change if the backend resolves it)
-- [ ] Read `users/{uid}.familyOwner` after sign-in. Expose `effectiveOwnerUid` as state (unit-tested).
-- [ ] Every `users/{uid}/profiles` path uses `effectiveOwnerUid`.
+- [x] Read `users/{uid}.familyOwner` after sign-in. Expose `effectiveOwnerUid` as state (unit-tested).
+- [x] Every `users/{uid}/profiles` path uses `effectiveOwnerUid`.
 
 ### Task B5: App — Family section in the parent dashboard (uz/ru/en)
 
 **Files:** `ui/screens/ParentDashboardScreen.kt`, new `ui/screens/FamilyScreen.kt`, `ui/viewmodel/FamilyViewModel.kt`, `BackendClient.kt`
-- [ ] Owner sees: the members list, "Invite a family member" (big 6-digit code with expiry), and remove member.
-- [ ] Member sees the owner's name and a "Leave family" action.
-- [ ] Not in a family: "Join a family" with a code entry (`KidNumberPad`).
-- [ ] All texts go through `tr(uz, ru, en)`. Errors (wrong / expired code, too many attempts) are localized.
+- [x] Owner sees: the members list, "Invite a family member" (big 6-digit code with expiry), and remove member.
+- [x] Member sees the owner's name and a "Leave family" action.
+- [x] Not in a family: "Join a family" with a code entry (`KidNumberPad`).
+- [x] All texts go through `tr(uz, ru, en)`. Errors (wrong / expired code, too many attempts) are localized.
 
 ### Task B6: End-to-end check
 
