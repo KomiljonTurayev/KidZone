@@ -589,3 +589,60 @@ describe('telegram_logins/{nonce}', () => {
     }
   });
 });
+
+// ---- Faza 16: family members --------------------------------------------------
+
+describe('family members (second parent)', () => {
+  const profile = `users/${OWNER_UID}/profiles/p1`;
+  const joinFamily = () => seed((db) => db.doc(`families/${OWNER_UID}/members/${OTHER_UID}`).set({ joinedAt: 1 }));
+
+  test('a member can read and edit the owner\u2019s profiles', async () => {
+    await seed((db) => db.doc(profile).set({ name: 'Child' }));
+    await joinFamily();
+    await assertSucceeds(otherCtx().firestore().doc(profile).get());
+    await assertSucceeds(otherCtx().firestore().doc(profile).set({ timeLimitMinutes: 45, updatedAt: 5 }, { merge: true }));
+  });
+
+  test('a member\u2019s profile writes are still schema-checked', async () => {
+    await joinFamily();
+    await assertFails(otherCtx().firestore().doc(profile).set({ name: 'Child', role: 'admin' }));
+  });
+
+  test('a member can use the profile\u2019s stats and challenges, and read play time', async () => {
+    await joinFamily();
+    await assertSucceeds(otherCtx().firestore().doc(`${profile}/stats/2026-10-29`).set({ minutesPlayed: 10 }));
+    await assertSucceeds(otherCtx().firestore().doc(`${profile}/daily_challenges/2026-10-29`).set({ completed: true }));
+    await assertSucceeds(otherCtx().firestore().doc(`${profile}/playtime/2026-10-29`).get());
+    await assertFails(otherCtx().firestore().doc(`${profile}/playtime/2026-10-29`).set({ elapsedSeconds: 0 }));
+  });
+
+  test('a non-member cannot read the owner\u2019s profiles', async () => {
+    await seed((db) => db.doc(profile).set({ name: 'Child' }));
+    await assertFails(otherCtx().firestore().doc(profile).get());
+  });
+
+  test('a member cannot read or change the owner\u2019s user document', async () => {
+    await seed((db) => db.doc(`users/${OWNER_UID}`).set({ status: 'active' }));
+    await joinFamily();
+    await assertFails(otherCtx().firestore().doc(`users/${OWNER_UID}`).get());
+    await assertFails(otherCtx().firestore().doc(`users/${OWNER_UID}`).set({ status: 'active', note: 'x' }, { merge: true }));
+  });
+
+  test('nobody can forge a familyOwner link on their own user document', async () => {
+    await assertFails(otherCtx().firestore().doc(`users/${OTHER_UID}`).set({ familyOwner: OWNER_UID }));
+    await seed((db) => db.doc(`users/${OTHER_UID}`).set({ status: 'active' }));
+    await assertFails(otherCtx().firestore().doc(`users/${OTHER_UID}`).set({ familyOwner: OWNER_UID }, { merge: true }));
+  });
+
+  test('a member can still update their own user document once linked by the backend', async () => {
+    await seed((db) => db.doc(`users/${OTHER_UID}`).set({ status: 'active', familyOwner: OWNER_UID }));
+    await assertSucceeds(otherCtx().firestore().doc(`users/${OTHER_UID}`).set({ fcmToken: 't' }, { merge: true }));
+  });
+
+  test('clients cannot write membership or invites', async () => {
+    await assertFails(otherCtx().firestore().doc(`families/${OWNER_UID}/members/${OTHER_UID}`).set({ joinedAt: 1 }));
+    await assertFails(ownerCtx().firestore().doc(`families/${OWNER_UID}/members/${OTHER_UID}`).set({ joinedAt: 1 }));
+    await assertFails(ownerCtx().firestore().doc('family_invites/123456').set({ ownerUid: OWNER_UID }));
+    await assertFails(otherCtx().firestore().doc('family_invites/123456').get());
+  });
+});

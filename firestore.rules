@@ -10,6 +10,20 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
+    // Faza 16: a second parent who joined this owner's family. Membership docs are written
+    // only by the backend (see the families/ match below), so they can be trusted here.
+    function isFamilyMember(ownerUid) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/families/$(ownerUid)/members/$(request.auth.uid));
+    }
+
+    // familyOwner links a member to a family; only the backend may set or change it.
+    function keepsFamilyOwner() {
+      return !('familyOwner' in request.resource.data) ||
+        (resource != null && 'familyOwner' in resource.data &&
+         request.resource.data.familyOwner == resource.data.familyOwner);
+    }
+
     function isAdmin() {
       return isAuthenticated() && (
         request.auth.token.admin == true ||
@@ -65,21 +79,21 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
       // Owner can initialize their profile with status=active or no status; cannot forge other statuses
-      allow create: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == 'active')) || isAdmin();
+      allow create: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == 'active') && keepsFamilyOwner()) || isAdmin();
       // Owner cannot alter status field once set (cannot unban themselves); only admin can change status
-      allow update: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status)) || isAdmin();
+      allow update: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status) && keepsFamilyOwner()) || isAdmin();
       allow delete: if isAdmin();
 
       match /profiles/{profileId} {
-        allow read: if isOwner(uid) || isAdmin();
-        allow create, update: if (isOwner(uid) && isValidProfileWrite(request.resource.data)) || isAdmin();
+        allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
+        allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProfileWrite(request.resource.data)) || isAdmin();
         allow delete: if isOwner(uid) || isAdmin();
 
         // Server-authoritative daily play-time counters (written only by the backend via
         // the Firebase Admin SDK, which bypasses these rules). The client must never write
         // its own elapsedSeconds — that would defeat the point of moving the limit off-device.
         match /playtime/{date} {
-          allow read: if isOwner(uid) || isAdmin();
+          allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
           allow write: if isAdmin();
         }
 
@@ -91,17 +105,26 @@ service cloud.firestore {
         // owner access (this exact bug let an owner self-unban and forge their own playtime
         // counter; caught by firestore-tests/firestore.rules.test.js).
         match /daily_challenges/{date} {
-          allow read: if isOwner(uid) || isAdmin();
-          allow create, update: if (isOwner(uid) && isValidChallengeWrite(request.resource.data)) || isAdmin();
+          allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
+          allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidChallengeWrite(request.resource.data)) || isAdmin();
           allow delete: if isOwner(uid) || isAdmin();
         }
 
         match /stats/{date} {
-          allow read: if isOwner(uid) || isAdmin();
-          allow create, update: if (isOwner(uid) && isValidProfileStatsWrite(request.resource.data)) || isAdmin();
+          allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
+          allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProfileStatsWrite(request.resource.data)) || isAdmin();
           allow delete: if isOwner(uid) || isAdmin();
         }
       }
+    }
+
+    // Family membership and invite codes: backend only (Admin SDK bypasses these rules).
+    match /families/{ownerUid}/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /family_invites/{code} {
+      allow read, write: if isAdmin();
     }
 
     // Public / authenticated config like banners
