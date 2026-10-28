@@ -13,6 +13,11 @@
       "key": "token",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "",
+      "type": "secret"
     }
   ],
   "item": [
@@ -41,7 +46,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@kidzone.uz\",\n  \"password\": \"kidzone2026\"\n}"
+              "raw": "{\n  \"email\": \"admin@kidzone.uz\",\n  \"password\": \"{{adminPassword}}\"\n}"
             },
             "url": "{{baseUrl}}/auth/login"
           }
