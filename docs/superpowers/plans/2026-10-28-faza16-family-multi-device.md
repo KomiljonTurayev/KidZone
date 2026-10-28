@@ -35,10 +35,10 @@
 - Produces: `ProfileEntity(..., createdAt: Long, updatedAt: Long = createdAt, deleted: Boolean = false)`
 - Produces: `ProfileDao.getAll()`, `count()`, `getById()` ignore rows with `deleted = 1`; `getAllSync()` keeps returning everything (sync needs tombstones).
 
-- [ ] **Step 1:** Add the two fields with defaults so existing call sites compile unchanged.
-- [ ] **Step 2:** `MIGRATION_3_4`: `ALTER TABLE profiles ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0`, `ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0`, then `UPDATE profiles SET updatedAt = createdAt`. Bump `version = 4`, register the migration.
-- [ ] **Step 3:** Add `WHERE deleted = 0` to the UI-facing queries; update `FakeProfileDao` the same way.
-- [ ] **Step 4:** Run `./gradlew :app:testDebugUnitTest` — existing profile tests still pass.
+- [x] **Step 1:** Add the two fields with defaults so existing call sites compile unchanged.
+- [x] **Step 2:** `MIGRATION_3_4`: `ALTER TABLE profiles ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0`, `ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0`, then `UPDATE profiles SET updatedAt = createdAt`. Bump `version = 4`, register the migration.
+- [x] **Step 3:** Add `WHERE deleted = 0` to the UI-facing queries; update `FakeProfileDao` the same way.
+- [x] **Step 4:** Run `./gradlew :app:testDebugUnitTest` — existing profile tests still pass.
 
 ### Task A2: Last-write-wins merge
 
@@ -46,13 +46,13 @@
 - Modify: `app/src/androidMain/kotlin/uz/kidzone/app/data/ProfileDao.kt` (`mergeProfiles`)
 - Test: `ProfileRepositoryTest`
 
-- [ ] **Step 1 (test first):**
+- [x] **Step 1 (test first):**
   - remote with a newer `updatedAt` replaces the local name/limit/PIN;
   - remote with an older `updatedAt` is ignored;
   - the local `avatarPath` survives a remote replace;
   - an unknown remote tombstone is stored.
-- [ ] **Step 2:** Change the condition from `remote.createdAt > local.createdAt` to `remote.updatedAt > local.updatedAt`.
-- [ ] **Step 3:** Tests pass.
+- [x] **Step 2:** Change the condition from `remote.createdAt > local.createdAt` to `remote.updatedAt > local.updatedAt`.
+- [x] **Step 3:** Tests pass.
 
 ### Task A3: Stamp every local change; deletes become tombstones
 
@@ -66,13 +66,13 @@
 - Produces: `ProfileRepository(..., nowMs: () -> Long = System::currentTimeMillis)`
 - Produces: `pushProfile` also writes `updatedAt`, `deleted` and `serverUpdatedAt = FieldValue.serverTimestamp()`; `pullProfiles` reads `updatedAt` (fallback `createdAt`) and `deleted` (fallback `false`).
 
-- [ ] **Step 1 (test first):**
+- [x] **Step 1 (test first):**
   - `insert`/`update` set `updatedAt = nowMs()` and push;
   - `delete` stores `deleted = true` with a fresh `updatedAt`, pushes it, and the profile disappears from `profiles`;
   - `setParentPin` stamps every profile it changes.
-- [ ] **Step 2:** Implement. `delete` = `update(profile.copy(deleted = true))`.
-- [ ] **Step 3:** Keep the "last live profile can't be deleted" rule (`ProfileViewModel` / dashboard).
-- [ ] **Step 4:** Tests pass.
+- [x] **Step 2:** Implement. `delete` = `update(profile.copy(deleted = true))`.
+- [x] **Step 3:** Keep the "last live profile can't be deleted" rule (`ProfileViewModel` / dashboard).
+- [x] **Step 4:** Tests pass.
 
 ### Task A4: Firestore rules for the new fields
 
@@ -80,9 +80,9 @@
 - Modify: `firestore.rules` (`isValidProfileWrite`)
 - Test: `firestore-tests/firestore.rules.test.js`
 
-- [ ] **Step 1 (test first):** owner may write `updatedAt` (int), `deleted` (bool), `serverUpdatedAt` (timestamp); wrong types are rejected; another user still can't write.
-- [ ] **Step 2:** Extend `hasOnly([...])` and add the type checks.
-- [ ] **Step 3:** Run `npm test` in `firestore-tests/` against the emulator — all tests pass (63 existing + new).
+- [x] **Step 1 (test first):** owner may write `updatedAt` (int), `deleted` (bool), `serverUpdatedAt` (timestamp); wrong types are rejected; another user still can't write.
+- [x] **Step 2:** Extend `hasOnly([...])` and add the type checks.
+- [x] **Step 3:** Run `npm test` in `firestore-tests/` against the emulator — all tests pass (63 existing + new).
 
 ### Task A5: Live updates while the app is open
 
@@ -91,9 +91,9 @@
 - Modify: `app/src/androidMain/kotlin/uz/kidzone/app/data/ProfileSyncManager.kt` (`listenProfiles(uid, onChange): ListenerRegistration?`)
 - Test: unit test for the listener's attach/detach on account changes (fake sync manager)
 
-- [ ] **Step 1 (test first):** signing in attaches exactly one listener; switching account detaches the old one first; signing out / guest detaches it; snapshots with `hasPendingWrites` are skipped.
-- [ ] **Step 2:** Implement with `addSnapshotListener`; each snapshot → `profileDao.mergeProfiles(...)`.
-- [ ] **Step 3:** Keep the existing one-off pull + push on sign-in (covers the first sync before the listener fires).
+- [x] **Step 1 (test first):** signing in attaches exactly one listener; switching account detaches the old one first; signing out / guest detaches it; snapshots with `hasPendingWrites` are skipped.
+- [x] **Step 2:** Implement with `addSnapshotListener`; each snapshot → `profileDao.mergeProfiles(...)`.
+- [x] **Step 3:** Keep the existing one-off pull + push on sign-in (covers the first sync before the listener fires).
 
 ### Task A6: Manual verification and release notes
 
