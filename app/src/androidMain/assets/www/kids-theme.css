@@ -1,5 +1,6 @@
 /* KidZone — Toca Boca Design System */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap');
+@import url('kz-fonts.css');
 
 /* ── TOKENS ──────────────────────────────────────── */
 :root {
@@ -11,7 +12,7 @@
   --kt-accent-dark:  #C94F20;
   --kt-radius-card:  24px;
   --kt-radius-btn:   20px;
-  --kt-font-h:       'Fredoka One', cursive;
+  --kt-font-h:       'Fredoka One','KZ Cyrillic', cursive;
   --kt-font-b:       'Nunito', sans-serif;
   --kt-spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
   --kt-hdr-h:        52px;

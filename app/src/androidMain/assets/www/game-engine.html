@@ -17,13 +17,14 @@
   .card.matched { background: #55EFC4; border-color: #00B894; opacity: 0.5; pointer-events: none; }
 
   /* Template: Count & Math */
-  #task { font-size: 40px; margin-bottom: 30px; text-align: center; width: 100%; font-family: 'Fredoka One'; }
+  #task { font-size: 40px; margin-bottom: 30px; text-align: center; width: 100%; font-family: 'Fredoka One','KZ Cyrillic'; }
   .choice { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; box-shadow: 0 8px 20px rgba(0,0,0,0.1); cursor: pointer; }
 
   #feedback { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; font-size: 100px; z-index: 100; pointer-events: none; }
   #feedback.show { display: flex; animation: zoomOut 0.8s forwards; }
   @keyframes zoomOut { from { transform: scale(0.5); opacity: 1; } to { transform: scale(2); opacity: 0; } }
 </style>
+  <link rel="stylesheet" href="kz-fonts.css">
 </head>
 <body>
 <div id="header">

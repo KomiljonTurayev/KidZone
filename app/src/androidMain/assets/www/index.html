@@ -37,7 +37,7 @@
     #loader.h{display:none}
     .ld-logo{font-size:80px;animation:ldB 1s ease-in-out infinite;will-change:transform}
     @keyframes ldB{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-15px) scale(1.08)}}
-    .ld-name{font-family:'Fredoka One',cursive;font-size:32px;color:white}
+    .ld-name{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:32px;color:white}
     .ld-dots{display:flex;gap:8px}
     .ld-dot{width:12px;height:12px;background:rgba(255,255,255,.5);border-radius:50%;animation:ldD 1.2s ease-in-out infinite}
     .ld-dot:nth-child(2){animation-delay:.2s}
@@ -68,7 +68,7 @@
       flex-shrink:0;
     }
     #logo-text{display:flex;flex-direction:column;line-height:1}
-    #logo-name{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text)}
+    #logo-name{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:20px;color:var(--text)}
     #hdr-spacer{flex:1}
     #music-pill{
       background:#FFFFFF;border:1.5px solid #F1F5F9;border-radius:50%;
@@ -103,7 +103,7 @@
       display:flex;align-items:center;gap:5px;
       box-shadow:0 2px 8px rgba(0,0,0,0.05);
     }
-    #stars-val{font-size:14px;font-weight:900;color:var(--accent);font-family:'Fredoka One',cursive}
+    #stars-val{font-size:14px;font-weight:900;color:var(--accent);font-family:'Fredoka One','KZ Cyrillic',cursive}
     @media(max-width:400px){#age-btn{display:none}}
 
     /* ── MASCOT ── */
@@ -113,7 +113,7 @@
     }
     #kt-owl{animation:owlBob 2s ease-in-out infinite;will-change:transform}
     @keyframes owlBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-    #kt-mascot-msg{font-family:'Fredoka One',cursive;font-size:15px;color:var(--text)}
+    #kt-mascot-msg{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:15px;color:var(--text)}
 
     /* ── HERO ── */
     #hero{
@@ -124,7 +124,7 @@
       box-shadow:0 4px 0 rgba(0,0,0,0.08);
     }
     #hero-text{flex:1}
-    #hero-h{font-family:'Fredoka One',cursive;font-size:clamp(15px,4vw,20px);color:var(--text);line-height:1.2}
+    #hero-h{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:clamp(15px,4vw,20px);color:var(--text);line-height:1.2}
     #hero-p{color:var(--dim);font-size:11px;font-weight:700;margin-top:3px}
     #hero-em{font-size:clamp(36px,9vw,56px);flex-shrink:0}
 
@@ -142,18 +142,18 @@
     .lv-icon{font-size:34px;flex-shrink:0;animation:lvRock 3s ease-in-out infinite;will-change:transform}
     @keyframes lvRock{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
     .lv-text{flex:1}
-    .lv-name{font-family:'Fredoka One',cursive;font-size:14px;color:var(--text)}
+    .lv-name{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:14px;color:var(--text)}
     .lv-sub{color:var(--dim);font-size:10px;font-weight:700;margin-top:2px}
     .lv-bar-wrap{background:rgba(0,0,0,0.07);border-radius:8px;height:7px;margin-top:6px;overflow:hidden}
     .lv-bar{height:100%;border-radius:8px;background:var(--accent);transition:width 1s var(--smooth)}
     .lv-pts{background:var(--accent);border-radius:14px;padding:7px 12px;text-align:center;flex-shrink:0;box-shadow:0 3px 0 var(--accent-dark)}
-    .lv-pts .pts-v{font-family:'Fredoka One',cursive;font-size:18px;color:white}
+    .lv-pts .pts-v{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:18px;color:white}
     .lv-pts .pts-l{font-size:8px;color:rgba(255,255,255,.8);font-weight:700}
 
     /* ── SECTION HEADERS ── */
     .sec-hdr{display:flex;align-items:center;gap:8px;margin:0 var(--pad) 8px}
     .sec-icon{font-size:18px}
-    .sec-title{font-family:'Fredoka One',cursive;font-size:16px;color:var(--text);flex:1}
+    .sec-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:16px;color:var(--text);flex:1}
     .sec-badge{background:rgba(255,107,53,.12);color:var(--accent);font-size:10px;font-weight:900;border-radius:20px;padding:3px 10px}
     .sec-more{background:none;border:none;color:var(--accent);font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
 
@@ -170,6 +170,7 @@
       font-size:100px; opacity:0.1; pointer-events:none;
     }
     .ai-hdr{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+    .ai-title{font-family:'Fredoka One','KZ Cyrillic',cursive; font-size:18px; line-height:1.2; color:white}
     .ai-badge{
       background:rgba(255,255,255,0.2); padding:4px 10px;
       border-radius:10px; font-size:10px; font-weight:900; text-transform:uppercase;
@@ -208,7 +209,7 @@
     }
     .aiv-body{flex:1; overflow-y:auto; padding:20px var(--pad) 24px; line-height:1.8; -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
     #aiv-loading.h, #aiv-content-wrap.h{display:none}
-    .aiv-story-title{font-family:'Fredoka One',cursive; font-size:22px; color:var(--accent); margin-bottom:20px; text-align:center; padding:0 4px}
+    .aiv-story-title{font-family:'Fredoka One','KZ Cyrillic',cursive; font-size:22px; color:var(--accent); margin-bottom:20px; text-align:center; padding:0 4px}
     .aiv-content{font-size:16px; color:var(--text); white-space:pre-wrap; letter-spacing:0.01em}
     .aiv-actions{padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px)); background:white; display:flex; gap:10px; flex-shrink:0}
     .aiv-play-btn{
@@ -278,7 +279,7 @@
       font-size:9px;font-weight:900;border-radius:10px;padding:2px 7px;
     }
     .feat-info{padding:8px 10px 10px;background:var(--surface)}
-    .feat-name{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text)}
+    .feat-name{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:13px;color:var(--text)}
     .feat-meta{display:flex;align-items:center;gap:5px;margin-top:3px}
     .feat-tag{font-size:9px;font-weight:900;border-radius:10px;padding:2px 7px}
     .feat-age{font-size:9px;color:var(--dim);font-weight:700}
@@ -323,7 +324,7 @@
       font-size:20px;z-index:5;border-radius:18px;
     }
     .gc-info{padding:4px 7px 7px;text-align:center}
-    .gc-nm{font-family:'Fredoka One',cursive;font-size:11px;line-height:1.2;color:var(--text)}
+    .gc-nm{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:11px;line-height:1.2;color:var(--text)}
     @media(min-width:600px){.gc-nm{font-size:13px}}
     .gc-stars{display:flex;justify-content:center;gap:1px;margin-top:2px}
     .gs-f{color:#FFB300;font-size:8px}
@@ -422,7 +423,7 @@
     }
     @keyframes shUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .modal-handle{width:34px;height:4px;border-radius:2px;background:#EEE;margin:0 auto 12px}
-    .modal-title{font-family:'Fredoka One',cursive;font-size:19px;color:var(--text);margin-bottom:12px;text-align:center}
+    .modal-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:19px;color:var(--text);margin-bottom:12px;text-align:center}
     .age-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     .age-card{
       background:rgba(255,107,53,0.06);border:2px solid transparent;
@@ -432,7 +433,7 @@
     .age-card:active{transform:scale(.94)}
     .age-card.sel{background:#FFF7ED;border-color:#FF6B35;box-shadow:0 4px 14px rgba(255,107,53,0.18)}
     .age-card .ac-em{font-size:28px;margin-bottom:4px}
-    .age-card .ac-range{font-family:'Fredoka One',cursive;font-size:14px;color:var(--accent)}
+    .age-card .ac-range{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:14px;color:var(--accent)}
     .age-card .ac-desc{font-size:9px;color:var(--dim);font-weight:700;margin-top:2px}
     .btn-primary{
       background:var(--accent);color:white;border:none;border-radius:20px;
@@ -449,7 +450,7 @@
     /* ── PARENT MODAL ── */
     .parent-lock{display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0}
     .lock-icon{font-size:44px}
-    .lock-title{font-family:'Fredoka One',cursive;font-size:19px;text-align:center}
+    .lock-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:19px;text-align:center}
     .lock-desc{font-size:12px;color:var(--dim);font-weight:700;text-align:center;line-height:1.5}
     .pin-row{display:flex;gap:10px;justify-content:center;margin:6px 0}
     .pin-dot{
@@ -484,12 +485,12 @@
     }
     @keyframes rwPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
     .rw-stars{font-size:42px;margin-bottom:6px}
-    .rw-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--accent);margin-bottom:4px}
+    .rw-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:22px;color:var(--accent);margin-bottom:4px}
     .rw-sub{font-size:12px;color:var(--dim);font-weight:700;margin-bottom:12px}
     .rw-pts{
       background:rgba(255,107,53,0.10);border-radius:14px;
       padding:9px 18px;display:inline-block;
-      font-family:'Fredoka One',cursive;font-size:24px;color:var(--accent);margin-bottom:12px;
+      font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:24px;color:var(--accent);margin-bottom:12px;
     }
 
     /* ── GAME VIEWER ── */
@@ -515,7 +516,7 @@
       cursor:pointer;font-family:'Nunito',sans-serif;
       display:flex;align-items:center;gap:4px;
     }
-    #gv-title{font-family:'Fredoka One',cursive;font-size:16px;color:white;flex:1;text-align:center}
+    #gv-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:16px;color:white;flex:1;text-align:center}
     #gv-fs{
       background:rgba(255,255,255,0.25);border:none;border-radius:12px;
       padding:7px;color:white;font-size:14px;cursor:pointer;
@@ -541,7 +542,7 @@
 
     /* ── TAB BAR ── */
     #tab-bar{display:flex;background:var(--surface);border-bottom:2px solid rgba(0,0,0,0.06);flex-shrink:0}
-    .kz-tab{flex:1;padding:11px 4px 9px;border:none;background:transparent;font-family:'Fredoka One',cursive;font-size:14px;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-bottom-color .2s;touch-action:manipulation;min-height:48px}
+    .kz-tab{flex:1;padding:11px 4px 9px;border:none;background:transparent;font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:14px;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;transition:color .2s,border-bottom-color .2s;touch-action:manipulation;min-height:48px}
     .kz-tab.active{color:var(--accent);border-bottom-color:var(--accent);border-bottom-width:3px}
 
     /* ── MAIN WITH PLAYER ── */
@@ -578,14 +579,14 @@
     .content-card:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,0.08)}
     .content-card.playing{background:rgba(255,107,53,0.08);outline:2px solid var(--accent)}
     .cc-art{font-size:52px;line-height:1}
-    .cc-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%}
+    .cc-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:13px;color:var(--text);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%}
     .cc-cat{font-size:10px;font-weight:800;color:var(--dim);background:rgba(0,0,0,0.05);border-radius:8px;padding:2px 8px}
     .cc-ic{font-size:16px;color:var(--accent);font-weight:900}
 
     /* ── EMPTY STATE ── */
     .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px var(--pad);gap:12px;text-align:center}
     .empty-state-icon{font-size:56px;opacity:.6}
-    .empty-state-title{font-family:'Fredoka One',cursive;font-size:17px;color:var(--dim)}
+    .empty-state-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:17px;color:var(--dim)}
     .empty-state-sub{font-size:13px;color:var(--dim);font-weight:700;line-height:1.5}
 
     /* ── CC-CATS SCROLL FADE ── */
@@ -595,7 +596,7 @@
     #kz-player.h{display:none}
     #kz-player{position:fixed;bottom:calc(var(--bh)+64px);left:0;right:0;z-index:19;background:var(--surface);padding:10px var(--pad) 8px;box-shadow:0 -3px 8px rgba(0,0,0,0.10)}
     .kzp-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-    #kzp-title{font-family:'Fredoka One',cursive;font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #kzp-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .kzp-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:0;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;flex-shrink:0}
     #kzp-progress{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,0.10);border-radius:2px;outline:none;cursor:pointer;padding:10px 0;box-sizing:content-box}
     #kzp-progress::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 2px 4px rgba(0,0,0,0.2)}
@@ -641,7 +642,7 @@
     }
     #badges-hdr-title{
       flex:1;font-size:18px;font-weight:700;
-      color:#222;font-family:'Fredoka One',cursive;
+      color:#222;font-family:'Fredoka One','KZ Cyrillic',cursive;
     }
     #badges-close{
       background:none;border:none;font-size:22px;
@@ -682,7 +683,7 @@
     #profile-picker.h{display:none}
     #prof-title{
       font-size:22px;font-weight:700;color:#222;
-      font-family:'Fredoka One',cursive;margin-bottom:24px;text-align:center;
+      font-family:'Fredoka One','KZ Cyrillic',cursive;margin-bottom:24px;text-align:center;
     }
     #prof-grid{
       display:grid;grid-template-columns:repeat(3,1fr);
@@ -710,7 +711,7 @@
     #prof-name-input{
       width:100%;padding:12px;border:2px solid #EEE;border-radius:12px;
       font-size:16px;margin-bottom:14px;box-sizing:border-box;
-      font-family:'Fredoka One',cursive;
+      font-family:'Fredoka One','KZ Cyrillic',cursive;
     }
     #av-picker{
       display:grid;grid-template-columns:repeat(4,1fr);
@@ -731,6 +732,7 @@
     .prof-btn-secondary{background:#EEE;color:#555}
     #prof-grid-wrap.h{display:none}
   </style>
+  <link rel="stylesheet" href="kz-fonts.css">
 </head>
 <body>
 
@@ -997,7 +999,7 @@
     <button id="sv-back" onclick="closeSleep()" style="background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.08);border-radius:14px;padding:7px 14px;color:var(--text);font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;touch-action:manipulation;">
       <span>←</span> <span id="sv-back-txt">Orqaga</span>
     </button>
-    <div style="font-family:'Fredoka One',cursive,'Nunito',sans-serif;font-size:16px;font-weight:900;color:var(--accent);flex:1;text-align:center;">
+    <div style="font-family:'Fredoka One','KZ Cyrillic',cursive,'Nunito',sans-serif;font-size:16px;font-weight:900;color:var(--accent);flex:1;text-align:center;">
       🌙 <span id="sv-title-txt">Sehrli Uyqu</span>
     </div>
     <div style="width:70px;"></div>
@@ -1302,6 +1304,42 @@
     // ════════════════════════════════════════════════════
     // 30 TA MINI-GAME MA'LUMOTLARI
     // ════════════════════════════════════════════════════
+    // Most game tags are written once in Uzbek; this gives them their ru/en names.
+    const TAG_I18N = {
+      "Allalar": {ru:"Колыбельные", en:"Lullabies"},
+      "Antistress": {ru:"Антистресс", en:"Anti-stress"},
+      "Boshqotirma": {ru:"Головоломка", en:"Puzzle"},
+      "Co-op": {ru:"Вместе", en:"Co-op"},
+      "Dinozavr": {ru:"Динозавры", en:"Dinosaurs"},
+      "Epchillik": {ru:"Ловкость", en:"Agility"},
+      "Ijodkorlik": {ru:"Творчество", en:"Creativity"},
+      "Klassik": {ru:"Классика", en:"Classic"},
+      "Mantiq": {ru:"Логика", en:"Logic"},
+      "Match-3": {ru:"Три в ряд", en:"Match-3"},
+      "Matematik": {ru:"Математика", en:"Math"},
+      "Matematika": {ru:"Математика", en:"Math"},
+      "Meva": {ru:"Фрукты", en:"Fruits"},
+      "Minora": {ru:"Башня", en:"Tower"},
+      "Musiqa": {ru:"Музыка", en:"Music"},
+      "Neon": {ru:"Неон", en:"Neon"},
+      "Nishon": {ru:"Меткость", en:"Aim"},
+      "Parvoz": {ru:"Полёт", en:"Flying"},
+      "Poyga": {ru:"Гонки", en:"Racing"},
+      "Qiziqarli": {ru:"Весёлое", en:"Fun"},
+      "Ranglar": {ru:"Цвета", en:"Colors"},
+      "Sport": {ru:"Спорт", en:"Sport"},
+      "Ta'lim": {ru:"Обучение", en:"Learn"},
+      "Tabiat": {ru:"Природа", en:"Nature"},
+      "Tezkorlik": {ru:"Скорость", en:"Speed"},
+      "Til": {ru:"Язык", en:"Language"},
+      "Yuguruvchi": {ru:"Бегалка", en:"Runner"},
+    };
+    function localizeTag(tag) {
+      const lang = app.translator.lang;
+      if (typeof tag === 'object') return tag[lang] || tag.en;
+      return (lang !== 'uz' && TAG_I18N[tag]?.[lang]) || tag;
+    }
+
     const GAMES = [
       // ── LEARN ───────────────────────────────────────
       {id:"animals",    em:"🐾", name:{uz:"Hayvonlar", ru:"Животные", en:"Animals"},      cat:"learn",  age:"2+", tag:{uz:"Ta'lim", ru:"Обучение", en:"Learn"},  tc:"#4CAF50", bg:"linear-gradient(135deg,#E8F5E9,#C8E6C9)", stars:5, plays:"12K", badge:"hot", file:"animals.html", pts:20},
@@ -1997,7 +2035,7 @@
             div.className = "feat-card";
             div.onclick = () => openGame(g);
             const localizedName = typeof g.name === 'object' ? (g.name[app.translator.lang] || g.name.en) : g.name;
-            const localizedTag = typeof g.tag === 'object' ? (g.tag[app.translator.lang] || g.tag.en) : g.tag;
+            const localizedTag = localizeTag(g.tag);
             div.innerHTML = `
         ${g.badge==="hot"?'<div class="feat-badge-hot">🔥 TOP</div>':''}
         <div class="feat-art" style="background:${g.bg}">

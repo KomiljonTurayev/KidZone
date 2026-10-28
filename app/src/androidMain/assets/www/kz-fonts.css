@@ -1,0 +1,12 @@
+/*
+ * Fredoka One (the heading font) has no Cyrillic, so Russian headings fell back
+ * to the thin system font. 'KZ Cyrillic' is Nunito Black, bundled so it also
+ * works offline, and used only for Cyrillic characters: list it right after
+ * 'Fredoka One' and Latin text keeps the Fredoka look.
+ */
+@font-face {
+  font-family: 'KZ Cyrillic';
+  src: url('fonts/nunito-900.ttf') format('truetype');
+  unicode-range: U+0400-04FF;
+  font-display: swap;
+}
