@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import uz.kidzone.app.FcmTokenManager
 import uz.kidzone.app.FirestoreSync
 import uz.kidzone.app.data.ProfileDao
+import uz.kidzone.app.data.ProfileOwner
 import uz.kidzone.app.data.ProfileSyncManager
 
 /** Keeps `users/{uid}` and the push token registered for whichever account is active. */
@@ -25,28 +26,54 @@ class CloudUserListener(
 }
 
 /**
- * Keeps the parent's profiles the same on every device of their account. On sign-in: pull and
- * merge what other devices saved, push this device's profiles (the server-side play-time limit
- * reads `users/{uid}/profiles/{id}`), then keep listening so later changes from other devices
- * arrive while the app is open. Guests and signed-out users don't sync.
+ * Keeps the parent's profiles the same on every device of their account — or of their family,
+ * if they joined one (Faza 16): then the owner's `users/{ownerUid}/profiles` are used. On
+ * sign-in it follows `users/{uid}.familyOwner`; whenever that changes (join, leave, removed)
+ * it pulls and merges the profiles, pushes this device's, and listens for later changes.
+ * Guests and signed-out users don't sync.
  */
 class ProfileCloudSyncListener(
     private val profileDao: ProfileDao,
     private val syncManager: ProfileSyncManager,
     private val scope: CoroutineScope,
 ) : AccountListener {
+    private var familyWatch: AutoCloseable? = null
     private var live: AutoCloseable? = null
+    private var syncedOwner: String? = null
 
     override suspend fun onAccountChanged(account: AccountState) {
-        live?.close()
-        live = null
+        familyWatch?.close()
+        familyWatch = null
+        stopProfiles()
+        ProfileOwner.familyOwnerUid = null
         if (account !is AccountState.SignedIn) return
-        val remote = syncManager.pullProfiles(account.uid)
+        startProfiles(account.uid)
+        familyWatch = syncManager.listenFamilyOwner(account.uid) { familyOwner ->
+            scope.launch {
+                ProfileOwner.familyOwnerUid = familyOwner
+                val owner = familyOwner ?: account.uid
+                if (owner != syncedOwner) {
+                    stopProfiles()
+                    startProfiles(owner)
+                }
+            }
+        }
+    }
+
+    private suspend fun startProfiles(ownerUid: String) {
+        syncedOwner = ownerUid
+        val remote = syncManager.pullProfiles(ownerUid)
         if (remote.isNotEmpty()) profileDao.mergeProfiles(remote)
         profileDao.getAllSync().forEach(syncManager::pushProfile)
-        live = syncManager.listenProfiles(account.uid) { profiles ->
+        live = syncManager.listenProfiles(ownerUid) { profiles ->
             scope.launch { profileDao.mergeProfiles(profiles) }
         }
+    }
+
+    private fun stopProfiles() {
+        live?.close()
+        live = null
+        syncedOwner = null
     }
 }
 

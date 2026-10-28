@@ -16,7 +16,7 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
     }
 
     open fun pushProfile(profile: ProfileEntity) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = ProfileOwner.uidFor(FirebaseAuth.getInstance().currentUser?.uid) ?: return
         val db = db ?: return
         val data = mapOf(
             "name" to profile.name,
@@ -40,7 +40,7 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
     // daily play-time limit. That decision comes from the backend's /playtime/heartbeat
     // (PlaytimeApiClient), which tracks elapsedSeconds under profiles/{id}/playtime/{date}.
     open fun pushStats(stats: ProfileStatsEntity) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = ProfileOwner.uidFor(FirebaseAuth.getInstance().currentUser?.uid) ?: return
         val db = db ?: return
         val data = mapOf(
             "minutesPlayed" to stats.minutesPlayed,
@@ -77,6 +77,20 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
                 if (e != null) { Log.w(TAG, "listenProfiles failed: $e"); return@addSnapshotListener }
                 if (snap == null || snap.metadata.hasPendingWrites()) return@addSnapshotListener
                 onChange(snap.documents.mapNotNull(::toProfile))
+            }
+        return AutoCloseable { registration.remove() }
+    }
+
+    /**
+     * Calls [onChange] with `users/{uid}.familyOwner` (null when not in a family) now and
+     * whenever the backend links or unlinks this account.
+     */
+    open fun listenFamilyOwner(uid: String, onChange: (String?) -> Unit): AutoCloseable? {
+        val db = db ?: return null
+        val registration = db.collection("users").document(uid)
+            .addSnapshotListener { snap, e ->
+                if (e != null) { Log.w(TAG, "listenFamilyOwner failed: $e"); return@addSnapshotListener }
+                onChange(snap?.getString("familyOwner"))
             }
         return AutoCloseable { registration.remove() }
     }

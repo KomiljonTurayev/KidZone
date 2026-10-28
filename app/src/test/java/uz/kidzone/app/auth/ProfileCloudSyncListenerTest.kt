@@ -6,9 +6,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Test
 import uz.kidzone.app.data.FakeProfileDao
 import uz.kidzone.app.data.ProfileEntity
+import uz.kidzone.app.data.ProfileOwner
 import uz.kidzone.app.data.ProfileStatsEntity
 import uz.kidzone.app.data.ProfileSyncManager
 
@@ -68,6 +70,60 @@ class ProfileCloudSyncListenerTest {
         assertTrue(sync.pushed.first { it.id == "gone" }.deleted)
     }
 
+    @Test
+    fun `a family member syncs the owner's profiles`() = runTest {
+        listener().onAccountChanged(AccountState.SignedIn("second", "S", AuthProvider.GOOGLE))
+
+        sync.familyOwnerIs("owner")
+        advanceUntilIdle()
+
+        assertEquals("owner", ProfileOwner.familyOwnerUid)
+        assertEquals("owner", sync.pulled.last())
+        assertEquals(listOf("second", "owner"), sync.listening)
+        assertEquals(1, sync.closed)
+    }
+
+    @Test
+    fun `leaving the family goes back to the parent's own profiles`() = runTest {
+        listener().onAccountChanged(AccountState.SignedIn("second", "S", AuthProvider.GOOGLE))
+        sync.familyOwnerIs("owner")
+        advanceUntilIdle()
+
+        sync.familyOwnerIs(null)
+        advanceUntilIdle()
+
+        assertEquals(null, ProfileOwner.familyOwnerUid)
+        assertEquals(listOf("second", "owner", "second"), sync.listening)
+    }
+
+    @Test
+    fun `not being in a family keeps the first listener`() = runTest {
+        listener().onAccountChanged(AccountState.SignedIn("parent", "P", AuthProvider.GOOGLE))
+
+        sync.familyOwnerIs(null)
+        advanceUntilIdle()
+
+        assertEquals(listOf("parent"), sync.listening)
+        assertEquals(0, sync.closed)
+    }
+
+    @Test
+    fun `signing out forgets the family`() = runTest {
+        val l = listener()
+        l.onAccountChanged(AccountState.SignedIn("second", "S", AuthProvider.GOOGLE))
+        sync.familyOwnerIs("owner")
+        advanceUntilIdle()
+
+        l.onAccountChanged(AccountState.Guest("guest"))
+
+        assertEquals(null, ProfileOwner.familyOwnerUid)
+    }
+
+    @After
+    fun resetOwner() {
+        ProfileOwner.familyOwnerUid = null
+    }
+
     private fun profile(id: String, name: String, updatedAt: Long) = ProfileEntity(
         id = id, name = name, avatarPath = null, language = "uz", timeLimitMinutes = 0,
         pinHash = null, isDefault = false, createdAt = 1L, updatedAt = updatedAt,
@@ -82,13 +138,24 @@ class ProfileCloudSyncListenerTest {
 
         override fun pushProfile(profile: ProfileEntity) { pushed += profile }
         override fun pushStats(stats: ProfileStatsEntity) {}
-        override suspend fun pullProfiles(uid: String) = emptyList<ProfileEntity>()
+        val pulled = mutableListOf<String>()
+        private var onFamilyOwner: ((String?) -> Unit)? = null
+
+        override suspend fun pullProfiles(uid: String): List<ProfileEntity> {
+            pulled += uid
+            return emptyList()
+        }
         override fun listenProfiles(uid: String, onChange: (List<ProfileEntity>) -> Unit): AutoCloseable {
             listening += uid
             this.onChange = onChange
             return AutoCloseable { closed++ }
         }
+        override fun listenFamilyOwner(uid: String, onChange: (String?) -> Unit): AutoCloseable {
+            onFamilyOwner = onChange
+            return AutoCloseable {}
+        }
 
         fun emit(profiles: List<ProfileEntity>) = onChange!!.invoke(profiles)
+        fun familyOwnerIs(owner: String?) = onFamilyOwner!!.invoke(owner)
     }
 }
