@@ -47,7 +47,7 @@ const CSS = `
 .kzl-step{display:flex;align-items:flex-start;gap:11px;margin-bottom:13px;}
 .kzl-step-icon{font-size:26px;flex-shrink:0;width:36px;text-align:center;}
 .kzl-step-text{font-size:13.5px;color:#333;line-height:1.5;font-weight:700;}
-.kzl-close-btn{width:100%;padding:14px;border:none;border-radius:20px;background:#FF6B35;color:#fff;font-size:15px;font-weight:900;cursor:pointer;margin-top:10px;font-family:'Arial Rounded MT Bold',Arial,sans-serif;touch-action:manipulation;}
+.kzl-close-btn{width:100%;padding:14px;border:none;border-radius:20px;background:#FF6B35;color:#fff;font-size:15px;font-weight:900;cursor:pointer;margin-top:10px;font-family:'Nunito','KZ Cyrillic',sans-serif;touch-action:manipulation;}
 .kzl-close-btn:active{transform:scale(.96);}
 .kzl-lvl-row{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:4px;}
 .kzl-lvl-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 13px;font-size:13px;font-weight:900;color:#fff;}
@@ -68,7 +68,7 @@ const CSS = `
 .kzl-lup-stars{font-size:44px;margin-bottom:4px;}
 .kzl-lup-num{font-size:72px;font-weight:900;line-height:1;}
 .kzl-lup-txt{font-size:18px;font-weight:800;margin:8px 0 22px;}
-.kzl-lup-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;padding:14px 34px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Arial Rounded MT Bold',Arial,sans-serif;box-shadow:0 4px 0 #C94F20;transform:translateY(0);transition:transform .08s,box-shadow .08s;}
+.kzl-lup-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;padding:14px 34px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito','KZ Cyrillic',sans-serif;box-shadow:0 4px 0 #C94F20;transform:translateY(0);transition:transform .08s,box-shadow .08s;}
 .kzl-lup-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #C94F20;}
 `;
 

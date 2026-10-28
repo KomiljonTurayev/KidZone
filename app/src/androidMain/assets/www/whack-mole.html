@@ -59,7 +59,7 @@
   <div class="hole"><div class="mole">🐹</div></div>
   <div class="hole"><div class="mole">🐹</div></div>
 </div>
-<p style="color:#166534; font-size:14px; font-weight:bold;">Chiqib kelgan sichqonchalarni tezda uring!</p>
+<p id="hint" style="color:#166534; font-size:14px; font-weight:bold;">Chiqib kelgan sichqonchalarni tezda uring!</p>
 
 <div class="over-overlay h" id="over-modal">
   <div class="over-box">
@@ -74,9 +74,9 @@
 const params = new URLSearchParams(location.search);
 const lang = params.get('lang') || 'uz';
 const I18N = {
-  uz: { score: '⭐ Ball: ', time: '⏳ Vaqt: ', over: 'Vaqt tugadi!', res: "To'plangan ball: ", restart: "Qayta O'ynash 🔄" },
-  ru: { score: '⭐ Очки: ', time: '⏳ Время: ', over: 'Время вышло!', res: 'Набранные очки: ', restart: 'Играть Снова 🔄' },
-  en: { score: '⭐ Score: ', time: '⏳ Time: ', over: 'Time Up!', res: 'Total Score: ', restart: 'Play Again 🔄' }
+  uz: { score: '⭐ Ball: ', time: '⏳ Vaqt: ', over: 'Vaqt tugadi!', res: "To'plangan ball: ", restart: "Qayta O'ynash 🔄", hint: 'Chiqib kelgan sichqonchalarni tezda uring!' },
+  ru: { score: '⭐ Очки: ', time: '⏳ Время: ', over: 'Время вышло!', res: 'Набранные очки: ', restart: 'Играть Снова 🔄', hint: 'Быстрее бей выглянувших хомячков!' },
+  en: { score: '⭐ Score: ', time: '⏳ Time: ', over: 'Time Up!', res: 'Total Score: ', restart: 'Play Again 🔄', hint: 'Tap the hamsters as soon as they pop up!' }
 };
 const T = I18N[lang] || I18N.uz;
 window.addEventListener('load', () => {
@@ -85,6 +85,7 @@ window.addEventListener('load', () => {
   document.querySelector('.over-box h2').textContent = T.over;
   document.querySelector('.over-box p').childNodes[0].textContent = T.res;
   document.querySelector('.restart-btn').textContent = T.restart;
+  document.getElementById('hint').textContent = T.hint;
 });
 
 let score = 0;
