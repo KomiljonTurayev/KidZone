@@ -30,10 +30,16 @@ val LoginUiState.isBusy: Boolean
         this is LoginUiState.StartingTelegram ||
         this is LoginUiState.WaitingForTelegram
 
+/**
+ * Drives Google/Telegram sign-in. With [confirmOnly] it re-confirms the parent who is already
+ * signed in instead (see SetPinFlow): no account switch, and [LoginUiState.SignedIn] then means
+ * "confirmed".
+ */
 class LoginViewModel(
     private val auth: AuthRepository,
     private val telegramLogin: TelegramLoginFlow,
     private val googleSignIn: GoogleIdTokenSource,
+    private val confirmOnly: Boolean = false,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
@@ -46,7 +52,8 @@ class LoginViewModel(
     }
 
     fun signInWithGoogle(activity: Activity) = launchAttempt(LoginUiState.SigningInWithGoogle) {
-        auth.signInWithGoogle(googleSignIn.requestIdToken(activity))
+        val idToken = googleSignIn.requestIdToken(activity)
+        if (confirmOnly) auth.reauthenticateWithGoogle(idToken) else auth.signInWithGoogle(idToken)
     }
 
     /** @param openUrl opens the bot link (Telegram app, or the browser if it isn't installed) */
@@ -54,7 +61,7 @@ class LoginViewModel(
         val login = telegramLogin.start()
         _state.value = LoginUiState.WaitingForTelegram(login.botUrl)
         openUrl(login.botUrl)
-        telegramLogin.awaitConfirmation(login.loginId)
+        if (confirmOnly) telegramLogin.awaitReconfirmation(login.loginId) else telegramLogin.awaitConfirmation(login.loginId)
     }
 
     fun cancel() {

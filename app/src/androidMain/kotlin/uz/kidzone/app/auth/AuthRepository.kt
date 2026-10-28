@@ -24,6 +24,12 @@ interface AuthRepository : IdTokenProvider {
     /** Signs in with a Firebase custom token minted by the backend (Telegram login). */
     suspend fun signInWithCustomToken(customToken: String)
 
+    /**
+     * Proves the person holding the phone controls the signed-in account, without ever switching
+     * accounts: a different Google account fails with [AuthException.Reason.WRONG_ACCOUNT].
+     */
+    suspend fun reauthenticateWithGoogle(googleIdToken: String)
+
     /** Signs out and immediately starts a fresh guest session, so the app keeps working. */
     suspend fun signOut()
 

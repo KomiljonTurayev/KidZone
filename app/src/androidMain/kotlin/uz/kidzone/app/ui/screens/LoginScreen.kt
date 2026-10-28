@@ -27,8 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uz.kidzone.app.auth.AccountFeature
+import uz.kidzone.app.auth.AuthProvider
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidCard
 import uz.kidzone.app.ui.components.KidPage
@@ -82,7 +83,8 @@ fun LoginScreen(
  * Parent sign-in with Google or Telegram. Always reached through a parental gate (the
  * onboarding birth-year screen or [AccountGate]), so a child never sees it on their own.
  * [benefits] is an optional checklist of what an account gives; [header] sits above the page
- * (the onboarding progress bar).
+ * (the onboarding progress bar). [providers] limits the buttons, e.g. to the signed-in parent's
+ * own provider when re-confirming them.
  */
 @Composable
 fun LoginScreen(
@@ -96,6 +98,7 @@ fun LoginScreen(
     emoji: String = "🔐",
     benefits: List<String> = emptyList(),
     header: (@Composable () -> Unit)? = null,
+    providers: Set<AuthProvider> = setOf(AuthProvider.GOOGLE, AuthProvider.TELEGRAM),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -131,7 +134,7 @@ fun LoginScreen(
         }
 
         Spacer(Modifier.height(28.dp))
-        ProviderButton(
+        if (AuthProvider.GOOGLE in providers) ProviderButton(
             label = t.google,
             background = Brush.horizontalGradient(listOf(Color.White, Color.White)),
             textColor = Kid.Ink,
@@ -141,8 +144,8 @@ fun LoginScreen(
             icon = { GoogleMark() },
             onClick = { (context as? Activity)?.let(viewModel::signInWithGoogle) },
         )
-        Spacer(Modifier.height(14.dp))
-        ProviderButton(
+        if (providers.size > 1) Spacer(Modifier.height(14.dp))
+        if (AuthProvider.TELEGRAM in providers) ProviderButton(
             label = t.telegram,
             background = Brush.horizontalGradient(listOf(Color(0xFF2AABEE), Kid.Telegram)),
             textColor = Color.White,

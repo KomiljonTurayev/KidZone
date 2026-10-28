@@ -170,7 +170,6 @@ fun KidZoneApp(
             }
             composable("dashboard") {
                 ParentDashboardScreen(
-                    prefs = prefs,
                     onBack = { navController.popBackStack() },
                     profileViewModel = profileViewModel,
                     challengeViewModel = challengeViewModel,
@@ -187,6 +186,8 @@ fun KidZoneApp(
                               else profiles.firstOrNull { it.id == profileId }
                 AddEditProfileScreen(
                     profile = profile,
+                    // New profiles share the parent PIN (see ProfileViewModel.setParentPin).
+                    parentPinHash = profiles.firstNotNullOfOrNull { it.pinHash },
                     onSave = { saved ->
                         if (profile == null) profileViewModel.insertProfile(saved)
                         else profileViewModel.updateProfile(saved)

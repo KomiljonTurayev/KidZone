@@ -105,6 +105,43 @@ class TelegramLoginFlowTest {
         assertEquals(AuthException.Reason.NETWORK, error.reason)
     }
 
+    @Test
+    fun `reconfirmation by the signed-in telegram account passes without signing in again`() = runTest {
+        auth.emit(AccountState.SignedIn("telegram:777", "Aziz", AuthProvider.TELEGRAM))
+        val api = ScriptedApi(TelegramLoginStatus.Confirmed(customToken("telegram:777"), "Aziz"))
+
+        flow(api).awaitReconfirmation("login-1")
+
+        assertTrue(auth.customTokensUsed.isEmpty())
+        assertEquals("telegram:777", auth.state.value.uid)
+    }
+
+    @Test
+    fun `reconfirmation by another telegram account is refused and keeps the session`() = runTest {
+        auth.emit(AccountState.SignedIn("telegram:777", "Aziz", AuthProvider.TELEGRAM))
+        val api = ScriptedApi(TelegramLoginStatus.Confirmed(customToken("telegram:999"), "Child"))
+
+        val error = runCatching { flow(api).awaitReconfirmation("login-1") }.exceptionOrNull() as AuthException
+
+        assertEquals(AuthException.Reason.WRONG_ACCOUNT, error.reason)
+        assertTrue(auth.customTokensUsed.isEmpty())
+        assertEquals("telegram:777", auth.state.value.uid)
+    }
+
+    @Test
+    fun `reads the uid claim of a custom token`() {
+        assertEquals("telegram:42", customTokenUid(customToken("telegram:42")))
+        assertEquals(null, customTokenUid("not-a-jwt"))
+    }
+
+    /** A JWT shaped like the ones Firebase Admin mints (the signature is never checked here). */
+    private fun customToken(uid: String): String {
+        val enc = java.util.Base64.getUrlEncoder().withoutPadding()
+        val header = enc.encodeToString("""{"alg":"RS256","typ":"JWT"}""".toByteArray())
+        val payload = enc.encodeToString("""{"aud":"https://identitytoolkit.googleapis.com","uid":"$uid","claims":{"provider":"telegram"}}""".toByteArray())
+        return "$header.$payload.signature"
+    }
+
     private fun flow(api: TelegramAuthApi) = TelegramLoginFlow(api, auth, pollInterval = 2.seconds, timeout = 5.minutes)
 
     /** Answers status calls from a script: a [TelegramLoginStatus] is returned, an exception thrown. */

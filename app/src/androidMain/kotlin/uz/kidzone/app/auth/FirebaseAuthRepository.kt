@@ -3,6 +3,7 @@ package uz.kidzone.app.auth
 import android.util.Log
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
@@ -62,6 +63,12 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth?) : AuthRepository {
         call { auth.signInWithCustomToken(customToken).await() }
     }
 
+    override suspend fun reauthenticateWithGoogle(googleIdToken: String) {
+        val user = requireAuth().currentUser?.takeUnless { it.isAnonymous }
+            ?: throw AuthException(AuthException.Reason.NO_SESSION)
+        call { user.reauthenticate(GoogleAuthProvider.getCredential(googleIdToken, null)).await() }
+    }
+
     override suspend fun signOut() {
         val auth = requireAuth()
         auth.signOut()
@@ -95,6 +102,9 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth?) : AuthRepository {
         throw AuthException(AuthException.Reason.NETWORK, e)
     } catch (e: FirebaseAuthRecentLoginRequiredException) {
         throw AuthException(AuthException.Reason.REAUTH_REQUIRED, e)
+    } catch (e: FirebaseAuthInvalidUserException) {
+        val reason = if (e.errorCode == "ERROR_USER_MISMATCH") AuthException.Reason.WRONG_ACCOUNT else AuthException.Reason.FAILED
+        throw AuthException(reason, e)
     } catch (e: Exception) {
         Log.w(TAG, "Firebase Auth call failed: ${e.javaClass.simpleName}: ${e.message}")
         throw AuthException(AuthException.Reason.FAILED, e)

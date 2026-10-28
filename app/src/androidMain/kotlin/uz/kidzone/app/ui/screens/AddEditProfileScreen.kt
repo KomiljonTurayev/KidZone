@@ -1,7 +1,5 @@
 package uz.kidzone.app.ui.screens
 
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.unit.sp
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,52 +11,50 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import uz.kidzone.app.PinUtil
 import uz.kidzone.app.data.ProfileEntity
+import uz.kidzone.app.ui.components.Kid
+import uz.kidzone.app.ui.components.KidButton
+import uz.kidzone.app.ui.components.KidChip
+import uz.kidzone.app.ui.components.KidError
+import uz.kidzone.app.ui.components.KidPage
+import uz.kidzone.app.ui.components.KidSection
+import uz.kidzone.app.ui.components.KidTextField
+import uz.kidzone.app.ui.components.KidTopBar
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditProfileScreen(
     profile: ProfileEntity?,
+    parentPinHash: String? = null,
     onSave: (ProfileEntity) -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -70,9 +66,7 @@ fun AddEditProfileScreen(
     var avatarPath by remember { mutableStateOf(profile?.avatarPath) }
     var language by remember { mutableStateOf(profile?.language ?: "uz") }
     var timeLimitSlider by remember { mutableFloatStateOf((profile?.timeLimitMinutes ?: 0).toFloat()) }
-    var pinInput by remember { mutableStateOf("") }
     var nameError by remember { mutableStateOf(false) }
-    var pinError by remember { mutableStateOf(false) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -90,157 +84,117 @@ fun AddEditProfileScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (isNew) "Yangi profil" else "Profilni tahrirlash") },
-                navigationIcon = { TextButton(onClick = onCancel) { Text("Bekor") } },
-            )
-        }
-    ) { padding ->
-        Column(
+    KidPage(top = { KidTopBar(if (isNew) "Yangi profil" else "Profilni tahrirlash", onBack = onCancel) }) {
+        // Avatar
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .size(116.dp)
+                .shadow(14.dp, CircleShape, ambientColor = Kid.Orange, spotColor = Kid.Orange)
+                .clip(CircleShape)
+                .background(Kid.Sunset)
+                .clickable {
+                    galleryLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
+            contentAlignment = Alignment.Center,
         ) {
-            // Avatar
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier
-                        .size(96.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2196F3))
-                        .clickable {
-                            galleryLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (avatarPath != null && File(avatarPath!!).exists()) {
-                        AsyncImage(
-                            model = File(avatarPath!!),
-                            contentDescription = "Avatar",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    } else {
-                        Text(
-                            text = if (name.isNotEmpty()) name.first().uppercase() else "?",
-                            color = Color.White,
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-                        )
-                    }
-                }
+            if (avatarPath != null && File(avatarPath!!).exists()) {
+                AsyncImage(
+                    model = File(avatarPath!!),
+                    contentDescription = "Avatar",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Text(
+                    text = if (name.isNotEmpty()) name.first().uppercase() else "?",
+                    color = Color.White,
+                    style = MaterialTheme.typography.displaySmall,
+                )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = {
-                        galleryLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    },
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9F1C)),
-                    modifier = Modifier.weight(1f).height(48.dp),
-                ) { Text("🖼 Galereya") }
-                Button(
-                    onClick = { cameraLauncher.launch(null) },
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                    modifier = Modifier.weight(1f).height(48.dp),
-                ) { Text("📸 Kamera") }
+        }
+        Spacer(Modifier.height(16.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            KidChip("🖼 Galereya", selected = false, modifier = Modifier.weight(1f)) {
+                galleryLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
             }
+            KidChip("📸 Kamera", selected = false, modifier = Modifier.weight(1f)) { cameraLauncher.launch(null) }
+        }
+        Spacer(Modifier.height(20.dp))
 
-            // Ism
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it; nameError = false },
-                label = { Text("Bola ismi") },
-                isError = nameError,
-                singleLine = true,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            if (nameError) {
-                Text("Ism bo'sh bo'lmasin", color = Color.Red)
-            }
+        // Ism
+        KidTextField(
+            value = name,
+            onValueChange = { name = it; nameError = false },
+            placeholder = "Bola ismi",
+            isError = nameError,
+        )
+        if (nameError) {
+            Spacer(Modifier.height(6.dp))
+            KidError("Ism bo'sh bo'lmasin")
+        }
+        Spacer(Modifier.height(16.dp))
 
-            // Til
-            Text("Til:")
+        // Til
+        KidSection("🌍", "Til") {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("uz" to "O'zbek", "ru" to "Русский", "en" to "English").forEach { (code, label) ->
-                    FilterChip(
-                        selected = language == code,
-                        onClick = { language = code },
-                        label = { Text(label) },
-                    )
+                    KidChip(label, selected = language == code, modifier = Modifier.weight(1f)) { language = code }
                 }
             }
+        }
+        Spacer(Modifier.height(16.dp))
 
-            // Vaqt limiti
-            val limitMinutes = timeLimitSlider.roundToInt()
-            Text("Vaqt limiti: ${if (limitMinutes == 0) "Cheksiz" else "$limitMinutes daqiqa"}")
+        // Vaqt limiti
+        val limitMinutes = timeLimitSlider.roundToInt()
+        KidSection("⏰", "Vaqt limiti") {
+            Text(
+                if (limitMinutes == 0) "Cheksiz" else "$limitMinutes daqiqa",
+                style = MaterialTheme.typography.titleLarge,
+                color = Kid.Orange,
+            )
             Slider(
                 value = timeLimitSlider,
                 onValueChange = { timeLimitSlider = it },
                 valueRange = 0f..180f,
                 steps = 11,
+                colors = SliderDefaults.colors(
+                    thumbColor = Kid.Orange,
+                    activeTrackColor = Kid.Amber,
+                    inactiveTrackColor = Kid.Line,
+                    activeTickColor = Color.White,
+                    inactiveTickColor = Kid.InkSoft.copy(alpha = 0.3f),
+                ),
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
+        Spacer(Modifier.height(16.dp))
 
-            // PIN (ixtiyoriy)
-            OutlinedTextField(
-                value = pinInput,
-                onValueChange = { if (it.length <= 4 && it.all { c -> c.isDigit() }) { pinInput = it; pinError = false } },
-                label = { Text("PIN (ixtiyoriy, 4 xona)") },
-                isError = pinError,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                singleLine = true,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                modifier = Modifier.fillMaxWidth(),
+        Spacer(Modifier.height(28.dp))
+
+        KidButton("✅ Saqlash", brush = Kid.Meadow) {
+            if (name.isBlank()) { nameError = true; return@KidButton }
+            val saved = (profile ?: ProfileEntity(
+                id = profileId,
+                name = "",
+                avatarPath = null,
+                language = "uz",
+                timeLimitMinutes = 0,
+                pinHash = null,
+                isDefault = false,
+                createdAt = System.currentTimeMillis(),
+            )).copy(
+                name = name.trim(),
+                avatarPath = avatarPath,
+                language = language,
+                timeLimitMinutes = limitMinutes,
+                // The PIN is set from the parent dashboard only, after confirming the account.
+                pinHash = profile?.pinHash ?: parentPinHash,
             )
-            if (pinError) {
-                Text("PIN 4 ta raqam bo'lishi kerak", color = Color.Red)
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            Button(
-                onClick = {
-                    if (name.isBlank()) { nameError = true; return@Button }
-                    val pinHash = when {
-                        pinInput.length == 4 -> PinUtil.hash(pinInput)
-                        pinInput.isEmpty() -> profile?.pinHash
-                        else -> { pinError = true; return@Button }
-                    }
-                    val saved = (profile ?: ProfileEntity(
-                        id = profileId,
-                        name = "",
-                        avatarPath = null,
-                        language = "uz",
-                        timeLimitMinutes = 0,
-                        pinHash = null,
-                        isDefault = false,
-                        createdAt = System.currentTimeMillis(),
-                    )).copy(
-                        name = name.trim(),
-                        avatarPath = avatarPath,
-                        language = language,
-                        timeLimitMinutes = limitMinutes,
-                        pinHash = pinHash,
-                    )
-                    onSave(saved)
-                },
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-            ) {
-                Text("✅ Saqlash", fontSize = 18.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-            }
+            onSave(saved)
         }
     }
 }

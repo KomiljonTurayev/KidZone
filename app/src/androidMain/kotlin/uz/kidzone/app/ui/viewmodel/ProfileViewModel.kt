@@ -47,6 +47,17 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
         }
     }
 
+    /**
+     * Sets the parent PIN. There is one parent per family, so every profile gets the same PIN:
+     * whichever child is active, the same PIN opens the parent area.
+     */
+    fun setParentPin(pinHash: String) {
+        viewModelScope.launch {
+            repository.profiles.first().forEach { repository.update(it.copy(pinHash = pinHash)) }
+            _activeProfile.value = _activeProfile.value?.copy(pinHash = pinHash)
+        }
+    }
+
     fun deleteProfile(profile: ProfileEntity, onSwitched: (ProfileEntity?) -> Unit) {
         viewModelScope.launch {
             repository.delete(profile)
