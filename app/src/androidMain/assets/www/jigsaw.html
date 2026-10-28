@@ -132,12 +132,12 @@
 </div>
 
 <div id="theme-bar">
-  <div class="theme-chip active" onclick="selectTheme(0)">🦁 Shercha</div>
-  <div class="theme-chip" onclick="selectTheme(1)">🦖 Dinozavr</div>
-  <div class="theme-chip" onclick="selectTheme(2)">🚀 Raketa</div>
-  <div class="theme-chip" onclick="selectTheme(3)">🐬 Delfin</div>
-  <div class="theme-chip" onclick="selectTheme(4)">🏰 Qasr</div>
-  <div class="theme-chip" onclick="selectTheme(5)">🚗 Mashina</div>
+  <div class="theme-chip active" onclick="selectTheme(0)" data-ru="🦁 Лев" data-en="🦁 Lion">🦁 Shercha</div>
+  <div class="theme-chip" onclick="selectTheme(1)" data-ru="🦖 Динозавр" data-en="🦖 Dino">🦖 Dinozavr</div>
+  <div class="theme-chip" onclick="selectTheme(2)" data-ru="🚀 Ракета" data-en="🚀 Rocket">🚀 Raketa</div>
+  <div class="theme-chip" onclick="selectTheme(3)" data-ru="🐬 Дельфин" data-en="🐬 Dolphin">🐬 Delfin</div>
+  <div class="theme-chip" onclick="selectTheme(4)" data-ru="🏰 Замок" data-en="🏰 Castle">🏰 Qasr</div>
+  <div class="theme-chip" onclick="selectTheme(5)" data-ru="🚗 Машина" data-en="🚗 Car">🚗 Mashina</div>
 </div>
 
 <div id="workspace">
@@ -168,6 +168,7 @@ const T = {
 }[lang] || { title: "Puzzle", hint: "Ko'rish", win: "Barakalla!", winSub: "Puzzle terildi!", next: "Keyingisi" };
 
 document.getElementById('ui-title').textContent = T.title;
+document.querySelectorAll('.theme-chip').forEach(c => { if (c.dataset[lang]) c.textContent = c.dataset[lang]; });
 document.getElementById('lbl-hint').textContent = T.hint;
 document.getElementById('win-title').textContent = T.win;
 document.getElementById('win-sub').textContent = T.winSub;

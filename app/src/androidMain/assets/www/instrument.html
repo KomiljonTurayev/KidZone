@@ -90,6 +90,12 @@ body {
 // =============================================
 
 const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+// mode.name stays the English key the sound code checks; these are what the child sees.
+const MODE_LABELS = {
+  Piano:     { uz: 'Pianino',  ru: 'Пианино',  en: 'Piano' },
+  Drums:     { uz: 'Doira',    ru: 'Барабаны', en: 'Drums' },
+  Xylophone: { uz: 'Ksilofon', ru: 'Ксилофон', en: 'Xylophone' },
+};
 KidUI.init({ title: "Instruments", icon: "🎸", color: "#3949AB", gameId: "instrument", lang: lang });
 
 const T = {
@@ -203,7 +209,7 @@ function renderInstrument() {
   container.style.alignItems = mode.name === 'Drums' ? 'center' : 'flex-end';
 
   document.getElementById('mode-icon').textContent = mode.icon;
-  document.getElementById('mode-name').textContent = mode.name;
+  document.getElementById('mode-name').textContent = (MODE_LABELS[mode.name] || {})[lang] || mode.name;
 
   mode.notes.forEach((note, i) => {
     const el = document.createElement('div');

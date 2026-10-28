@@ -149,7 +149,7 @@ window.KZL = {
     const floatBtn = document.createElement('button');
     floatBtn.className = 'kzl-htp-btn';
     floatBtn.textContent = '❓';
-    floatBtn.setAttribute('aria-label', 'How to play');
+    floatBtn.setAttribute('aria-label', (DEF_TITLE[lang] || DEF_TITLE.en).replace(' 🎮', ''));
     floatBtn.onclick = () => overlay.classList.remove('h');
     document.body.appendChild(floatBtn);
 
