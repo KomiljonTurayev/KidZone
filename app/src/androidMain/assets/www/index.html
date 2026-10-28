@@ -1137,7 +1137,7 @@
     <!-- AI STUDIO -->
     <div id="ai-studio">
       <div class="ai-hdr">
-        <div class="ai-badge">NEW • AI</div>
+        <div class="ai-badge" id="ai-badge">NEW • AI</div>
         <div class="ai-title" id="ai-studio-title">AI Bolalar Studiyasi</div>
       </div>
       <div class="ai-btns">
@@ -1204,7 +1204,7 @@
     <div class="sec-hdr">
       <span class="sec-icon">🔥</span>
       <span class="sec-title" id="feat-title">Most Popular</span>
-      <span class="sec-badge">Top 5</span>
+      <span class="sec-badge" id="top-badge">Top 5</span>
     </div>
     <div id="featured-row"></div>
 
@@ -1437,7 +1437,7 @@
         playMode: "O'ynash rejimi",
         learnMode: "O'rganish rejimi",
         yourStars: "Yutuqlaringiz",
-        aiStudioTitle: "✨ AI Bolalar Studiyasi",
+        aiStudioTitle: "✨ AI Bolalar Studiyasi", aiBadge: "Yangi • AI", topBadge: "Eng zo'r 5",
         aiBtnKidzo: "Aqlli Kidzo",
         aiBtnStory: "Ertak To'qish",
         aiBtnMusic: "Sehrli Uyqu",
@@ -1501,7 +1501,7 @@
         playMode: "Режим игры",
         learnMode: "Режим обучения",
         yourStars: "Ваши звезды",
-        aiStudioTitle: "✨ AI Студия",
+        aiStudioTitle: "✨ AI Студия", aiBadge: "Новое • AI", topBadge: "Топ-5",
         aiBtnKidzo: "Умный Кидзо",
         aiBtnStory: "Создать Сказку",
         aiBtnMusic: "Сладкий Сон",
@@ -1565,7 +1565,7 @@
         playMode: "Play mode",
         learnMode: "Learn mode",
         yourStars: "Your stars",
-        aiStudioTitle: "✨ AI Kids Studio",
+        aiStudioTitle: "✨ AI Kids Studio", aiBadge: "New • AI", topBadge: "Top 5",
         aiBtnKidzo: "Smart Kidzo",
         aiBtnStory: "Create Story",
         aiBtnMusic: "Magic Sleep",
@@ -1919,6 +1919,8 @@
 
         // AI Studio
         document.getElementById("ai-studio-title").textContent = t.aiStudioTitle;
+        document.getElementById("ai-badge").textContent = t.aiBadge;
+        document.getElementById("top-badge").textContent = t.topBadge;
         const kidzoBtn = document.getElementById("ai-btn-kidzo");
         if (kidzoBtn) kidzoBtn.textContent = t.aiBtnKidzo || "Aqlli Kidzo";
         document.getElementById("ai-btn-story").textContent = t.aiBtnStory;
