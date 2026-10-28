@@ -431,6 +431,7 @@ let T = {
     mixer: "Fon Tovushi (Qatlam qo'shish)",
     timer: "Uyqu Taymeri",
     autoOff: "Avtomatik o'chadi",
+    timerDone: "Taymer tugadi 💤",
     routine: "Uyqu Odobi & Vazifalar (Todo)",
     presets: "Tezkor tavsiyalar:",
     addBtn: "+ Qo'shish",
@@ -462,6 +463,7 @@ let T = {
     mixer: "Фоновый Слой (Микс звуков)",
     timer: "Таймер Сна",
     autoOff: "Выключится сам",
+    timerDone: "Таймер закончился 💤",
     routine: "План ко Сну & Задачи (Todo)",
     presets: "Быстрые задачи:",
     addBtn: "+ Добавить",
@@ -493,6 +495,7 @@ let T = {
     mixer: "Background Layer (Sound Mix)",
     timer: "Sleep Timer",
     autoOff: "Auto shuts off",
+    timerDone: "Timer finished 💤",
     routine: "Bedtime Routine & Tasks (Todo)",
     presets: "Quick suggestions:",
     addBtn: "+ Add",
@@ -848,7 +851,7 @@ function startTimerCountdown() {
       if (timerSecondsLeft <= 0) {
         stopAudio();
         clearInterval(timerInterval);
-        document.getElementById('timer-left-txt').textContent = "Taymer tugadi 💤";
+        document.getElementById('timer-left-txt').textContent = T.timerDone || "Taymer tugadi 💤";
       }
     }
   }, 1000);
@@ -1042,7 +1045,7 @@ window.updateLang = function(newLang) {
       heroMsg: "Orom Baxsh Allalar", heroSub: "Har qanday tovushni bosing — darhol yangraydi!",
       catAllalar: "Allalar", catSuv: "Yomg'ir & Suv", catTabiat: "Tabiat", catOrom: "Orom & Yurak",
       sounds: "Uyqu Ovozlarini Tanlang", mixer: "Fon Tovushi (Qatlam qo'shish)", timer: "Uyqu Taymeri",
-      autoOff: "Avtomatik o'chadi", routine: "Uyqu Odobi & Vazifalar (Todo)", presets: "Tezkor tavsiyalar:",
+      autoOff: "Avtomatik o'chadi", timerDone: "Taymer tugadi 💤", routine: "Uyqu Odobi & Vazifalar (Todo)", presets: "Tezkor tavsiyalar:",
       addBtn: "+ Qo'shish", placeholder: "Yangi vazifa yozing...", allDone: "Barchasi bajarildi! 🌟",
       nightLight: "Tungi Chiroq Nuri", mNone: "🚫 O'chiq", mRain: "🌧️ Yomg'ir", mWaves: "🌊 To'lqin",
       mFire: "🪵 Olov", mWind: "💨 Shamol"
@@ -1053,7 +1056,7 @@ window.updateLang = function(newLang) {
       heroMsg: "Успокаивающая Мелодия", heroSub: "Нажмите на любой звук — включится сразу!",
       catAllalar: "Колыбельные", catSuv: "Дождь и Вода", catTabiat: "Природа", catOrom: "Покой и Сердце",
       sounds: "Выберите Звук для Сна", mixer: "Фоновый Слой (Микс звуков)", timer: "Таймер Сна",
-      autoOff: "Выключится сам", routine: "План ко Сну & Задачи (Todo)", presets: "Быстрые задачи:",
+      autoOff: "Выключится сам", timerDone: "Таймер закончился 💤", routine: "План ко Сну & Задачи (Todo)", presets: "Быстрые задачи:",
       addBtn: "+ Добавить", placeholder: "Напишите задачу...", allDone: "Всё выполнено! 🌟",
       nightLight: "Ночник", mNone: "🚫 Выкл", mRain: "🌧️ Дождик", mWaves: "🌊 Волны",
       mFire: "🪵 Костёр", mWind: "💨 Ветерок"
@@ -1064,7 +1067,7 @@ window.updateLang = function(newLang) {
       heroMsg: "Soothing Sleep Melody", heroSub: "Tap any sound — it plays immediately!",
       catAllalar: "Lullabies", catSuv: "Rain & Water", catTabiat: "Nature", catOrom: "Comfort & Heart",
       sounds: "Select Sleep Sound", mixer: "Background Layer (Sound Mix)", timer: "Sleep Timer",
-      autoOff: "Auto shuts off", routine: "Bedtime Routine & Tasks (Todo)", presets: "Quick suggestions:",
+      autoOff: "Auto shuts off", timerDone: "Timer finished 💤", routine: "Bedtime Routine & Tasks (Todo)", presets: "Quick suggestions:",
       addBtn: "+ Add", placeholder: "Write new task...", allDone: "All tasks done! 🌟",
       nightLight: "Night Light", mNone: "🚫 Off", mRain: "🌧️ Rain", mWaves: "🌊 Waves",
       mFire: "🪵 Campfire", mWind: "💨 Breeze"

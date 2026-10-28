@@ -46,7 +46,7 @@
 
   <div class="screen" id="start-screen">
     <div style="font-size:72px">🫧</div>
-    <h1 style="color:white; font-size:32px">Bubble Pop!</h1>
+    <h1 style="color:white; font-size:32px" id="lbl-title">Bubble Pop!</h1>
     <p style="color:#aaa; text-align:center" id="lbl-hint">Pufaklarni bosing!</p>
     <button class="btn btn-primary" id="btn-start" onclick="startGame(false)">🚀 BOSHLASH</button>
     <button class="btn btn-secondary" id="btn-zen" onclick="startGame(true)">👶 ZEN REJIMI</button>
@@ -75,6 +75,7 @@ const BUBBLE_LANG = {
 
 function applyLang() {
   const t = BUBBLE_LANG[game.lang] || BUBBLE_LANG.en;
+  document.getElementById('lbl-title').textContent = { ru: 'Пузырьки!' }[game.lang] || 'Bubble Pop!';
   document.getElementById('lbl-hint').textContent     = t.hint;
   document.getElementById('btn-start').textContent    = t.start;
   document.getElementById('btn-zen').textContent      = t.zen;

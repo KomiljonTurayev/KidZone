@@ -109,6 +109,8 @@
   <script>
     const lang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
     KidUI.init({ title: "Puzzle Slider", icon: "🧩", color: "#E64A19", gameId: "puzzle_slider", lang: lang });
+    document.getElementById('lbl-title').textContent =
+      { uz: 'Mozaika Slider', ru: 'Слайдер Пазл' }[lang] || 'Puzzle Slider';
     const T = {
       uz: { vic:"Barakalla!", vicSub:"Siz puzzle-ni yig'dingiz!", vicBtn:"Yana O'ynash 🔄", goal:"Maqsad:", moves:"harakat", newPuzzle:"🔀 Yangi", hint:"💡 Maslahat", hintMsg:"Hayvonlarni tartibga soling!" },
       ru: { vic:"Молодец!",   vicSub:"Вы собрали пазл!",          vicBtn:"Играть снова 🔄",  goal:"Цель:",    moves:"ходов",    newPuzzle:"🔀 Новый",  hint:"💡 Подсказка", hintMsg:"Расставь животных по порядку!" },

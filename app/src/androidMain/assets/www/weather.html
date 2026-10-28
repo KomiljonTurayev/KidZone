@@ -37,7 +37,7 @@ body { min-height:100vh; background:linear-gradient(180deg,#1565C0 0%,#42A5F5 60
   <div class="pill">⭐ <span id="score">0</span></div>
   <div class="pill">🌤️ <span id="ui-title">Ob-Havo</span></div>
   <div class="pill" style="flex-direction:column;padding:5px 10px;">
-    <span class="pill-sm">LEVEL</span><span id="lv-val">1</span>
+    <span class="pill-sm" id="ui-level">LEVEL</span><span id="lv-val">1</span>
   </div>
 </div>
 
@@ -54,7 +54,7 @@ body { min-height:100vh; background:linear-gradient(180deg,#1565C0 0%,#42A5F5 60
   <h1 id="ui-start-t" style="font-size:26px;margin:12px 0 8px;">Ob-Havo</h1>
   <p  id="ui-start-d" style="font-size:14px;opacity:.85;">Ob-havo turlarini o'rgan!</p>
   <div id="level-info" style="background:rgba(255,255,255,.15);border-radius:14px;padding:9px 18px;margin:12px 0;font-size:13px;font-weight:900;"></div>
-  <button class="btn-p" onclick="startGame()">START</button>
+  <button class="btn-p" id="btn-start" onclick="startGame()">START</button>
 </div>
 
 <div id="result-screen" class="screen hidden">
@@ -62,16 +62,16 @@ body { min-height:100vh; background:linear-gradient(180deg,#1565C0 0%,#42A5F5 60
   <h1 id="res-ttl" style="font-size:22px;margin:10px 0 6px;"></h1>
   <div id="res-sc" style="font-size:26px;font-weight:900;margin-bottom:14px;"></div>
   <button class="btn-p" id="btn-next" onclick="onNext()"></button>
-  <button class="btn-p" style="background:rgba(255,255,255,.15);color:#fff;margin-top:8px;" onclick="startGame()">↩ Qayta</button>
+  <button class="btn-p" style="background:rgba(255,255,255,.15);color:#fff;margin-top:8px;" id="btn-again" onclick="startGame()">↩ Qayta</button>
 </div>
 
 <script src="game-engine.js"></script>
 <script>
 const GAME_ID = 'weather';
 const T = {
-  uz:{title:"Ob-Havo", quest:"Bu qanday ob-havo?", start:"BOSHLASH", desc:"Ob-havo turlarini o'rgan!", great:"Zo'r!", good:"Yaxshi!", try:"Harakat qil!", next:"Keyingi →", again:"↩ Qayta"},
-  ru:{title:"Погода",  quest:"Какая погода?",       start:"ИГРАТЬ",  desc:"Изучай виды погоды!",      great:"Отлично!", good:"Хорошо!", try:"Ещё раз!",  next:"Дальше →", again:"↩ Снова"},
-  en:{title:"Weather", quest:"What weather is this?",start:"START",   desc:"Learn about weather types!",great:"Amazing!", good:"Good job!", try:"Try again!", next:"Next →", again:"↩ Again"},
+  uz:{title:"Ob-Havo", quest:"Bu qanday ob-havo?", start:"BOSHLASH", desc:"Ob-havo turlarini o'rgan!", great:"Zo'r!", good:"Yaxshi!", try:"Harakat qil!", next:"Keyingi →", again:"↩ Qayta", level:"DARAJA", questions:"savol", items:"ta"},
+  ru:{title:"Погода",  quest:"Какая погода?",       start:"ИГРАТЬ",  desc:"Изучай виды погоды!",      great:"Отлично!", good:"Хорошо!", try:"Ещё раз!",  next:"Дальше →", again:"↩ Снова", level:"УРОВЕНЬ", questions:"вопр.", items:"шт."},
+  en:{title:"Weather", quest:"What weather is this?",start:"START",   desc:"Learn about weather types!",great:"Amazing!", good:"Good job!", try:"Try again!", next:"Next →", again:"↩ Again", level:"LEVEL", questions:"questions", items:""},
 };
 const DATA = [
   /* 1-8 Easy */
@@ -123,8 +123,11 @@ function init() {
   document.getElementById('ui-title').textContent   = t.title;
   document.getElementById('ui-start-t').textContent = t.title;
   document.getElementById('ui-start-d').textContent = t.desc;
+  document.getElementById('ui-level').textContent   = t.level;
+  document.getElementById('btn-start').textContent  = t.start;
+  document.getElementById('btn-again').textContent  = t.again;
   document.getElementById('lv-val').textContent     = _level;
-  document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} savol · 💡${_cfg.hints} · 🌡️${_pool.length} ta`;
+  document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.questions} · 💡${_cfg.hints} · 🌡️${_pool.length} ${t.items}`.trim();
   KZL.howToPlay({id:GAME_ID,steps:{
     uz:[{icon:'🌤️',text:'Ob-havo belgisini ko\'rasan'},{icon:'👆',text:'To\'g\'ri nomini tanlang'},{icon:'💡',text:'Hint noto\'g\'ri javobni o\'chiradi'},{icon:'❤️',text:'3 ta hayot bor — ehtiyotkor bo\'l!'},{icon:'🏆',text:'60% ball yig\'ib keyingi darajaga o\'t!'}],
     ru:[{icon:'🌤️',text:'Видишь символ погоды'},{icon:'👆',text:'Выбери правильное название'},{icon:'💡',text:'Подсказка убирает неверный ответ'},{icon:'❤️',text:'3 жизни — будь внимателен!'},{icon:'🏆',text:'Набери 60% чтобы перейти на следующий уровень!'}],

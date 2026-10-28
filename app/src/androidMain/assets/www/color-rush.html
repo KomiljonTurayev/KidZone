@@ -271,7 +271,7 @@ body {
 <!-- START SCREEN -->
 <div class="screen" id="start-screen">
   <div class="big-icon">🎨</div>
-  <div class="screen-title">Color Rush!</div>
+  <div class="screen-title" id="start-title">Color Rush!</div>
   <div class="screen-sub" id="start-sub"></div>
   <div class="rule-box" id="rule-box"></div>
   <button class="btn btn-primary" onclick="startGame()" id="btn-start"></button>
@@ -296,6 +296,8 @@ body {
 // =============================================
 
 const lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+document.getElementById('start-title').textContent =
+  { uz: 'Rang Aralash!', ru: 'Смешивание цветов!' }[lang] || 'Color Rush!';
 KidUI.init({ title: "Color Rush", icon: "🌀", color: "#00796B", gameId: "color_rush", lang: lang });
 
 const T = {

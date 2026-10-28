@@ -83,7 +83,7 @@ body {
   <h1 id="ui-start-t" style="font-size:28px;margin:12px 0 8px;">Animal World</h1>
   <p id="ui-start-d" style="font-size:15px;opacity:.85;">Learn animal names and sounds!</p>
   <div id="level-info" style="background:rgba(255,255,255,.15);border-radius:16px;padding:10px 20px;margin:14px 0;font-size:14px;font-weight:900;"></div>
-  <button class="btn-p" onclick="startGame()">START</button>
+  <button class="btn-p" id="btn-start" onclick="startGame()">START</button>
   <button class="btn-p" id="btn-levels" style="background:rgba(255,255,255,.2);color:#fff;margin-top:8px;font-size:14px;" onclick="showAllLevels()">📊 Darajalar</button>
 </div>
 
@@ -167,6 +167,7 @@ function init() {
   // Apply lang
   document.title = t.title;
   document.getElementById('ui-title').textContent        = t.title;
+  document.getElementById('btn-start').textContent = t.start;
   document.getElementById('ui-start-t').textContent      = t.title;
   document.getElementById('ui-start-d').textContent      = t.desc;
   document.getElementById('ui-quest').textContent        = t.quest;

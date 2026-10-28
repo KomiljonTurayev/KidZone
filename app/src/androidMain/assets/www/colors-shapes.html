@@ -303,23 +303,23 @@ body {
 <script>
 // ── DATA ─────────────────────────────────────────────────────────────────────
 const COLORS_DATA = [
-  { name:"Qizil",     emoji:"🔴", hex:"#FF6B6B", light:"#FFE5E5" },
-  { name:"Ko'k",      emoji:"🔵", hex:"#4ECDC4", light:"#E0FAF8" },
-  { name:"Yashil",    emoji:"🟢", hex:"#55EFC4", light:"#E0FAF0" },
-  { name:"Sariq",     emoji:"🟡", hex:"#FECA57", light:"#FFFBE0" },
-  { name:"To'q sariq",emoji:"🟠", hex:"#FF9F43", light:"#FFF0D9" },
-  { name:"Binafsha",  emoji:"🟣", hex:"#A29BFE", light:"#F0EEFF" },
-  { name:"Pushti",    emoji:"🩷", hex:"#FD79A8", light:"#FFE5F0" },
-  { name:"Jigarrang", emoji:"🟤", hex:"#CD853F", light:"#F5E6D0" },
+  { name:"Qizil", ru:"Красный", en:"Red",     emoji:"🔴", hex:"#FF6B6B", light:"#FFE5E5" },
+  { name:"Ko'k", ru:"Синий", en:"Blue",      emoji:"🔵", hex:"#4ECDC4", light:"#E0FAF8" },
+  { name:"Yashil", ru:"Зелёный", en:"Green",    emoji:"🟢", hex:"#55EFC4", light:"#E0FAF0" },
+  { name:"Sariq", ru:"Жёлтый", en:"Yellow",     emoji:"🟡", hex:"#FECA57", light:"#FFFBE0" },
+  { name:"To'q sariq", ru:"Оранжевый", en:"Orange",emoji:"🟠", hex:"#FF9F43", light:"#FFF0D9" },
+  { name:"Binafsha", ru:"Фиолетовый", en:"Purple",  emoji:"🟣", hex:"#A29BFE", light:"#F0EEFF" },
+  { name:"Pushti", ru:"Розовый", en:"Pink",    emoji:"🩷", hex:"#FD79A8", light:"#FFE5F0" },
+  { name:"Jigarrang", ru:"Коричневый", en:"Brown", emoji:"🟤", hex:"#CD853F", light:"#F5E6D0" },
 ];
 
 const SHAPES_DATA = [
-  { name:"Doira",        type:"circle" },
-  { name:"Kvadrat",      type:"square" },
-  { name:"Uchburchak",   type:"triangle" },
-  { name:"Yulduz",       type:"star" },
-  { name:"Yurak",        type:"heart" },
-  { name:"Olmoscha",     type:"diamond" },
+  { name:"Doira", ru:"Круг", en:"Circle",        type:"circle" },
+  { name:"Kvadrat", ru:"Квадрат", en:"Square",      type:"square" },
+  { name:"Uchburchak", ru:"Треугольник", en:"Triangle",   type:"triangle" },
+  { name:"Yulduz", ru:"Звезда", en:"Star",       type:"star" },
+  { name:"Yurak", ru:"Сердце", en:"Heart",        type:"heart" },
+  { name:"Olmoscha", ru:"Ромб", en:"Diamond",     type:"diamond" },
 ];
 
 function drawShape(svgEl, type, color, size=56) {
@@ -452,6 +452,7 @@ const CS_T = {
     resMsgGood:  "Deyarli hammasi to'g'ri! Davom eting 💪",
     resMsgOk:    "Yana bir oz mashq qiling! 📚",
     howToPlay:   "Qanday o'ynash?",
+    colorWord:   "RANG",
   },
   ru: {
     title:       "🎨 Цвета & Фигуры",
@@ -481,6 +482,7 @@ const CS_T = {
     resMsgGood:  "Почти всё верно! Продолжай 💪",
     resMsgOk:    "Ещё немного попрактикуйся! 📚",
     howToPlay:   "Как играть?",
+    colorWord:   "ЦВЕТ",
   },
   en: {
     title:       "🎨 Colors & Shapes",
@@ -510,10 +512,13 @@ const CS_T = {
     resMsgGood:  "Almost all correct! Keep going 💪",
     resMsgOk:    "Practice a little more! 📚",
     howToPlay:   "How to play?",
+    colorWord:   "",
   },
 };
 
 function getT() { return CS_T[CS_LANG] || CS_T.en; }
+/* name is the Uzbek key used for comparisons; this is what the child sees */
+function nm(item) { return item[CS_LANG] || item.name; }
 
 function applyCSLang() {
   const t = getT();
@@ -544,6 +549,10 @@ function applyCSLang() {
   const resLabels = document.querySelectorAll('#result-screen [style*="font-size:11px"]');
   if (resLabels[0]) resLabels[0].textContent = t.resBall;
   if (resLabels[1]) resLabels[1].textContent = t.resCorrect;
+  /* question card placeholder shown behind the start screen */
+  document.getElementById('q-instruction').textContent = t.findIt;
+  document.getElementById('q-name').textContent = (nm(COLORS_DATA[0]) + " " + t.colorWord).trim().toUpperCase();
+  document.getElementById('q-hint').textContent = t.hintColor;
 }
 
 /* level selector for colors-shapes */
@@ -637,7 +646,7 @@ function nextQ() {
     emojiEl.style.display = "block";
     svgEl.style.display   = "none";
     emojiEl.textContent   = currentItem.emoji;
-    nameEl.textContent    = currentItem.name.toUpperCase() + " RANG";
+    nameEl.textContent    = (nm(currentItem) + " " + getT().colorWord).trim().toUpperCase();
     nameEl.style.color    = currentItem.hex;
     hintEl.textContent    = getT().hintColor;
     cardEl.style.background = currentItem.light;
@@ -646,7 +655,7 @@ function nextQ() {
     svgEl.style.display   = "block";
     drawShape(svgEl, currentItem.type, currentItem.color.hex, 72);
     svgEl.setAttribute("width","72"); svgEl.setAttribute("height","72");
-    nameEl.textContent  = currentItem.name.toUpperCase();
+    nameEl.textContent  = nm(currentItem).toUpperCase();
     nameEl.style.color  = currentItem.color.hex;
     hintEl.textContent  = getT().hintShape;
     cardEl.style.background = currentItem.color.light;
@@ -668,7 +677,7 @@ function nextQ() {
       btn.innerHTML = `
         <div style="width:54px;height:54px;border-radius:50%;background:${item.hex};
                     box-shadow:0 3px 10px ${item.hex}66"></div>
-        <span class="choice-label">${item.name}</span>`;
+        <span class="choice-label">${nm(item)}</span>`;
     } else {
       const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
       svg.setAttribute("width","54"); svg.setAttribute("height","54");
@@ -677,7 +686,7 @@ function nextQ() {
       btn.appendChild(svg);
       const lbl = document.createElement("span");
       lbl.className = "choice-label";
-      lbl.textContent = item.name;
+      lbl.textContent = nm(item);
       btn.appendChild(lbl);
     }
     btn.onclick = () => checkChoice(item, btn);
@@ -785,6 +794,7 @@ function goHome() {
 
 setMode("color");
 window.addEventListener('load', () => {
+  applyCSLang();
   initKZL();
 });
 </script>

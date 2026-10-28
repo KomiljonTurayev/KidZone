@@ -48,10 +48,11 @@ const params = new URLSearchParams(location.search);
 const lang = params.get('lang') || 'uz';
 const I18N = {
   uz: { hint: 'Uchish uchun ekranni bosing!', start: 'BOSHLASH', over: 'O\'yin Tugadi!', res: 'Natijangiz: ' },
-  ru: { hint: 'Нажимайте на экран для полета!', start: 'СТАРТ', over: 'Игра Окончена!', res: 'Ваш результат: ' },
+  ru: { title: 'Флаппи Дино', hint: 'Нажимайте на экран для полета!', start: 'СТАРТ', over: 'Игра Окончена!', res: 'Ваш результат: ' },
   en: { hint: 'Tap screen to flap and fly!', start: 'START', over: 'Game Over!', res: 'Your Score: ' }
 };
 const T = I18N[lang] || I18N.uz;
+document.getElementById('title').textContent = T.title || 'Flappy Dino';
 window.addEventListener('load', () => {
   document.getElementById('hint').textContent = T.hint;
   document.querySelector('.btn').textContent = T.start;
@@ -158,7 +159,7 @@ function start() {
 function end() {
   active = false;
   document.getElementById('overlay').style.display = 'flex';
-  document.getElementById('title').textContent = 'O\'yin Tugadi!';
+  document.getElementById('title').textContent = T.over;
   document.getElementById('hint').textContent = 'Natijangiz: ' + score + ' ball ⭐';
 }
 

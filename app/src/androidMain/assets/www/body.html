@@ -54,7 +54,7 @@ body { min-height:100vh; background:#FCE4EC; font-family:'Arial Rounded MT Bold'
   <h1 id="ui-start-t" style="font-size:26px;margin:12px 0 8px;">Body Parts</h1>
   <p  id="ui-start-d" style="font-size:14px;opacity:.85;"></p>
   <div id="level-info" style="background:rgba(255,255,255,.2);border-radius:14px;padding:9px 18px;margin:12px 0;font-size:13px;font-weight:900;"></div>
-  <button class="btn-p" onclick="startGame()">START</button>
+  <button class="btn-p" id="btn-start" onclick="startGame()">START</button>
 </div>
 
 <div id="result-screen" class="screen hidden">
@@ -122,6 +122,7 @@ function init() {
   _pool  = KZL.slicePool(DATA, _level);
   document.title = t.title;
   document.getElementById('ui-title').textContent   = t.title;
+  document.getElementById('btn-start').textContent = t.start;
   document.getElementById('ui-start-t').textContent = t.title;
   document.getElementById('ui-start-d').textContent = t.desc;
   document.getElementById('lv-val').textContent     = _level;
