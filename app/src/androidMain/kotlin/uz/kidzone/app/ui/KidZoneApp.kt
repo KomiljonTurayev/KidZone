@@ -2,6 +2,7 @@ package uz.kidzone.app.ui
 
 import uz.kidzone.app.arch.AppPreferences
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,6 +25,8 @@ import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
 import uz.kidzone.app.ui.screens.ProfileSelectScreen
 import uz.kidzone.app.ui.screens.SleepScreen
+import uz.kidzone.app.ui.i18n.LocalAppLang
+import uz.kidzone.app.ui.i18n.rememberAppLang
 import uz.kidzone.app.ui.theme.KidZoneTheme
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import android.content.SharedPreferences
@@ -42,9 +45,10 @@ fun KidZoneApp(
     onOnboardingDone: () -> Unit = {},
 ) {
     val mainUiState by mainViewModel.state.collectAsState()
+    val appLang by rememberAppLang(prefs)
     if (mainUiState.isBanned) {
         KidZoneTheme {
-            BannedScreen()
+            CompositionLocalProvider(LocalAppLang provides appLang) { BannedScreen() }
         }
         return
     }
@@ -86,115 +90,117 @@ fun KidZoneApp(
     }
 
     KidZoneTheme {
-        NavHost(navController = navController, startDestination = startDestination) {
-            composable("onboarding") {
-                OnboardingScreen(
-                    prefs = prefs,
-                    profiles = profiles,
-                    onSaveChild = { name, lang ->
-                        // Every install starts with one default profile; the parent names it here.
-                        val target = profiles.firstOrNull { it.isDefault } ?: profiles.firstOrNull()
-                        if (target != null) {
-                            val named = target.copy(name = name, language = lang)
-                            profileViewModel.updateProfile(named)
-                            profileViewModel.setActiveProfile(named)
+        CompositionLocalProvider(LocalAppLang provides appLang) {
+            NavHost(navController = navController, startDestination = startDestination) {
+                composable("onboarding") {
+                    OnboardingScreen(
+                        prefs = prefs,
+                        profiles = profiles,
+                        onSaveChild = { name, lang ->
+                            // Every install starts with one default profile; the parent names it here.
+                            val target = profiles.firstOrNull { it.isDefault } ?: profiles.firstOrNull()
+                            if (target != null) {
+                                val named = target.copy(name = name, language = lang)
+                                profileViewModel.updateProfile(named)
+                                profileViewModel.setActiveProfile(named)
+                            }
+                        },
+                        onDone = {
+                            onOnboardingDone()
+                            navController.navigate("main") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
                         }
-                    },
-                    onDone = {
-                        onOnboardingDone()
-                        navController.navigate("main") {
-                            popUpTo("onboarding") { inclusive = true }
-                        }
-                    }
-                )
-            }
-            composable("profile_select") {
-                ProfileSelectScreen(
-                    profiles = profiles,
-                    onSelect = { profile ->
-                        profileViewModel.setActiveProfile(profile)
-                        navController.navigate("main") {
-                            popUpTo("profile_select") { inclusive = true }
-                        }
-                    },
-                    onAddNew = { navController.navigate("add_edit_profile/new") },
-                )
-            }
-            composable("main") { backStack ->
-                // Set by the "account/{feature}" route after a successful sign-in, so the
-                // feature the child asked for opens right away instead of needing a second tap.
-                val unlocked by backStack.savedStateHandle
-                    .getStateFlow<String?>(UNLOCKED_FEATURE_KEY, null)
-                    .collectAsState()
-                MainScreen(
-                    mainViewModel = mainViewModel,
-                    prefs = prefs,
-                    statsManager = statsManager,
-                    profileViewModel = profileViewModel,
-                    challengeViewModel = challengeViewModel,
-                    onOpenDashboard = { navController.navigate("dashboard") },
-                    onOpenSleep = { navController.navigate("sleep") },
-                    onRequireAccount = { feature -> navController.navigate("account/${feature.name}") },
-                    unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
-                    onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },
-                )
-            }
-            composable("account/{feature}") { backStack ->
-                val feature = backStack.arguments?.getString("feature")
-                    ?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } }
-                    ?: AccountFeature.AI_COMPANION
-                val activeProfile by profileViewModel.activeProfile.collectAsState()
-                AccountGate(
-                    feature = feature,
-                    pinHash = activeProfile?.pinHash,
-                    lang = prefs.getString("kz_lang", "uz") ?: "uz",
-                    onSignedIn = {
-                        navController.previousBackStackEntry?.savedStateHandle?.set(UNLOCKED_FEATURE_KEY, feature.name)
-                        navController.popBackStack()
-                    },
-                    onBack = { navController.popBackStack() },
-                )
-            }
-            composable("premium") {
-                PaywallScreen(
-                    onDismiss = { navController.popBackStack() },
-                    onSuccess = { navController.popBackStack() },
-                )
-            }
-            composable("sleep") {
-                val curLang = prefs.getString("kz_lang", "uz") ?: "uz"
-                SleepScreen(
-                    lang = curLang,
-                    onBack = { navController.popBackStack() },
-                )
-            }
-            composable("dashboard") {
-                ParentDashboardScreen(
-                    onBack = { navController.popBackStack() },
-                    profileViewModel = profileViewModel,
-                    challengeViewModel = challengeViewModel,
-                    onNavigateToAddEdit = { profileId ->
-                        navController.navigate("add_edit_profile/${profileId ?: "new"}")
-                    },
-                    // Reached only from the signed-in dashboard, so PREMIUM is already unlocked.
-                    onOpenPremium = { navController.navigate("premium") },
-                )
-            }
-            composable("add_edit_profile/{profileId}") { backStack ->
-                val profileId = backStack.arguments?.getString("profileId")
-                val profile = if (profileId == "new") null
-                              else profiles.firstOrNull { it.id == profileId }
-                AddEditProfileScreen(
-                    profile = profile,
-                    // New profiles share the parent PIN (see ProfileViewModel.setParentPin).
-                    parentPinHash = profiles.firstNotNullOfOrNull { it.pinHash },
-                    onSave = { saved ->
-                        if (profile == null) profileViewModel.insertProfile(saved)
-                        else profileViewModel.updateProfile(saved)
-                        navController.popBackStack()
-                    },
-                    onCancel = { navController.popBackStack() },
-                )
+                    )
+                }
+                composable("profile_select") {
+                    ProfileSelectScreen(
+                        profiles = profiles,
+                        onSelect = { profile ->
+                            profileViewModel.setActiveProfile(profile)
+                            navController.navigate("main") {
+                                popUpTo("profile_select") { inclusive = true }
+                            }
+                        },
+                        onAddNew = { navController.navigate("add_edit_profile/new") },
+                    )
+                }
+                composable("main") { backStack ->
+                    // Set by the "account/{feature}" route after a successful sign-in, so the
+                    // feature the child asked for opens right away instead of needing a second tap.
+                    val unlocked by backStack.savedStateHandle
+                        .getStateFlow<String?>(UNLOCKED_FEATURE_KEY, null)
+                        .collectAsState()
+                    MainScreen(
+                        mainViewModel = mainViewModel,
+                        prefs = prefs,
+                        statsManager = statsManager,
+                        profileViewModel = profileViewModel,
+                        challengeViewModel = challengeViewModel,
+                        onOpenDashboard = { navController.navigate("dashboard") },
+                        onOpenSleep = { navController.navigate("sleep") },
+                        onRequireAccount = { feature -> navController.navigate("account/${feature.name}") },
+                        unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
+                        onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },
+                    )
+                }
+                composable("account/{feature}") { backStack ->
+                    val feature = backStack.arguments?.getString("feature")
+                        ?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } }
+                        ?: AccountFeature.AI_COMPANION
+                    val activeProfile by profileViewModel.activeProfile.collectAsState()
+                    AccountGate(
+                        feature = feature,
+                        pinHash = activeProfile?.pinHash,
+                        lang = appLang,
+                        onSignedIn = {
+                            navController.previousBackStackEntry?.savedStateHandle?.set(UNLOCKED_FEATURE_KEY, feature.name)
+                            navController.popBackStack()
+                        },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+                composable("premium") {
+                    PaywallScreen(
+                        onDismiss = { navController.popBackStack() },
+                        onSuccess = { navController.popBackStack() },
+                    )
+                }
+                composable("sleep") {
+                    val curLang = appLang
+                    SleepScreen(
+                        lang = curLang,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+                composable("dashboard") {
+                    ParentDashboardScreen(
+                        onBack = { navController.popBackStack() },
+                        profileViewModel = profileViewModel,
+                        challengeViewModel = challengeViewModel,
+                        onNavigateToAddEdit = { profileId ->
+                            navController.navigate("add_edit_profile/${profileId ?: "new"}")
+                        },
+                        // Reached only from the signed-in dashboard, so PREMIUM is already unlocked.
+                        onOpenPremium = { navController.navigate("premium") },
+                    )
+                }
+                composable("add_edit_profile/{profileId}") { backStack ->
+                    val profileId = backStack.arguments?.getString("profileId")
+                    val profile = if (profileId == "new") null
+                                  else profiles.firstOrNull { it.id == profileId }
+                    AddEditProfileScreen(
+                        profile = profile,
+                        // New profiles share the parent PIN (see ProfileViewModel.setParentPin).
+                        parentPinHash = profiles.firstNotNullOfOrNull { it.pinHash },
+                        onSave = { saved ->
+                            if (profile == null) profileViewModel.insertProfile(saved)
+                            else profileViewModel.updateProfile(saved)
+                            navController.popBackStack()
+                        },
+                        onCancel = { navController.popBackStack() },
+                    )
+                }
             }
         }
     }

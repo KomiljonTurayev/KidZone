@@ -12,7 +12,6 @@ import uz.kidzone.app.auth.AuthException
 import uz.kidzone.app.auth.AuthRepository
 import uz.kidzone.app.auth.GoogleIdTokenSource
 import uz.kidzone.app.auth.TelegramLoginFlow
-import uz.kidzone.app.auth.userMessage
 
 @Immutable
 sealed interface LoginUiState {
@@ -22,7 +21,8 @@ sealed interface LoginUiState {
     /** The bot link is open; waiting for the parent to press Start in Telegram. */
     data class WaitingForTelegram(val botUrl: String) : LoginUiState
     data object SignedIn : LoginUiState
-    data class Failed(val message: String) : LoginUiState
+    /** [reason] is turned into text by the screen, in the app language. */
+    data class Failed(val reason: AuthException.Reason) : LoginUiState
 }
 
 val LoginUiState.isBusy: Boolean
@@ -77,7 +77,7 @@ class LoginViewModel(
                 signIn()
                 LoginUiState.SignedIn
             } catch (e: AuthException) {
-                e.reason.userMessage()?.let { LoginUiState.Failed(it) } ?: LoginUiState.Idle
+                if (e.reason == AuthException.Reason.CANCELLED) LoginUiState.Idle else LoginUiState.Failed(e.reason)
             }
         }
     }

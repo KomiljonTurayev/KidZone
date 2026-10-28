@@ -28,6 +28,7 @@ import uz.kidzone.app.ui.components.KidSubtitle
 import uz.kidzone.app.ui.components.KidTextButton
 import uz.kidzone.app.ui.components.KidTitle
 import uz.kidzone.app.ui.components.MascotBubble
+import uz.kidzone.app.ui.i18n.tr
 
 // Lockout after repeated wrong PINs: a 4-digit PIN only has 10k combinations, so the real
 // defense isn't the hash — it's throttling guesses. Escalating cooldown (30s, 60s, 120s, ...)
@@ -62,9 +63,9 @@ internal fun PinGate(
         KidPage {
             MascotBubble("🔐", size = 100.dp)
             Spacer(Modifier.height(18.dp))
-            KidTitle("Ota-ona qulfi")
+            KidTitle(tr("Ota-ona qulfi", "Родительский замок", "Parent lock"))
             Spacer(Modifier.height(6.dp))
-            KidSubtitle("Kattalar ekanligingizni tasdiqlash uchun masalani yeching:")
+            KidSubtitle(tr("Kattalar ekanligingizni tasdiqlash uchun masalani yeching:", "Решите пример, чтобы подтвердить, что вы взрослый:", "Solve this to confirm you're a grown-up:"))
             Spacer(Modifier.height(18.dp))
             KidCard {
                 Text(
@@ -76,7 +77,7 @@ internal fun PinGate(
             }
             if (error) {
                 Spacer(Modifier.height(10.dp))
-                KidError("Xato! Qaytadan urinib ko'ring.")
+                KidError(tr("Xato! Qaytadan urinib ko'ring.", "Неверно! Попробуйте ещё раз.", "Wrong! Please try again."))
             }
             Spacer(Modifier.height(18.dp))
             KidNumberPad(
@@ -84,7 +85,7 @@ internal fun PinGate(
                 onDelete = { answer = answer.dropLast(1); error = false },
             )
             Spacer(Modifier.height(18.dp))
-            KidButton("Tasdiqlash", enabled = answer.isNotEmpty()) {
+            KidButton(tr("Tasdiqlash", "Подтвердить", "Confirm"), enabled = answer.isNotEmpty()) {
                 if (answer.toIntOrNull() == a * b) {
                     onSuccess()
                 } else {
@@ -95,7 +96,7 @@ internal fun PinGate(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            KidTextButton("Bekor qilish", onClick = onBack)
+            KidTextButton(tr("Bekor qilish", "Отмена", "Cancel"), onClick = onBack)
         }
         return
     }
@@ -120,17 +121,21 @@ internal fun PinGate(
     KidPage {
         MascotBubble(if (isLocked) "⏳" else "🔐", size = 100.dp)
         Spacer(Modifier.height(18.dp))
-        KidTitle("PIN kiriting")
+        KidTitle(tr("PIN kiriting", "Введите PIN", "Enter PIN"))
         Spacer(Modifier.height(20.dp))
         DigitBoxes(entered, length = 4, error = lastAttemptFailed || isLocked, masked = true)
         when {
             isLocked -> {
                 Spacer(Modifier.height(10.dp))
-                KidError("Juda ko'p xato urinish. $remainingLockSeconds soniyadan keyin qayta urinib ko'ring ⏳")
+                KidError(tr(
+                    "Juda ko'p xato urinish. $remainingLockSeconds soniyadan keyin qayta urinib ko'ring ⏳",
+                    "Слишком много попыток. Попробуйте через $remainingLockSeconds с ⏳",
+                    "Too many wrong tries. Try again in $remainingLockSeconds s ⏳",
+                ))
             }
             lastAttemptFailed -> {
                 Spacer(Modifier.height(10.dp))
-                KidError("PIN noto'g'ri ❌")
+                KidError(tr("PIN noto'g'ri ❌", "Неверный PIN ❌", "Wrong PIN ❌"))
             }
         }
         Spacer(Modifier.height(20.dp))
@@ -171,6 +176,6 @@ internal fun PinGate(
             },
         )
         Spacer(Modifier.height(12.dp))
-        KidTextButton("Bekor qilish", onClick = onBack)
+        KidTextButton(tr("Bekor qilish", "Отмена", "Cancel"), onClick = onBack)
     }
 }

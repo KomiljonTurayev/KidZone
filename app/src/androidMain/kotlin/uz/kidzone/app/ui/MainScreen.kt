@@ -79,6 +79,7 @@ import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.KidzoViewModel
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
+import uz.kidzone.app.ui.i18n.tr
 
 private val KidZoneOrange = Color(0xFFFF6B35)
 
@@ -223,7 +224,7 @@ fun MainScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("🌙", style = MaterialTheme.typography.displayLarge)
-                        Text("Bugungi vaqting tugadi", color = Color.White)
+                        Text(tr("Bugungi vaqting tugadi", "Время на сегодня закончилось", "Your time for today is up"), color = Color.White)
                         Spacer(Modifier.height(16.dp))
                         Button(
                             onClick = { showUnlockPin = true },
@@ -231,7 +232,7 @@ fun MainScreen(
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B35)),
                             modifier = Modifier.height(56.dp).padding(horizontal = 24.dp)
                         ) {
-                            Text("Ota-ona uchun 🔐", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(tr("Ota-ona uchun 🔐", "Для родителей 🔐", "For parents 🔐"), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -375,7 +376,8 @@ fun MainScreen(
             icon = { Text(if (uiState.isExitFromGame) "🎮" else "👋", fontSize = 40.sp) },
             title = {
                 Text(
-                    if (uiState.isExitFromGame) "O’yindan chiqish?" else "KidZone’dan chiqish?",
+                    if (uiState.isExitFromGame) tr("O‘yindan chiqish?", "Выйти из игры?", "Leave the game?")
+                    else tr("KidZone’dan chiqish?", "Выйти из KidZone?", "Leave KidZone?"),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
@@ -383,8 +385,8 @@ fun MainScreen(
             },
             text = {
                 Text(
-                    if (uiState.isExitFromGame) "Menyuga qaytmoqchimisiz?"
-                    else "Haqiqatan ham chiqib ketmoqchimisiz?",
+                    if (uiState.isExitFromGame) tr("Menyuga qaytmoqchimisiz?", "Вернуться в меню?", "Go back to the menu?")
+                    else tr("Haqiqatan ham chiqib ketmoqchimisiz?", "Вы точно хотите выйти?", "Do you really want to leave?"),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -404,7 +406,10 @@ fun MainScreen(
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = KidZoneOrange),
                 ) {
-                    Text(if (uiState.isExitFromGame) "Ha, menyuga" else "Ha, chiqish")
+                    Text(
+                        if (uiState.isExitFromGame) tr("Ha, menyuga", "Да, в меню", "Yes, to the menu")
+                        else tr("Ha, chiqish", "Да, выйти", "Yes, leave"),
+                    )
                 }
             },
             dismissButton = {
@@ -413,7 +418,7 @@ fun MainScreen(
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = KidZoneOrange),
                     border = BorderStroke(1.dp, KidZoneOrange),
-                ) { Text("Yoʼq, qolish") }
+                ) { Text(tr("Yoʻq, qolish", "Нет, остаться", "No, stay")) }
             },
         )
     }

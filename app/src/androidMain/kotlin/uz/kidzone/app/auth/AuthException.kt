@@ -19,14 +19,45 @@ class AuthException(val reason: Reason, cause: Throwable? = null) : Exception(re
     }
 }
 
-/** Uzbek copy shown to the parent for each failure. */
-fun AuthException.Reason.userMessage(): String? = when (this) {
-    AuthException.Reason.CANCELLED -> null
-    AuthException.Reason.NOT_CONFIGURED -> "Bu kirish usuli hozircha sozlanmagan."
-    AuthException.Reason.NETWORK -> "Internet aloqasini tekshirib, qayta urinib ko'ring."
-    AuthException.Reason.EXPIRED -> "Vaqt tugadi. Qaytadan urinib ko'ring."
-    AuthException.Reason.REAUTH_REQUIRED -> "Xavfsizlik uchun avval qaytadan kiring, so'ng hisobni o'chiring."
-    AuthException.Reason.WRONG_ACCOUNT -> "Bu boshqa hisob. Ilovaga kirgan hisobingiz bilan tasdiqlang."
-    AuthException.Reason.NO_SESSION -> "Ilova hali tayyor emas. Birozdan so'ng qayta urinib ko'ring."
-    AuthException.Reason.FAILED -> "Kirib bo'lmadi. Qayta urinib ko'ring."
+/** Copy shown to the parent for each failure, in [lang] ("uz", "ru" or "en"; anything else is Uzbek). */
+fun AuthException.Reason.userMessage(lang: String = "uz"): String? {
+    fun t(uz: String, ru: String, en: String) = when (lang) { "ru" -> ru; "en" -> en; else -> uz }
+    return when (this) {
+        AuthException.Reason.CANCELLED -> null
+        AuthException.Reason.NOT_CONFIGURED -> t(
+            "Bu kirish usuli hozircha sozlanmagan.",
+            "Этот способ входа пока не настроен.",
+            "This sign-in method isn't set up yet.",
+        )
+        AuthException.Reason.NETWORK -> t(
+            "Internet aloqasini tekshirib, qayta urinib ko'ring.",
+            "Проверьте подключение к интернету и попробуйте снова.",
+            "Check your internet connection and try again.",
+        )
+        AuthException.Reason.EXPIRED -> t(
+            "Vaqt tugadi. Qaytadan urinib ko'ring.",
+            "Время истекло. Попробуйте снова.",
+            "Time ran out. Please try again.",
+        )
+        AuthException.Reason.REAUTH_REQUIRED -> t(
+            "Xavfsizlik uchun avval qaytadan kiring, so'ng hisobni o'chiring.",
+            "В целях безопасности войдите заново, затем удалите аккаунт.",
+            "For security, sign in again first, then delete the account.",
+        )
+        AuthException.Reason.WRONG_ACCOUNT -> t(
+            "Bu boshqa hisob. Ilovaga kirgan hisobingiz bilan tasdiqlang.",
+            "Это другой аккаунт. Подтвердите тем аккаунтом, которым вы вошли в приложение.",
+            "That's a different account. Confirm with the account you're signed in with.",
+        )
+        AuthException.Reason.NO_SESSION -> t(
+            "Ilova hali tayyor emas. Birozdan so'ng qayta urinib ko'ring.",
+            "Приложение ещё не готово. Попробуйте чуть позже.",
+            "The app isn't ready yet. Please try again in a moment.",
+        )
+        AuthException.Reason.FAILED -> t(
+            "Kirib bo'lmadi. Qayta urinib ko'ring.",
+            "Не удалось войти. Попробуйте снова.",
+            "Couldn't sign in. Please try again.",
+        )
+    }
 }

@@ -32,6 +32,7 @@ import uz.kidzone.app.ui.components.KidCard
 import uz.kidzone.app.ui.components.KidPage
 import uz.kidzone.app.ui.components.KidTitle
 import uz.kidzone.app.ui.components.MascotBubble
+import uz.kidzone.app.ui.i18n.tr
 import java.io.File
 import kotlin.math.absoluteValue
 
@@ -44,7 +45,7 @@ fun ProfileSelectScreen(
     KidPage {
         MascotBubble("👋", size = 108.dp)
         Spacer(Modifier.height(20.dp))
-        KidTitle("Kim o'ynaydi? 🎮")
+        KidTitle(tr("Kim o'ynaydi? 🎮", "Кто играет? 🎮", "Who's playing? 🎮"))
         Spacer(Modifier.height(24.dp))
         // Plain rows rather than a lazy grid: the page scrolls as a whole and there are only a few profiles.
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -58,7 +59,7 @@ fun ProfileSelectScreen(
             }
         }
         Spacer(Modifier.height(28.dp))
-        KidButton("➕ Yangi profil qo'shish", brush = Kid.Meadow, onClick = onAddNew)
+        KidButton(tr("➕ Yangi profil qo'shish", "➕ Добавить профиль", "➕ Add profile"), brush = Kid.Meadow, onClick = onAddNew)
     }
 }
 

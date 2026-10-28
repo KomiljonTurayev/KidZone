@@ -23,13 +23,16 @@ import uz.kidzone.app.data.ProfileEntity
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidCard
 import uz.kidzone.app.ui.components.KidChip
+import uz.kidzone.app.ui.i18n.LocalAppLang
+import uz.kidzone.app.ui.i18n.tr
 
-private val MILESTONE_COPY: Map<Int, Pair<String, String>> = mapOf(
-    3 to ("🔥" to "3 kun ketma-ket! Ajoyib boshlanish!"),
-    7 to ("🔥🔥" to "Bir hafta ketma-ket! Zo'r!"),
-    14 to ("🔥🔥🔥" to "Ikki hafta ketma-ket!"),
-    30 to ("🔥🔥🔥🔥" to "Bir oy ketma-ket! Sen chempion!"),
-)
+private fun milestoneCopy(days: Int, lang: String): Pair<String, String>? = when (days) {
+    3 -> "🔥" to tr(lang, "3 kun ketma-ket! Ajoyib boshlanish!", "3 дня подряд! Отличное начало!", "3 days in a row! Great start!")
+    7 -> "🔥🔥" to tr(lang, "Bir hafta ketma-ket! Zo'r!", "Неделя подряд! Здорово!", "A whole week in a row! Awesome!")
+    14 -> "🔥🔥🔥" to tr(lang, "Ikki hafta ketma-ket!", "Две недели подряд!", "Two weeks in a row!")
+    30 -> "🔥🔥🔥🔥" to tr(lang, "Bir oy ketma-ket! Sen chempion!", "Месяц подряд! Ты чемпион!", "A month in a row! You're a champion!")
+    else -> null
+}
 
 @Composable
 internal fun ProfileListItem(
@@ -67,7 +70,7 @@ internal fun ProfileListItem(
                         if (isActive) {
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                "✓ Faol",
+                                tr("✓ Faol", "✓ Активен", "✓ Active"),
                                 color = Color.White,
                                 style = MaterialTheme.typography.labelMedium,
                                 modifier = Modifier
@@ -78,7 +81,9 @@ internal fun ProfileListItem(
                         }
                     }
                     Text(
-                        "${profile.language.uppercase()} · ${if (profile.timeLimitMinutes == 0) "Cheksiz" else "${profile.timeLimitMinutes} daq"}",
+                        "${profile.language.uppercase()} · " +
+                            if (profile.timeLimitMinutes == 0) tr("Cheksiz", "Без лимита", "No limit")
+                            else "${profile.timeLimitMinutes} " + tr("daq", "мин", "min"),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Kid.InkSoft,
                     )
@@ -86,7 +91,7 @@ internal fun ProfileListItem(
             }
             Spacer(Modifier.padding(top = 10.dp))
             // Streak satri
-            val milestoneCopy = celebrateMilestone?.let { MILESTONE_COPY[it] }
+            val milestoneCopy = celebrateMilestone?.let { milestoneCopy(it, LocalAppLang.current) }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -102,10 +107,10 @@ internal fun ProfileListItem(
                         color = Kid.Orange,
                     )
                 } else {
-                    Text("🔥 $streakCount kun streak", style = MaterialTheme.typography.titleSmall, color = Kid.Ink)
+                    Text("🔥 " + tr("$streakCount kun ketma-ket", "$streakCount дн. подряд", "$streakCount-day streak"), style = MaterialTheme.typography.titleSmall, color = Kid.Ink)
                     Spacer(Modifier.weight(1f))
                     Text(
-                        if (doneToday) "Bugun: ✅" else "Bugun: ⏳",
+                        tr("Bugun: ", "Сегодня: ", "Today: ") + if (doneToday) "✅" else "⏳",
                         style = MaterialTheme.typography.titleSmall,
                         color = Kid.InkSoft,
                     )
@@ -113,9 +118,9 @@ internal fun ProfileListItem(
             }
             Spacer(Modifier.padding(top = 12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (!isActive) KidChip("Tanlash", selected = false, modifier = Modifier.weight(1f), onClick = onSwitch)
-                KidChip("✏️ Tahrir", selected = false, modifier = Modifier.weight(1f), onClick = onEdit)
-                KidChip("🗑 O'chir", selected = false, modifier = Modifier.weight(1f), onClick = onDelete)
+                if (!isActive) KidChip(tr("Tanlash", "Выбрать", "Select"), selected = false, modifier = Modifier.weight(1f), onClick = onSwitch)
+                KidChip(tr("✏️ Tahrir", "✏️ Изменить", "✏️ Edit"), selected = false, modifier = Modifier.weight(1f), onClick = onEdit)
+                KidChip(tr("🗑 O'chir", "🗑 Удалить", "🗑 Delete"), selected = false, modifier = Modifier.weight(1f), onClick = onDelete)
             }
         }
     }

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import uz.kidzone.app.auth.AccountFeature
 import uz.kidzone.app.auth.AuthProvider
+import uz.kidzone.app.auth.userMessage
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidCard
 import uz.kidzone.app.ui.components.KidPage
@@ -70,8 +71,8 @@ fun LoginScreen(
     val t = loginTexts(lang)
     LoginScreen(
         viewModel = viewModel,
-        title = feature.title,
-        message = "${feature.pitch}. ${t.featureMessage}",
+        title = feature.title(lang),
+        message = "${feature.pitch(lang)}. ${t.featureMessage}",
         skipLabel = t.continueAsGuest,
         onSignedIn = onSignedIn,
         onSkip = onContinueAsGuest,
@@ -163,7 +164,7 @@ fun LoginScreen(
             )
             is LoginUiState.Failed -> {
                 Spacer(Modifier.height(16.dp))
-                Text(s.message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleSmall,
+                Text(s.reason.userMessage(lang).orEmpty(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleSmall,
                     textAlign = TextAlign.Center)
             }
             else -> Unit

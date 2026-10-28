@@ -25,6 +25,8 @@ import uz.kidzone.app.ui.components.KidTextButton
 import uz.kidzone.app.ui.components.KidTitle
 import uz.kidzone.app.ui.components.KidTopBar
 import uz.kidzone.app.ui.components.MascotBubble
+import uz.kidzone.app.ui.i18n.LocalAppLang
+import uz.kidzone.app.ui.i18n.tr
 import uz.kidzone.app.ui.viewmodel.LoginViewModel
 
 private const val PIN_LENGTH = 4
@@ -41,7 +43,8 @@ internal fun SetPinFlow(
     onSave: (pinHash: String) -> Unit,
     onCancel: () -> Unit,
 ) {
-    val title = if (hasPin) "PIN o'zgartirish" else "PIN o'rnatish"
+    val lang = LocalAppLang.current
+    val title = if (hasPin) tr(lang, "PIN o'zgartirish", "Изменить PIN", "Change PIN") else tr(lang, "PIN o'rnatish", "Установить PIN", "Set PIN")
     var confirmed by remember { mutableStateOf(false) }
 
     if (!confirmed) {
@@ -55,9 +58,15 @@ internal fun SetPinFlow(
         )
         LoginScreen(
             viewModel = confirmViewModel,
-            title = "Hisobingiz bilan tasdiqlang",
-            message = "PIN'ni faqat ota-ona hisobi egasi o'rnata oladi.",
-            skipLabel = "Bekor qilish",
+            title = tr(lang, "Hisobingiz bilan tasdiqlang", "Подтвердите аккаунтом", "Confirm with your account"),
+            message = tr(
+                lang,
+                "PIN'ni faqat ota-ona hisobi egasi o'rnata oladi.",
+                "PIN может установить только владелец родительского аккаунта.",
+                "Only the owner of the parent account can set the PIN.",
+            ),
+            skipLabel = tr(lang, "Bekor qilish", "Отмена", "Cancel"),
+            lang = lang,
             // Reset the (screen-scoped) view model, or reopening this flow would count as confirmed.
             onSignedIn = { confirmViewModel.cancel(); confirmed = true },
             onSkip = onCancel,
@@ -78,14 +87,17 @@ internal fun SetPinFlow(
     KidPage(top = { KidTopBar(title, onBack = onCancel) }) {
         MascotBubble(if (first == null) "🔑" else "✅", size = 100.dp)
         Spacer(Modifier.height(18.dp))
-        KidTitle(if (first == null) "Yangi PIN'ni kiriting" else "PIN'ni qayta kiriting")
+        KidTitle(
+            if (first == null) tr(lang, "Yangi PIN'ni kiriting", "Введите новый PIN", "Enter a new PIN")
+            else tr(lang, "PIN'ni qayta kiriting", "Повторите PIN", "Enter the PIN again"),
+        )
         Spacer(Modifier.height(6.dp))
-        KidSubtitle("Istalgan 4 ta raqam. Uni bolangizga aytmang.")
+        KidSubtitle(tr(lang, "Istalgan 4 ta raqam. Uni bolangizga aytmang.", "Любые 4 цифры. Не говорите их ребёнку.", "Any 4 digits. Don't tell your child."))
         Spacer(Modifier.height(20.dp))
         DigitBoxes(entered, length = PIN_LENGTH, error = mismatch, masked = true)
         if (mismatch) {
             Spacer(Modifier.height(10.dp))
-            KidError("PIN'lar mos kelmadi. Qaytadan kiriting.")
+            KidError(tr(lang, "PIN'lar mos kelmadi. Qaytadan kiriting.", "PIN-коды не совпали. Введите заново.", "The PINs didn't match. Please enter it again."))
         }
         Spacer(Modifier.height(20.dp))
         KidNumberPad(
@@ -107,6 +119,6 @@ internal fun SetPinFlow(
             onDelete = { entered = entered.dropLast(1); mismatch = false },
         )
         Spacer(Modifier.height(12.dp))
-        KidTextButton("Bekor qilish", onClick = onCancel)
+        KidTextButton(tr(lang, "Bekor qilish", "Отмена", "Cancel"), onClick = onCancel)
     }
 }
