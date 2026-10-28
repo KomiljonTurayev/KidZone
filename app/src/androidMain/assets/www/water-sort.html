@@ -50,7 +50,7 @@
 
 <div class="header">
   <div class="lvl-badge" id="lvl-txt">⭐ 1-Bosqich</div>
-  <h1 style="color:#0284C7; font-size:20px;">Rangli Suvlar 🧪</h1>
+  <h1 id="title" style="color:#0284C7; font-size:20px;">Rangli Suvlar 🧪</h1>
   <button class="rst-btn" onclick="resetLevel()">🔄 Qayta</button>
 </div>
 
@@ -74,9 +74,9 @@
 const params = new URLSearchParams(location.search);
 const lang = params.get('lang') || 'uz';
 const I18N = {
-  uz: { lvl: 'Bosqich', reset: '🔄 Qayta', hint: 'Bir xil ranglarni bitta idishga to\'plang!', win: 'Barakalla!', msg: 'Barcha ranglar saralandi!', next: 'Keyingi Bosqich ➡️' },
-  ru: { lvl: 'Уровень', reset: '🔄 Заново', hint: 'Соберите одинаковые цвета в одну колбу!', win: 'Отлично!', msg: 'Все цвета отсортированы!', next: 'Следующий Уровень ➡️' },
-  en: { lvl: 'Level', reset: '🔄 Reset', hint: 'Sort the same colors into the same tube!', win: 'Well Done!', msg: 'All colors sorted successfully!', next: 'Next Level ➡️' }
+  uz: { title: 'Rangli Suvlar 🧪', level: n => n + '-Bosqich', reset: '🔄 Qayta', hint: 'Bir xil ranglarni bitta idishga to\'plang!', win: 'Barakalla!', msg: 'Barcha ranglar saralandi!', next: 'Keyingi Bosqich ➡️' },
+  ru: { title: 'Цветная Вода 🧪', level: n => 'Уровень ' + n, reset: '🔄 Заново', hint: 'Соберите одинаковые цвета в одну колбу!', win: 'Отлично!', msg: 'Все цвета отсортированы!', next: 'Следующий Уровень ➡️' },
+  en: { title: 'Water Sort 🧪', level: n => 'Level ' + n, reset: '🔄 Reset', hint: 'Sort the same colors into the same tube!', win: 'Well Done!', msg: 'All colors sorted successfully!', next: 'Next Level ➡️' }
 };
 const T = I18N[lang] || I18N.uz;
 window.addEventListener('load', () => {
@@ -84,6 +84,9 @@ window.addEventListener('load', () => {
   document.querySelector('p').textContent = T.hint;
   document.querySelector('.win-box h2').textContent = T.win;
   document.querySelector('.win-btn').textContent = T.next;
+  document.getElementById('win-msg').textContent = T.msg;
+  document.getElementById('title').textContent = T.title;
+  document.title = T.title;
 });
 
 const LEVELS = [
@@ -140,7 +143,7 @@ function playTone(freq, dur = 0.08) {
 
 function loadLevel(lvl) {
   currentLevel = lvl % LEVELS.length;
-  document.getElementById('lvl-txt').textContent = '⭐ ' + (currentLevel + 1) + '-Bosqich';
+  document.getElementById('lvl-txt').textContent = '⭐ ' + T.level(currentLevel + 1);
   document.getElementById('win-modal').classList.add('h');
   selected = null;
   tubes = JSON.parse(JSON.stringify(LEVELS[currentLevel]));
