@@ -22,6 +22,7 @@ import uz.kidzone.app.ui.viewmodel.LoginViewModel
 fun AccountGate(
     feature: AccountFeature,
     pinHash: String?,
+    lang: String = "uz",
     parentVerified: Boolean = false,
     onSignedIn: () -> Unit,
     onBack: () -> Unit,
@@ -46,5 +47,6 @@ fun AccountGate(
         feature = feature,
         onSignedIn = onSignedIn,
         onContinueAsGuest = onBack,
+        lang = lang,
     )
 }

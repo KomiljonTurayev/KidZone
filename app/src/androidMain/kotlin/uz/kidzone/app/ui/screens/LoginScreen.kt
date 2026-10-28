@@ -46,19 +46,44 @@ private val LoginBackground = Color(0xFFFFF8F3)
 private val LoginText = Color(0xFF2B2B2B)
 private val LoginAccent = Color(0xFFE8551F)
 
-/**
- * Parent sign-in, shown when a guest opens an account-only [feature]. Always reached through a
- * parental gate (see [AccountGate]), so a child never sees it on their own.
- */
+/** Sign-in for an account-only [feature] a guest tried to open (see [AccountGate]). */
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
     feature: AccountFeature,
     onSignedIn: () -> Unit,
     onContinueAsGuest: () -> Unit,
+    lang: String = "uz",
+) {
+    val t = loginTexts(lang)
+    LoginScreen(
+        viewModel = viewModel,
+        title = feature.title,
+        message = "${feature.pitch}. ${t.featureMessage}",
+        skipLabel = t.continueAsGuest,
+        onSignedIn = onSignedIn,
+        onSkip = onContinueAsGuest,
+        lang = lang,
+    )
+}
+
+/**
+ * Parent sign-in with Google or Telegram. Always reached through a parental gate (the
+ * onboarding birth-year screen or [AccountGate]), so a child never sees it on their own.
+ */
+@Composable
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    title: String,
+    message: String,
+    skipLabel: String,
+    onSignedIn: () -> Unit,
+    onSkip: () -> Unit,
+    lang: String = "uz",
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val t = loginTexts(lang)
 
     LaunchedEffect(state) {
         if (state == LoginUiState.SignedIn) onSignedIn()
@@ -75,14 +100,14 @@ fun LoginScreen(
         Text("🔐", style = MaterialTheme.typography.displaySmall)
         Spacer(Modifier.height(12.dp))
         Text(
-            feature.title,
+            title,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "${feature.pitch}. Bu imkoniyat uchun ota-ona hisobi bilan kiring.",
+            message,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
@@ -98,7 +123,7 @@ fun LoginScreen(
         ) {
             ButtonContent(
                 busy = state == LoginUiState.SigningInWithGoogle,
-                label = "Google orqali kirish",
+                label = t.google,
                 progressColor = LoginText,
             )
         }
@@ -110,11 +135,12 @@ fun LoginScreen(
             shape = RoundedCornerShape(26.dp),
             colors = ButtonDefaults.buttonColors(containerColor = TelegramBlue),
         ) {
-            ButtonContent(busy = state == LoginUiState.StartingTelegram, label = "Telegram orqali kirish")
+            ButtonContent(busy = state == LoginUiState.StartingTelegram, label = t.telegram)
         }
 
         when (val s = state) {
             is LoginUiState.WaitingForTelegram -> TelegramWaiting(
+                t = t,
                 onReopen = { context.openExternally(s.botUrl) },
                 onCancel = viewModel::cancel,
             )
@@ -127,13 +153,53 @@ fun LoginScreen(
 
         Spacer(Modifier.height(24.dp))
         TextButton(
-            onClick = { viewModel.cancel(); onContinueAsGuest() },
+            onClick = { viewModel.cancel(); onSkip() },
             colors = ButtonDefaults.textButtonColors(contentColor = LoginAccent),
         ) {
-            Text("Mehmon sifatida davom etish")
+            Text(skipLabel)
         }
     }
     }
+}
+
+internal class LoginTexts(
+    val google: String,
+    val telegram: String,
+    val featureMessage: String,
+    val continueAsGuest: String,
+    val telegramWaiting: String,
+    val reopenBot: String,
+    val cancel: String,
+)
+
+internal fun loginTexts(lang: String): LoginTexts = when (lang) {
+    "ru" -> LoginTexts(
+        google = "Войти через Google",
+        telegram = "Войти через Telegram",
+        featureMessage = "Для этого войдите в аккаунт родителя.",
+        continueAsGuest = "Продолжить как гость",
+        telegramWaiting = "Откройте бота в Telegram и нажмите «Start»…",
+        reopenBot = "Открыть бота снова",
+        cancel = "Отмена",
+    )
+    "en" -> LoginTexts(
+        google = "Continue with Google",
+        telegram = "Continue with Telegram",
+        featureMessage = "Sign in with a parent account to use it.",
+        continueAsGuest = "Continue as guest",
+        telegramWaiting = "Open the bot in Telegram and tap «Start»…",
+        reopenBot = "Open the bot again",
+        cancel = "Cancel",
+    )
+    else -> LoginTexts(
+        google = "Google orqali kirish",
+        telegram = "Telegram orqali kirish",
+        featureMessage = "Bu imkoniyat uchun ota-ona hisobi bilan kiring.",
+        continueAsGuest = "Mehmon sifatida davom etish",
+        telegramWaiting = "Telegram'da botni oching va «Start» tugmasini bosing…",
+        reopenBot = "Botni qayta ochish",
+        cancel = "Bekor qilish",
+    )
 }
 
 @Composable
@@ -146,17 +212,17 @@ private fun ButtonContent(busy: Boolean, label: String, progressColor: Color = C
 }
 
 @Composable
-private fun TelegramWaiting(onReopen: () -> Unit, onCancel: () -> Unit) {
+private fun TelegramWaiting(t: LoginTexts, onReopen: () -> Unit, onCancel: () -> Unit) {
     Spacer(Modifier.height(20.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
         CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
         Spacer(Modifier.width(10.dp))
-        Text("Telegram'da botni oching va «Start» tugmasini bosing…", style = MaterialTheme.typography.bodyMedium)
+        Text(t.telegramWaiting, style = MaterialTheme.typography.bodyMedium)
     }
     Spacer(Modifier.height(8.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedButton(onClick = onReopen) { Text("Botni qayta ochish") }
-        TextButton(onClick = onCancel) { Text("Bekor qilish") }
+        OutlinedButton(onClick = onReopen) { Text(t.reopenBot) }
+        TextButton(onClick = onCancel) { Text(t.cancel) }
     }
 }
 

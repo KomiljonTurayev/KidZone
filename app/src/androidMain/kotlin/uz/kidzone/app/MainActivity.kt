@@ -46,7 +46,9 @@ class MainActivity : ComponentActivity() {
         }
         systemUiHelper = SystemUiHelper(window)
 
-        requestNotificationPermissionIfNeeded()
+        // On a first launch this waits until the parent finishes onboarding, so the system
+        // prompt doesn't greet them before they know what the app is.
+        if (kzPrefs.getBoolean("kz_onboarding_done", false)) requestNotificationPermissionIfNeeded()
 
         firestoreSync = FirestoreSync.init(this)
         val activeProfileId = kzPrefs.getString("active_profile_id", "default") ?: "default"
@@ -77,6 +79,7 @@ class MainActivity : ComponentActivity() {
                 prefs = kzPrefs,
                 mainViewModel = mainViewModel,
                 statsManager = statsManager,
+                onOnboardingDone = ::requestNotificationPermissionIfNeeded,
             )
         }
     }
