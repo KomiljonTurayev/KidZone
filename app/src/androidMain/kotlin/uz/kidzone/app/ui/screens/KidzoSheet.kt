@@ -128,6 +128,8 @@ fun KidzoSheet(
     }
 
     LaunchedEffect(Unit) {
+        // Before repeatSpeech, which reads the greeting aloud.
+        viewModel.setLanguage(lang)
         viewModel.repeatSpeech(context, lang)
     }
 

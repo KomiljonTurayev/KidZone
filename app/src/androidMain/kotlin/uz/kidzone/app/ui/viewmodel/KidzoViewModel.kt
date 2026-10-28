@@ -33,7 +33,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     val state: StateFlow<KidzoState> = agent.state
     val cards: StateFlow<List<ContentCard>> = agent.cards
 
-    private val initialGreeting = "Salom, do'stim! 🐥 Men Kidzo bo'laman. Nima haqida gaplashamiz?"
+    private val initialGreeting = greeting("uz")
 
     private val _messages = MutableStateFlow<List<Pair<Boolean, String>>>(
         listOf(false to initialGreeting)
@@ -62,6 +62,19 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     fun requestRecommendations() { agent.requestRecommendations() }
 
+    /**
+     * Greets in [lang]. The view model is created before the app language is known, so the sheet
+     * calls this when it opens; once the child has said something the conversation is left alone.
+     */
+    fun setLanguage(lang: String) {
+        val current = _messages.value
+        if (current.size != 1 || current.first().first) return
+        val text = greeting(lang)
+        if (current.first().second == text) return
+        _messages.value = listOf(false to text)
+        _lastSpokenText.value = text
+    }
+
     fun askKidzo(query: String, lang: String, childName: String, context: Context) {
         if (query.isBlank()) return
         Log.d(TAG, "askKidzo requested: query='$query', lang='$lang', childName='$childName'")
@@ -77,7 +90,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
                 KidzoCompanionEngine.ask(query, lang, childName)
             } catch (e: Exception) {
                 Log.e(TAG, "Error in KidzoCompanionEngine: ${e.message}", e)
-                "Seni eshitdim, $childName! 🐥 Keling, birgalikda quvnoq o'yin o'ynaymiz! ✨"
+                fallbackReply(lang, childName)
             }
 
             Log.d(TAG, "Kidzo replied: '$reply'")
@@ -271,4 +284,16 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         ttsEngine?.shutdown()
         ttsEngine = null
     }
+}
+
+internal fun greeting(lang: String): String = when (lang) {
+    "ru" -> "Привет, дружок! 🐥 Я Kidzo. О чём поговорим?"
+    "en" -> "Hi, friend! 🐥 I'm Kidzo. What shall we talk about?"
+    else -> "Salom, do'stim! 🐥 Men Kidzo bo'laman. Nima haqida gaplashamiz?"
+}
+
+internal fun fallbackReply(lang: String, childName: String): String = when (lang) {
+    "ru" -> "Я тебя слышу, ${childName.ifBlank { "дружок" }}! 🐥 Давай вместе поиграем во что-нибудь весёлое! ✨"
+    "en" -> "I hear you, ${childName.ifBlank { "friend" }}! 🐥 Let's play something fun together! ✨"
+    else -> "Seni eshitdim, ${childName.ifBlank { "do'stim" }}! 🐥 Keling, birgalikda quvnoq o'yin o'ynaymiz! ✨"
 }
