@@ -30,7 +30,8 @@ data class DashboardState(
     val account: AccountState = AccountState.Unavailable,
     val isSyncing: Boolean = false,
     val lastSyncTime: String? = null,
-    val accountError: String? = null,
+    /** Shown by the screen as [uz.kidzone.app.auth.userMessage] in the app language. */
+    val accountError: AuthException.Reason? = null,
 )
 
 class DashboardViewModel(
@@ -102,7 +103,7 @@ class DashboardViewModel(
                 action()
                 true
             } catch (e: AuthException) {
-                _state.update { it.copy(accountError = e.reason.userMessage()) }
+                _state.update { it.copy(accountError = e.reason) }
                 false
             }
             _state.update { it.copy(isSyncing = false, lastSyncTime = if (ok) null else it.lastSyncTime) }

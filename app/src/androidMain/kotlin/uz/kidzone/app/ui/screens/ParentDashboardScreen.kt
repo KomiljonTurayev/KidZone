@@ -48,6 +48,7 @@ import uz.kidzone.app.auth.AccountFeature
 import uz.kidzone.app.auth.AccountState
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.auth.AuthProvider
+import uz.kidzone.app.auth.userMessage
 import uz.kidzone.app.data.AppClock
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidButton
@@ -56,6 +57,8 @@ import uz.kidzone.app.ui.components.KidPage
 import uz.kidzone.app.ui.components.KidSection
 import uz.kidzone.app.ui.components.KidTextButton
 import uz.kidzone.app.ui.components.KidTopBar
+import uz.kidzone.app.ui.i18n.LocalAppLang
+import uz.kidzone.app.ui.i18n.tr
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
 import uz.kidzone.app.ui.viewmodel.ProfileViewModel
@@ -99,6 +102,7 @@ fun ParentDashboardScreen(
         AccountGate(
             feature = AccountFeature.PARENT_DASHBOARD,
             pinHash = savedPinHash,
+            lang = LocalAppLang.current,
             parentVerified = true,
             onSignedIn = {},
             onBack = onBack,
@@ -119,13 +123,13 @@ fun ParentDashboardScreen(
         return
     }
 
-    KidPage(top = { KidTopBar("Ota-ona paneli", onBack = onBack) }) {
+    KidPage(top = { KidTopBar(tr("Ota-ona paneli", "Панель родителя", "Parent dashboard"), onBack = onBack) }) {
         // 1. Statistika
-        KidSection("📊", "Bugun") {
+        KidSection("📊", tr("Bugun", "Сегодня", "Today")) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text("${state.todayMinutes}", style = MaterialTheme.typography.displaySmall, color = Kid.Orange)
                 Spacer(Modifier.width(6.dp))
-                Text("daqiqa", style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft,
+                Text(tr("daqiqa", "мин", "min"), style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft,
                     modifier = Modifier.padding(bottom = 6.dp))
             }
             Spacer(Modifier.height(12.dp))
@@ -134,7 +138,7 @@ fun ParentDashboardScreen(
         Spacer(Modifier.height(16.dp))
 
         // 2. Yosh guruhi
-        KidSection("🎂", "Yosh guruhi") {
+        KidSection("🎂", tr("Yosh guruhi", "Возраст", "Age group")) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("2-4", "5-7", "8+").forEach { age ->
                     KidChip(age, selected = state.age == age, modifier = Modifier.weight(1f)) { vm.setAge(age) }
@@ -145,7 +149,7 @@ fun ParentDashboardScreen(
 
         // 3. Vaqt limiti — activeProfile.timeLimitMinutes ustida ishlaydi, chunki
         // aynan shu maydonni MainScreen kunlik limitni tekshirish uchun o'qiydi.
-        KidSection("⏰", "Vaqt limiti") {
+        KidSection("⏰", tr("Vaqt limiti", "Лимит времени", "Time limit")) {
             val currentLimit = activeProfile?.timeLimitMinutes ?: 0
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 RoundButton("−") {
@@ -154,7 +158,7 @@ fun ParentDashboardScreen(
                     }
                 }
                 Text(
-                    if (currentLimit == 0) "Limit yo'q" else "$currentLimit daqiqa",
+                    if (currentLimit == 0) tr("Limit yo'q", "Без лимита", "No limit") else "$currentLimit " + tr("daqiqa", "мин", "min"),
                     style = MaterialTheme.typography.titleLarge,
                     color = Kid.Ink,
                     textAlign = TextAlign.Center,
@@ -170,11 +174,11 @@ fun ParentDashboardScreen(
         Spacer(Modifier.height(16.dp))
 
         // 4. Xavfsizlik: PIN va push bildirishnomalar
-        KidSection("🔑", "Sozlamalar") {
-            SettingRow(if (savedPinHash.isNullOrEmpty()) "PIN o'rnatish" else "PIN o'zgartirish", onClick = { showSetPin = true }) {
+        KidSection("🔑", tr("Sozlamalar", "Настройки", "Settings")) {
+            SettingRow(if (savedPinHash.isNullOrEmpty()) tr("PIN o'rnatish", "Установить PIN", "Set PIN") else tr("PIN o'zgartirish", "Изменить PIN", "Change PIN"), onClick = { showSetPin = true }) {
                 Text("›", fontSize = 26.sp, color = Kid.Orange)
             }
-            SettingRow("Bildirishnomalar") {
+            SettingRow(tr("Bildirishnomalar", "Уведомления", "Notifications")) {
                 Switch(
                     checked = state.pushEnabled,
                     onCheckedChange = { vm.setPushEnabled(it) },
@@ -191,22 +195,22 @@ fun ParentDashboardScreen(
         Spacer(Modifier.height(16.dp))
 
         // 5. Hisob va bulutli sinxronlash
-        KidSection("☁️", "Hisob") {
+        KidSection("☁️", tr("Hisob", "Аккаунт", "Account")) {
             Text(
-                "${account.displayName ?: "Ota-ona"} · ${account.provider.label()}",
+                "${account.displayName ?: tr("Ota-ona", "Родитель", "Parent")} · ${account.provider.label(LocalAppLang.current)}",
                 style = MaterialTheme.typography.titleMedium,
                 color = Kid.Ink,
             )
-            if (!state.accountError.isNullOrEmpty()) {
+            state.accountError?.userMessage(LocalAppLang.current)?.let { error ->
                 Text(
-                    state.accountError.orEmpty(),
+                    error,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
             }
             if (!state.lastSyncTime.isNullOrEmpty()) {
                 Text(
-                    "Oxirgi sync: ${state.lastSyncTime}",
+                    tr("Oxirgi sinxronlash: ", "Последняя синхронизация: ", "Last sync: ") + state.lastSyncTime,
                     style = MaterialTheme.typography.bodySmall,
                     color = Kid.InkSoft,
                 )
@@ -214,21 +218,21 @@ fun ParentDashboardScreen(
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 KidChip(
-                    if (state.isSyncing) "⏳ Sinxronlanmoqda" else "🔄 Sinxronlash",
+                    if (state.isSyncing) tr("⏳ Sinxronlanmoqda", "⏳ Синхронизация", "⏳ Syncing") else tr("🔄 Sinxronlash", "🔄 Обновить", "🔄 Sync now"),
                     selected = false,
                     modifier = Modifier.weight(1f),
                 ) { if (!state.isSyncing) vm.syncNow() }
-                KidChip("🚪 Chiqish", selected = false, modifier = Modifier.weight(1f)) { vm.logout() }
+                KidChip(tr("🚪 Chiqish", "🚪 Выйти", "🚪 Sign out"), selected = false, modifier = Modifier.weight(1f)) { vm.logout() }
             }
         }
         Spacer(Modifier.height(20.dp))
-        KidButton("⭐ Premium obuna", brush = Kid.Royal, onClick = onOpenPremium)
+        KidButton(tr("⭐ Premium obuna", "⭐ Подписка Premium", "⭐ Premium"), brush = Kid.Royal, onClick = onOpenPremium)
         Spacer(Modifier.height(8.dp))
 
         // 6. Profillar bo'limi
         Spacer(Modifier.height(20.dp))
         Text(
-            "👧 Profillar",
+            tr("👧 Profillar", "👧 Профили", "👧 Profiles"),
             style = MaterialTheme.typography.titleLarge,
             color = Kid.Ink,
             modifier = Modifier.fillMaxWidth(),
@@ -260,10 +264,10 @@ fun ParentDashboardScreen(
         }
 
         Spacer(Modifier.height(12.dp))
-        KidButton("➕ Yangi profil qo'shish", brush = Kid.Meadow, onClick = { onNavigateToAddEdit(null) })
+        KidButton(tr("➕ Yangi profil qo'shish", "➕ Добавить профиль", "➕ Add profile"), brush = Kid.Meadow, onClick = { onNavigateToAddEdit(null) })
 
         Spacer(Modifier.height(20.dp))
-        KidTextButton("Hisobni butunlay o'chirish", color = MaterialTheme.colorScheme.error) { showDeleteDialog = true }
+        KidTextButton(tr("Hisobni butunlay o'chirish", "Удалить аккаунт навсегда", "Delete account permanently"), color = MaterialTheme.colorScheme.error) { showDeleteDialog = true }
     }
 
     if (showDeleteDialog) {
@@ -272,10 +276,14 @@ fun ParentDashboardScreen(
             containerColor = Color.White,
             shape = RoundedCornerShape(28.dp),
             icon = { Text("⚠️", fontSize = 36.sp) },
-            title = { Text("Diqqat!", color = Kid.Ink) },
+            title = { Text(tr("Diqqat!", "Внимание!", "Warning!"), color = Kid.Ink) },
             text = {
                 Text(
-                    "Barcha ma'lumotlaringiz, statistika va profillar serverdan butunlay o'chirib tashlanadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
+                    tr(
+                        "Barcha ma'lumotlaringiz, statistika va profillar serverdan butunlay o'chirib tashlanadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
+                        "Все ваши данные, статистика и профили будут безвозвратно удалены с сервера. Это нельзя отменить. Вы уверены?",
+                        "All your data, stats and profiles will be permanently deleted from the server. This can't be undone. Are you sure?",
+                    ),
                     color = Kid.InkSoft,
                 )
             },
@@ -287,12 +295,12 @@ fun ParentDashboardScreen(
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("O'chirish", color = Color.White)
+                    Text(tr("O'chirish", "Удалить", "Delete"), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Bekor qilish", color = Kid.InkSoft)
+                    Text(tr("Bekor qilish", "Отмена", "Cancel"), color = Kid.InkSoft)
                 }
             }
         )
@@ -353,9 +361,9 @@ private fun WeeklyChart(weeklyMinutes: List<Int>) {
     }
 }
 
-private fun AuthProvider.label(): String = when (this) {
+private fun AuthProvider.label(lang: String): String = when (this) {
     AuthProvider.GOOGLE -> "Google"
     AuthProvider.TELEGRAM -> "Telegram"
     AuthProvider.EMAIL -> "Email"
-    AuthProvider.UNKNOWN -> "Hisob"
+    AuthProvider.UNKNOWN -> tr(lang, "Hisob", "Аккаунт", "Account")
 }

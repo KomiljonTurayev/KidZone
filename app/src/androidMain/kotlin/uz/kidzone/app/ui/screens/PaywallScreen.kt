@@ -34,6 +34,7 @@ import uz.kidzone.app.ui.components.KidSubtitle
 import uz.kidzone.app.ui.components.KidTextButton
 import uz.kidzone.app.ui.components.KidTitle
 import uz.kidzone.app.ui.components.MascotBubble
+import uz.kidzone.app.ui.i18n.tr
 
 @Composable
 fun PaywallScreen(
@@ -49,20 +50,24 @@ fun PaywallScreen(
         Spacer(Modifier.height(20.dp))
         KidTitle("KidZone Premium")
         Spacer(Modifier.height(6.dp))
-        KidSubtitle("Cheksiz Sun'iy Intellekt ertaklari va ovozli hikoyalarni oching!")
+        KidSubtitle(tr(
+            "Cheksiz Sun'iy Intellekt ertaklari va ovozli hikoyalarni oching!",
+            "Откройте безлимитные сказки от ИИ и озвученные истории!",
+            "Unlock unlimited AI stories and narrated tales!",
+        ))
         Spacer(Modifier.height(24.dp))
 
         PlanCard(
-            title = "Oylik",
-            price = "$4.99 / oy",
+            title = tr("Oylik", "Ежемесячно", "Monthly"),
+            price = "$4.99 / " + tr("oy", "мес", "month"),
             isSelected = selectedPlan == "monthly",
             onClick = { selectedPlan = "monthly" }
         )
         Spacer(Modifier.height(14.dp))
         PlanCard(
-            title = "Yillik",
-            price = "$39.99 / yil",
-            badge = "Tejamkor",
+            title = tr("Yillik", "Ежегодно", "Yearly"),
+            price = "$39.99 / " + tr("yil", "год", "year"),
+            badge = tr("Tejamkor", "Выгодно", "Best value"),
             isSelected = selectedPlan == "annual",
             onClick = { selectedPlan = "annual" }
         )
@@ -73,7 +78,7 @@ fun PaywallScreen(
             Spacer(Modifier.height(12.dp))
         }
 
-        KidButton("Davom etish", busy = isLoading, enabled = !isLoading) {
+        KidButton(tr("Davom etish", "Продолжить", "Continue"), busy = isLoading, enabled = !isLoading) {
             isLoading = true
             errorMessage = null
             if (selectedPlan == "monthly") {
@@ -89,7 +94,7 @@ fun PaywallScreen(
             }
         }
         Spacer(Modifier.height(8.dp))
-        KidTextButton("Hozir emas", onClick = onDismiss)
+        KidTextButton(tr("Hozir emas", "Не сейчас", "Not now"), onClick = onDismiss)
     }
 }
 

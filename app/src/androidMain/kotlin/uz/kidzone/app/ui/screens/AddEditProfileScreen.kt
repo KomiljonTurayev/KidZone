@@ -46,6 +46,7 @@ import uz.kidzone.app.ui.components.KidPage
 import uz.kidzone.app.ui.components.KidSection
 import uz.kidzone.app.ui.components.KidTextField
 import uz.kidzone.app.ui.components.KidTopBar
+import uz.kidzone.app.ui.i18n.tr
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -84,7 +85,10 @@ fun AddEditProfileScreen(
         }
     }
 
-    KidPage(top = { KidTopBar(if (isNew) "Yangi profil" else "Profilni tahrirlash", onBack = onCancel) }) {
+    KidPage(top = { KidTopBar(
+        if (isNew) tr("Yangi profil", "Новый профиль", "New profile") else tr("Profilni tahrirlash", "Изменить профиль", "Edit profile"),
+        onBack = onCancel,
+    ) }) {
         // Avatar
         Box(
             modifier = Modifier
@@ -116,12 +120,12 @@ fun AddEditProfileScreen(
         }
         Spacer(Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            KidChip("🖼 Galereya", selected = false, modifier = Modifier.weight(1f)) {
+            KidChip(tr("🖼 Galereya", "🖼 Галерея", "🖼 Gallery"), selected = false, modifier = Modifier.weight(1f)) {
                 galleryLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             }
-            KidChip("📸 Kamera", selected = false, modifier = Modifier.weight(1f)) { cameraLauncher.launch(null) }
+            KidChip(tr("📸 Kamera", "📸 Камера", "📸 Camera"), selected = false, modifier = Modifier.weight(1f)) { cameraLauncher.launch(null) }
         }
         Spacer(Modifier.height(20.dp))
 
@@ -129,17 +133,17 @@ fun AddEditProfileScreen(
         KidTextField(
             value = name,
             onValueChange = { name = it; nameError = false },
-            placeholder = "Bola ismi",
+            placeholder = tr("Bola ismi", "Имя ребёнка", "Child's name"),
             isError = nameError,
         )
         if (nameError) {
             Spacer(Modifier.height(6.dp))
-            KidError("Ism bo'sh bo'lmasin")
+            KidError(tr("Ism bo'sh bo'lmasin", "Введите имя", "Please enter a name"))
         }
         Spacer(Modifier.height(16.dp))
 
         // Til
-        KidSection("🌍", "Til") {
+        KidSection("🌍", tr("Til", "Язык", "Language")) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("uz" to "O'zbek", "ru" to "Русский", "en" to "English").forEach { (code, label) ->
                     KidChip(label, selected = language == code, modifier = Modifier.weight(1f)) { language = code }
@@ -150,9 +154,9 @@ fun AddEditProfileScreen(
 
         // Vaqt limiti
         val limitMinutes = timeLimitSlider.roundToInt()
-        KidSection("⏰", "Vaqt limiti") {
+        KidSection("⏰", tr("Vaqt limiti", "Лимит времени", "Time limit")) {
             Text(
-                if (limitMinutes == 0) "Cheksiz" else "$limitMinutes daqiqa",
+                if (limitMinutes == 0) tr("Cheksiz", "Без лимита", "No limit") else "$limitMinutes " + tr("daqiqa", "мин", "min"),
                 style = MaterialTheme.typography.titleLarge,
                 color = Kid.Orange,
             )
@@ -175,7 +179,7 @@ fun AddEditProfileScreen(
 
         Spacer(Modifier.height(28.dp))
 
-        KidButton("✅ Saqlash", brush = Kid.Meadow) {
+        KidButton(tr("✅ Saqlash", "✅ Сохранить", "✅ Save"), brush = Kid.Meadow) {
             if (name.isBlank()) { nameError = true; return@KidButton }
             val saved = (profile ?: ProfileEntity(
                 id = profileId,

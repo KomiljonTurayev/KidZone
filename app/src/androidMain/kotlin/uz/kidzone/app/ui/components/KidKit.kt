@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -421,7 +422,17 @@ fun KidChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onC
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(label, color = fg, style = MaterialTheme.typography.titleSmall, maxLines = 1) }
+    ) {
+        // One line, cut with "…": wrapping would push the words onto a clipped second line.
+        Text(
+            label,
+            color = fg,
+            style = MaterialTheme.typography.titleSmall,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 /** Full-width card with an emoji + title header, grouping one settings section. */

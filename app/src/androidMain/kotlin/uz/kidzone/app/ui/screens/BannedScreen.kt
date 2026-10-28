@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uz.kidzone.app.ui.i18n.tr
 
 @Composable
 fun BannedScreen() {
@@ -66,7 +67,7 @@ fun BannedScreen() {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
-                        text = "Hisob Bloklangan",
+                        text = tr("Hisob bloklangan", "Аккаунт заблокирован", "Account blocked"),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFD32F2F),
@@ -76,7 +77,11 @@ fun BannedScreen() {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Sizning hisobingiz xavfsizlik qoidalariga binoan ma'muriyat tomonidan to'xtatilgan.",
+                        text = tr(
+                            "Sizning hisobingiz xavfsizlik qoidalariga binoan ma'muriyat tomonidan to'xtatilgan.",
+                            "Ваш аккаунт приостановлен администрацией в соответствии с правилами безопасности.",
+                            "Your account has been suspended by the administrators under the safety rules.",
+                        ),
                         fontSize = 15.sp,
                         color = Color(0xFF555555),
                         textAlign = TextAlign.Center,
@@ -103,7 +108,7 @@ fun BannedScreen() {
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Savollar bo'lsa ma'muriyatga yozing:",
+                                text = tr("Savollar bo'lsa ma'muriyatga yozing:", "Если есть вопросы, напишите администрации:", "If you have questions, contact us:"),
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280)
                             )

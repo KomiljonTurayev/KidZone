@@ -27,7 +27,6 @@ import uz.kidzone.app.auth.TelegramLoginFlow
 import uz.kidzone.app.auth.TelegramLoginStart
 import uz.kidzone.app.auth.TelegramLoginStatus
 import uz.kidzone.app.auth.isSignedIn
-import uz.kidzone.app.auth.userMessage
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -90,7 +89,7 @@ class LoginViewModelTest {
         vm.signInWithGoogle(activity)
         advanceUntilIdle()
 
-        assertEquals(LoginUiState.Failed(AuthException.Reason.NETWORK.userMessage()!!), vm.state.value)
+        assertEquals(LoginUiState.Failed(AuthException.Reason.NETWORK), vm.state.value)
     }
 
     @Test
@@ -156,7 +155,7 @@ class LoginViewModelTest {
         confirm.signInWithGoogle(activity)
         advanceUntilIdle()
 
-        assertEquals(LoginUiState.Failed(AuthException.Reason.WRONG_ACCOUNT.userMessage()!!), confirm.state.value)
+        assertEquals(LoginUiState.Failed(AuthException.Reason.WRONG_ACCOUNT), confirm.state.value)
         assertEquals("parent-uid", auth.state.value.uid)
     }
 
