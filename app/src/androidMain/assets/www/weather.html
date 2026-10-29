@@ -128,7 +128,7 @@ function init() {
   document.getElementById('btn-again').textContent  = t.again;
   document.getElementById('lv-val').textContent     = _level;
   document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.questions} · 💡${_cfg.hints} · 🌡️${_pool.length} ${t.items}`.trim();
-  KZL.howToPlay({id:GAME_ID,steps:{
+  KZL.howToPlay({ duo: true,id:GAME_ID,steps:{
     uz:[{icon:'🌤️',text:'Ob-havo belgisini ko\'rasan'},{icon:'👆',text:'To\'g\'ri nomini tanlang'},{icon:'💡',text:'Hint noto\'g\'ri javobni o\'chiradi'},{icon:'❤️',text:'3 ta hayot bor — ehtiyotkor bo\'l!'},{icon:'🏆',text:'60% ball yig\'ib keyingi darajaga o\'t!'}],
     ru:[{icon:'🌤️',text:'Видишь символ погоды'},{icon:'👆',text:'Выбери правильное название'},{icon:'💡',text:'Подсказка убирает неверный ответ'},{icon:'❤️',text:'3 жизни — будь внимателен!'},{icon:'🏆',text:'Набери 60% чтобы перейти на следующий уровень!'}],
     en:[{icon:'🌤️',text:'You see a weather symbol'},{icon:'👆',text:'Choose the correct name'},{icon:'💡',text:'Hint removes one wrong option'},{icon:'❤️',text:'3 lives — be careful!'},{icon:'🏆',text:'Score 60% to advance to next level!'}],
@@ -159,7 +159,7 @@ function startGame() {
   _livesObj=KZL.createLives(3); row.appendChild(_livesObj.el);
   const lv=document.createElement('div');
   lv.style.cssText='margin-left:auto;background:rgba(255,255,255,.12);border-radius:12px;padding:5px 12px;font-size:12px;font-weight:900;';
-  lv.textContent='LV '+_level+' / 20'; row.appendChild(lv);
+  lv.textContent='LV '+_level; row.appendChild(lv);
   loadQ();
 }
 
@@ -187,7 +187,7 @@ function loadQ() {
 function pick(btn,opt,q){
   if(_answered)return; _answered=true;
   if(opt.id===q.id){
-    btn.classList.add('correct'); _score+=10;
+    btn.classList.add('correct'); _score+=10; KZL.duo.answer(true);
     document.getElementById('score').textContent=_score;
     engine.playSound('match'); engine.vibrate(30);
   } else {
@@ -200,16 +200,18 @@ function pick(btn,opt,q){
 }
 
 function showResult(){
+  if (KZL.duo.end()) return;
   const max=_questions.length*10, pct=_score/max;
   document.getElementById('res-em').textContent = pct>=.8?'🏆':pct>=.6?'⭐':'💪';
   document.getElementById('res-ttl').textContent= pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById('res-sc').textContent = _score+' / '+max;
-  document.getElementById('btn-next').textContent=(pct>=.6&&_level<20)?t.next:t.again;
+  document.getElementById('btn-next').textContent=(pct>=.6)?t.next:t.again;
   document.getElementById('result-screen').classList.remove('hidden');
+  KZL.recordResult(GAME_ID, pct>=.6);
   if(pct>=.6){
     engine.reportScore(Math.round(_score/2));
     engine.spawnConfetti();
-    if(KZL.getLevel(GAME_ID)===_level&&_level<20){
+    if(KZL.getLevel(GAME_ID)===_level){
       const nl=KZL.nextLevel(GAME_ID);
       setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,lang),400);
     }

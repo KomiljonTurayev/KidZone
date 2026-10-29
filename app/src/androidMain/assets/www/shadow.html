@@ -125,7 +125,7 @@ function init() {
   document.getElementById('btn-restart').textContent= t.again;
   document.getElementById('lv-val').textContent     = _level;
   document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.lvInfo} · 💡${_cfg.hints} · 🎭${_pool.length} ${t.lvUnit}`;
-  KZL.howToPlay({ id: GAME_ID, steps:{
+  KZL.howToPlay({ duo: true, id: GAME_ID, steps:{
     uz:[{icon:'👤',text:'Qora soyani diqqat bilan kuzat'},{icon:'👆',text:'4 variantdan to\'g\'ri javobni top'},{icon:'💡',text:'Hint bir noto\'g\'ri variantni o\'chiradi'},{icon:'❤️',text:'3 ta hayot — ehtiyot bo\'l!'},{icon:'🏆',text:'60% ball yig\'ib keyingi darajaga o\'t!'}],
     ru:[{icon:'👤',text:'Внимательно рассмотри тёмный силуэт'},{icon:'👆',text:'Найди правильный ответ из 4 вариантов'},{icon:'💡',text:'Подсказка убирает один неверный вариант'},{icon:'❤️',text:'3 жизни — будь внимателен!'},{icon:'🏆',text:'Набери 60% чтобы перейти на следующий уровень!'}],
     en:[{icon:'👤',text:'Look carefully at the dark silhouette'},{icon:'👆',text:'Find the correct answer from 4 options'},{icon:'💡',text:'Hint removes one wrong option'},{icon:'❤️',text:'3 lives — be careful!'},{icon:'🏆',text:'Score 60% to advance to the next level!'}],
@@ -158,7 +158,7 @@ function startGame() {
   row.appendChild(_livesObj.el);
   const lv=document.createElement('div');
   lv.style.cssText='margin-left:auto;background:rgba(255,255,255,.12);border-radius:12px;padding:5px 12px;font-size:12px;font-weight:900;';
-  lv.textContent='LV '+_level+' / 20'; row.appendChild(lv);
+  lv.textContent='LV '+_level; row.appendChild(lv);
   loadQ();
 }
 
@@ -187,7 +187,7 @@ function loadQ() {
 function pick(btn,opt,q){
   if(_answered)return; _answered=true;
   if(opt.id===q.id){
-    btn.classList.add('correct'); _score+=10;
+    btn.classList.add('correct'); _score+=10; KZL.duo.answer(true);
     document.getElementById('score').textContent=_score;
     engine.playSound('match'); engine.vibrate(30);
   } else {
@@ -200,19 +200,21 @@ function pick(btn,opt,q){
 }
 
 function showResult(){
+  if (KZL.duo.end()) return;
   const max=_questions.length*10, pct=_score/max;
   document.getElementById('res-em').textContent = pct>=.8?'🏆':pct>=.6?'⭐':'💪';
   document.getElementById('res-ttl').textContent= pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById('res-sc').textContent = _score+' / '+max;
-  const _showNext = pct>=.6&&_level<20;
+  const _showNext = pct>=.6;
   const _btnNext = document.getElementById('btn-next');
   _btnNext.textContent = _showNext ? t.next : t.again;
   _btnNext.style.display = _showNext ? '' : 'none';
   document.getElementById('result-screen').classList.remove('hidden');
+  KZL.recordResult(GAME_ID, pct>=.6);
   if(pct>=.6){
     engine.reportScore(Math.round(_score/2));
     engine.spawnConfetti();
-    if(KZL.getLevel(GAME_ID)===_level&&_level<20){
+    if(KZL.getLevel(GAME_ID)===_level){
       const nl=KZL.nextLevel(GAME_ID);
       setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,lang),400);
     }

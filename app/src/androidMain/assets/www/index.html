@@ -131,6 +131,32 @@
     /* ── CHALLENGE BAR (hidden, kept for main.js) ── */
     #challenge-bar{display:none!important}
 
+    /* ── TODAY'S TASKS (Faza 18; filled by kzTasks.render from the app) ── */
+    #tasks-card{background:var(--surface);border-radius:20px;padding:12px 14px;margin:0 var(--pad) 12px;box-shadow:0 4px 0 rgba(0,0,0,0.08)}
+    #tasks-card.h{display:none}
+    .tk-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    .tk-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:16px;color:var(--text)}
+    .tk-streak{background:#FFF3E0;color:#E65100;border-radius:14px;padding:4px 10px;font-size:13px;font-weight:900}
+    .tk-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px dashed rgba(0,0,0,.08)}
+    .tk-row:first-of-type{border-top:none}
+    .tk-check{width:28px;height:28px;border-radius:50%;border:3px solid #FFCC80;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+    .tk-row.done .tk-check{background:#2ECC71;border-color:#2ECC71;color:#fff}
+    .tk-text{flex:1;font-size:13px;font-weight:800;color:var(--text);line-height:1.3}
+    .tk-row.done .tk-text{color:var(--dim);text-decoration:line-through}
+    .tk-bar{height:6px;border-radius:3px;background:#FFE0B2;margin-top:4px;overflow:hidden}
+    .tk-bar i{display:block;height:100%;background:linear-gradient(90deg,#FFB74D,#FF6B35);border-radius:3px}
+    .tk-go{background:#FF6B35;color:#fff;border:none;border-radius:14px;padding:6px 12px;font-size:12px;font-weight:900;cursor:pointer}
+    .tk-crown{text-align:center;font-size:14px;font-weight:900;color:#7B1FA2;padding-top:6px}
+    #goal-card{background:linear-gradient(135deg,#7B1FA2,#E91E63);color:#fff;border-radius:20px;padding:12px 14px;margin:0 var(--pad) 12px;box-shadow:0 4px 0 rgba(0,0,0,0.12);display:flex;align-items:center;gap:12px}
+    #goal-card.h{display:none}
+    .gl-em{font-size:34px}
+    .gl-body{flex:1}
+    .gl-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:15px}
+    .gl-sub{font-size:12px;font-weight:800;opacity:.92;margin-top:2px}
+    .gl-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.3);margin-top:6px;overflow:hidden}
+    .gl-bar i{display:block;height:100%;background:#FFD600;border-radius:3px}
+    .gl-go{background:#fff;color:#7B1FA2;border:none;border-radius:14px;padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer}
+
     /* ── LEVEL CARD ── */
     #level-card{
       background:var(--surface);
@@ -665,6 +691,9 @@
     .bdg-card.bdg-locked{opacity:.45}
     .bdg-em{font-size:32px;margin-bottom:6px}
     .bdg-nm{font-size:11px;color:#444;font-weight:600;line-height:1.3}
+    .stk-head{grid-column:1/-1;font-size:17px;font-weight:700;color:#7B1FA2;margin-top:14px;font-family:'Fredoka One','KZ Cyrillic',cursive}
+    .stk-empty{grid-column:1/-1;text-align:center;font-size:13px;color:#888;padding:8px 0 16px}
+    .bdg-card.stk-gold{border-color:#FFD600;background:#FFFDE7}
     /* Badge pill in header */
     #badge-pill{
       background:var(--surface);border:none;border-radius:50%;
@@ -1159,6 +1188,12 @@
         </button>
       </div>
     </div>
+
+    <!-- PARENT'S CHALLENGE -->
+    <div id="goal-card" class="h"></div>
+
+    <!-- TODAY'S TASKS -->
+    <div id="tasks-card" class="h"></div>
 
     <!-- CHALLENGE BAR (hidden via CSS, kept for main.js) -->
     <div id="challenge-bar">
@@ -1866,6 +1901,8 @@
 
     // Legacy sync (will be fully integrated into GameManager)
     function updateLangUI() {
+        if (window.kzTasks) kzTasks.rerender();
+        if (window.kzGoal) kzGoal.rerender();
         const t = T[app.translator.lang];
         document.getElementById("hero-h").innerHTML = t.heroH;
         document.getElementById("hero-p").innerHTML = t.heroP;

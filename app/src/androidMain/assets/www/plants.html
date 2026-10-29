@@ -170,9 +170,9 @@ const T = {
   almostThere:{uz:"Deyarli!",             ru:"Почти!",              en:"Almost there!"},
   howTitle:  {uz:"Qanday o'ynash kerak?", ru:"Как играть?",         en:"How to play?"},
   howSteps:  {
-    uz:["Ekranda o'simlik emojisi chiqadi","To'g'ri nomni tanlang","💡 Ko'mak uchun yordam tugmasini bosing","❤️ 3 ta hayotingiz bor — ehtiyot bo'ling!","20 darajani bosib o'ting!"],
-    ru:["На экране появится эмодзи растения","Выберите правильное название","💡 Нажмите кнопку подсказки для помощи","❤️ У вас 3 жизни — будьте осторожны!","Пройдите все 20 уровней!"],
-    en:["An plant emoji appears on screen","Choose the correct name","💡 Tap the hint button for help","❤️ You have 3 lives — be careful!","Complete all 20 levels!"],
+    uz:["Ekranda o'simlik emojisi chiqadi","To'g'ri nomni tanlang","💡 Ko'mak uchun yordam tugmasini bosing","❤️ 3 ta hayotingiz bor — ehtiyot bo'ling!","Har 5 darajada yangi stiker 🎁 — qancha uzoqqa bora olasan?"],
+    ru:["На экране появится эмодзи растения","Выберите правильное название","💡 Нажмите кнопку подсказки для помощи","❤️ У вас 3 жизни — будьте осторожны!","Каждые 5 уровней — новая наклейка 🎁. Как далеко дойдёшь?"],
+    en:["An plant emoji appears on screen","Choose the correct name","💡 Tap the hint button for help","❤️ You have 3 lives — be careful!","A new sticker every 5 levels 🎁 — how far can you go?"],
   },
 };
 function t(key){ return T[key][LANG] || T[key]['uz']; }
@@ -224,7 +224,7 @@ function init() {
   renderQuestion();
 
   /* how-to-play: auto on first visit */
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID, lang: LANG,
     title: t('howTitle'),
     steps: T.howSteps[LANG] || T.howSteps['uz'],
@@ -311,6 +311,7 @@ function answer(opt, q, btn) {
   if (opt.en === q.en) {
     btn.classList.add('correct');
     _score++;
+    KZL.duo.answer(true);
     const _asEl = document.getElementById('t-score'); if (_asEl) _asEl.textContent = _score;
     setTimeout(advance, 750);
   } else {
@@ -350,8 +351,10 @@ function advance() {
    LEVEL DONE / GAME OVER
 ═══════════════════════════════════════════════ */
 function levelDone() {
+  if (KZL.duo.end()) return;
   const pct = _score / _total;
   const passed = pct >= 0.6;
+  KZL.recordResult(GAME_ID, passed);
 
   if (passed && KZL.getLevel(GAME_ID) === _level) {
     KZL.nextLevel(GAME_ID);
@@ -410,12 +413,12 @@ function buildDots() {
    LEVEL SELECTOR
 ═══════════════════════════════════════════════ */
 function openLevelSelector() {
-  const max = KZL.getLevel(GAME_ID);
+  const max = KZL.getBest(GAME_ID);
   const grid = document.getElementById('lvl-grid');
   grid.innerHTML = '';
-  for (let n = 1; n <= 20; n++) {
+  for (const {n} of KZL.levelWindow(GAME_ID)) {
     const btn = document.createElement('button');
-    const cfg = KZL.CONFIGS[n - 1];
+    const cfg = KZL.cfgFor(n);
     btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
     btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small>`;
     if (n <= max) btn.onclick = () => { _level = n; KZL.setLevel(GAME_ID, n); closeLevelSelector(); init(); };

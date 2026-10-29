@@ -17,6 +17,9 @@ interface DailyChallengeDao {
     @Query("UPDATE daily_challenge SET completed = 1 WHERE id = :id")
     suspend fun markCompleted(id: String)
 
+    @Query("UPDATE daily_challenge SET progress = :progress, completed = :completed WHERE id = :id")
+    suspend fun setProgress(id: String, progress: Int, completed: Boolean)
+
     @Query("SELECT * FROM daily_challenge WHERE profileId = :profileId ORDER BY date DESC")
     fun getByProfile(profileId: String): Flow<List<DailyChallengeEntity>>
 }

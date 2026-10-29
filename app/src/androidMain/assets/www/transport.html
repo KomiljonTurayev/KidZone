@@ -178,7 +178,7 @@ function init() {
   tr.appendChild(_livesObj.el);
   const lv=document.createElement('div');
   lv.style.cssText='margin-left:auto;background:rgba(255,255,255,.15);border-radius:12px;padding:5px 12px;font-size:12px;font-weight:900;color:#fff;';
-  lv.textContent='LV '+_level+' / 20'; tr.appendChild(lv);
+  lv.textContent='LV '+_level; tr.appendChild(lv);
 
   // Set data-cat on buttons
   [0,1,2].forEach(i=>{
@@ -208,7 +208,7 @@ function answer(catIdx) {
   const q=questions[qIdx];
   const btn=document.getElementById("cat"+catIdx);
   if(catIdx===q.cat){
-    btn.classList.add("correct"); score+=10;
+    btn.classList.add("correct"); score+=10; KZL.duo.answer(true);
     document.getElementById("sv").textContent=score;
     document.getElementById("feedback").textContent=t.correct;
     engine.playSound('match');
@@ -224,16 +224,18 @@ function answer(catIdx) {
 }
 
 function showResult() {
+  if (KZL.duo.end()) return;
   const max=questions.length*10, pct=score/max;
   document.getElementById("rem").textContent=pct>=.8?"🏆":pct>=.6?"⭐":"💪";
   document.getElementById("rttl").textContent=pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById("rsc").textContent=`${t.score}: ${score}/${max}`;
   document.getElementById("result").classList.remove("h");
+  KZL.recordResult(GAME_ID, pct>=.6);
   if(pct>=.6){
     engine.gameOver(Math.round(score/2));
     if(engine.spawnConfetti){engine.spawnConfetti();}
   }
-  if(pct>=.6&&KZL.getLevel(GAME_ID)===_level&&_level<20){
+  if(pct>=.6&&KZL.getLevel(GAME_ID)===_level){
     const nl=KZL.nextLevel(GAME_ID);
     setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,engine.lang),500);
   }
@@ -243,7 +245,7 @@ function restart(){init();}
 
 window.onload=()=>{
   updateUI();
-  KZL.howToPlay({id:GAME_ID,steps:{
+  KZL.howToPlay({ duo: true,id:GAME_ID,steps:{
     uz:[{icon:'🚗',text:'Transport vositasini ko\'rasan'},{icon:'👆',text:'Quruqlik, Dengiz yoki Havo — to\'g\'risini tanlang'},{icon:'💡',text:'Hint noto\'g\'ri bir variantni o\'chiradi'},{icon:'❤️',text:'3 ta hayot — xato qilsang kamayadi'},{icon:'🏆',text:'60% ball to\'plab keyingi darajaga o\'t!'}],
     ru:[{icon:'🚗',text:'Видишь транспортное средство'},{icon:'👆',text:'Выбери: Земля, Вода или Воздух'},{icon:'💡',text:'Подсказка убирает неверный вариант'},{icon:'❤️',text:'3 жизни — теряются при ошибке'},{icon:'🏆',text:'Набери 60% для следующего уровня!'}],
     en:[{icon:'🚗',text:'You see a vehicle'},{icon:'👆',text:'Choose: Land, Water, or Air'},{icon:'💡',text:'Hint removes one wrong option'},{icon:'❤️',text:'3 lives — lost on mistake'},{icon:'🏆',text:'Score 60% to advance to next level!'}],

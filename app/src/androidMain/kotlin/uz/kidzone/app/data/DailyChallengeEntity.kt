@@ -12,4 +12,18 @@ data class DailyChallengeEntity(
     val gameId: String,
     val gameTitle: String,
     @ColumnInfo(defaultValue = "0") val completed: Boolean = false,
-)
+    /** 0 = play [gameId] (the original challenge), 1 = reach a new level, 2 = earn [target] stars. */
+    @ColumnInfo(defaultValue = "0") val slot: Int = 0,
+    @ColumnInfo(defaultValue = "0") val target: Int = 0,
+    @ColumnInfo(defaultValue = "0") val progress: Int = 0,
+) {
+    companion object {
+        const val SLOT_PLAY = 0
+        const val SLOT_LEVEL = 1
+        const val SLOT_STARS = 2
+
+        /** Slot 0 keeps the old id so rows written before Faza 18 still count. */
+        fun idFor(profileId: String, date: String, slot: Int): String =
+            if (slot == SLOT_PLAY) "$profileId-$date" else "$profileId-$date-$slot"
+    }
+}

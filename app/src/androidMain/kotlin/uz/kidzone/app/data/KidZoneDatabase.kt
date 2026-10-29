@@ -13,8 +13,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ProfileStatsEntity::class,
         DailyChallengeEntity::class,
         StreakEntity::class,
+        LevelUpEntity::class,
+        ParentChallengeEntity::class,
     ],
-    version = 4,
+    version = 7,
     exportSchema = false,
 )
 abstract class KidZoneDatabase : RoomDatabase() {
@@ -22,6 +24,8 @@ abstract class KidZoneDatabase : RoomDatabase() {
     abstract fun profileStatsDao(): ProfileStatsDao
     abstract fun dailyChallengeDao(): DailyChallengeDao
     abstract fun streakDao(): StreakDao
+    abstract fun levelUpDao(): LevelUpDao
+    abstract fun parentChallengeDao(): ParentChallengeDao
 
     companion object {
         @Volatile private var instance: KidZoneDatabase? = null
@@ -58,6 +62,37 @@ abstract class KidZoneDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `level_ups` " +
+                    "(`profileId` TEXT NOT NULL, `gameId` TEXT NOT NULL, `level` INTEGER NOT NULL, " +
+                    "`date` TEXT NOT NULL, PRIMARY KEY(`profileId`, `gameId`, `level`))"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_level_ups_profileId_date` ON `level_ups` (`profileId`, `date`)"
+                )
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `daily_challenge` ADD COLUMN `slot` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `daily_challenge` ADD COLUMN `target` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `daily_challenge` ADD COLUMN `progress` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `parent_challenge` " +
+                    "(`profileId` TEXT NOT NULL, `gameId` TEXT NOT NULL, `targetLevel` INTEGER NOT NULL, " +
+                    "`createdAt` INTEGER NOT NULL, `completedAt` INTEGER, PRIMARY KEY(`profileId`))"
+                )
+            }
+        }
+
         fun getInstance(context: Context): KidZoneDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -65,7 +100,7 @@ abstract class KidZoneDatabase : RoomDatabase() {
                     KidZoneDatabase::class.java,
                     "kidzone.db",
                 )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                 .build().also { instance = it }
             }
     }

@@ -239,7 +239,7 @@ function init() {
   buildDots();
   renderQuestion();
 
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID, lang: LANG,
     title: t('howTitle'),
     steps: T.howSteps[LANG] || T.howSteps['en'],
@@ -324,6 +324,7 @@ function answer(val, q, btn) {
   if (val === q.text) {
     btn.classList.add('correct');
     _score++;
+    KZL.duo.answer(true);
     engine.playSound('win');
     setTimeout(advance, 800);
   } else {
@@ -361,8 +362,10 @@ function advance() {
    LEVEL DONE / GAME OVER
 ═══════════════════════════════════════════════ */
 function levelDone() {
+  if (KZL.duo.end()) return;
   const pct = _score / _total;
   const passed = pct >= 0.6;
+  KZL.recordResult(GAME_ID, passed);
 
   if (passed && KZL.getLevel(GAME_ID) === _level) {
     KZL.nextLevel(GAME_ID);
@@ -418,11 +421,11 @@ function buildDots() {
 }
 
 function openLevelSelector() {
-  const max = KZL.getLevel(GAME_ID);
+  const max = KZL.getBest(GAME_ID);
   const grid = document.getElementById('lvl-grid');
   grid.innerHTML = '';
-  for (let n = 1; n <= 20; n++) {
-    const cfg = KZL.CONFIGS[n - 1];
+  for (const {n} of KZL.levelWindow(GAME_ID)) {
+    const cfg = KZL.cfgFor(n);
     const btn = document.createElement('button');
     btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
     btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small>`;

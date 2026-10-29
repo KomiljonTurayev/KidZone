@@ -46,6 +46,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import uz.kidzone.app.data.GameProgressRepository
+import uz.kidzone.app.data.ParentChallengeRepository
 import androidx.compose.runtime.setValue
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.screens.PinGate
@@ -90,6 +94,8 @@ fun MainScreen(
     statsManager: ParentalStatsManager,
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
+    gameProgress: GameProgressRepository,
+    parentChallenge: ParentChallengeRepository,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
     onOpenPremium: () -> Unit = {},
@@ -101,6 +107,7 @@ fun MainScreen(
     // Bu orqafon (background) da batareya isrofgarchiligini oldini oladi.
     val uiState by mainViewModel.state.collectAsStateWithLifecycle()
     val activeProfile by profileViewModel.activeProfile.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(activeProfile) {
         activeProfile?.id?.let { challengeViewModel.onProfileChanged(it) }
@@ -108,6 +115,37 @@ fun MainScreen(
     
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
+
+    // Today's tasks card on the WebView home screen (Faza 18).
+    val challengeState by challengeViewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(challengeState.tasks, challengeState.streakCount, webMgrRef.value) {
+        val mgr = webMgrRef.value ?: return@LaunchedEffect
+        if (challengeState.tasks.isEmpty()) return@LaunchedEffect
+        mgr.evaluateJavascript("window.kzTasks&&kzTasks.render(${tasksJson(challengeState.tasks, challengeState.streakCount)})")
+    }
+
+    // The parent's challenge card on the home screen; levelTick refreshes "you are at level N".
+    var levelTick by remember { mutableStateOf(0) }
+    val parentGoal by remember(activeProfile?.id) {
+        activeProfile?.id?.let(parentChallenge::observe) ?: kotlinx.coroutines.flow.flowOf(null)
+    }.collectAsStateWithLifecycle(initialValue = null)
+    LaunchedEffect(parentGoal, levelTick, webMgrRef.value, challengeState.tasks) {
+        val mgr = webMgrRef.value ?: return@LaunchedEffect
+        val goal = parentGoal
+        val json = if (goal == null) "null" else org.json.JSONObject().apply {
+            put("gameId", goal.gameId)
+            put("target", goal.targetLevel)
+            put("best", parentChallenge.bestLevel(goal.profileId, goal.gameId))
+            put("done", goal.completedAt != null)
+        }.toString()
+        mgr.evaluateJavascript("window.kzGoal&&kzGoal.render($json)")
+    }
+
+    // Game levels are kept per child: tell the WebView who is playing now.
+    LaunchedEffect(activeProfile?.id, webMgrRef.value) {
+        val id = activeProfile?.id?.let(::jsSafeId) ?: return@LaunchedEffect
+        webMgrRef.value?.evaluateJavascript("try{localStorage.setItem('kz-native-profile','$id')}catch(e){}")
+    }
 
     LaunchedEffect(uiState.pendingDeepLinkContentId) {
         val contentId = uiState.pendingDeepLinkContentId ?: return@LaunchedEffect
@@ -177,6 +215,15 @@ fun MainScreen(
                             onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
                             // Feeds the parent dashboard's "games played today".
                             onGameLaunched = statsManager::onGameLaunched,
+                            onLevelReached = { gameId, level ->
+                                val pid = profileViewModel.activeProfile.value?.id
+                                if (pid != null) scope.launch {
+                                    gameProgress.onLevelReached(pid, gameId, level)
+                                    parentChallenge.onLevelReached(pid, gameId, level)
+                                    levelTick++
+                                }
+                                challengeViewModel.onLevelUp()
+                            },
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
                             onLanguageChanged = { lang ->
                                 prefs.edit().putString("kz_lang", lang).apply()
@@ -201,8 +248,9 @@ fun MainScreen(
                             ChallengeBridge(challengeViewModel, context),
                             "AndroidChallenge",
                         )
+                        val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
                         mgr.loadUrl(
-                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}"
+                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}"
                         )
                         webMgrRef.value = mgr
                         addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
@@ -468,3 +516,23 @@ fun MainScreen(
     }
 }
 
+
+/** Profile ids are UUIDs; anything else is dropped before it goes into a JS string. */
+internal fun jsSafeId(id: String): String = id.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
+
+/** What the home screen's tasks card needs; texts are chosen in the WebView's language. */
+internal fun tasksJson(tasks: List<uz.kidzone.app.data.DailyChallengeEntity>, streak: Int): String =
+    org.json.JSONObject().apply {
+        put("streak", streak)
+        put("tasks", org.json.JSONArray().apply {
+            tasks.forEach { t ->
+                put(org.json.JSONObject().apply {
+                    put("slot", t.slot)
+                    put("gameId", t.gameId)
+                    put("done", t.completed)
+                    put("progress", t.progress)
+                    put("target", t.target)
+                })
+            }
+        })
+    }.toString()

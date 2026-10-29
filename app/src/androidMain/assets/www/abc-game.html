@@ -197,9 +197,9 @@ const T = {
   selectLvl:{uz:"Daraja tanlang",    ru:"Выберите уровень",  en:"Select Level"},
   howTitle: {uz:"Qanday o'ynash?",   ru:"Как играть?",       en:"How to play?"},
   howSteps: {
-    uz:["Ekranda emoji va so'z chiqadi","So'zning BIRINCHI HARFINI tanlang","💡 Ko'mak — noto'g'ri harfni olib tashlaydi","❤️ 3 ta hayotingiz bor!","Daraja oshgan sari harflar ko'payadi","20 darajani bosib o'ting!"],
-    ru:["На экране появится эмодзи и слово","Выберите ПЕРВУЮ БУКВУ слова","💡 Подсказка убирает неверную букву","❤️ У вас 3 жизни!","С уровнем букв становится больше","Пройдите все 20 уровней!"],
-    en:["An emoji and word appear on screen","Choose the FIRST LETTER of the word","💡 Hint removes a wrong letter","❤️ You have 3 lives!","More letters unlock as you level up","Complete all 20 levels!"],
+    uz:["Ekranda emoji va so'z chiqadi","So'zning BIRINCHI HARFINI tanlang","💡 Ko'mak — noto'g'ri harfni olib tashlaydi","❤️ 3 ta hayotingiz bor!","Daraja oshgan sari harflar ko'payadi","Har 5 darajada yangi stiker 🎁 — qancha uzoqqa bora olasan?"],
+    ru:["На экране появится эмодзи и слово","Выберите ПЕРВУЮ БУКВУ слова","💡 Подсказка убирает неверную букву","❤️ У вас 3 жизни!","С уровнем букв становится больше","Каждые 5 уровней — новая наклейка 🎁. Как далеко дойдёшь?"],
+    en:["An emoji and word appear on screen","Choose the FIRST LETTER of the word","💡 Hint removes a wrong letter","❤️ You have 3 lives!","More letters unlock as you level up","A new sticker every 5 levels 🎁 — how far can you go?"],
   },
 };
 function t(k){ return T[k][LANG] || T[k]['en']; }
@@ -254,7 +254,7 @@ function init() {
   buildDots();
   renderQuestion();
 
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID, lang: LANG,
     title: t('howTitle'),
     steps: T.howSteps[LANG] || T.howSteps['en'],
@@ -337,6 +337,7 @@ function answer(letter, q, btn) {
   if (letter === q.l) {
     btn.classList.add('correct');
     _score++;
+    KZL.duo.answer(true);
     engine.playSound('win');
     setTimeout(advance, 750);
   } else {
@@ -374,8 +375,10 @@ function advance() {
    LEVEL DONE / GAME OVER
 ═══════════════════════════════════════════════ */
 function levelDone() {
+  if (KZL.duo.end()) return;
   const pct = _score / _total;
   const passed = pct >= 0.6;
+  KZL.recordResult(GAME_ID, passed);
 
   if (passed && KZL.getLevel(GAME_ID) === _level) {
     KZL.nextLevel(GAME_ID);
@@ -431,11 +434,11 @@ function buildDots() {
 }
 
 function openLevelSelector() {
-  const max = KZL.getLevel(GAME_ID);
+  const max = KZL.getBest(GAME_ID);
   const grid = document.getElementById('lvl-grid');
   grid.innerHTML = '';
-  for (let n = 1; n <= 20; n++) {
-    const cfg = KZL.CONFIGS[n - 1];
+  for (const {n} of KZL.levelWindow(GAME_ID)) {
+    const cfg = KZL.cfgFor(n);
     const poolSize = Math.max(2, Math.floor(POOL.length * cfg.pool));
     const btn = document.createElement('button');
     btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
