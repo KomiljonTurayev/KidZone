@@ -646,3 +646,34 @@ describe('family members (second parent)', () => {
     await assertFails(otherCtx().firestore().doc('family_invites/123456').get());
   });
 });
+
+// ---- Faza 17: backend-only Premium copy and AI allowance ---------------------
+// Written only by the backend (Admin SDK). No rule matches these paths, so clients are
+// denied by default; a client that could write them would give itself Premium or reset
+// its daily AI counter.
+
+describe('entitlements/{uid} and users/{uid}/ai_usage/{date}', () => {
+  test('an owner can neither read nor write their own Premium copy', async () => {
+    await seed((db) => db.doc(`entitlements/${OWNER_UID}`).set({ premiumUntil: 1, eventAtMs: 1 }));
+
+    await assertFails(ownerCtx().firestore().doc(`entitlements/${OWNER_UID}`).get());
+    await assertFails(ownerCtx().firestore().doc(`entitlements/${OWNER_UID}`).set({ premiumUntil: 9e15 }));
+    await assertFails(ownerCtx().firestore().doc(`entitlements/${OWNER_UID}`).delete());
+  });
+
+  test('an owner can neither read nor reset their AI allowance', async () => {
+    const usage = `users/${OWNER_UID}/ai_usage/2026-10-29`;
+    await seed((db) => db.doc(usage).set({ stories: 1, questions: 10 }));
+
+    await assertFails(ownerCtx().firestore().doc(usage).get());
+    await assertFails(ownerCtx().firestore().doc(usage).set({ stories: 0 }));
+    await assertFails(ownerCtx().firestore().doc(usage).delete());
+  });
+
+  test('a family member cannot touch the owner\'s allowance either', async () => {
+    await seed((db) => db.doc(`families/${OWNER_UID}/members/${OTHER_UID}`).set({ joinedAt: 1 }));
+
+    await assertFails(otherCtx().firestore().doc(`users/${OWNER_UID}/ai_usage/2026-10-29`).set({ stories: 0 }));
+    await assertFails(otherCtx().firestore().doc(`entitlements/${OWNER_UID}`).get());
+  });
+});

@@ -11,6 +11,13 @@ import java.util.concurrent.TimeUnit
 
 data class GeneratedStory(val title: String, val text: String)
 
+sealed interface StoryResult {
+    data class Ready(val story: GeneratedStory) : StoryResult
+
+    /** The family's free stories for today are used up (backend 402). */
+    data object DailyLimitReached : StoryResult
+}
+
 /**
  * Generates children's stories for KidZone.
  *
@@ -37,19 +44,22 @@ object StoryGenerator {
         ageRange: String,
         childName: String = "",
         scenario: String = "",
-    ): GeneratedStory {
+    ): StoryResult {
         val safeName = childName.trim().take(30)
         val safeScenario = scenario.trim().take(200)
 
-        val backendStory = generateViaBackend(lang, ageRange, safeName, safeScenario)
-        if (backendStory != null) {
-            Log.d(TAG, "Story successfully generated via backend")
-            return backendStory
+        when (val answer = generateViaBackend(lang, ageRange, safeName, safeScenario)) {
+            is AiBackendAnswer.Ready -> {
+                Log.d(TAG, "Story successfully generated via backend")
+                return StoryResult.Ready(answer.value)
+            }
+            AiBackendAnswer.DailyLimitReached -> return StoryResult.DailyLimitReached
+            AiBackendAnswer.Unavailable -> Unit
         }
 
         // Robust PersonalizedStoryEngine (always succeeds and respects childName & scenario)
         Log.d(TAG, "Generating story via PersonalizedStoryEngine for name='$safeName', scenario='$safeScenario'")
-        return PersonalizedStoryEngine.generate(lang, ageRange, safeName, safeScenario)
+        return StoryResult.Ready(PersonalizedStoryEngine.generate(lang, ageRange, safeName, safeScenario))
     }
 
     private suspend fun generateViaBackend(
@@ -57,9 +67,9 @@ object StoryGenerator {
         ageRange: String,
         childName: String,
         scenario: String,
-    ): GeneratedStory? {
+    ): AiBackendAnswer<GeneratedStory> {
         return try {
-            val idToken = AuthGraph.idTokens.idToken() ?: return null
+            val idToken = AuthGraph.idTokens.idToken() ?: return AiBackendAnswer.Unavailable
 
             val requestJson = JSONObject().apply {
                 put("lang", lang)
@@ -77,19 +87,12 @@ object StoryGenerator {
                 .build()
 
             httpClient.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    Log.w(TAG, "Backend story HTTP failed: ${response.code}")
-                    return null
-                }
-                val respBody = response.body?.string() ?: return null
-                val root = JSONObject(respBody)
-                val title = root.optString("title").trim()
-                val text = root.optString("text").trim()
-                if (title.isNotEmpty() && text.isNotEmpty()) GeneratedStory(title, text) else null
+                if (!response.isSuccessful) Log.w(TAG, "Backend story HTTP failed: ${response.code}")
+                aiBackendAnswer(response.code, response.body?.string(), ::parseStory)
             }
         } catch (e: Exception) {
             Log.w(TAG, "Backend story call failed: ${e.message}")
-            null
+            AiBackendAnswer.Unavailable
         }
     }
 

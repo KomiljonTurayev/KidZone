@@ -26,6 +26,16 @@ class KidzoTextsTest {
     }
 
     @Test
+    fun `the daily-limit reply is in the app language and reads naturally without a name`() {
+        assertTrue(dailyLimitReply("uz", "Aziz").startsWith("Bugun juda ko'p suhbatlashdik, Aziz!"))
+        assertTrue(dailyLimitReply("ru", "Aziz").contains("Aziz"))
+        assertTrue(dailyLimitReply("en", "Aziz").startsWith("We talked so much today, Aziz!"))
+        listOf("uz", "ru", "en").forEach { lang ->
+            assertFalse(lang, dailyLimitReply(lang, "").contains(", !"))
+        }
+    }
+
+    @Test
     fun `without a name the fallback reply still reads naturally`() {
         listOf("uz", "ru", "en").forEach { lang ->
             assertFalse(lang, fallbackReply(lang, "").contains(", !"))
