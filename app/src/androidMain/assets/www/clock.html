@@ -239,7 +239,7 @@ function init() {
   buildDots();
   renderQuestion();
 
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID, lang: LANG,
     title: t('howTitle'),
     steps: T.howSteps[LANG] || T.howSteps['en'],
@@ -324,6 +324,7 @@ function answer(val, q, btn) {
   if (val === q.text) {
     btn.classList.add('correct');
     _score++;
+    KZL.duo.answer(true);
     engine.playSound('win');
     setTimeout(advance, 800);
   } else {
@@ -361,6 +362,7 @@ function advance() {
    LEVEL DONE / GAME OVER
 ═══════════════════════════════════════════════ */
 function levelDone() {
+  if (KZL.duo.end()) return;
   const pct = _score / _total;
   const passed = pct >= 0.6;
   KZL.recordResult(GAME_ID, passed);

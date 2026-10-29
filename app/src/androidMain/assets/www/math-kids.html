@@ -326,7 +326,7 @@ function init() {
   renderQuestion();
 
   const stepsSrc = MODE === 'money' ? T.howStepsMoney : T.howSteps;
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID, lang: LANG,
     title: t('howTitle'),
     steps: stepsSrc[LANG] || stepsSrc['en'],
@@ -409,6 +409,7 @@ function answer(v, q, btn) {
   if (v === q.ans) {
     btn.classList.add('correct');
     _score++;
+    KZL.duo.answer(true);
     setTimeout(advance, 750);
   } else {
     btn.classList.add('wrong');
@@ -446,6 +447,7 @@ function advance() {
    LEVEL DONE / GAME OVER
 ═══════════════════════════════════════════════ */
 function levelDone() {
+  if (KZL.duo.end()) return;
   const pct = _score / _total;
   const passed = pct >= 0.6;
   KZL.recordResult(GAME_ID, passed);

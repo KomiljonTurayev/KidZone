@@ -224,7 +224,7 @@ function init() {
   renderQuestion();
 
   /* how-to-play: auto on first visit */
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID, lang: LANG,
     title: t('howTitle'),
     steps: T.howSteps[LANG] || T.howSteps['uz'],
@@ -311,6 +311,7 @@ function answer(opt, q, btn) {
   if (opt.en === q.en) {
     btn.classList.add('correct');
     _score++;
+    KZL.duo.answer(true);
     const _asEl = document.getElementById('t-score'); if (_asEl) _asEl.textContent = _score;
     setTimeout(advance, 750);
   } else {
@@ -350,6 +351,7 @@ function advance() {
    LEVEL DONE / GAME OVER
 ═══════════════════════════════════════════════ */
 function levelDone() {
+  if (KZL.duo.end()) return;
   const pct = _score / _total;
   const passed = pct >= 0.6;
   KZL.recordResult(GAME_ID, passed);

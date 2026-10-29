@@ -163,7 +163,7 @@ function getLevelConfig() {
 // How-to-play
 window.addEventListener('load', () => {
   getLevelConfig();
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID,
     steps: {
       uz:[
@@ -280,6 +280,7 @@ function answer(idx) {
     combo++;
     const pts = 10 + (combo > 2 ? 5 : 0);
     score += pts;
+    KZL.duo.answer(true);
     document.getElementById("score-val").textContent = score;
     document.getElementById("combo-bar").textContent = combo > 2 ? `${t.combo}${combo}! +${pts}` : "";
     game.playSound('match');
@@ -298,6 +299,7 @@ function answer(idx) {
 }
 
 function showResult() {
+  if (KZL.duo.end()) return;
   const maxScore = questions.length * 10;
   const pct = score / maxScore;
   document.getElementById("result-em").textContent  = pct >= 0.8 ? "🏆" : pct >= 0.5 ? "⭐" : "💪";

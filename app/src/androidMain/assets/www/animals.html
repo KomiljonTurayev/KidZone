@@ -191,7 +191,7 @@ function init() {
   btnReplay.textContent = t.again;
 
   // How-to-play
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID,
     steps: {
       uz:[
@@ -369,6 +369,7 @@ function pick(btn, animal) {
     combo++;
     const pts = 10 + (combo >= 3 ? 5 : 0);
     score += pts;
+    KZL.duo.answer(true);
     document.getElementById('score').textContent = score;
     document.getElementById('dot' + qIdx).classList.add('ok');
     engine.playSound('match');
@@ -400,6 +401,7 @@ function playAnimalSound() {
 
 /* ════════════ RESULT ════════════ */
 function showResult() {
+  if (KZL.duo.end()) return;
   if (timerObj) clearInterval(timerObj);
   const maxScore = cfg.q * 10;
   const pct = score / maxScore;

@@ -133,6 +133,14 @@ const CSS = `
 .kzl-lup-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;padding:14px 34px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito','KZ Cyrillic',sans-serif;box-shadow:0 4px 0 #C94F20;transform:translateY(0);transition:transform .08s,box-shadow .08s;}
 .kzl-lup-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #C94F20;}
 .kzl-map-btn{bottom:136px;}
+.kzl-duo-btn{bottom:190px;font-size:18px;}
+.kzl-duo-btn.on{background:#FFD600;}
+.kzl-duo-banner{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:950;display:flex;gap:12px;align-items:center;background:#fff;border:3px solid #2ECC71;border-radius:22px;padding:7px 14px;font-size:14px;font-weight:900;color:#2D2D2D;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap;font-family:'Nunito','KZ Cyrillic',sans-serif;animation:kzlPop .35s cubic-bezier(.34,1.56,.64,1);}
+.kzl-duo-banner.parent{border-color:#7B1FA2;}
+.kzl-duo-banner span{color:#888;font-size:13px;}
+.kzl-duo-score{font-size:44px;font-weight:900;margin-bottom:6px;}
+.kzl-duo-score span{color:#bbb;}
+.kzl-duo-solo{display:block;margin:12px auto 0;background:none;border:none;color:#888;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito','KZ Cyrillic',sans-serif;}
 .kzl-stk-big{display:inline-block;font-size:64px;line-height:1.1;animation:kzlPop .5s cubic-bezier(.34,1.56,.64,1);}
 .kzl-stk-big.gold{filter:drop-shadow(0 0 12px #FFD600);}
 .kzl-stk-row{display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:900;color:#7B1FA2;margin:-6px 0 14px;}
@@ -240,6 +248,93 @@ window.KZL = {
       document.body.appendChild(p);
       setTimeout(() => p.remove(), 2200);
     }
+  },
+
+  /* ─── Play together (Faza 18): child and parent take turns on one phone ───
+     A game adds two lines: KZL.duo.answer(true) where it scores a right answer, and
+     `if (KZL.duo.end()) return;` at the top of its result screen. Misses come from lives.lose(). */
+  duo: {
+    active: new URLSearchParams(location.search).get('duo') === '1',
+    turn: 0,
+    scores: [0, 0],
+    _txt: {
+      uz: {kid: "Bola", parent: "Ota-ona", turn: "navbati", btn: "Birga o'ynash", solo: "Yakka o'yin",
+           again: "Yana bellashamiz", win: "g'olib! 🏆", tie: "Durang! Ikkalangiz ham zo'r! 🤝", bonus: "Birga o'ynaganingiz uchun +20 ⭐"},
+      ru: {kid: "Ребёнок", parent: "Родитель", turn: "ходит", btn: "Играть вместе", solo: "Играть одному",
+           again: "Ещё раз", win: "победил! 🏆", tie: "Ничья! Вы оба молодцы! 🤝", bonus: "+20 ⭐ за игру вместе"},
+      en: {kid: "Kid", parent: "Parent", turn: "to play", btn: "Play together", solo: "Play alone",
+           again: "Play again", win: "wins! 🏆", tie: "A tie! You're both great! 🤝", bonus: "+20 ⭐ for playing together"},
+    },
+    t() { return this._txt[langOf()] || this._txt.en; },
+    players() {
+      const pm = window.parent && window.parent.profileManager;
+      const kid = (pm && pm.getActive && pm.getActive().name) || this.t().kid;
+      return [{em: '🐣', name: kid}, {em: '🦁', name: this.t().parent}];
+    },
+    /** Called by the game on a right answer, and by lives.lose() on a miss. */
+    answer(correct) {
+      if (!this.active) return;
+      if (correct) this.scores[this.turn] += 1;
+      this.turn = 1 - this.turn;
+      setTimeout(() => this._banner(), 650);
+    },
+    /** Shows who won instead of the game's own result. True when it did. */
+    end() {
+      if (!this.active) return false;
+      window.KZL._inject();
+      const t = this.t(), p = this.players(), [a, b] = this.scores;
+      const head = a === b ? t.tie : `${(a > b ? p[0] : p[1]).em} ${(a > b ? p[0] : p[1]).name} ${t.win}`;
+      const app = window.parent && window.parent.app;
+      if (app && app.addPoints) app.addPoints(20);
+      const el = document.createElement('div');
+      el.className = 'kzl-level-up';
+      el.innerHTML =
+        `<div class="kzl-lup-card">
+          <div class="kzl-duo-score">${p[0].em} ${a} <span>:</span> ${b} ${p[1].em}</div>
+          <div class="kzl-lup-txt"></div>
+          <div class="kzl-stk-bonus">${t.bonus}</div>
+          <button class="kzl-lup-btn" data-a="again">${t.again}</button>
+          <button class="kzl-duo-solo" data-a="solo">${t.solo}</button>
+        </div>`;
+      el.querySelector('.kzl-lup-txt').textContent = head;
+      el.querySelector('[data-a=again]').onclick = () => location.reload();
+      el.querySelector('[data-a=solo]').onclick = () => this._go(false);
+      document.body.appendChild(el);
+      window.KZL._burst();
+      return true;
+    },
+    _go(on) {
+      const q = new URLSearchParams(location.search);
+      if (on) q.set('duo', '1'); else q.delete('duo');
+      location.search = q.toString();
+    },
+    _banner() {
+      if (!this.active) return;
+      window.KZL._inject();
+      let el = document.getElementById('kzl-duo');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'kzl-duo';
+        el.className = 'kzl-duo-banner';
+        document.body.appendChild(el);
+      }
+      const p = this.players(), cur = p[this.turn];
+      el.innerHTML = `<b>${cur.em} ${cur.name} ${this.t().turn}</b><span>${p[0].em} ${this.scores[0]} : ${this.scores[1]} ${p[1].em}</span>`;
+      el.classList.toggle('parent', this.turn === 1);
+      // Grown-ups play without hints.
+      const hint = document.getElementById('kzl-hint');
+      if (hint) hint.style.visibility = this.turn === 1 ? 'hidden' : '';
+    },
+    /** The 👨‍👧 button that switches a game between solo and together. */
+    _button() {
+      const b = document.createElement('button');
+      b.className = 'kzl-htp-btn kzl-duo-btn' + (this.active ? ' on' : '');
+      b.textContent = this.active ? '🐣' : '👨‍👧';
+      b.setAttribute('aria-label', this.active ? this.t().solo : this.t().btn);
+      b.onclick = () => this._go(!this.active);
+      document.body.appendChild(b);
+      if (this.active) setTimeout(() => this._banner(), 300);
+    },
   },
 
   /* ─── Level map: a winding path, gifts every 5 levels, castles every 10 ─── */
@@ -371,6 +466,7 @@ window.KZL = {
     mapBtn.setAttribute('aria-label', tr(L.map));
     mapBtn.onclick = () => this.showMap(cfg.levelId || this._gameId || cfg.id);
     document.body.appendChild(mapBtn);
+    if (cfg.duo) this.duo._button();
 
     const key = 'kzl-seen-' + (cfg.id || 'game');
     if (!localStorage.getItem(key)) {
@@ -474,7 +570,11 @@ window.KZL = {
 
     return {
       el: wrap,
-      lose() { rem = Math.max(0, rem - 1); render(); return rem === 0; },
+      lose() {
+        // Playing together: a miss is the other player's turn, nobody runs out of hearts.
+        if (window.KZL.duo.active) { window.KZL.duo.answer(false); return false; }
+        rem = Math.max(0, rem - 1); render(); return rem === 0;
+      },
       reset() { rem = total; render(); },
       get left() { return rem; }
     };

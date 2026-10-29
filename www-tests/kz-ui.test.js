@@ -139,3 +139,14 @@ test('level 50 gives a gold sticker; stickers stay with their child', () => {
   env.data['kz-native-profile'] = 'kid-b';
   assert.strictEqual(env.KZL.stickers().length, 0);
 });
+
+test('playing together: turns alternate and only right answers score', () => {
+  const {KZL} = load({search: '?duo=1'});
+  assert.strictEqual(KZL.duo.active, true);
+  KZL.duo.answer(true);   // child right
+  KZL.duo.answer(false);  // parent wrong
+  KZL.duo.answer(true);   // child right
+  assert.deepStrictEqual([...KZL.duo.scores], [2, 0]);
+  assert.strictEqual(KZL.duo.turn, 1);
+  assert.strictEqual(load().KZL.duo.active, false);
+});

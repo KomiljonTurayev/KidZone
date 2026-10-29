@@ -128,7 +128,7 @@ function init() {
   document.getElementById('btn-again').textContent  = t.again;
   document.getElementById('lv-val').textContent     = _level;
   document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.questions} · 💡${_cfg.hints} · 🌡️${_pool.length} ${t.items}`.trim();
-  KZL.howToPlay({id:GAME_ID,steps:{
+  KZL.howToPlay({ duo: true,id:GAME_ID,steps:{
     uz:[{icon:'🌤️',text:'Ob-havo belgisini ko\'rasan'},{icon:'👆',text:'To\'g\'ri nomini tanlang'},{icon:'💡',text:'Hint noto\'g\'ri javobni o\'chiradi'},{icon:'❤️',text:'3 ta hayot bor — ehtiyotkor bo\'l!'},{icon:'🏆',text:'60% ball yig\'ib keyingi darajaga o\'t!'}],
     ru:[{icon:'🌤️',text:'Видишь символ погоды'},{icon:'👆',text:'Выбери правильное название'},{icon:'💡',text:'Подсказка убирает неверный ответ'},{icon:'❤️',text:'3 жизни — будь внимателен!'},{icon:'🏆',text:'Набери 60% чтобы перейти на следующий уровень!'}],
     en:[{icon:'🌤️',text:'You see a weather symbol'},{icon:'👆',text:'Choose the correct name'},{icon:'💡',text:'Hint removes one wrong option'},{icon:'❤️',text:'3 lives — be careful!'},{icon:'🏆',text:'Score 60% to advance to next level!'}],
@@ -187,7 +187,7 @@ function loadQ() {
 function pick(btn,opt,q){
   if(_answered)return; _answered=true;
   if(opt.id===q.id){
-    btn.classList.add('correct'); _score+=10;
+    btn.classList.add('correct'); _score+=10; KZL.duo.answer(true);
     document.getElementById('score').textContent=_score;
     engine.playSound('match'); engine.vibrate(30);
   } else {
@@ -200,6 +200,7 @@ function pick(btn,opt,q){
 }
 
 function showResult(){
+  if (KZL.duo.end()) return;
   const max=_questions.length*10, pct=_score/max;
   document.getElementById('res-em').textContent = pct>=.8?'🏆':pct>=.6?'⭐':'💪';
   document.getElementById('res-ttl').textContent= pct>=.8?t.great:pct>=.6?t.good:t.try;

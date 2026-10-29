@@ -130,7 +130,7 @@ function init() {
   document.getElementById('btn-back').textContent   = t.back;
   document.getElementById('level-info').textContent = `${_cfg.stars} · ${_cfg.q} ${t.qUnit} · 💡${_cfg.hints} · 🐾${_pool.length}${t.pUnit}`;
 
-  KZL.howToPlay({ id: GAME_ID, steps:{
+  KZL.howToPlay({ duo: true, id: GAME_ID, steps:{
     uz:[{icon:'👦',text:'Tana a\'zosi nomini ko\'rasan'},{icon:'👆',text:'To\'g\'ri emoji ni top'},{icon:'💡',text:'Hint bir noto\'g\'ri javobni o\'chiradi'},{icon:'❤️',text:'3 ta hayot — ehtiyotkor bo\'l!'},{icon:'🏆',text:'Yangi daraja uchun 60% ball to\'pla!'}],
     ru:[{icon:'👦',text:'Видишь название части тела'},{icon:'👆',text:'Найди правильный эмодзи'},{icon:'💡',text:'Подсказка убирает неверный ответ'},{icon:'❤️',text:'3 жизни — будь осторожен!'},{icon:'🏆',text:'Набери 60% для следующего уровня!'}],
     en:[{icon:'👦',text:'You see the name of a body part'},{icon:'👆',text:'Find the correct emoji'},{icon:'💡',text:'Hint removes one wrong option'},{icon:'❤️',text:'3 lives — be careful!'},{icon:'🏆',text:'Score 60% to advance to next level!'}],
@@ -193,7 +193,7 @@ function loadQ() {
 function pick(btn,opt,q){
   if(_answered)return; _answered=true;
   if(opt.id===q.id){
-    btn.classList.add('correct'); _score+=10;
+    btn.classList.add('correct'); _score+=10; KZL.duo.answer(true);
     document.getElementById('score').textContent=_score;
     engine.playSound('match'); engine.vibrate(30);
   } else {
@@ -206,6 +206,7 @@ function pick(btn,opt,q){
 }
 
 function showResult(){
+  if (KZL.duo.end()) return;
   const max=_questions.length*10, pct=_score/max;
   document.getElementById('res-em').textContent  = pct>=.8?'🏆':pct>=.6?'⭐':'💪';
   document.getElementById('res-ttl').textContent = pct>=.8?t.great:pct>=.6?t.good:t.try;
