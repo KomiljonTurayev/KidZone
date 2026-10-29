@@ -175,6 +175,8 @@ fun MainScreen(
                             isAiAvailable = { aiAvailable() },
                             onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
                             onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
+                            // Feeds the parent dashboard's "games played today".
+                            onGameLaunched = statsManager::onGameLaunched,
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
                             onLanguageChanged = { lang ->
                                 prefs.edit().putString("kz_lang", lang).apply()

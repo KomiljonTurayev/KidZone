@@ -23,6 +23,7 @@ internal class NativeBridge(
     private val isAiAvailable: () -> Boolean,
     private val onAiLocked: () -> Unit,
     private val onAiDailyLimit: () -> Unit,
+    private val onGameLaunched: (String) -> Unit,
     /** Persists a language/age the child picked in the WebView header (already validated). */
     private val onLanguageChanged: (String) -> Unit,
     private val onAgeChanged: (String) -> Unit,
@@ -210,8 +211,11 @@ internal class NativeBridge(
     }
 
     @android.webkit.JavascriptInterface
-    fun gameLaunched(@Suppress("UNUSED_PARAMETER") gameId: String) {
-        onMain { viewModel.setInGame(true) }
+    fun gameLaunched(gameId: String) {
+        onMain {
+            viewModel.setInGame(true)
+            onGameLaunched(gameId)
+        }
     }
 
     @android.webkit.JavascriptInterface

@@ -120,4 +120,37 @@ public class ParentalStatsManagerTest {
     public void getTodaySeconds_beforeSessionStart_ignoresElapsedTime() {
         assertEquals(0L, mgr.getTodaySeconds());
     }
+
+    @Test
+    public void followsActiveProfile_dashboardReadsWhatTheSessionWrote() {
+        prefs.edit().putString("active_profile_id", "kid-a").commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("kid-a"), 12).commit();
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("kid-b"), 30).commit();
+        ParentalStatsManager following = new ParentalStatsManager(prefs);
+
+        assertEquals(12, following.getTodayMinutes());
+
+        prefs.edit().putString("active_profile_id", "kid-b").commit();
+        assertEquals(30, following.getTodayMinutes());
+        assertEquals(30, following.getWeeklyMinutes()[6]);
+    }
+
+    @Test
+    public void followsActiveProfile_gamesGoToTheActiveChild() {
+        prefs.edit().putString("active_profile_id", "kid-a").commit();
+        ParentalStatsManager following = new ParentalStatsManager(prefs);
+
+        following.onGameLaunched("animals");
+
+        assertEquals(java.util.List.of("animals"), following.getTodayGames());
+        prefs.edit().putString("active_profile_id", "kid-b").commit();
+        assertTrue(following.getTodayGames().isEmpty());
+    }
+
+    @Test
+    public void withoutAnActiveProfile_usesDefault() {
+        prefs.edit().putInt(ParentalStatsManager.todayPtKey("default"), 7).commit();
+
+        assertEquals(7, new ParentalStatsManager(prefs).getTodayMinutes());
+    }
 }
