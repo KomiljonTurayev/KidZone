@@ -23,6 +23,12 @@ internal class ChallengeBridge(
     fun onGameOpened(@Suppress("UNUSED_PARAMETER") gameId: String) {
     }
 
+    /** Stars the child just earned in the WebView (games, badges, stickers). */
+    @android.webkit.JavascriptInterface
+    fun onStarsEarned(stars: Int) {
+        if (stars in 1..1000) onMain { viewModel.onStarsEarned(stars) }
+    }
+
     @android.webkit.JavascriptInterface
     fun onGameClosed(gameId: String) {
         onMain { viewModel.onGameClosed(gameId) }

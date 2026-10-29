@@ -44,6 +44,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,10 +63,15 @@ import androidx.compose.ui.unit.sp
 
 /** Palette shared by the parent-facing native screens; matches the WebView home (kids-theme.css). */
 object Kid {
-    val Ink = Color(0xFF2D2A4A)
-    val InkSoft = Color(0xFF6B6785)
-    val Cream = Color(0xFFFFF8F0)
-    val Peach = Color(0xFFFFE3CF)
+    /** Night mode (Faza 18). Set by KidZoneTheme; snapshot state, so screens recolor when it flips. */
+    var dark by mutableStateOf(false)
+
+    val Ink get() = if (dark) Color(0xFFF2EEFF) else Color(0xFF2D2A4A)
+    val InkSoft get() = if (dark) Color(0xFFA9A3C2) else Color(0xFF6B6785)
+    val Cream get() = if (dark) Color(0xFF14121F) else Color(0xFFFFF8F0)
+    val Peach get() = if (dark) Color(0xFF2E2840) else Color(0xFFFFE3CF)
+    /** Cards, chips and buttons that sit on the page background. */
+    val Card get() = if (dark) Color(0xFF221F33) else Color.White
     val Orange = Color(0xFFFF6B35)
     val Amber = Color(0xFFFF9F1C)
     val Sky = Color(0xFF4FACFE)
@@ -72,7 +79,7 @@ object Kid {
     val Mint = Color(0xFF2ECC71)
     val Grape = Color(0xFF7B5CFF)
     val Telegram = Color(0xFF229ED9)
-    val Line = Color(0xFFEDE3DA)
+    val Line get() = if (dark) Color(0xFF3A3450) else Color(0xFFEDE3DA)
 
     val Sunset = Brush.horizontalGradient(listOf(Color(0xFFFF8A3D), Color(0xFFFF5E62)))
     val Ocean = Brush.horizontalGradient(listOf(Sky, Blue))
@@ -92,7 +99,10 @@ fun KidBackground(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFFFFF4E8), Kid.Cream, Color(0xFFFFEDE0)))),
+            .background(
+                if (Kid.dark) Brush.verticalGradient(listOf(Color(0xFF1B1830), Kid.Cream, Color(0xFF191526)))
+                else Brush.verticalGradient(listOf(Color(0xFFFFF4E8), Kid.Cream, Color(0xFFFFEDE0)))
+            ),
     ) {
         Bubble(Color(0x33FF9F1C), 220.dp, x = (-60).dp, y = (60 + 20 * t).dp)
         Bubble(Color(0x2A4FACFE), 180.dp, x = 250.dp, y = (180 - 24 * t).dp)
@@ -150,7 +160,7 @@ fun MascotBubble(emoji: String, size: Dp = 132.dp) {
             .size(size)
             .shadow(18.dp, CircleShape, ambientColor = Kid.Orange, spotColor = Kid.Orange)
             .clip(CircleShape)
-            .background(Brush.radialGradient(listOf(Color.White, Color(0xFFFFF1E4)))),
+            .background(Brush.radialGradient(if (Kid.dark) listOf(Color(0xFF2E2840), Kid.Card) else listOf(Color.White, Color(0xFFFFF1E4)))),
         contentAlignment = Alignment.Center,
     ) {
         Text(emoji, fontSize = (size.value * 0.48f).sp)
@@ -197,7 +207,7 @@ fun KidCard(
             .scale(scale)
             .shadow(if (selected) 14.dp else 8.dp, shape, ambientColor = Color(0x22FF9F1C), spotColor = Color(0x33FF6B35))
             .clip(shape)
-            .background(Color.White)
+            .background(Kid.Card)
             .border(3.dp, borderColor, shape)
             .then(if (onClick != null) Modifier.clickable(interaction, indication = null, onClick = onClick) else Modifier),
         content = content,
@@ -260,7 +270,7 @@ fun BackChip(onClick: () -> Unit) {
             .size(44.dp)
             .shadow(6.dp, CircleShape)
             .clip(CircleShape)
-            .background(Color.White)
+            .background(Kid.Card)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { Text("←", fontSize = 22.sp, color = Kid.Ink) }
@@ -356,7 +366,7 @@ fun DigitBoxes(value: String, length: Int, error: Boolean = false, masked: Boole
                     .size(width = 58.dp, height = 68.dp)
                     .shadow(6.dp, shape)
                     .clip(shape)
-                    .background(Color.White)
+                    .background(Kid.Card)
                     .border(
                         2.dp,
                         when { error -> MaterialTheme.colorScheme.error; active -> Kid.Orange; else -> Color.Transparent },
@@ -396,9 +406,9 @@ fun KidTextField(
         keyboardOptions = keyboardOptions,
         shape = RoundedCornerShape(24.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
+            focusedContainerColor = Kid.Card,
+            unfocusedContainerColor = Kid.Card,
+            errorContainerColor = Kid.Card,
             focusedBorderColor = Kid.Orange,
             unfocusedBorderColor = Kid.Line,
             cursorColor = Kid.Orange,
@@ -410,7 +420,7 @@ fun KidTextField(
 /** Pill toggle; filled orange when [selected]. */
 @Composable
 fun KidChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val bg by animateColorAsState(if (selected) Kid.Orange else Color.White, label = "chip_bg")
+    val bg by animateColorAsState(if (selected) Kid.Orange else Kid.Card, label = "chip_bg")
     val fg by animateColorAsState(if (selected) Color.White else Kid.Ink, label = "chip_fg")
     val shape = RoundedCornerShape(22.dp)
     Box(

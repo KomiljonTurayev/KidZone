@@ -371,7 +371,7 @@ fun KidzoSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 4.dp),
                     shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = uz.kidzone.app.ui.components.Kid.Card),
                     border = BorderStroke(1.dp, Color(0xFFFFE8DE))
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {

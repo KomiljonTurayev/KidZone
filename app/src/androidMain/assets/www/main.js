@@ -457,7 +457,10 @@ class GameManager {
             const list = JSON.stringify(this.games.map(function(g) {
                 return {
                     id: g.id,
-                    title: typeof g.name === 'object' ? (g.name.uz || g.name.en) : g.name
+                    title: typeof g.name === 'object' ? (g.name.uz || g.name.en) : g.name,
+                    // The parent dashboard names games in the app language (levels card).
+                    em: g.em || '',
+                    names: typeof g.name === 'object' ? g.name : {}
                 };
             }));
             window.AndroidChallenge.onGamesLoaded(list);
@@ -466,6 +469,10 @@ class GameManager {
 
     addPoints(n) {
         this.pts += n;
+        // Counts toward today's "earn N stars" task.
+        if (n > 0 && window.AndroidChallenge && window.AndroidChallenge.onStarsEarned) {
+            window.AndroidChallenge.onStarsEarned(n);
+        }
         localStorage.setItem(profileManager.key('pts'), this.pts);
         this.updateProgress();
         if (window.badgeManager) badgeManager.onPointsUpdated(this.pts);
@@ -598,7 +605,8 @@ class GameManager {
         if (titleEl) titleEl.textContent = g.em + " " + gameName;
         if (backEl) backEl.textContent = this.translator.get('back').replace("← ", "");
 
-        const gameUrl = g.file.includes("?") ? `${g.file}&lang=${this.translator.lang}` : `${g.file}?lang=${this.translator.lang}`;
+        const params = `lang=${this.translator.lang}&age=${encodeURIComponent(this.age)}`;
+        const gameUrl = g.file.includes("?") ? `${g.file}&${params}` : `${g.file}?${params}`;
         const frameEl = document.getElementById("gv-frame");
         if (frameEl) frameEl.src = gameUrl;
         const gvEl = document.getElementById("gv");
@@ -606,6 +614,8 @@ class GameManager {
 
         if (window.AndroidBridge) {
             window.AndroidBridge.hideBanner();
+            // Feeds the parent dashboard's "games played today".
+            if (window.AndroidBridge.gameLaunched) window.AndroidBridge.gameLaunched(g.id);
         }
         if (window.AndroidChallenge) {
             window.AndroidChallenge.onGameOpened(g.id);
@@ -623,9 +633,9 @@ class GameManager {
         this.currentGameId = null;
         if (game) {
             const earned = game.pts || 20;
+            this.showRewardScreen(earned);
             this.addPoints(earned);
             if (window.badgeManager) badgeManager.onGamePlayed(game.cat);
-            this.showRewardScreen(earned);
         }
         if (game && window.AndroidChallenge) {
             window.AndroidChallenge.onGameClosed(game.id);
@@ -1175,6 +1185,12 @@ class BadgeManager {
     _next() {
         if (this._queue.length === 0) { this._busy = false; return; }
         this._busy = true;
+        // One celebration at a time: a badge waits until the reward card is closed.
+        const reward = document.getElementById('reward-screen');
+        if (reward && !reward.classList.contains('h')) {
+            this._timer = setTimeout(() => this._next(), 400);
+            return;
+        }
         const id = this._queue.shift();
         const def = BADGE_DEFS.find(b => b.id === id);
         if (!def) { this._next(); return; }
@@ -1285,6 +1301,11 @@ class BadgeManager {
         if (prog) prog.textContent = earned + ' / ' + total + label;
 
         grid.innerHTML = '';
+        this.renderStickers(grid, lang);
+        const bhead = document.createElement('div');
+        bhead.className = 'stk-head';
+        bhead.textContent = (lang==='uz' ? '🏅 Yutuqlar' : lang==='ru' ? '🏅 Достижения' : '🏅 Achievements') + ' • ' + earned + ' / ' + total;
+        grid.appendChild(bhead);
         BADGE_DEFS.forEach(def => {
             const ok   = this.isEarned(def.id);
             const name = def.name[lang] || def.name.uz;
@@ -1296,12 +1317,151 @@ class BadgeManager {
             grid.appendChild(card);
         });
     }
+
+    /** Stickers the games hand out every 5 levels (kz-ui.js keeps them per child). */
+    renderStickers(grid, lang) {
+        const pid = localStorage.getItem('kz-native-profile') || localStorage.getItem('kz-active-profile') || 'p1';
+        let stickers = [];
+        try { stickers = JSON.parse(localStorage.getItem('kzl-stickers-' + pid) || '[]'); } catch (e) {}
+        const title = {uz: '🎨 Stikerlar albomi', ru: '🎨 Альбом наклеек', en: '🎨 Sticker album'};
+        const empty = {uz: "Har 5 darajada yangi stiker! O'ynashda davom et 🚀",
+                       ru: 'Новая наклейка каждые 5 уровней! Играй дальше 🚀',
+                       en: 'A new sticker every 5 levels! Keep playing 🚀'};
+        const lvl = {uz: '-daraja', ru: ' ур.', en: ' lvl'};
+        const head = document.createElement('div');
+        head.className = 'stk-head';
+        head.textContent = (title[lang] || title.en) + ' • ' + stickers.length;
+        grid.appendChild(head);
+        if (!stickers.length) {
+            const e = document.createElement('div');
+            e.className = 'stk-empty';
+            e.textContent = empty[lang] || empty.en;
+            grid.appendChild(e);
+            return;
+        }
+        stickers.slice().reverse().forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'bdg-card bdg-earned' + (s.gold ? ' stk-gold' : '');
+            const game = (window.app && app.games || []).find(g => g.id === s.g || (g.file || '').startsWith(s.g));
+            const gname = game ? (typeof game.name === 'object' ? (game.name[lang] || game.name.en) : game.name) : '';
+            card.innerHTML = '<div class="bdg-em"></div><div class="bdg-nm"></div>';
+            card.querySelector('.bdg-em').textContent = s.e;
+            card.querySelector('.bdg-nm').textContent = (gname ? gname + ' • ' : '') + s.lv + (lvl[lang] || lvl.en);
+            grid.appendChild(card);
+        });
+    }
 }
+
+/** Night mode for the home screen; the app decides (system / parent's pick) and calls apply(). */
+window.kzTheme = {
+    apply(mode) {
+        const dark = mode === 'dark';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        const ic = document.getElementById('theme-ic');
+        if (ic) ic.textContent = dark ? '☀️' : '🌙';
+    },
+    toggle() {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        this.apply(next);
+        if (window.AndroidBridge && window.AndroidBridge.setThemeMode) window.AndroidBridge.setThemeMode(next);
+    },
+};
+
+/** Today's three tasks, sent by the app (MainScreen.tasksJson) whenever they change. */
+window.kzTasks = {
+    data: null,
+    T: {
+        uz: {title: "🎯 Bugungi vazifalar", play: "{g} o'yinini o'yna", level: "Istalgan o'yinda yangi darajaga chiq",
+             stars: "Bugun {n} ⭐ yig'", go: "O'ynash", streak: "🔥 {n} kun", crown: "👑 Bugun hammasi bajarildi! Barakalla!"},
+        ru: {title: "🎯 Задания на сегодня", play: "Сыграй в «{g}»", level: "Пройди новый уровень в любой игре",
+             stars: "Собери сегодня {n} ⭐", go: "Играть", streak: "🔥 {n} дн.", crown: "👑 Всё выполнено! Молодец!"},
+        en: {title: "🎯 Today's tasks", play: "Play {g}", level: "Reach a new level in any game",
+             stars: "Earn {n} ⭐ today", go: "Play", streak: "🔥 {n} days", crown: "👑 All done today! Well done!"},
+    },
+    render(data) {
+        this.data = data;
+        this.rerender();
+    },
+    rerender() {
+        const card = document.getElementById('tasks-card');
+        if (!card || !this.data || !window.app) return;
+        const lang = app.translator.lang;
+        const t = this.T[lang] || this.T.en;
+        const game = id => app.games.find(g => g.id === id);
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+        const rows = this.data.tasks.map(task => {
+            let text = '', extra = '';
+            if (task.slot === 0) {
+                const g = game(task.gameId);
+                const name = g ? (typeof g.name === 'object' ? (g.name[lang] || g.name.en) : g.name) : task.gameId;
+                text = t.play.replace('{g}', (g ? g.em + ' ' : '') + name);
+                if (!task.done && g) extra = `<button class="tk-go" data-game="${esc(task.gameId)}">${t.go}</button>`;
+            } else if (task.slot === 1) {
+                text = t.level;
+            } else {
+                text = t.stars.replace('{n}', task.target);
+                const pct = task.target ? Math.round(100 * task.progress / task.target) : 0;
+                if (!task.done) text += ` <small>(${task.progress}/${task.target})</small><div class="tk-bar"><i style="width:${pct}%"></i></div>`;
+            }
+            return `<div class="tk-row${task.done ? ' done' : ''}"><div class="tk-check">${task.done ? '✓' : ''}</div>` +
+                   `<div class="tk-text">${text}</div>${extra}</div>`;
+        }).join('');
+        const allDone = this.data.tasks.length > 0 && this.data.tasks.every(x => x.done);
+        card.innerHTML =
+            `<div class="tk-hdr"><span class="tk-title">${t.title}</span>` +
+            (this.data.streak > 0 ? `<span class="tk-streak">${t.streak.replace('{n}', this.data.streak)}</span>` : '') + `</div>` +
+            rows + (allDone ? `<div class="tk-crown">${t.crown}</div>` : '');
+        card.querySelectorAll('.tk-go').forEach(b => {
+            b.onclick = () => { const g = game(b.dataset.game); if (g) app.openGame(g); };
+        });
+        card.classList.remove('h');
+    },
+};
+
+/** The goal a parent set in the dashboard, sent by the app (MainScreen); null clears it. */
+window.kzGoal = {
+    data: null,
+    T: {
+        uz: {title: "🎯 Ota-onangdan chaqiruv!", goal: "{g}da {n}-darajaga chiq", now: "Hozir: {b}-daraja",
+             go: "Boshla", done: "✅ Chaqiruv bajarildi!", show: "Ota-onangga ko'rsat — ular xursand bo'ladi 🎉"},
+        ru: {title: "🎯 Вызов от родителей!", goal: "Дойди до {n} уровня в «{g}»", now: "Сейчас: уровень {b}",
+             go: "Вперёд", done: "✅ Вызов выполнен!", show: "Покажи родителям — они обрадуются 🎉"},
+        en: {title: "🎯 A challenge from your parent!", goal: "Reach level {n} in {g}", now: "Now: level {b}",
+             go: "Go", done: "✅ Challenge done!", show: "Show your parent — they'll be so happy 🎉"},
+    },
+    render(data) {
+        const was = this.data;
+        this.data = data;
+        this.rerender();
+        if (data && data.done && was && !was.done && window.app) app.spawnFireworks();
+    },
+    rerender() {
+        const card = document.getElementById('goal-card');
+        if (!card || !window.app) return;
+        if (!this.data) { card.classList.add('h'); return; }
+        const d = this.data, lang = app.translator.lang, t = this.T[lang] || this.T.en;
+        const g = app.games.find(x => x.id === d.gameId);
+        const name = g ? (typeof g.name === 'object' ? (g.name[lang] || g.name.en) : g.name) : d.gameId;
+        const pct = Math.min(100, Math.round(100 * d.best / d.target));
+        card.innerHTML = d.done
+            ? `<div class="gl-em">🏆</div><div class="gl-body"><div class="gl-title">${t.done}</div><div class="gl-sub">${t.show}</div></div>`
+            : `<div class="gl-em">${g ? g.em : '🎯'}</div><div class="gl-body"><div class="gl-title">${t.title}</div>` +
+              `<div class="gl-sub"></div><div class="gl-sub">${t.now.replace('{b}', d.best)}</div>` +
+              `<div class="gl-bar"><i style="width:${pct}%"></i></div></div>` +
+              (g ? `<button class="gl-go">${t.go}</button>` : '');
+        const sub = card.querySelector('.gl-sub');
+        if (sub && !d.done) sub.textContent = t.goal.replace('{g}', name).replace('{n}', d.target);
+        const go = card.querySelector('.gl-go');
+        if (go) go.onclick = () => app.openGame(g);
+        card.classList.remove('h');
+    },
+};
 
 // Initialize application
 let app;
 window.addEventListener("load", () => {
     window.profileManager = new ProfileManager();
+    kzTheme.apply(document.documentElement.dataset.theme);
     // The native app passes the user's chosen language/age as URL query params
     // (e.g. index.html?lang=uz&age=2-4) so they're available synchronously here,
     // before any localStorage read. Seed the active profile's keys from them so
@@ -1312,6 +1472,9 @@ window.addEventListener("load", () => {
     if (urlLang) localStorage.setItem(profileManager.key('lang'), urlLang);
     const urlAge = urlParams.get('age');
     if (urlAge) localStorage.setItem(profileManager.key('age'), urlAge);
+    // Which child is playing; kz-ui.js keeps each child's game levels apart with it.
+    const urlProfile = urlParams.get('profile');
+    if (urlProfile) localStorage.setItem('kz-native-profile', urlProfile);
     const translator = new TranslationManager(T);
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);

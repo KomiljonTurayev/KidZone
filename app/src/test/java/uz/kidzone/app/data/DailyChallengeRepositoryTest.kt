@@ -44,6 +44,61 @@ class DailyChallengeRepositoryTest {
     }
 
     @Test
+    fun `today has three tasks with a stars target for the child age`() = runTest {
+        repo.updateGamesList("""[{"id":"memory","title":"Memory"}]""")
+        val tasks = repo.getTodayTasks("p1", "8+")!!
+        assertEquals(listOf(0, 1, 2), tasks.map { it.slot })
+        assertEquals("p1-$fixedDate", tasks[0].id)
+        assertEquals(80, tasks[2].target)
+        assertEquals(30, DailyChallengeRepository.starsTarget("2-4"))
+        // Asking again returns the same rows, not new ones.
+        assertEquals(tasks, repo.getTodayTasks("p1", "8+"))
+    }
+
+    @Test
+    fun `stars add up until the target, then the task is done and the streak starts`() = runTest {
+        repo.updateGamesList("""[{"id":"memory","title":"Memory"}]""")
+        repo.getTodayTasks("p1", "5-7")
+        repo.onStarsEarned("p1", 20)
+        assertEquals(0, repo.getStreak("p1").count)
+        repo.onStarsEarned("p1", 40)
+        val stars = repo.getTodayTasks("p1", "5-7")!![2]
+        assertTrue(stars.completed)
+        assertEquals(50, stars.progress)
+        assertEquals(1, repo.getStreak("p1").count)
+    }
+
+    @Test
+    fun `a new level finishes the level task and more tasks the same day keep the streak at one`() = runTest {
+        repo.updateGamesList("""[{"id":"memory","title":"Memory"}]""")
+        repo.getTodayTasks("p1", "5-7")
+        repo.onLevelUp("p1")
+        repo.markChallengeCompleted("p1", "memory")
+        val tasks = repo.getTodayTasks("p1", "5-7")!!
+        assertTrue(tasks[0].completed && tasks[1].completed)
+        assertFalse(tasks[2].completed)
+        assertEquals(1, repo.getStreak("p1").count)
+    }
+
+    @Test
+    fun `progress before today's tasks exist is ignored`() = runTest {
+        assertNull(repo.onLevelUp("p1"))
+        assertNull(repo.onStarsEarned("p1", 10))
+        assertNull(repo.onStarsEarned("p1", 0))
+    }
+
+    @Test
+    fun `gameLabel names a game in the app language with its emoji`() {
+        repo.updateGamesList(
+            """[{"id":"animals","title":"Hayvonlar","em":"🐾","names":{"uz":"Hayvonlar","ru":"Животные","en":"Animals"}},
+               {"id":"memory","title":"Xotira"}]"""
+        )
+        assertEquals("🐾 Животные", repo.gameLabel("animals", "ru"))
+        assertEquals("Xotira", repo.gameLabel("memory", "en"))
+        assertNull(repo.gameLabel("nope", "uz"))
+    }
+
+    @Test
     fun `getTodayChallenge returns null when no games loaded`() = runTest {
         assertNull(repo.getTodayChallenge("p1"))
     }
@@ -171,6 +226,9 @@ class FakeDailyChallengeDao : DailyChallengeDao {
     override suspend fun insert(entity: DailyChallengeEntity) { store[entity.id] = entity }
     override suspend fun markCompleted(id: String) {
         store[id] = store[id]?.copy(completed = true) ?: return
+    }
+    override suspend fun setProgress(id: String, progress: Int, completed: Boolean) {
+        store[id] = store[id]?.copy(progress = progress, completed = completed) ?: return
     }
     override fun getByProfile(profileId: String): Flow<List<DailyChallengeEntity>> =
         MutableStateFlow(store.values.filter { it.profileId == profileId })

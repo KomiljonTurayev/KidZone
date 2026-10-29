@@ -8,6 +8,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColors = lightColorScheme(
@@ -87,6 +88,8 @@ fun KidZoneTheme(
         else -> LightColors
     }
 
+    // The parent screens' Kid palette follows the same switch.
+    SideEffect { uz.kidzone.app.ui.components.Kid.dark = darkTheme }
     MaterialTheme(
         colorScheme = colorScheme,
         typography = KidZoneTypography,

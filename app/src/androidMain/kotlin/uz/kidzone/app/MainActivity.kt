@@ -51,8 +51,7 @@ class MainActivity : ComponentActivity() {
         if (kzPrefs.getBoolean("kz_onboarding_done", false)) requestNotificationPermissionIfNeeded()
 
         firestoreSync = FirestoreSync.init(this)
-        val activeProfileId = kzPrefs.getString("active_profile_id", "default") ?: "default"
-        statsManager = ParentalStatsManager(this, activeProfileId)
+        statsManager = ParentalStatsManager(this)
 
         // Push-token registration happens in the Application's AccountSessionCoordinator;
         // here we only need the UI-facing checks, re-run whenever the account changes.

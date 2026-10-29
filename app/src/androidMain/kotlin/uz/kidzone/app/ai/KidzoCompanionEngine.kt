@@ -17,6 +17,13 @@ import java.util.concurrent.TimeUnit
  * drain the quota/billing. The backend holds the key server-side and forwards
  * the child's Firebase ID token so it can rate-limit / attribute usage.
  */
+sealed interface KidzoReply {
+    data class Answer(val text: String) : KidzoReply
+
+    /** The family's free questions for today are used up (backend 402). */
+    data object DailyLimitReached : KidzoReply
+}
+
 object KidzoCompanionEngine {
 
     private const val TAG = "KidzoCompanion"
@@ -34,7 +41,7 @@ object KidzoCompanionEngine {
         lang: String = "uz",
         childName: String = "",
         ageRange: String = "3-5"
-    ): String = withContext(Dispatchers.IO) {
+    ): KidzoReply = withContext(Dispatchers.IO) {
         val trimmed = query.trim()
         val targetLang = when (lang.lowercase()) {
             "ru" -> "ru"
@@ -42,17 +49,19 @@ object KidzoCompanionEngine {
             else -> "uz"
         }
 
-        try {
-            val backendAnswer = callBackend(trimmed, targetLang, childName, ageRange)
-            if (!backendAnswer.isNullOrBlank()) {
-                return@withContext backendAnswer
-            }
+        val backend = try {
+            callBackend(trimmed, targetLang, childName, ageRange)
         } catch (e: Exception) {
             Log.w(TAG, "Backend companion call failed: ${e.message}, falling back to offline brain")
+            AiBackendAnswer.Unavailable
         }
 
-        // Fallback to rich Offline Companion Brain
-        OfflineKidzoBrain.respond(trimmed, targetLang, childName)
+        when (backend) {
+            is AiBackendAnswer.Ready -> KidzoReply.Answer(backend.value)
+            AiBackendAnswer.DailyLimitReached -> KidzoReply.DailyLimitReached
+            // Fallback to rich Offline Companion Brain
+            AiBackendAnswer.Unavailable -> KidzoReply.Answer(OfflineKidzoBrain.respond(trimmed, targetLang, childName))
+        }
     }
 
     private suspend fun callBackend(
@@ -60,8 +69,8 @@ object KidzoCompanionEngine {
         lang: String,
         childName: String,
         ageRange: String
-    ): String? {
-        val idToken = AuthGraph.idTokens.idToken() ?: return null
+    ): AiBackendAnswer<String> {
+        val idToken = AuthGraph.idTokens.idToken() ?: return AiBackendAnswer.Unavailable
 
         val requestJson = JSONObject().apply {
             put("query", query)
@@ -79,9 +88,7 @@ object KidzoCompanionEngine {
             .build()
 
         httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return null
-            val respBody = response.body?.string() ?: return null
-            return JSONObject(respBody).optString("answer").ifBlank { null }
+            return aiBackendAnswer(response.code, response.body?.string(), ::parseAnswer)
         }
     }
 }

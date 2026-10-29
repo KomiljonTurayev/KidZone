@@ -29,16 +29,26 @@ class ParentalStatsManager {
     }
 
     private val prefs: SharedPreferences
-    private val profileId: String
+    private val profileIdOf: () -> String
+    private val profileId: String get() = profileIdOf()
     private var sessionStartMs: Long = 0L
     private val sessionGames: MutableList<String> = mutableListOf()
 
-    constructor(ctx: Context, profileId: String = "default") : this(ctx.getSharedPreferences("kz_prefs", Context.MODE_PRIVATE), profileId)
+    /**
+     * Follows the active profile (`active_profile_id`), so the session being recorded and the
+     * parent dashboard reading it always mean the same child, also after switching profiles.
+     */
+    constructor(ctx: Context) : this(ctx.getSharedPreferences("kz_prefs", Context.MODE_PRIVATE))
+
+    internal constructor(prefs: SharedPreferences) {
+        this.prefs = prefs
+        this.profileIdOf = { prefs.getString("active_profile_id", null) ?: "default" }
+    }
 
     // Package-private-equivalent constructor for testing
-    internal constructor(prefs: SharedPreferences, profileId: String = "default") {
+    internal constructor(prefs: SharedPreferences, profileId: String) {
         this.prefs = prefs
-        this.profileId = profileId
+        this.profileIdOf = { profileId }
     }
 
     fun onSessionStart() {

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.kidzone.app.RevenueCatManager
+import uz.kidzone.app.data.ProfileOwner
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidButton
 import uz.kidzone.app.ui.components.KidCard
@@ -50,11 +51,20 @@ fun PaywallScreen(
         Spacer(Modifier.height(20.dp))
         KidTitle("KidZone Premium")
         Spacer(Modifier.height(6.dp))
+        // Matches the backend's daily allowance (Faza 17): per family, Premium shared with members.
         KidSubtitle(tr(
-            "Cheksiz Sun'iy Intellekt ertaklari va ovozli hikoyalarni oching!",
-            "Откройте безлимитные сказки от ИИ и озвученные истории!",
-            "Unlock unlimited AI stories and narrated tales!",
+            "Bepul: kuniga 1 ta AI ertak va Kidzo'ga 10 ta savol. Premium bilan — kuniga 30 ta ertak va 200 ta savol, butun oila uchun.",
+            "Бесплатно: 1 ИИ-сказка и 10 вопросов Kidzo в день. С Premium — 30 сказок и 200 вопросов в день для всей семьи.",
+            "Free: 1 AI story and 10 questions to Kidzo a day. With Premium: 30 stories and 200 questions a day for the whole family.",
         ))
+        if (ProfileOwner.familyOwnerUid != null) {
+            Spacer(Modifier.height(8.dp))
+            KidSubtitle(tr(
+                "Siz oila a'zosisiz: oila egasi Premium olgan bo'lsa, u sizda ham ishlaydi.",
+                "Вы участник семьи: если у владельца семьи есть Premium, он работает и у вас.",
+                "You're a family member: if the family owner has Premium, it works for you too.",
+            ))
+        }
         Spacer(Modifier.height(24.dp))
 
         PlanCard(

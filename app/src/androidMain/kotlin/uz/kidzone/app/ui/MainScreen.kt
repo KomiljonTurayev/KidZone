@@ -46,6 +46,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import uz.kidzone.app.data.GameProgressRepository
+import uz.kidzone.app.data.ParentChallengeRepository
 import androidx.compose.runtime.setValue
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.screens.PinGate
@@ -90,8 +94,11 @@ fun MainScreen(
     statsManager: ParentalStatsManager,
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
+    gameProgress: GameProgressRepository,
+    parentChallenge: ParentChallengeRepository,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
+    onOpenPremium: () -> Unit = {},
     onRequireAccount: (AccountFeature) -> Unit = {},
     unlockedFeature: AccountFeature? = null,
     onUnlockedFeatureHandled: () -> Unit = {},
@@ -100,6 +107,9 @@ fun MainScreen(
     // Bu orqafon (background) da batareya isrofgarchiligini oldini oladi.
     val uiState by mainViewModel.state.collectAsStateWithLifecycle()
     val activeProfile by profileViewModel.activeProfile.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    val theme = uz.kidzone.app.ui.theme.LocalThemeController.current
+    val setThemeMode by rememberUpdatedState(theme.setMode)
 
     LaunchedEffect(activeProfile) {
         activeProfile?.id?.let { challengeViewModel.onProfileChanged(it) }
@@ -108,6 +118,46 @@ fun MainScreen(
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
 
+    // Today's tasks card on the WebView home screen (Faza 18).
+    val challengeState by challengeViewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(challengeState.tasks, challengeState.streakCount, challengeState.pageLoads, webMgrRef.value) {
+        val mgr = webMgrRef.value ?: return@LaunchedEffect
+        if (challengeState.tasks.isEmpty()) return@LaunchedEffect
+        mgr.evaluateJavascript("window.kzTasks&&kzTasks.render(${tasksJson(challengeState.tasks, challengeState.streakCount)})")
+    }
+
+    // The parent's challenge card on the home screen; levelTick refreshes "you are at level N".
+    var levelTick by remember { mutableStateOf(0) }
+    val parentGoal by remember(activeProfile?.id) {
+        activeProfile?.id?.let(parentChallenge::observe) ?: kotlinx.coroutines.flow.flowOf(null)
+    }.collectAsStateWithLifecycle(initialValue = null)
+    LaunchedEffect(parentGoal, levelTick, webMgrRef.value, challengeState.pageLoads) {
+        val mgr = webMgrRef.value ?: return@LaunchedEffect
+        val goal = parentGoal
+        val json = if (goal == null) "null" else org.json.JSONObject().apply {
+            put("gameId", goal.gameId)
+            put("target", goal.targetLevel)
+            put("best", parentChallenge.bestLevel(goal.profileId, goal.gameId))
+            put("done", goal.completedAt != null)
+        }.toString()
+        mgr.evaluateJavascript("window.kzGoal&&kzGoal.render($json)")
+    }
+
+    // Night mode for the WebView home screen (the games keep their own colors).
+    LaunchedEffect(theme.dark, webMgrRef.value, challengeState.pageLoads) {
+        webMgrRef.value?.evaluateJavascript("window.kzTheme&&kzTheme.apply('${if (theme.dark) "dark" else "light"}')")
+    }
+
+    // Game levels are kept per child: tell the WebView who is playing now.
+    LaunchedEffect(activeProfile?.id, activeProfile?.name, webMgrRef.value, challengeState.pageLoads) {
+        val id = activeProfile?.id?.let(::jsSafeId) ?: return@LaunchedEffect
+        // The child's name for "Ibrohim's turn" in play-together mode; quote() makes it a safe JS string.
+        val name = org.json.JSONObject.quote(activeProfile?.name.orEmpty())
+        webMgrRef.value?.evaluateJavascript(
+            "try{localStorage.setItem('kz-native-profile','$id');localStorage.setItem('kz-native-name',$name)}catch(e){}"
+        )
+    }
+
     LaunchedEffect(uiState.pendingDeepLinkContentId) {
         val contentId = uiState.pendingDeepLinkContentId ?: return@LaunchedEffect
         webMgrRef.value?.evaluateJavascript("if(window.playContent)playContent('$contentId')")
@@ -115,6 +165,7 @@ fun MainScreen(
     }
     
     var showKidzoSheet by remember { mutableStateOf(false) }
+    var aiLimit by remember { mutableStateOf<AiLimitKind?>(null) }
 
     val kidzoAgentRef = remember {
         val filter = try { ContentFilter.fromAssets(context) } catch (e: Exception) { null }
@@ -172,6 +223,19 @@ fun MainScreen(
                             onOpenKidzo = { openKidzo() },
                             isAiAvailable = { aiAvailable() },
                             onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
+                            onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
+                            // Feeds the parent dashboard's "games played today".
+                            onGameLaunched = statsManager::onGameLaunched,
+                            onThemeModeChanged = { setThemeMode(it) },
+                            onLevelReached = { gameId, level ->
+                                val pid = profileViewModel.activeProfile.value?.id
+                                if (pid != null) scope.launch {
+                                    gameProgress.onLevelReached(pid, gameId, level)
+                                    parentChallenge.onLevelReached(pid, gameId, level)
+                                    levelTick++
+                                }
+                                challengeViewModel.onLevelUp()
+                            },
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
                             onLanguageChanged = { lang ->
                                 prefs.edit().putString("kz_lang", lang).apply()
@@ -196,8 +260,9 @@ fun MainScreen(
                             ChallengeBridge(challengeViewModel, context),
                             "AndroidChallenge",
                         )
+                        val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
                         mgr.loadUrl(
-                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}"
+                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}&theme=${if (theme.dark) "dark" else "light"}"
                         )
                         webMgrRef.value = mgr
                         addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
@@ -289,6 +354,7 @@ fun MainScreen(
                 val viewConfiguration = LocalViewConfiguration.current
                 val fabSizePx = with(density) { 56.dp.toPx() }
                 val edgePaddingPx = with(density) { 16.dp.toPx() }
+                val bottomPaddingPx = with(density) { 84.dp.toPx() }
                 var offsetX by remember { mutableFloatStateOf(0f) }
                 var offsetY by remember { mutableFloatStateOf(0f) }
                 val infiniteTransition = rememberInfiniteTransition(label = "kidzo_pulse")
@@ -305,7 +371,8 @@ fun MainScreen(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                        .padding(16.dp)
+                        // Above the WebView's bottom menu, so it no longer hides the "Ota-ona" label.
+                        .padding(end = 16.dp, bottom = 84.dp)
                         .size(56.dp)
                         .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale }
                         .pointerInput(containerSize) {
@@ -322,7 +389,7 @@ fun MainScreen(
                                     if (dragged) {
                                         change.consume()
                                         val minX = -(containerSize.width - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
-                                        val minY = -(containerSize.height - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
+                                        val minY = -(containerSize.height - fabSizePx - bottomPaddingPx).coerceAtLeast(0f)
                                         offsetX = (offsetX + delta.x).coerceIn(minX, 0f)
                                         offsetY = (offsetY + delta.y).coerceIn(minY, 0f)
                                     }
@@ -372,7 +439,7 @@ fun MainScreen(
         AlertDialog(
             onDismissRequest = { mainViewModel.dismissExitDialog() },
             shape = RoundedCornerShape(24.dp),
-            containerColor = Color.White,
+            containerColor = uz.kidzone.app.ui.components.Kid.Card,
             icon = { Text(if (uiState.isExitFromGame) "🎮" else "👋", fontSize = 40.sp) },
             title = {
                 Text(
@@ -423,6 +490,26 @@ fun MainScreen(
         )
     }
 
+    // The family's free AI allowance for today is used up: offer Premium to a parent.
+    val kidzoLimitReached = kidzoViewModel?.dailyLimitReached?.collectAsStateWithLifecycle()?.value == true
+    LaunchedEffect(kidzoLimitReached) {
+        if (kidzoLimitReached) {
+            aiLimit = AiLimitKind.QUESTIONS
+            kidzoViewModel?.dailyLimitHandled()
+        }
+    }
+    aiLimit?.let { kind ->
+        AiDailyLimitDialog(
+            kind = kind,
+            parentPinHash = activeProfile?.pinHash,
+            onOpenPremium = {
+                showKidzoSheet = false
+                onOpenPremium()
+            },
+            onDismiss = { aiLimit = null },
+        )
+    }
+
     // Kidzo sheet
     if (showKidzoSheet && kidzoViewModel != null) {
         val currentLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
@@ -443,3 +530,23 @@ fun MainScreen(
     }
 }
 
+
+/** Profile ids are UUIDs; anything else is dropped before it goes into a JS string. */
+internal fun jsSafeId(id: String): String = id.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
+
+/** What the home screen's tasks card needs; texts are chosen in the WebView's language. */
+internal fun tasksJson(tasks: List<uz.kidzone.app.data.DailyChallengeEntity>, streak: Int): String =
+    org.json.JSONObject().apply {
+        put("streak", streak)
+        put("tasks", org.json.JSONArray().apply {
+            tasks.forEach { t ->
+                put(org.json.JSONObject().apply {
+                    put("slot", t.slot)
+                    put("gameId", t.gameId)
+                    put("done", t.completed)
+                    put("progress", t.progress)
+                    put("target", t.target)
+                })
+            }
+        })
+    }.toString()

@@ -46,9 +46,10 @@ fun KidZoneApp(
 ) {
     val mainUiState by mainViewModel.state.collectAsState()
     val appLang by rememberAppLang(prefs)
+    val theme = uz.kidzone.app.ui.theme.rememberThemeController(prefs)
     if (mainUiState.isBanned) {
-        KidZoneTheme {
-            CompositionLocalProvider(LocalAppLang provides appLang) { BannedScreen() }
+        KidZoneTheme(darkTheme = theme.dark) {
+            CompositionLocalProvider(LocalAppLang provides appLang, uz.kidzone.app.ui.theme.LocalThemeController provides theme) { BannedScreen() }
         }
         return
     }
@@ -77,8 +78,18 @@ fun KidZoneApp(
             firestoreSync = firestoreSync,
         )
     }
+    val gameProgress = remember {
+        uz.kidzone.app.data.GameProgressRepository(
+            dao = KidZoneDatabase.getInstance(context).levelUpDao(),
+            firestoreSync = uz.kidzone.app.FirestoreSync.getInstance(),
+        )
+    }
+    val parentChallenge = remember {
+        val db = KidZoneDatabase.getInstance(context)
+        uz.kidzone.app.data.ParentChallengeRepository(db.parentChallengeDao(), db.levelUpDao())
+    }
     val challengeViewModel: DailyChallengeViewModel = viewModel(
-        factory = DailyChallengeViewModelFactory(challengeRepository)
+        factory = DailyChallengeViewModelFactory(challengeRepository) { prefs.getString("kz_age", "2-4") ?: "2-4" }
     )
 
     val profiles by profileViewModel.profiles.collectAsState()
@@ -89,8 +100,8 @@ fun KidZoneApp(
         else -> "main"
     }
 
-    KidZoneTheme {
-        CompositionLocalProvider(LocalAppLang provides appLang) {
+    KidZoneTheme(darkTheme = theme.dark) {
+        CompositionLocalProvider(LocalAppLang provides appLang, uz.kidzone.app.ui.theme.LocalThemeController provides theme) {
             NavHost(navController = navController, startDestination = startDestination) {
                 composable("onboarding") {
                     OnboardingScreen(
@@ -137,8 +148,11 @@ fun KidZoneApp(
                         statsManager = statsManager,
                         profileViewModel = profileViewModel,
                         challengeViewModel = challengeViewModel,
+                        gameProgress = gameProgress,
+                        parentChallenge = parentChallenge,
                         onOpenDashboard = { navController.navigate("dashboard") },
                         onOpenSleep = { navController.navigate("sleep") },
+                        onOpenPremium = { navController.navigate("premium") },
                         onRequireAccount = { feature -> navController.navigate("account/${feature.name}") },
                         unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
                         onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },
@@ -178,6 +192,8 @@ fun KidZoneApp(
                         onBack = { navController.popBackStack() },
                         profileViewModel = profileViewModel,
                         challengeViewModel = challengeViewModel,
+                        gameProgress = gameProgress,
+                        parentChallenge = parentChallenge,
                         onNavigateToAddEdit = { profileId ->
                             navController.navigate("add_edit_profile/${profileId ?: "new"}")
                         },

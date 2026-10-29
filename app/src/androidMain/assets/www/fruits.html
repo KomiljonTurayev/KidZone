@@ -163,7 +163,7 @@ function getLevelConfig() {
 // How-to-play
 window.addEventListener('load', () => {
   getLevelConfig();
-  KZL.howToPlay({
+  KZL.howToPlay({ duo: true,
     id: GAME_ID,
     steps: {
       uz:[
@@ -236,7 +236,7 @@ function buildQuestionsAndStart() {
 
   const lvBadge = document.createElement('div');
   lvBadge.style.cssText='margin-left:auto;background:rgba(255,255,255,.2);border-radius:14px;padding:5px 12px;font-size:12px;font-weight:900;color:#fff;';
-  lvBadge.textContent = 'LV ' + _level + ' / 20';
+  lvBadge.textContent = 'LV ' + _level;
   toolsEl.appendChild(lvBadge);
 
   loadQ();
@@ -280,6 +280,7 @@ function answer(idx) {
     combo++;
     const pts = 10 + (combo > 2 ? 5 : 0);
     score += pts;
+    KZL.duo.answer(true);
     document.getElementById("score-val").textContent = score;
     document.getElementById("combo-bar").textContent = combo > 2 ? `${t.combo}${combo}! +${pts}` : "";
     game.playSound('match');
@@ -298,17 +299,19 @@ function answer(idx) {
 }
 
 function showResult() {
+  if (KZL.duo.end()) return;
   const maxScore = questions.length * 10;
   const pct = score / maxScore;
   document.getElementById("result-em").textContent  = pct >= 0.8 ? "🏆" : pct >= 0.5 ? "⭐" : "💪";
   document.getElementById("result-ttl").textContent = pct >= 0.8 ? t.great : pct >= 0.5 ? t.good : t.tryAgain;
   document.getElementById("result-sc").textContent  = `${t.result} ${score}/${maxScore}`;
   document.getElementById("result").classList.remove("h");
+  KZL.recordResult(GAME_ID, pct >= 0.6);
   if (pct >= 0.6) {
     game.reportScore(Math.round(score / 2));
     game.spawnConfetti();
     const savedLv = KZL.getLevel(GAME_ID);
-    if (savedLv === _level && _level < 20) {
+    if (savedLv === _level ) {
       const nl = KZL.nextLevel(GAME_ID);
       setTimeout(() => KZL.showLevelUp(GAME_ID, nl, lang), 400);
     }

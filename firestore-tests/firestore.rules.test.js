@@ -646,3 +646,71 @@ describe('family members (second parent)', () => {
     await assertFails(otherCtx().firestore().doc('family_invites/123456').get());
   });
 });
+
+// ---- Faza 17: backend-only Premium copy and AI allowance ---------------------
+// Written only by the backend (Admin SDK). No rule matches these paths, so clients are
+// denied by default; a client that could write them would give itself Premium or reset
+// its daily AI counter.
+
+describe('entitlements/{uid} and users/{uid}/ai_usage/{date}', () => {
+  test('an owner can neither read nor write their own Premium copy', async () => {
+    await seed((db) => db.doc(`entitlements/${OWNER_UID}`).set({ premiumUntil: 1, eventAtMs: 1 }));
+
+    await assertFails(ownerCtx().firestore().doc(`entitlements/${OWNER_UID}`).get());
+    await assertFails(ownerCtx().firestore().doc(`entitlements/${OWNER_UID}`).set({ premiumUntil: 9e15 }));
+    await assertFails(ownerCtx().firestore().doc(`entitlements/${OWNER_UID}`).delete());
+  });
+
+  test('an owner can neither read nor reset their AI allowance', async () => {
+    const usage = `users/${OWNER_UID}/ai_usage/2026-10-29`;
+    await seed((db) => db.doc(usage).set({ stories: 1, questions: 10 }));
+
+    await assertFails(ownerCtx().firestore().doc(usage).get());
+    await assertFails(ownerCtx().firestore().doc(usage).set({ stories: 0 }));
+    await assertFails(ownerCtx().firestore().doc(usage).delete());
+  });
+
+  test('a family member cannot touch the owner\'s allowance either', async () => {
+    await seed((db) => db.doc(`families/${OWNER_UID}/members/${OTHER_UID}`).set({ joinedAt: 1 }));
+
+    await assertFails(otherCtx().firestore().doc(`users/${OWNER_UID}/ai_usage/2026-10-29`).set({ stories: 0 }));
+    await assertFails(otherCtx().firestore().doc(`entitlements/${OWNER_UID}`).get());
+  });
+});
+
+// ---- Faza 18: best level per game -------------------------------------------
+
+describe('profiles/{profileId}/progress/{gameId}', () => {
+  const p = `users/${OWNER_UID}/profiles/p1/progress/animals`;
+  const now = () => firebase.firestore.FieldValue.serverTimestamp();
+
+  test('the owner can record and read a level', async () => {
+    await assertSucceeds(ownerCtx().firestore().doc(p).set({ level: 21, updatedAt: now() }));
+    await assertSucceeds(ownerCtx().firestore().doc(p).get());
+  });
+
+  test('a family member can record a level and read it', async () => {
+    await seed((db) => db.doc(`families/${OWNER_UID}/members/${OTHER_UID}`).set({ joinedAt: 1 }));
+    await assertSucceeds(otherCtx().firestore().doc(p).set({ level: 3 }));
+    await assertSucceeds(otherCtx().firestore().doc(p).get());
+  });
+
+  test('someone outside the family cannot read or write it', async () => {
+    await seed((db) => db.doc(p).set({ level: 5 }));
+    await assertFails(otherCtx().firestore().doc(p).get());
+    await assertFails(otherCtx().firestore().doc(p).set({ level: 6 }));
+  });
+
+  test('a level never goes down', async () => {
+    await seed((db) => db.doc(p).set({ level: 30 }));
+    await assertFails(ownerCtx().firestore().doc(p).set({ level: 12 }, { merge: true }));
+    await assertSucceeds(ownerCtx().firestore().doc(p).set({ level: 31 }, { merge: true }));
+  });
+
+  test('levels outside 1..10000, non-integers and extra fields are refused', async () => {
+    await assertFails(ownerCtx().firestore().doc(p).set({ level: 0 }));
+    await assertFails(ownerCtx().firestore().doc(p).set({ level: 10001 }));
+    await assertFails(ownerCtx().firestore().doc(p).set({ level: '5' }));
+    await assertFails(ownerCtx().firestore().doc(p).set({ level: 5, stars: 999 }));
+  });
+});

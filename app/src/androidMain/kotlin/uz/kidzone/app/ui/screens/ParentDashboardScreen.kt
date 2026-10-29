@@ -58,6 +58,15 @@ import uz.kidzone.app.ui.components.KidSection
 import uz.kidzone.app.ui.components.KidTextButton
 import uz.kidzone.app.ui.components.KidTopBar
 import uz.kidzone.app.ui.i18n.LocalAppLang
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
+import uz.kidzone.app.data.GameProgress
+import uz.kidzone.app.data.GameProgressRepository
+import uz.kidzone.app.data.ParentChallengeEntity
+import uz.kidzone.app.data.ParentChallengeRepository
 import uz.kidzone.app.ui.i18n.tr
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
@@ -68,6 +77,8 @@ fun ParentDashboardScreen(
     onBack: () -> Unit,
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
+    gameProgress: GameProgressRepository,
+    parentChallenge: ParentChallengeRepository,
     onNavigateToAddEdit: (String?) -> Unit,
     onOpenPremium: () -> Unit,
 ) {
@@ -83,6 +94,13 @@ fun ParentDashboardScreen(
     val profiles by profileViewModel.profiles.collectAsState()
     val allStreaks by challengeViewModel.allStreaks.collectAsState()
     val challengeState by challengeViewModel.state.collectAsState()
+    val levels by remember(activeProfile?.id) {
+        activeProfile?.id?.let(gameProgress::progress) ?: flowOf(emptyList())
+    }.collectAsState(initial = emptyList())
+    val goal by remember(activeProfile?.id) {
+        activeProfile?.id?.let(parentChallenge::observe) ?: flowOf(null)
+    }.collectAsState(initial = null)
+    val goalScope = rememberCoroutineScope()
 
     if (!pinVerified) {
         PinGate(
@@ -143,6 +161,28 @@ fun ParentDashboardScreen(
         }
         Spacer(Modifier.height(16.dp))
 
+        // 1b. Darajalar (Faza 18)
+        KidSection("📈", tr("Darajalar", "Уровни", "Levels")) {
+            LevelsCard(levels) { id -> challengeViewModel.gameLabel(id, LocalAppLang.current) ?: id }
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 1c. Ota-ona chaqiruvi (Faza 18)
+        KidSection("🎯", tr("Chaqiruv", "Вызов", "Challenge")) {
+            val pid = activeProfile?.id
+            val lang = LocalAppLang.current
+            val gameIds = (levels.map { it.gameId } + challengeViewModel.gameIds()).distinct().take(12)
+            ChallengeCard(
+                goal = goal,
+                gameIds = gameIds,
+                bestOf = { id -> levels.firstOrNull { it.gameId == id }?.level ?: 1 },
+                label = { id -> challengeViewModel.gameLabel(id, lang) ?: id },
+                onSend = { id, target -> if (pid != null) goalScope.launch { parentChallenge.set(pid, id, target) } },
+                onClear = { if (pid != null) goalScope.launch { parentChallenge.clear(pid) } },
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+
         // 2. Yosh guruhi
         KidSection("🎂", tr("Yosh guruhi", "Возраст", "Age group")) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -183,6 +223,18 @@ fun ParentDashboardScreen(
         KidSection("🔑", tr("Sozlamalar", "Настройки", "Settings")) {
             SettingRow(if (savedPinHash.isNullOrEmpty()) tr("PIN o'rnatish", "Установить PIN", "Set PIN") else tr("PIN o'zgartirish", "Изменить PIN", "Change PIN"), onClick = { showSetPin = true }) {
                 Text("›", fontSize = 26.sp, color = Kid.Orange)
+            }
+            val themeCtl = uz.kidzone.app.ui.theme.LocalThemeController.current
+            Text(tr("🌙 Tungi rejim", "🌙 Ночной режим", "🌙 Night mode"), style = MaterialTheme.typography.bodyLarge, color = Kid.Ink,
+                modifier = Modifier.padding(vertical = 6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    "system" to tr("📱 Tizim", "📱 Системный", "📱 System"),
+                    "light" to tr("☀️ Yorug'", "☀️ Светлый", "☀️ Light"),
+                    "dark" to tr("🌙 Tungi", "🌙 Ночной", "🌙 Night"),
+                ).forEach { (mode, label) ->
+                    KidChip(label, selected = themeCtl.mode == mode, modifier = Modifier.weight(1f)) { themeCtl.setMode(mode) }
+                }
             }
             SettingRow(tr("Oila", "Семья", "Family"), onClick = { showFamily = true }) {
                 Text("›", fontSize = 26.sp, color = Kid.Orange)
@@ -282,7 +334,7 @@ fun ParentDashboardScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            containerColor = Color.White,
+            containerColor = uz.kidzone.app.ui.components.Kid.Card,
             shape = RoundedCornerShape(28.dp),
             icon = { Text("⚠️", fontSize = 36.sp) },
             title = { Text(tr("Diqqat!", "Внимание!", "Warning!"), color = Kid.Ink) },
@@ -329,6 +381,110 @@ private fun SettingRow(label: String, onClick: (() -> Unit)? = null, trailing: @
     ) {
         Text(label, style = MaterialTheme.typography.bodyLarge, color = Kid.Ink, modifier = Modifier.weight(1f))
         trailing()
+    }
+}
+
+/** Best level per game, highest first; "+N" is what the child gained over the last 7 days. */
+@Composable
+private fun LevelsCard(levels: List<GameProgress>, label: @Composable (String) -> String) {
+    if (levels.isEmpty()) {
+        Text(
+            tr(
+                "Bola o'ynagan sari har bir o'yindagi darajasi shu yerda ko'rinadi.",
+                "Здесь появятся уровни ребёнка в каждой игре.",
+                "Your child's level in each game shows up here as they play.",
+            ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Kid.InkSoft,
+        )
+        return
+    }
+    val weekTotal = levels.sumOf { it.gainedThisWeek }
+    if (weekTotal > 0) {
+        Text(
+            tr("Bu hafta: +$weekTotal daraja 🚀", "За неделю: +$weekTotal ур. 🚀", "This week: +$weekTotal levels 🚀"),
+            style = MaterialTheme.typography.titleMedium,
+            color = Kid.Mint,
+        )
+        Spacer(Modifier.height(8.dp))
+    }
+    levels.take(8).forEach { g ->
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
+            Text(label(g.gameId), style = MaterialTheme.typography.bodyLarge, color = Kid.Ink, modifier = Modifier.weight(1f))
+            if (g.gainedThisWeek > 0) {
+                Text("+${g.gainedThisWeek}", style = MaterialTheme.typography.labelLarge, color = Kid.Mint)
+                Spacer(Modifier.width(10.dp))
+            }
+            Text("⭐ ${g.level}", style = MaterialTheme.typography.titleMedium, color = Kid.Orange)
+        }
+    }
+    if (levels.size > 8) {
+        Text(
+            tr("va yana ${levels.size - 8} ta o'yin", "и ещё ${levels.size - 8} игр", "and ${levels.size - 8} more games"),
+            style = MaterialTheme.typography.bodySmall,
+            color = Kid.InkSoft,
+        )
+    }
+}
+
+/**
+ * Shows the current challenge, or lets the parent pick a game and a target a few levels
+ * above the child's best. The child sees it on the home screen.
+ */
+@Composable
+private fun ChallengeCard(
+    goal: ParentChallengeEntity?,
+    gameIds: List<String>,
+    bestOf: (String) -> Int,
+    label: (String) -> String,
+    onSend: (String, Int) -> Unit,
+    onClear: () -> Unit,
+) {
+    if (goal != null) {
+        val done = goal.completedAt != null
+        Text(
+            (if (done) "✅ " else "⏳ ") + label(goal.gameId) + " — " +
+                tr("${goal.targetLevel}-daraja", "уровень ${goal.targetLevel}", "level ${goal.targetLevel}"),
+            style = MaterialTheme.typography.titleMedium,
+            color = if (done) Kid.Mint else Kid.Ink,
+        )
+        Text(
+            if (done) tr("Bajarildi! Farzandingizni maqtab qo'ying 🎉", "Выполнено! Похвалите ребёнка 🎉", "Done! Give your child a big high-five 🎉")
+            else tr("Hozir: ${bestOf(goal.gameId)}-daraja", "Сейчас: уровень ${bestOf(goal.gameId)}", "Now at level ${bestOf(goal.gameId)}"),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Kid.InkSoft,
+        )
+        Spacer(Modifier.height(10.dp))
+        KidChip(
+            if (done) tr("➕ Yangi chaqiruv", "➕ Новый вызов", "➕ New challenge") else tr("✕ Bekor qilish", "✕ Отменить", "✕ Cancel"),
+            selected = false,
+            onClick = onClear,
+        )
+        return
+    }
+    if (gameIds.isEmpty()) {
+        Text(
+            tr("Bola o'ynay boshlagach, shu yerdan unga maqsad qo'ya olasiz.", "Когда ребёнок начнёт играть, здесь можно поставить ему цель.", "Once your child starts playing, you can set them a goal here."),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Kid.InkSoft,
+        )
+        return
+    }
+    var picked by remember(gameIds) { mutableStateOf(gameIds.first()) }
+    Text(tr("O'yinni tanlang", "Выберите игру", "Pick a game"), style = MaterialTheme.typography.bodyMedium, color = Kid.InkSoft)
+    Spacer(Modifier.height(6.dp))
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        gameIds.forEach { id -> KidChip(label(id), selected = id == picked) { picked = id } }
+    }
+    Spacer(Modifier.height(10.dp))
+    val best = bestOf(picked)
+    Text(tr("Maqsad (hozir $best)", "Цель (сейчас $best)", "Goal (now $best)"), style = MaterialTheme.typography.bodyMedium, color = Kid.InkSoft)
+    Spacer(Modifier.height(6.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf(1, 3, 5).forEach { step ->
+            val target = best + step
+            KidChip("🎯 $target", selected = false, modifier = Modifier.weight(1f)) { onSend(picked, target) }
+        }
     }
 }
 
