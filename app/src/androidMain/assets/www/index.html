@@ -1280,7 +1280,7 @@
         <div class="pb-title">Parental Control</div>
         <div class="pb-sub">Play time · Stats</div>
       </div>
-      <button class="pb-btn" onclick="openModal('parent-modal')">Enter 🔐</button>
+      <button class="pb-btn" onclick="openParent()">Enter 🔐</button>
     </div>
 
     </div><!-- /#games-section -->
@@ -1349,7 +1349,7 @@
     <div class="ni-pill"><span class="ni-ic">🌙</span></div>
     <span class="ni-lb" id="nb3">Uyqu</span>
   </button>
-  <button class="ni" id="ni-parent" onclick="openModal('parent-modal')">
+  <button class="ni" id="ni-parent" onclick="openParent()">
     <div class="ni-pill"><span class="ni-ic">👨‍👩‍👧</span></div>
     <span class="ni-lb" id="nb4">Parents</span>
   </button>
@@ -1737,6 +1737,13 @@
       const scenario = document.getElementById('ps-scenario-input').value.trim().slice(0, 200);
       document.getElementById('ps-modal').classList.add('h');
       app.generateAiStory(name, scenario);
+    }
+
+    // The real parent area is the app's dashboard (math lock + sign-in). The old PIN sheet
+    // (hard-coded 1234) only showed a toast, so it is kept for a plain browser only.
+    function openParent() {
+      if (window.AndroidBridge && AndroidBridge.openParentalDashboard) AndroidBridge.openParentalDashboard();
+      else openModal('parent-modal');
     }
 
     function openBadges() {

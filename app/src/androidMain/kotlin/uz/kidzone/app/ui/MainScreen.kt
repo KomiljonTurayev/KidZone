@@ -354,6 +354,7 @@ fun MainScreen(
                 val viewConfiguration = LocalViewConfiguration.current
                 val fabSizePx = with(density) { 56.dp.toPx() }
                 val edgePaddingPx = with(density) { 16.dp.toPx() }
+                val bottomPaddingPx = with(density) { 84.dp.toPx() }
                 var offsetX by remember { mutableFloatStateOf(0f) }
                 var offsetY by remember { mutableFloatStateOf(0f) }
                 val infiniteTransition = rememberInfiniteTransition(label = "kidzo_pulse")
@@ -370,7 +371,8 @@ fun MainScreen(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                        .padding(16.dp)
+                        // Above the WebView's bottom menu, so it no longer hides the "Ota-ona" label.
+                        .padding(end = 16.dp, bottom = 84.dp)
                         .size(56.dp)
                         .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale }
                         .pointerInput(containerSize) {
@@ -387,7 +389,7 @@ fun MainScreen(
                                     if (dragged) {
                                         change.consume()
                                         val minX = -(containerSize.width - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
-                                        val minY = -(containerSize.height - fabSizePx - edgePaddingPx).coerceAtLeast(0f)
+                                        val minY = -(containerSize.height - fabSizePx - bottomPaddingPx).coerceAtLeast(0f)
                                         offsetX = (offsetX + delta.x).coerceIn(minX, 0f)
                                         offsetY = (offsetY + delta.y).coerceIn(minY, 0f)
                                     }
