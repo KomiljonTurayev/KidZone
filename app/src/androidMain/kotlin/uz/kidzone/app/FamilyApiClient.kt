@@ -55,6 +55,9 @@ object FamilyApiClient {
 
     suspend fun removeMember(uid: String): FamilyResult<Unit> = call("DELETE", "$BASE/members/$uid") { }
 
+    /** Drops all of this account's family links; called just before the account is deleted. */
+    suspend fun forgetMe(): FamilyResult<Unit> = call("DELETE", "$BASE/me") { }
+
     private suspend fun <T> call(
         method: String,
         url: String,

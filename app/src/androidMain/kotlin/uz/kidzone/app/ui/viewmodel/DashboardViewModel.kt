@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uz.kidzone.app.FamilyApiClient
 import uz.kidzone.app.FirestoreSync
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.auth.AccountState
@@ -65,7 +66,12 @@ class DashboardViewModel(
     /** Signing out returns the app to guest mode; the dashboard then asks to sign in again. */
     fun logout() = runAccountAction { auth.signOut() }
 
-    fun deleteAccount(onDone: (Boolean) -> Unit) = runAccountAction(onDone) { auth.deleteAccount() }
+    // Family links go first: once the account is gone it can no longer ask the backend to
+    // drop them. Best effort: if this call fails, the members keep reading the old profiles.
+    fun deleteAccount(onDone: (Boolean) -> Unit) = runAccountAction(onDone) {
+        FamilyApiClient.forgetMe()
+        auth.deleteAccount()
+    }
 
     fun syncNow() {
         val account = _state.value.account as? AccountState.SignedIn ?: return
