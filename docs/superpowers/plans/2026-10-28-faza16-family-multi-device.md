@@ -99,7 +99,7 @@
 
 - [ ] Two emulators, one Google account. Change name / time limit / PIN, and delete a profile on one emulator. Each change shows on the other **without restarting**.
 - [ ] Upgrade test: install the current `master` build, create profiles, upgrade to this build. Profiles survive (migration 3→4) and sync.
-- [ ] Note in the release changelog (uz/ru/en): "Changes now reach your other phones instantly".
+- [x] Note in the release changelog (uz/ru/en): "Changes now reach your other phones instantly".
 
 ---
 
