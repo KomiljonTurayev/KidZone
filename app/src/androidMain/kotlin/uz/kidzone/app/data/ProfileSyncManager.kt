@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 
 open class ProfileSyncManager(private val db: FirebaseFirestore?) {
@@ -62,6 +63,22 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
         } catch (e: Exception) {
             Log.w(TAG, "pullProfiles failed: $e")
             emptyList()
+        }
+    }
+
+    /**
+     * The profiles as the server has them, or null if it can't be reached. Unlike [pullProfiles],
+     * an empty list here really means "no profiles", not "offline".
+     */
+    open suspend fun pullProfilesFromServer(uid: String): List<ProfileEntity>? {
+        val db = db ?: return null
+        return try {
+            val snap = db.collection("users").document(uid)
+                .collection("profiles").get(Source.SERVER).await()
+            snap.documents.mapNotNull(::toProfile)
+        } catch (e: Exception) {
+            Log.w(TAG, "pullProfilesFromServer failed: $e")
+            null
         }
     }
 

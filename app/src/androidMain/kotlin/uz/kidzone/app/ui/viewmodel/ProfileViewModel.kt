@@ -23,10 +23,21 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
     private val _activeProfile = MutableStateFlow<ProfileEntity?>(null)
     val activeProfile: StateFlow<ProfileEntity?> = _activeProfile.asStateFlow()
 
+    // Follows Room, so changes from another device or the family owner show up here. If the
+    // active profile is gone (another family's profiles replaced it), the default one takes over.
     init {
         viewModelScope.launch {
-            _activeProfile.value = repository.getActiveProfile()
+            repository.profiles.collect { profiles -> _activeProfile.value = activeIn(profiles) }
         }
+    }
+
+    private fun activeIn(profiles: List<ProfileEntity>): ProfileEntity? {
+        val id = repository.getActiveProfileId() ?: return null
+        val active = profiles.firstOrNull { it.id == id }
+            ?: profiles.firstOrNull { it.isDefault }
+            ?: profiles.firstOrNull()
+        if (active != null && active.id != id) repository.setActiveProfileId(active.id)
+        return active
     }
 
     fun setActiveProfile(profile: ProfileEntity) {

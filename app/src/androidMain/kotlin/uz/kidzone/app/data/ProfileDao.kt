@@ -37,11 +37,21 @@ interface ProfileDao {
     @Delete
     suspend fun delete(profile: ProfileEntity)
 
+    @Query("DELETE FROM profiles")
+    suspend fun deleteAll()
+
     /** Applies the remote copies that are newer than the local ones (see [profilesToApply]). */
     @Transaction
     suspend fun mergeProfiles(remoteProfiles: List<ProfileEntity>) {
         val toApply = profilesToApply(getAllSync().associateBy { it.id }, remoteProfiles)
         if (toApply.isNotEmpty()) insertAll(toApply)
+    }
+
+    /** Makes [remoteProfiles] the only profiles on this device (another account's took their place). */
+    @Transaction
+    suspend fun replaceProfiles(remoteProfiles: List<ProfileEntity>) {
+        deleteAll()
+        insertAll(remoteProfiles)
     }
 }
 

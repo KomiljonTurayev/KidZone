@@ -25,13 +25,14 @@ import uz.kidzone.app.data.ProfileRepository
 class ProfileViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
+    private val dao = FakeProfileDao()
     private lateinit var repo: ProfileRepository
     private lateinit var vm: ProfileViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
-        repo = ProfileRepository(FakeProfileDao(), FakeProfileStatsDao(), FakeSharedPreferences(), NoOpSyncManager())
+        repo = ProfileRepository(dao, FakeProfileStatsDao(), FakeSharedPreferences(), NoOpSyncManager())
         vm = ProfileViewModel(repo)
     }
 
@@ -101,6 +102,33 @@ class ProfileViewModelTest {
 
         assertEquals(listOf("new-hash", "new-hash"), repo.profiles.first().map { it.pinHash })
         assertEquals("new-hash", vm.activeProfile.value?.pinHash)
+    }
+
+    @Test
+    fun `a change synced from another device shows on the active profile`() = runTest {
+        val p = makeProfile("s1", "Before")
+        dao.insert(p)
+        vm.setActiveProfile(p)
+        advanceUntilIdle()
+
+        dao.mergeProfiles(listOf(p.copy(name = "After", updatedAt = p.updatedAt + 1)))
+        advanceUntilIdle()
+
+        assertEquals("After", vm.activeProfile.value?.name)
+    }
+
+    @Test
+    fun `when the active profile is replaced by another family's, their default one becomes active`() = runTest {
+        val mine = makeProfile("mine", "Mine")
+        dao.insert(mine)
+        vm.setActiveProfile(mine)
+        advanceUntilIdle()
+
+        dao.replaceProfiles(listOf(makeProfile("other", "Other"), makeProfile("main", "Main").copy(isDefault = true)))
+        advanceUntilIdle()
+
+        assertEquals("main", vm.activeProfile.value?.id)
+        assertEquals("main", repo.getActiveProfileId())
     }
 
     private fun makeProfile(id: String, name: String) = ProfileEntity(
