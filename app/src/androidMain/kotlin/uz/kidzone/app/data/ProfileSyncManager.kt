@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 
 open class ProfileSyncManager(private val db: FirebaseFirestore?) {
@@ -16,7 +17,7 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
     }
 
     open fun pushProfile(profile: ProfileEntity) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = ProfileOwner.uidFor(FirebaseAuth.getInstance().currentUser?.uid) ?: return
         val db = db ?: return
         val data = mapOf(
             "name" to profile.name,
@@ -40,7 +41,7 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
     // daily play-time limit. That decision comes from the backend's /playtime/heartbeat
     // (PlaytimeApiClient), which tracks elapsedSeconds under profiles/{id}/playtime/{date}.
     open fun pushStats(stats: ProfileStatsEntity) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = ProfileOwner.uidFor(FirebaseAuth.getInstance().currentUser?.uid) ?: return
         val db = db ?: return
         val data = mapOf(
             "minutesPlayed" to stats.minutesPlayed,
@@ -66,6 +67,22 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
     }
 
     /**
+     * The profiles as the server has them, or null if it can't be reached. Unlike [pullProfiles],
+     * an empty list here really means "no profiles", not "offline".
+     */
+    open suspend fun pullProfilesFromServer(uid: String): List<ProfileEntity>? {
+        val db = db ?: return null
+        return try {
+            val snap = db.collection("users").document(uid)
+                .collection("profiles").get(Source.SERVER).await()
+            snap.documents.mapNotNull(::toProfile)
+        } catch (e: Exception) {
+            Log.w(TAG, "pullProfilesFromServer failed: $e")
+            null
+        }
+    }
+
+    /**
      * Calls [onChange] with the account's profiles whenever another device changes them. This
      * device's own writes are skipped until the server has them (they're already in Room).
      * Close the result to stop listening; null when Firestore isn't available.
@@ -77,6 +94,20 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
                 if (e != null) { Log.w(TAG, "listenProfiles failed: $e"); return@addSnapshotListener }
                 if (snap == null || snap.metadata.hasPendingWrites()) return@addSnapshotListener
                 onChange(snap.documents.mapNotNull(::toProfile))
+            }
+        return AutoCloseable { registration.remove() }
+    }
+
+    /**
+     * Calls [onChange] with `users/{uid}.familyOwner` (null when not in a family) now and
+     * whenever the backend links or unlinks this account.
+     */
+    open fun listenFamilyOwner(uid: String, onChange: (String?) -> Unit): AutoCloseable? {
+        val db = db ?: return null
+        val registration = db.collection("users").document(uid)
+            .addSnapshotListener { snap, e ->
+                if (e != null) { Log.w(TAG, "listenFamilyOwner failed: $e"); return@addSnapshotListener }
+                onChange(snap?.getString("familyOwner"))
             }
         return AutoCloseable { registration.remove() }
     }

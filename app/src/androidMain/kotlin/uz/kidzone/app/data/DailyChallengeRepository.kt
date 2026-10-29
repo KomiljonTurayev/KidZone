@@ -70,11 +70,13 @@ open class DailyChallengeRepository(
         val celebratedMilestone = newlyReached ?: resetMilestone
         streakDao.upsert(StreakEntity(profileId, newCount, today, celebratedMilestone))
 
-        val uid = try {
-            FirebaseAuth.getInstance().currentUser?.uid
-        } catch (_: Exception) {
-            null
-        } ?: return newlyReached
+        val uid = ProfileOwner.uidFor(
+            try {
+                FirebaseAuth.getInstance().currentUser?.uid
+            } catch (_: Exception) {
+                null
+            }
+        ) ?: return newlyReached
         firestoreSync.syncStreak(uid, profileId, newCount, today)
         firestoreSync.syncChallengeCompleted(uid, profileId, today, gameId, gameTitle)
         return newlyReached

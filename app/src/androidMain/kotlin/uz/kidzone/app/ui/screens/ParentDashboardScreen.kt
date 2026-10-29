@@ -111,6 +111,12 @@ fun ParentDashboardScreen(
     }
 
     var showSetPin by remember { mutableStateOf(false) }
+    var showFamily by remember { mutableStateOf(false) }
+
+    if (showFamily) {
+        FamilyScreen(onBack = { showFamily = false })
+        return
+    }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (showSetPin) {
@@ -176,6 +182,9 @@ fun ParentDashboardScreen(
         // 4. Xavfsizlik: PIN va push bildirishnomalar
         KidSection("🔑", tr("Sozlamalar", "Настройки", "Settings")) {
             SettingRow(if (savedPinHash.isNullOrEmpty()) tr("PIN o'rnatish", "Установить PIN", "Set PIN") else tr("PIN o'zgartirish", "Изменить PIN", "Change PIN"), onClick = { showSetPin = true }) {
+                Text("›", fontSize = 26.sp, color = Kid.Orange)
+            }
+            SettingRow(tr("Oila", "Семья", "Family"), onClick = { showFamily = true }) {
                 Text("›", fontSize = 26.sp, color = Kid.Orange)
             }
             SettingRow(tr("Bildirishnomalar", "Уведомления", "Notifications")) {

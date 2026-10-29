@@ -204,6 +204,10 @@ class FakeProfileDao : ProfileDao {
         store.removeAll { it.id == profile.id }
         flow.value = store.toList()
     }
+    override suspend fun deleteAll() {
+        store.clear()
+        flow.value = emptyList()
+    }
     
     override suspend fun insertAll(profiles: List<ProfileEntity>) {
         profiles.forEach { p ->
@@ -214,7 +218,7 @@ class FakeProfileDao : ProfileDao {
     }
 
     override suspend fun getAllSync(): List<ProfileEntity> = store.toList()
-    // mergeProfiles: the interface's own implementation, so the real merge rule is tested.
+    // mergeProfiles, replaceProfiles: the interface's own implementations, so the real rules are tested.
 }
 
 class FakeProfileStatsDao : ProfileStatsDao {

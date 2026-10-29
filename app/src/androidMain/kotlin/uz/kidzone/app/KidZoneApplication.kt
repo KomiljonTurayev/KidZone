@@ -19,6 +19,7 @@ import uz.kidzone.app.auth.ProfileCloudSyncListener
 import uz.kidzone.app.auth.PurchasesIdentityListener
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileEntity
+import uz.kidzone.app.data.PrefsLocalProfilesOwner
 import uz.kidzone.app.data.ProfileSyncManager
 import java.util.UUID
 
@@ -55,7 +56,7 @@ class KidZoneApplication : Application() {
             appScope = appScope,
             listeners = listOf(
                 CloudUserListener({ FirestoreSync.init(this) }, prefs),
-                ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore), appScope),
+                ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore), appScope, PrefsLocalProfilesOwner(prefs)),
                 PurchasesIdentityListener(),
             ),
         )

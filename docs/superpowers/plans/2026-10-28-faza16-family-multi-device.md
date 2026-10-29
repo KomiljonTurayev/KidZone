@@ -99,7 +99,7 @@
 
 - [ ] Two emulators, one Google account. Change name / time limit / PIN, and delete a profile on one emulator. Each change shows on the other **without restarting**.
 - [ ] Upgrade test: install the current `master` build, create profiles, upgrade to this build. Profiles survive (migration 3→4) and sync.
-- [ ] Note in the release changelog (uz/ru/en): "Changes now reach your other phones instantly".
+- [x] Note in the release changelog (uz/ru/en): "Changes now reach your other phones instantly".
 
 ---
 
@@ -108,7 +108,7 @@
 > Start only after Phase A is released and the spec's open questions are answered.
 
 > **Done (2026-10-29), with deviations:** backend `feat/family-accounts` (6241f78, cefc822, 1ac1ebe); rules 2fcd764.
-> - Not yet done from B1: clearing members' `familyOwner` when the owner deletes their account (account deletion happens client-side today — needs a backend hook or Cloud Function); `FamilyControllerTest`.
+> - Follow-up done 2026-10-29: backend `feat/family-account-cleanup` (58d04e1) adds `DELETE /family/me` (a member leaves; an owner's members and open codes are dropped), also run by admin user deletion, plus `FamilyControllerTest`. The app calls it just before deleting the account (719a33d).
 > - Added (security): clients can't write `familyOwner`, and `findOwnerOf` also requires the `members/{uid}` doc.
 
 ### Task B1: Backend — family model and invite codes
@@ -149,21 +149,22 @@
 ### Task B4: App — effective owner everywhere
 
 **Files:** `auth/AccountListeners.kt`, `data/ProfileSyncManager.kt`, `FirestoreSync.kt` (streak / challenge paths), `PlaytimeApiClient.kt` (no change if the backend resolves it)
-- [ ] Read `users/{uid}.familyOwner` after sign-in. Expose `effectiveOwnerUid` as state (unit-tested).
-- [ ] Every `users/{uid}/profiles` path uses `effectiveOwnerUid`.
+- [x] Read `users/{uid}.familyOwner` after sign-in. Expose `effectiveOwnerUid` as state (unit-tested).
+- [x] Every `users/{uid}/profiles` path uses `effectiveOwnerUid`.
 
 ### Task B5: App — Family section in the parent dashboard (uz/ru/en)
 
 **Files:** `ui/screens/ParentDashboardScreen.kt`, new `ui/screens/FamilyScreen.kt`, `ui/viewmodel/FamilyViewModel.kt`, `BackendClient.kt`
-- [ ] Owner sees: the members list, "Invite a family member" (big 6-digit code with expiry), and remove member.
-- [ ] Member sees the owner's name and a "Leave family" action.
-- [ ] Not in a family: "Join a family" with a code entry (`KidNumberPad`).
-- [ ] All texts go through `tr(uz, ru, en)`. Errors (wrong / expired code, too many attempts) are localized.
+- [x] Owner sees: the members list, "Invite a family member" (big 6-digit code with expiry), and remove member.
+- [x] Member sees the owner's name and a "Leave family" action.
+- [x] Not in a family: "Join a family" with a code entry (`KidNumberPad`).
+- [x] All texts go through `tr(uz, ru, en)`. Errors (wrong / expired code, too many attempts) are localized.
 
 ### Task B6: End-to-end check
 
 - [ ] Two emulators, two different Google accounts:
   - invite and join;
   - edit a PIN or limit on either side and see it on both;
-  - remove the member: their app falls back to their own (empty) profiles.
+  - remove the member: their app falls back to their own (empty) profiles;
+  - delete the owner's account: the member's app falls back the same way.
 - [ ] Deploy order: backend (B1–B2), then rules (B3), then app (B4–B5).
