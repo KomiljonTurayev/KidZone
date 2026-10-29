@@ -180,8 +180,10 @@ window.KZL = {
     localStorage.setItem(key('lv', id), lv);
     if (lv > readInt(key('best', id))) {
       localStorage.setItem(key('best', id), lv);
+      // The dashboard names games by their catalog id (abc-uz, abc-ru… share one level id).
+      const parentApp = window.parent && window.parent.app;
       const bridge = window.AndroidBridge || (window.parent && window.parent.AndroidBridge);
-      if (bridge && bridge.levelReached) bridge.levelReached(id, lv);
+      if (bridge && bridge.levelReached) bridge.levelReached((parentApp && parentApp.currentGameId) || id, lv);
     }
   },
   nextLevel(id) {

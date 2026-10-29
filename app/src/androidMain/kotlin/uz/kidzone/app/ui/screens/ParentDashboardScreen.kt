@@ -58,6 +58,9 @@ import uz.kidzone.app.ui.components.KidSection
 import uz.kidzone.app.ui.components.KidTextButton
 import uz.kidzone.app.ui.components.KidTopBar
 import uz.kidzone.app.ui.i18n.LocalAppLang
+import kotlinx.coroutines.flow.flowOf
+import uz.kidzone.app.data.GameProgress
+import uz.kidzone.app.data.GameProgressRepository
 import uz.kidzone.app.ui.i18n.tr
 import uz.kidzone.app.ui.viewmodel.DailyChallengeViewModel
 import uz.kidzone.app.ui.viewmodel.DashboardViewModel
@@ -68,6 +71,7 @@ fun ParentDashboardScreen(
     onBack: () -> Unit,
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
+    gameProgress: GameProgressRepository,
     onNavigateToAddEdit: (String?) -> Unit,
     onOpenPremium: () -> Unit,
 ) {
@@ -83,6 +87,9 @@ fun ParentDashboardScreen(
     val profiles by profileViewModel.profiles.collectAsState()
     val allStreaks by challengeViewModel.allStreaks.collectAsState()
     val challengeState by challengeViewModel.state.collectAsState()
+    val levels by remember(activeProfile?.id) {
+        activeProfile?.id?.let(gameProgress::progress) ?: flowOf(emptyList())
+    }.collectAsState(initial = emptyList())
 
     if (!pinVerified) {
         PinGate(
@@ -140,6 +147,12 @@ fun ParentDashboardScreen(
             }
             Spacer(Modifier.height(12.dp))
             WeeklyChart(state.weeklyMinutes)
+        }
+        Spacer(Modifier.height(16.dp))
+
+        // 1b. Darajalar (Faza 18)
+        KidSection("📈", tr("Darajalar", "Уровни", "Levels")) {
+            LevelsCard(levels) { id -> challengeViewModel.gameLabel(id, LocalAppLang.current) ?: id }
         }
         Spacer(Modifier.height(16.dp))
 
@@ -329,6 +342,49 @@ private fun SettingRow(label: String, onClick: (() -> Unit)? = null, trailing: @
     ) {
         Text(label, style = MaterialTheme.typography.bodyLarge, color = Kid.Ink, modifier = Modifier.weight(1f))
         trailing()
+    }
+}
+
+/** Best level per game, highest first; "+N" is what the child gained over the last 7 days. */
+@Composable
+private fun LevelsCard(levels: List<GameProgress>, label: @Composable (String) -> String) {
+    if (levels.isEmpty()) {
+        Text(
+            tr(
+                "Bola o'ynagan sari har bir o'yindagi darajasi shu yerda ko'rinadi.",
+                "Здесь появятся уровни ребёнка в каждой игре.",
+                "Your child's level in each game shows up here as they play.",
+            ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Kid.InkSoft,
+        )
+        return
+    }
+    val weekTotal = levels.sumOf { it.gainedThisWeek }
+    if (weekTotal > 0) {
+        Text(
+            tr("Bu hafta: +$weekTotal daraja 🚀", "За неделю: +$weekTotal ур. 🚀", "This week: +$weekTotal levels 🚀"),
+            style = MaterialTheme.typography.titleMedium,
+            color = Kid.Mint,
+        )
+        Spacer(Modifier.height(8.dp))
+    }
+    levels.take(8).forEach { g ->
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
+            Text(label(g.gameId), style = MaterialTheme.typography.bodyLarge, color = Kid.Ink, modifier = Modifier.weight(1f))
+            if (g.gainedThisWeek > 0) {
+                Text("+${g.gainedThisWeek}", style = MaterialTheme.typography.labelLarge, color = Kid.Mint)
+                Spacer(Modifier.width(10.dp))
+            }
+            Text("⭐ ${g.level}", style = MaterialTheme.typography.titleMedium, color = Kid.Orange)
+        }
+    }
+    if (levels.size > 8) {
+        Text(
+            tr("va yana ${levels.size - 8} ta o'yin", "и ещё ${levels.size - 8} игр", "and ${levels.size - 8} more games"),
+            style = MaterialTheme.typography.bodySmall,
+            color = Kid.InkSoft,
+        )
     }
 }
 

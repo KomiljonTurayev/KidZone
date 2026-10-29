@@ -44,6 +44,17 @@ class DailyChallengeRepositoryTest {
     }
 
     @Test
+    fun `gameLabel names a game in the app language with its emoji`() {
+        repo.updateGamesList(
+            """[{"id":"animals","title":"Hayvonlar","em":"🐾","names":{"uz":"Hayvonlar","ru":"Животные","en":"Animals"}},
+               {"id":"memory","title":"Xotira"}]"""
+        )
+        assertEquals("🐾 Животные", repo.gameLabel("animals", "ru"))
+        assertEquals("Xotira", repo.gameLabel("memory", "en"))
+        assertNull(repo.gameLabel("nope", "uz"))
+    }
+
+    @Test
     fun `getTodayChallenge returns null when no games loaded`() = runTest {
         assertNull(repo.getTodayChallenge("p1"))
     }

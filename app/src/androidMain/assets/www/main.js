@@ -457,7 +457,10 @@ class GameManager {
             const list = JSON.stringify(this.games.map(function(g) {
                 return {
                     id: g.id,
-                    title: typeof g.name === 'object' ? (g.name.uz || g.name.en) : g.name
+                    title: typeof g.name === 'object' ? (g.name.uz || g.name.en) : g.name,
+                    // The parent dashboard names games in the app language (levels card).
+                    em: g.em || '',
+                    names: typeof g.name === 'object' ? g.name : {}
                 };
             }));
             window.AndroidChallenge.onGamesLoaded(list);

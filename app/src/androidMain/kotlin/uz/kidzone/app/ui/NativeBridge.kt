@@ -24,6 +24,8 @@ internal class NativeBridge(
     private val onAiLocked: () -> Unit,
     private val onAiDailyLimit: () -> Unit,
     private val onGameLaunched: (String) -> Unit,
+    /** A child reached a new best level in a game (Faza 18); checked in GameProgressRepository. */
+    private val onLevelReached: (String, Int) -> Unit,
     /** Persists a language/age the child picked in the WebView header (already validated). */
     private val onLanguageChanged: (String) -> Unit,
     private val onAgeChanged: (String) -> Unit,
@@ -216,6 +218,11 @@ internal class NativeBridge(
             viewModel.setInGame(true)
             onGameLaunched(gameId)
         }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun levelReached(gameId: String, level: Int) {
+        onMain { onLevelReached(gameId, level) }
     }
 
     @android.webkit.JavascriptInterface

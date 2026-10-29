@@ -77,6 +77,12 @@ fun KidZoneApp(
             firestoreSync = firestoreSync,
         )
     }
+    val gameProgress = remember {
+        uz.kidzone.app.data.GameProgressRepository(
+            dao = KidZoneDatabase.getInstance(context).levelUpDao(),
+            firestoreSync = uz.kidzone.app.FirestoreSync.getInstance(),
+        )
+    }
     val challengeViewModel: DailyChallengeViewModel = viewModel(
         factory = DailyChallengeViewModelFactory(challengeRepository)
     )
@@ -137,6 +143,7 @@ fun KidZoneApp(
                         statsManager = statsManager,
                         profileViewModel = profileViewModel,
                         challengeViewModel = challengeViewModel,
+                        gameProgress = gameProgress,
                         onOpenDashboard = { navController.navigate("dashboard") },
                         onOpenSleep = { navController.navigate("sleep") },
                         onOpenPremium = { navController.navigate("premium") },
@@ -179,6 +186,7 @@ fun KidZoneApp(
                         onBack = { navController.popBackStack() },
                         profileViewModel = profileViewModel,
                         challengeViewModel = challengeViewModel,
+                        gameProgress = gameProgress,
                         onNavigateToAddEdit = { profileId ->
                             navController.navigate("add_edit_profile/${profileId ?: "new"}")
                         },

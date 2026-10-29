@@ -46,6 +46,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import uz.kidzone.app.data.GameProgressRepository
 import androidx.compose.runtime.setValue
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.screens.PinGate
@@ -90,6 +93,7 @@ fun MainScreen(
     statsManager: ParentalStatsManager,
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
+    gameProgress: GameProgressRepository,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
     onOpenPremium: () -> Unit = {},
@@ -101,6 +105,7 @@ fun MainScreen(
     // Bu orqafon (background) da batareya isrofgarchiligini oldini oladi.
     val uiState by mainViewModel.state.collectAsStateWithLifecycle()
     val activeProfile by profileViewModel.activeProfile.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(activeProfile) {
         activeProfile?.id?.let { challengeViewModel.onProfileChanged(it) }
@@ -183,6 +188,10 @@ fun MainScreen(
                             onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
                             // Feeds the parent dashboard's "games played today".
                             onGameLaunched = statsManager::onGameLaunched,
+                            onLevelReached = { gameId, level ->
+                                val pid = profileViewModel.activeProfile.value?.id
+                                if (pid != null) scope.launch { gameProgress.onLevelReached(pid, gameId, level) }
+                            },
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
                             onLanguageChanged = { lang ->
                                 prefs.edit().putString("kz_lang", lang).apply()

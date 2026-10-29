@@ -6,7 +6,12 @@ import org.json.JSONArray
 import uz.kidzone.app.FirestoreSync
 import com.google.firebase.auth.FirebaseAuth
 
-data class GameItem(val id: String, val title: String)
+data class GameItem(
+    val id: String,
+    val title: String,
+    val emoji: String = "",
+    val names: Map<String, String> = emptyMap(),
+)
 
 open class DailyChallengeRepository(
     private val challengeDao: DailyChallengeDao,
@@ -24,9 +29,22 @@ open class DailyChallengeRepository(
             val arr = JSONArray(json)
             gamesList = (0 until arr.length()).map { i ->
                 val obj = arr.getJSONObject(i)
-                GameItem(obj.getString("id"), obj.getString("title"))
+                val names = obj.optJSONObject("names")
+                GameItem(
+                    obj.getString("id"),
+                    obj.getString("title"),
+                    obj.optString("em", ""),
+                    names?.keys()?.asSequence()?.associateWith { names.getString(it) }.orEmpty(),
+                )
             }
         } catch (_: Exception) {}
+    }
+
+    /** "🐾 Animals" for a catalog game id, in [lang] when the catalog has it; null if unknown. */
+    open fun gameLabel(id: String, lang: String): String? {
+        val g = gamesList.firstOrNull { it.id == id } ?: return null
+        val name = g.names[lang] ?: g.title
+        return if (g.emoji.isEmpty()) name else "${g.emoji} $name"
     }
 
     open suspend fun getTodayChallenge(profileId: String): DailyChallengeEntity? {

@@ -75,6 +75,14 @@ service cloud.firestore {
         (!('gamesPlayed' in data) || (data.gamesPlayed is int && data.gamesPlayed >= 0 && data.gamesPlayed <= 1000));
     }
 
+    // Best level per game (Faza 18). A level can only go up, and never past the app's cap.
+    function isValidProgressWrite(data) {
+      return data.keys().hasOnly(['level', 'updatedAt']) &&
+        data.level is int && data.level >= 1 && data.level <= 10000 &&
+        (!('updatedAt' in data) || data.updatedAt is timestamp) &&
+        (resource == null || !('level' in resource.data) || data.level >= resource.data.level);
+    }
+
     // User document and all child subcollections (profiles, daily_challenges, stats)
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
@@ -113,6 +121,12 @@ service cloud.firestore {
         match /stats/{date} {
           allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
           allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProfileStatsWrite(request.resource.data)) || isAdmin();
+          allow delete: if isOwner(uid) || isAdmin();
+        }
+
+        match /progress/{gameId} {
+          allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
+          allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProgressWrite(request.resource.data)) || isAdmin();
           allow delete: if isOwner(uid) || isAdmin();
         }
       }

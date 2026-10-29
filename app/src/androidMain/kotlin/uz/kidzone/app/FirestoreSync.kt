@@ -219,4 +219,18 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
             .set(data, SetOptions.merge())
             .addOnFailureListener { e -> Log.w(TAG, "syncChallengeCompleted failed: $e") }
     }
+
+    /** Best level of one game; the dashboard on any family device reads it. */
+    open fun syncGameProgress(uid: String, profileId: String, gameId: String, level: Int) {
+        if (!isAvailable()) return
+        val data = mapOf<String, Any>(
+            "level" to level,
+            "updatedAt" to FieldValue.serverTimestamp(),
+        )
+        db!!.collection("users").document(uid)
+            .collection("profiles").document(profileId)
+            .collection("progress").document(gameId)
+            .set(data, SetOptions.merge())
+            .addOnFailureListener { e -> Log.w(TAG, "syncGameProgress failed: $e") }
+    }
 }
