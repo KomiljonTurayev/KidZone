@@ -606,6 +606,8 @@ class GameManager {
 
         if (window.AndroidBridge) {
             window.AndroidBridge.hideBanner();
+            // Feeds the parent dashboard's "games played today".
+            if (window.AndroidBridge.gameLaunched) window.AndroidBridge.gameLaunched(g.id);
         }
         if (window.AndroidChallenge) {
             window.AndroidChallenge.onGameOpened(g.id);
