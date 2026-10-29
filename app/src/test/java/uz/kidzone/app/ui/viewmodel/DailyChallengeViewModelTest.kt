@@ -133,6 +133,7 @@ class FakeDailyChallengeRepository : DailyChallengeRepository(
         override suspend fun getById(id: String) = null
         override suspend fun insert(entity: DailyChallengeEntity) {}
         override suspend fun markCompleted(id: String) {}
+        override suspend fun setProgress(id: String, progress: Int, completed: Boolean) {}
         override fun getByProfile(profileId: String): Flow<List<DailyChallengeEntity>> =
             MutableStateFlow(emptyList())
     },

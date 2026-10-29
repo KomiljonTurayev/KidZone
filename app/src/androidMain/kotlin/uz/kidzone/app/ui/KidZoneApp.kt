@@ -84,7 +84,7 @@ fun KidZoneApp(
         )
     }
     val challengeViewModel: DailyChallengeViewModel = viewModel(
-        factory = DailyChallengeViewModelFactory(challengeRepository)
+        factory = DailyChallengeViewModelFactory(challengeRepository) { prefs.getString("kz_age", "2-4") ?: "2-4" }
     )
 
     val profiles by profileViewModel.profiles.collectAsState()

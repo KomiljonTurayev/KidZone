@@ -469,6 +469,10 @@ class GameManager {
 
     addPoints(n) {
         this.pts += n;
+        // Counts toward today's "earn N stars" task.
+        if (n > 0 && window.AndroidChallenge && window.AndroidChallenge.onStarsEarned) {
+            window.AndroidChallenge.onStarsEarned(n);
+        }
         localStorage.setItem(profileManager.key('pts'), this.pts);
         this.updateProgress();
         if (window.badgeManager) badgeManager.onPointsUpdated(this.pts);
@@ -1347,6 +1351,57 @@ class BadgeManager {
         });
     }
 }
+
+/** Today's three tasks, sent by the app (MainScreen.tasksJson) whenever they change. */
+window.kzTasks = {
+    data: null,
+    T: {
+        uz: {title: "🎯 Bugungi vazifalar", play: "{g} o'yinini o'yna", level: "Istalgan o'yinda yangi darajaga chiq",
+             stars: "Bugun {n} ⭐ yig'", go: "O'ynash", streak: "🔥 {n} kun", crown: "👑 Bugun hammasi bajarildi! Barakalla!"},
+        ru: {title: "🎯 Задания на сегодня", play: "Сыграй в «{g}»", level: "Пройди новый уровень в любой игре",
+             stars: "Собери сегодня {n} ⭐", go: "Играть", streak: "🔥 {n} дн.", crown: "👑 Всё выполнено! Молодец!"},
+        en: {title: "🎯 Today's tasks", play: "Play {g}", level: "Reach a new level in any game",
+             stars: "Earn {n} ⭐ today", go: "Play", streak: "🔥 {n} days", crown: "👑 All done today! Well done!"},
+    },
+    render(data) {
+        this.data = data;
+        this.rerender();
+    },
+    rerender() {
+        const card = document.getElementById('tasks-card');
+        if (!card || !this.data || !window.app) return;
+        const lang = app.translator.lang;
+        const t = this.T[lang] || this.T.en;
+        const game = id => app.games.find(g => g.id === id);
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+        const rows = this.data.tasks.map(task => {
+            let text = '', extra = '';
+            if (task.slot === 0) {
+                const g = game(task.gameId);
+                const name = g ? (typeof g.name === 'object' ? (g.name[lang] || g.name.en) : g.name) : task.gameId;
+                text = t.play.replace('{g}', (g ? g.em + ' ' : '') + name);
+                if (!task.done && g) extra = `<button class="tk-go" data-game="${esc(task.gameId)}">${t.go}</button>`;
+            } else if (task.slot === 1) {
+                text = t.level;
+            } else {
+                text = t.stars.replace('{n}', task.target);
+                const pct = task.target ? Math.round(100 * task.progress / task.target) : 0;
+                if (!task.done) text += ` <small>(${task.progress}/${task.target})</small><div class="tk-bar"><i style="width:${pct}%"></i></div>`;
+            }
+            return `<div class="tk-row${task.done ? ' done' : ''}"><div class="tk-check">${task.done ? '✓' : ''}</div>` +
+                   `<div class="tk-text">${text}</div>${extra}</div>`;
+        }).join('');
+        const allDone = this.data.tasks.length > 0 && this.data.tasks.every(x => x.done);
+        card.innerHTML =
+            `<div class="tk-hdr"><span class="tk-title">${t.title}</span>` +
+            (this.data.streak > 0 ? `<span class="tk-streak">${t.streak.replace('{n}', this.data.streak)}</span>` : '') + `</div>` +
+            rows + (allDone ? `<div class="tk-crown">${t.crown}</div>` : '');
+        card.querySelectorAll('.tk-go').forEach(b => {
+            b.onclick = () => { const g = game(b.dataset.game); if (g) app.openGame(g); };
+        });
+        card.classList.remove('h');
+    },
+};
 
 // Initialize application
 let app;

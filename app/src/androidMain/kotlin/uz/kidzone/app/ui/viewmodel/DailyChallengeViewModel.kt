@@ -19,6 +19,8 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class ChallengeState(
     val challenge: DailyChallengeEntity? = null,
+    /** Today's three tasks (play, new level, stars); empty until the game list arrives. */
+    val tasks: List<DailyChallengeEntity> = emptyList(),
     val streakCount: Int = 0,
     val isLoading: Boolean = true,
     val celebrateMilestone: Int? = null,
@@ -26,6 +28,7 @@ data class ChallengeState(
 
 open class DailyChallengeViewModel(
     private val repository: DailyChallengeRepository,
+    private val ageProvider: () -> String = { "5-7" },
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChallengeState())
@@ -45,12 +48,13 @@ open class DailyChallengeViewModel(
     private fun loadChallenge(profileId: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            val challenge = repository.getTodayChallenge(profileId)
+            val tasks = repository.getTodayTasks(profileId, ageProvider()).orEmpty()
             val streak = repository.getStreak(profileId)
             if (activeProfileId != profileId) return@launch
             _state.update {
                 ChallengeState(
-                    challenge = challenge,
+                    challenge = tasks.firstOrNull(),
+                    tasks = tasks,
                     streakCount = streak.count,
                     isLoading = false,
                 )
@@ -68,11 +72,32 @@ open class DailyChallengeViewModel(
     fun onGameClosed(gameId: String) {
         val profileId = activeProfileId ?: return
         viewModelScope.launch {
-            val milestone = repository.markChallengeCompleted(profileId, gameId)
-            val challenge = repository.getTodayChallenge(profileId)
-            val streak = repository.getStreak(profileId)
-            if (activeProfileId != profileId) return@launch
-            _state.update { it.copy(challenge = challenge, streakCount = streak.count, celebrateMilestone = milestone) }
+            refreshAfter(profileId, repository.markChallengeCompleted(profileId, gameId))
+        }
+    }
+
+    /** The child reached a new best level in some game. */
+    fun onLevelUp() {
+        val profileId = activeProfileId ?: return
+        viewModelScope.launch { refreshAfter(profileId, repository.onLevelUp(profileId)) }
+    }
+
+    fun onStarsEarned(stars: Int) {
+        val profileId = activeProfileId ?: return
+        viewModelScope.launch { refreshAfter(profileId, repository.onStarsEarned(profileId, stars)) }
+    }
+
+    private suspend fun refreshAfter(profileId: String, milestone: Int?) {
+        val tasks = repository.getTodayTasks(profileId, ageProvider()).orEmpty()
+        val streak = repository.getStreak(profileId)
+        if (activeProfileId != profileId) return
+        _state.update {
+            it.copy(
+                challenge = tasks.firstOrNull(),
+                tasks = tasks,
+                streakCount = streak.count,
+                celebrateMilestone = milestone ?: it.celebrateMilestone,
+            )
         }
     }
 
@@ -83,8 +108,9 @@ open class DailyChallengeViewModel(
 
 class DailyChallengeViewModelFactory(
     private val repository: DailyChallengeRepository,
+    private val ageProvider: () -> String = { "5-7" },
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
-        DailyChallengeViewModel(repository) as T
+        DailyChallengeViewModel(repository, ageProvider) as T
 }

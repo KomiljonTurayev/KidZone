@@ -114,6 +114,14 @@ fun MainScreen(
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
 
+    // Today's tasks card on the WebView home screen (Faza 18).
+    val challengeState by challengeViewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(challengeState.tasks, challengeState.streakCount, webMgrRef.value) {
+        val mgr = webMgrRef.value ?: return@LaunchedEffect
+        if (challengeState.tasks.isEmpty()) return@LaunchedEffect
+        mgr.evaluateJavascript("window.kzTasks&&kzTasks.render(${tasksJson(challengeState.tasks, challengeState.streakCount)})")
+    }
+
     // Game levels are kept per child: tell the WebView who is playing now.
     LaunchedEffect(activeProfile?.id, webMgrRef.value) {
         val id = activeProfile?.id?.let(::jsSafeId) ?: return@LaunchedEffect
@@ -191,6 +199,7 @@ fun MainScreen(
                             onLevelReached = { gameId, level ->
                                 val pid = profileViewModel.activeProfile.value?.id
                                 if (pid != null) scope.launch { gameProgress.onLevelReached(pid, gameId, level) }
+                                challengeViewModel.onLevelUp()
                             },
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
                             onLanguageChanged = { lang ->
@@ -487,3 +496,20 @@ fun MainScreen(
 
 /** Profile ids are UUIDs; anything else is dropped before it goes into a JS string. */
 internal fun jsSafeId(id: String): String = id.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
+
+/** What the home screen's tasks card needs; texts are chosen in the WebView's language. */
+internal fun tasksJson(tasks: List<uz.kidzone.app.data.DailyChallengeEntity>, streak: Int): String =
+    org.json.JSONObject().apply {
+        put("streak", streak)
+        put("tasks", org.json.JSONArray().apply {
+            tasks.forEach { t ->
+                put(org.json.JSONObject().apply {
+                    put("slot", t.slot)
+                    put("gameId", t.gameId)
+                    put("done", t.completed)
+                    put("progress", t.progress)
+                    put("target", t.target)
+                })
+            }
+        })
+    }.toString()
