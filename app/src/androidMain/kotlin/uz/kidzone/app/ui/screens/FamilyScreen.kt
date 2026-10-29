@@ -1,5 +1,6 @@
 package uz.kidzone.app.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -72,6 +73,9 @@ internal fun FamilyScreen(onBack: () -> Unit) {
     fun reload() = run({ FamilyApiClient.family() }) { family = it }
 
     LaunchedEffect(Unit) { reload() }
+    // The system back button returns to the dashboard (or from the code entry to here),
+    // not out of the parent area.
+    BackHandler { if (joining) { joining = false; error = null } else onBack() }
 
     if (joining) {
         JoinFamily(
