@@ -108,7 +108,7 @@
 > Start only after Phase A is released and the spec's open questions are answered.
 
 > **Done (2026-10-29), with deviations:** backend `feat/family-accounts` (6241f78, cefc822, 1ac1ebe); rules 2fcd764.
-> - Not yet done from B1: clearing members' `familyOwner` when the owner deletes their account (account deletion happens client-side today — needs a backend hook or Cloud Function); `FamilyControllerTest`.
+> - Follow-up done 2026-10-29: backend `feat/family-account-cleanup` (58d04e1) adds `DELETE /family/me` (a member leaves; an owner's members and open codes are dropped), also run by admin user deletion, plus `FamilyControllerTest`. The app calls it just before deleting the account (719a33d).
 > - Added (security): clients can't write `familyOwner`, and `findOwnerOf` also requires the `members/{uid}` doc.
 
 ### Task B1: Backend — family model and invite codes
@@ -165,5 +165,6 @@
 - [ ] Two emulators, two different Google accounts:
   - invite and join;
   - edit a PIN or limit on either side and see it on both;
-  - remove the member: their app falls back to their own (empty) profiles.
+  - remove the member: their app falls back to their own (empty) profiles;
+  - delete the owner's account: the member's app falls back the same way.
 - [ ] Deploy order: backend (B1–B2), then rules (B3), then app (B4–B5).
