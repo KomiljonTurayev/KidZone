@@ -406,9 +406,9 @@ fun KidTextField(
         keyboardOptions = keyboardOptions,
         shape = RoundedCornerShape(24.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            errorContainerColor = Color.White,
+            focusedContainerColor = Kid.Card,
+            unfocusedContainerColor = Kid.Card,
+            errorContainerColor = Kid.Card,
             focusedBorderColor = Kid.Orange,
             unfocusedBorderColor = Kid.Line,
             cursorColor = Kid.Orange,
@@ -420,7 +420,7 @@ fun KidTextField(
 /** Pill toggle; filled orange when [selected]. */
 @Composable
 fun KidChip(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val bg by animateColorAsState(if (selected) Kid.Orange else Color.White, label = "chip_bg")
+    val bg by animateColorAsState(if (selected) Kid.Orange else Kid.Card, label = "chip_bg")
     val fg by animateColorAsState(if (selected) Color.White else Kid.Ink, label = "chip_fg")
     val shape = RoundedCornerShape(22.dp)
     Box(

@@ -149,9 +149,13 @@ fun MainScreen(
     }
 
     // Game levels are kept per child: tell the WebView who is playing now.
-    LaunchedEffect(activeProfile?.id, webMgrRef.value) {
+    LaunchedEffect(activeProfile?.id, activeProfile?.name, webMgrRef.value, challengeState.pageLoads) {
         val id = activeProfile?.id?.let(::jsSafeId) ?: return@LaunchedEffect
-        webMgrRef.value?.evaluateJavascript("try{localStorage.setItem('kz-native-profile','$id')}catch(e){}")
+        // The child's name for "Ibrohim's turn" in play-together mode; quote() makes it a safe JS string.
+        val name = org.json.JSONObject.quote(activeProfile?.name.orEmpty())
+        webMgrRef.value?.evaluateJavascript(
+            "try{localStorage.setItem('kz-native-profile','$id');localStorage.setItem('kz-native-name',$name)}catch(e){}"
+        )
     }
 
     LaunchedEffect(uiState.pendingDeepLinkContentId) {

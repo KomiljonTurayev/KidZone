@@ -267,8 +267,8 @@ window.KZL = {
     },
     t() { return this._txt[langOf()] || this._txt.en; },
     players() {
-      const pm = window.parent && window.parent.profileManager;
-      const kid = (pm && pm.getActive && pm.getActive().name) || this.t().kid;
+      // The app's profile name (set by MainScreen); the WebView's own profiles are just "Profil 1".
+      const kid = localStorage.getItem('kz-native-name') || this.t().kid;
       return [{em: '🐣', name: kid}, {em: '🦁', name: this.t().parent}];
     },
     /** Called by the game on a right answer, and by lives.lose() on a miss. */
