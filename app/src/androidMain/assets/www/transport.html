@@ -229,11 +229,12 @@ function showResult() {
   document.getElementById("rttl").textContent=pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById("rsc").textContent=`${t.score}: ${score}/${max}`;
   document.getElementById("result").classList.remove("h");
+  KZL.recordResult(GAME_ID, pct>=.6);
   if(pct>=.6){
     engine.gameOver(Math.round(score/2));
     if(engine.spawnConfetti){engine.spawnConfetti();}
   }
-  if(pct>=.6&&KZL.getLevel(GAME_ID)===_level&&_level<20){
+  if(pct>=.6&&KZL.getLevel(GAME_ID)===_level){
     const nl=KZL.nextLevel(GAME_ID);
     setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,engine.lang),500);
   }

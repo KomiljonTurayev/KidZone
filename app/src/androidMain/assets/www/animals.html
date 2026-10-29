@@ -145,9 +145,9 @@ const ANIMALS = [
 
 /* ════════════ TRANSLATIONS ════════════ */
 const T = {
-  uz:{title:"Hayvonlar 🐾", quest:"Bu qaysi hayvon?", hint:"Ovoz eshitish uchun bosing", start:"BOSHLASH", desc:"Hayvon nomlarini va ovozlarini o'rgan!", great:"Zo'r!", good:"Yaxshi!", tryAgain:"Harakat qil!", again:"QAYTA", next:"KEYINGI DARAJA →", lvLbl:"DARAJA", lvInfo:"ta savol • ", levels:"📊 Darajalar", allLevels:"📊 Barcha Darajalar", close:"✕ Yopish"},
-  ru:{title:"Животные 🐾",  quest:"Кто это?",          hint:"Нажми, чтобы услышать",     start:"ИГРАТЬ",   desc:"Учи имена и звуки животных!",           great:"Отлично!", good:"Хорошо!", tryAgain:"Ещё раз!",    again:"ЕЩЁ",    next:"СЛЕДУЮЩИЙ УРОВЕНЬ →", lvLbl:"УРОВЕНЬ",lvInfo:"вопросов • ", levels:"📊 Уровни", allLevels:"📊 Все уровни", close:"✕ Закрыть"},
-  en:{title:"Animals 🐾",   quest:"Which animal?",     hint:"Tap to hear the sound",      start:"START",    desc:"Learn animal names and sounds!",          great:"Amazing!", good:"Good job!",tryAgain:"Try again!",  again:"AGAIN",  next:"NEXT LEVEL →",       lvLbl:"LEVEL",  lvInfo:"questions • ", levels:"📊 Levels", allLevels:"📊 All Levels", close:"✕ Close"},
+  uz:{title:"Hayvonlar 🐾", quest:"Bu qaysi hayvon?", hint:"Ovoz eshitish uchun bosing", start:"BOSHLASH", desc:"Hayvon nomlarini va ovozlarini o'rgan!", great:"Zo'r!", good:"Yaxshi!", tryAgain:"Harakat qil!", again:"QAYTA", next:"KEYINGI DARAJA →", lvLbl:"DARAJA", lvInfo:"ta savol", levels:"📊 Darajalar", allLevels:"📊 Barcha Darajalar", close:"✕ Yopish"},
+  ru:{title:"Животные 🐾",  quest:"Кто это?",          hint:"Нажми, чтобы услышать",     start:"ИГРАТЬ",   desc:"Учи имена и звуки животных!",           great:"Отлично!", good:"Хорошо!", tryAgain:"Ещё раз!",    again:"ЕЩЁ",    next:"СЛЕДУЮЩИЙ УРОВЕНЬ →", lvLbl:"УРОВЕНЬ",lvInfo:"вопросов", levels:"📊 Уровни", allLevels:"📊 Все уровни", close:"✕ Закрыть"},
+  en:{title:"Animals 🐾",   quest:"Which animal?",     hint:"Tap to hear the sound",      start:"START",    desc:"Learn animal names and sounds!",          great:"Amazing!", good:"Good job!",tryAgain:"Try again!",  again:"AGAIN",  next:"NEXT LEVEL →",       lvLbl:"LEVEL",  lvInfo:"questions", levels:"📊 Levels", allLevels:"📊 All Levels", close:"✕ Close"},
 };
 
 /* ════════════ STATE ════════════ */
@@ -182,12 +182,12 @@ function init() {
   const hintsText = cfg.hints > 0 ? `💡${cfg.hints}` : '';
   const timerText = cfg.timer > 0 ? `⏱${cfg.timer}s` : '';
   document.getElementById('level-info').textContent =
-    `${cfg.stars}  ${t.lvInfo}${cfg.q}  ${hintsText}  ${timerText}  🐾${pool.length}`;
+    [`${cfg.stars} ${cfg.q} ${t.lvInfo}`, hintsText, timerText, `🐾${pool.length}`].filter(Boolean).join(" • ");
 
   // Result buttons
   const btnNext   = document.getElementById('btn-next');
   const btnReplay = btnNext.nextElementSibling;
-  btnNext.textContent   = level < 20 ? t.next : t.again;
+  btnNext.textContent   = t.next;
   btnReplay.textContent = t.again;
 
   // How-to-play
@@ -404,6 +404,7 @@ function showResult() {
   const maxScore = cfg.q * 10;
   const pct = score / maxScore;
   const passed = pct >= 0.6;
+  KZL.recordResult(GAME_ID, passed);
 
   document.getElementById('res-em').textContent    = pct >= 0.8 ? '🏆' : pct >= 0.6 ? '⭐' : '💪';
   document.getElementById('ui-res-t').textContent  = pct >= 0.8 ? t.great : pct >= 0.6 ? t.good : t.tryAgain;
@@ -411,7 +412,7 @@ function showResult() {
   document.getElementById('res-stars').textContent = cfg.stars;
 
   const btnNext = document.getElementById('btn-next');
-  const showNext = passed && level < 20;
+  const showNext = passed ;
   btnNext.textContent = showNext ? t.next : t.again;
   btnNext.style.display = showNext ? '' : 'none';
 
@@ -419,7 +420,7 @@ function showResult() {
     engine.spawnConfetti();
     engine.reportScore(Math.round(score / 2));
     const savedLevel = KZL.getLevel(GAME_ID);
-    if (savedLevel === level && level < 20) {
+    if (savedLevel === level ) {
       setTimeout(() => {
         const nl = KZL.nextLevel(GAME_ID);
         KZL.showLevelUp(GAME_ID, nl, lang, () => {
@@ -452,12 +453,11 @@ function restartLevel() {
 function buildLevelsGrid() {
   const grid = document.getElementById('levels-grid');
   grid.innerHTML = '';
-  const current = KZL.getLevel(GAME_ID);
-  KZL.CONFIGS.forEach(c => {
+  KZL.levelWindow(GAME_ID).forEach(c => {
     const div = document.createElement('div');
-    div.style.cssText = `background:${c.n <= current ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.2)'};border-radius:12px;padding:8px 4px;text-align:center;cursor:pointer;font-size:11px;font-weight:900;color:#fff;`;
-    div.innerHTML = `<div style="font-size:18px;">${c.n <= current ? c.stars : '🔒'}</div><div>${c.n}</div>`;
-    if (c.n <= current) div.onclick = () => { KZL.setLevel(GAME_ID, c.n); hideLevels(); startGame(); };
+    div.style.cssText = `background:${!c.locked ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.2)'};border-radius:12px;padding:8px 4px;text-align:center;cursor:pointer;font-size:11px;font-weight:900;color:#fff;`;
+    div.innerHTML = `<div style="font-size:18px;">${!c.locked ? c.stars : '🔒'}</div><div>${c.n}</div>`;
+    if (!c.locked) div.onclick = () => { KZL.setLevel(GAME_ID, c.n); hideLevels(); startGame(); };
     grid.appendChild(div);
   });
 }

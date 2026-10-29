@@ -598,7 +598,8 @@ class GameManager {
         if (titleEl) titleEl.textContent = g.em + " " + gameName;
         if (backEl) backEl.textContent = this.translator.get('back').replace("← ", "");
 
-        const gameUrl = g.file.includes("?") ? `${g.file}&lang=${this.translator.lang}` : `${g.file}?lang=${this.translator.lang}`;
+        const params = `lang=${this.translator.lang}&age=${encodeURIComponent(this.age)}`;
+        const gameUrl = g.file.includes("?") ? `${g.file}&${params}` : `${g.file}?${params}`;
         const frameEl = document.getElementById("gv-frame");
         if (frameEl) frameEl.src = gameUrl;
         const gvEl = document.getElementById("gv");
@@ -625,9 +626,9 @@ class GameManager {
         this.currentGameId = null;
         if (game) {
             const earned = game.pts || 20;
+            this.showRewardScreen(earned);
             this.addPoints(earned);
             if (window.badgeManager) badgeManager.onGamePlayed(game.cat);
-            this.showRewardScreen(earned);
         }
         if (game && window.AndroidChallenge) {
             window.AndroidChallenge.onGameClosed(game.id);
@@ -1177,6 +1178,12 @@ class BadgeManager {
     _next() {
         if (this._queue.length === 0) { this._busy = false; return; }
         this._busy = true;
+        // One celebration at a time: a badge waits until the reward card is closed.
+        const reward = document.getElementById('reward-screen');
+        if (reward && !reward.classList.contains('h')) {
+            this._timer = setTimeout(() => this._next(), 400);
+            return;
+        }
         const id = this._queue.shift();
         const def = BADGE_DEFS.find(b => b.id === id);
         if (!def) { this._next(); return; }
@@ -1314,6 +1321,9 @@ window.addEventListener("load", () => {
     if (urlLang) localStorage.setItem(profileManager.key('lang'), urlLang);
     const urlAge = urlParams.get('age');
     if (urlAge) localStorage.setItem(profileManager.key('age'), urlAge);
+    // Which child is playing; kz-ui.js keeps each child's game levels apart with it.
+    const urlProfile = urlParams.get('profile');
+    if (urlProfile) localStorage.setItem('kz-native-profile', urlProfile);
     const translator = new TranslationManager(T);
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);

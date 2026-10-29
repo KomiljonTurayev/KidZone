@@ -1,39 +1,73 @@
 /**
- * KidZone Shared UI Library v2.0
- * Provides: 20-Level system, How-to-Play overlay, Hint, Lives, Timer
+ * KidZone Shared UI Library v3.0
+ * Provides: endless age-aware levels, How-to-Play overlay, Hint, Lives, Timer
  */
 (function () {
 'use strict';
 
-/* ══ 20 LEVEL CONFIGS ══════════════════════════════════════════════════
+/* ══ ENDLESS LEVEL CONFIG ══════════════════════════════════════════════
    q = questions per round
    c = number of choices shown
    hints = hint uses available
    timer = seconds per question (0 = no timer)
    pool = fraction of full item pool to use (0..1)
+   tier = floor((n-1)/10); games may use it for extra variety past level 20
+   Age bands: "2-4" never gets a timer, "5-7" never below 15 s, "8+" down to 8 s.
+   ease = the child failed this level twice in a row: softer round, same level.
 ════════════════════════════════════════════════════════════════════════ */
-const CONFIGS = [
-  {n:1,  q:5,  c:2, hints:3, timer:0,  pool:0.20, stars:"⭐"},
-  {n:2,  q:5,  c:2, hints:3, timer:0,  pool:0.22, stars:"⭐"},
-  {n:3,  q:6,  c:3, hints:3, timer:0,  pool:0.28, stars:"⭐⭐"},
-  {n:4,  q:6,  c:3, hints:2, timer:0,  pool:0.33, stars:"⭐⭐"},
-  {n:5,  q:7,  c:3, hints:2, timer:60, pool:0.38, stars:"⭐⭐"},
-  {n:6,  q:7,  c:4, hints:2, timer:55, pool:0.45, stars:"⭐⭐⭐"},
-  {n:7,  q:8,  c:4, hints:2, timer:50, pool:0.50, stars:"⭐⭐⭐"},
-  {n:8,  q:8,  c:4, hints:1, timer:45, pool:0.55, stars:"⭐⭐⭐"},
-  {n:9,  q:9,  c:4, hints:1, timer:40, pool:0.62, stars:"🌟🌟"},
-  {n:10, q:10, c:4, hints:1, timer:35, pool:0.67, stars:"🌟🌟"},
-  {n:11, q:10, c:4, hints:1, timer:30, pool:0.72, stars:"🌟🌟🌟"},
-  {n:12, q:11, c:4, hints:1, timer:28, pool:0.77, stars:"🌟🌟🌟"},
-  {n:13, q:11, c:4, hints:0, timer:25, pool:0.82, stars:"🏅"},
-  {n:14, q:12, c:4, hints:0, timer:22, pool:0.87, stars:"🏅"},
-  {n:15, q:12, c:4, hints:0, timer:20, pool:0.90, stars:"🏅🏅"},
-  {n:16, q:13, c:4, hints:0, timer:18, pool:0.93, stars:"🥇"},
-  {n:17, q:13, c:4, hints:0, timer:15, pool:0.95, stars:"🥇"},
-  {n:18, q:14, c:4, hints:0, timer:12, pool:0.97, stars:"👑"},
-  {n:19, q:15, c:4, hints:0, timer:10, pool:1.00, stars:"👑"},
-  {n:20, q:15, c:4, hints:0, timer:8,  pool:1.00, stars:"🧠"},
-];
+const AGE_BAND = {'2-4': 0, '5-7': 1, '8+': 2};
+const TIER_STARS = ["⭐", "⭐⭐", "🌟", "🌟🌟", "🏅", "🥇", "👑", "🧠", "💎", "🚀"];
+
+function cfgFor(level, age, ease) {
+  const n = Math.max(1, Math.floor(level) || 1);
+  const band = AGE_BAND[age] !== undefined ? AGE_BAND[age] : 1;
+  const q = Math.min(15, 5 + Math.floor((n - 1) / 2));
+  let c = n < 3 ? 2 : n < 6 ? 3 : 4;
+  if (band === 2 && n >= 25) c = n >= 40 ? 6 : 5;
+  const pool = Math.min(1, 0.2 + 0.04 * (n - 1));
+  let hints = n < 4 ? 3 : n < 9 ? 2 : n < 13 ? 1 : 0;
+  if (band === 0) hints = Math.max(1, hints);
+  let timer = 0;
+  if (band === 1 && n >= 8) timer = Math.max(15, 40 - (n - 8));
+  if (band === 2 && n >= 5) timer = Math.max(8, 60 - 3 * (n - 5));
+  if (ease) {
+    timer = timer ? Math.round(timer * 1.5) : 0;
+    c = Math.max(2, c - 1);
+    hints += 1;
+  }
+  const tier = Math.floor((n - 1) / 10);
+  const stars = TIER_STARS[Math.min(TIER_STARS.length - 1, tier)];
+  return {n, q, c, hints, timer, pool, stars, tier, ease: !!ease};
+}
+
+/* ══ PROFILE + AGE ══════════════════════════════════════════════════════
+   The native app tells index.html which child is playing (?profile=…, then
+   kz-native-profile); games run same-origin in an iframe and read it here. */
+function profileId() {
+  return localStorage.getItem('kz-native-profile')
+      || localStorage.getItem('kz-active-profile') || 'p1';
+}
+function currentAge() {
+  const q = new URLSearchParams(location.search).get('age');
+  if (q && AGE_BAND[q] !== undefined) return q;
+  const a = localStorage.getItem('kz-' + (localStorage.getItem('kz-active-profile') || 'p1') + '-age');
+  return AGE_BAND[a] !== undefined ? a : '5-7';
+}
+function key(kind, id) { return 'kzl-' + kind + '-' + profileId() + '-' + id; }
+function readInt(k) { const v = parseInt(localStorage.getItem(k)); return v > 0 ? v : 0; }
+
+/* Levels used to live in kzl-<gameId>, shared by every child on the phone.
+   The first child to open the game after the update inherits them. */
+function migrate(id) {
+  const old = 'kzl-' + id;
+  const lv = readInt(old);
+  if (!lv) return;
+  if (!readInt(key('lv', id))) {
+    localStorage.setItem(key('lv', id), lv);
+    localStorage.setItem(key('best', id), lv);
+  }
+  localStorage.removeItem(old);
+}
 
 /* ══ SHARED CSS ═══════════════════════════════════════════════════════ */
 const CSS = `
@@ -74,23 +108,56 @@ const CSS = `
 
 /* ══ PUBLIC API ════════════════════════════════════════════════════════ */
 window.KZL = {
-  CONFIGS,
+  cfgFor,
+  /** Most choices a game's layout can show; a game that handles more raises it. */
+  maxChoices: 4,
 
-  /* ─── Level persistence ─── */
+  /* ─── Level persistence (per child, no upper limit) ─── */
+  /** The level being played. Replaying an old level lowers it; [getBest] keeps the record. */
   getLevel(id) {
-    return Math.min(20, Math.max(1, parseInt(localStorage.getItem('kzl-' + id) || '1')));
+    migrate(id);
+    return Math.max(1, readInt(key('lv', id)));
+  },
+  /** Highest level this child has unlocked in the game. */
+  getBest(id) {
+    migrate(id);
+    return Math.max(1, readInt(key('best', id)), readInt(key('lv', id)));
   },
   setLevel(id, n) {
-    localStorage.setItem('kzl-' + id, Math.min(20, Math.max(1, n)));
+    const lv = Math.max(1, Math.floor(n) || 1);
+    localStorage.setItem(key('lv', id), lv);
+    if (lv > readInt(key('best', id))) {
+      localStorage.setItem(key('best', id), lv);
+      const bridge = window.AndroidBridge || (window.parent && window.parent.AndroidBridge);
+      if (bridge && bridge.levelReached) bridge.levelReached(id, lv);
+    }
   },
   nextLevel(id) {
-    const n = this.getLevel(id);
-    const next = Math.min(20, n + 1);
+    const next = this.getLevel(id) + 1;
+    localStorage.removeItem(key('fails', id));
     this.setLevel(id, next);
     return next;
   },
+  /** Games report every finished round; two misses in a row soften the level. */
+  recordResult(id, passed) {
+    const k = key('fails', id);
+    if (passed) localStorage.removeItem(k);
+    else localStorage.setItem(k, readInt(k) + 1);
+  },
   cfg(id) {
-    return CONFIGS[this.getLevel(id) - 1];
+    const c = cfgFor(this.getLevel(id), currentAge(), readInt(key('fails', id)) >= 2);
+    c.c = Math.min(c.c, this.maxChoices);
+    return c;
+  },
+  /** Level numbers for a picker: everything unlocked so far (latest 11) plus the next locked one. */
+  levelWindow(id) {
+    const best = this.getBest(id);
+    const from = Math.max(1, best - 10);
+    const out = [];
+    for (let n = from; n <= best + 1; n++) {
+      out.push({n, stars: cfgFor(n, currentAge()).stars, locked: n > best});
+    }
+    return out;
   },
 
   /* ─── Style injection (once) ─── */
@@ -171,7 +238,7 @@ window.KZL = {
     const l = lang || 'en';
     const SUB = {uz:"Tabriklaymiz! Yangi daraja 🎉", ru:"Поздравляем! Новый уровень 🎉", en:"Congratulations! New level 🎉"};
     const BTN = {uz:"Davom etish →", ru:"Продолжить →", en:"Continue →"};
-    const cfg = CONFIGS[Math.min(19, newLevel - 1)];
+    const cfg = cfgFor(newLevel, currentAge());
 
     let el = document.getElementById('kzl-lup');
     if (!el) {
@@ -304,7 +371,7 @@ window.KZL = {
 
   /* ─── Pool slicer: returns first `pct` fraction of array ─── */
   slicePool(arr, level) {
-    const cfg = CONFIGS[Math.min(19, level - 1)];
+    const cfg = cfgFor(level, currentAge());
     const count = Math.max(cfg.c + 1, Math.ceil(arr.length * cfg.pool));
     return arr.slice(0, Math.min(arr.length, count));
   },

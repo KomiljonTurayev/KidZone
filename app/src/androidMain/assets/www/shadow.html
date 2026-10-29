@@ -204,15 +204,16 @@ function showResult(){
   document.getElementById('res-em').textContent = pct>=.8?'🏆':pct>=.6?'⭐':'💪';
   document.getElementById('res-ttl').textContent= pct>=.8?t.great:pct>=.6?t.good:t.try;
   document.getElementById('res-sc').textContent = _score+' / '+max;
-  const _showNext = pct>=.6&&_level<20;
+  const _showNext = pct>=.6;
   const _btnNext = document.getElementById('btn-next');
   _btnNext.textContent = _showNext ? t.next : t.again;
   _btnNext.style.display = _showNext ? '' : 'none';
   document.getElementById('result-screen').classList.remove('hidden');
+  KZL.recordResult(GAME_ID, pct>=.6);
   if(pct>=.6){
     engine.reportScore(Math.round(_score/2));
     engine.spawnConfetti();
-    if(KZL.getLevel(GAME_ID)===_level&&_level<20){
+    if(KZL.getLevel(GAME_ID)===_level){
       const nl=KZL.nextLevel(GAME_ID);
       setTimeout(()=>KZL.showLevelUp(GAME_ID,nl,lang),400);
     }

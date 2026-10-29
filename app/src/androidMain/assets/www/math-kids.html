@@ -195,6 +195,12 @@ const MATH_CFG = [
   {ops:['+','-','×','÷'],maxA:50, maxB:15,dr:40},// 19
   {ops:['+','-','×','÷'],maxA:60, maxB:15,dr:50},// 20
 ];
+/* Past 20 the numbers keep growing, up to three-digit sums. */
+function mathCfgForLevel(n) {
+  if (n <= MATH_CFG.length) return MATH_CFG[n - 1];
+  const k = n - MATH_CFG.length;
+  return {ops:['+','-','×','÷'], maxA:Math.min(200, 60 + 10 * k), maxB:Math.min(25, 15 + Math.floor(k / 2)), dr:Math.min(100, 50 + 5 * k)};
+}
 
 /* ═══════════════════════════════════════════════
    MONEY MODE CONFIG & GENERATOR
@@ -290,7 +296,7 @@ let _hint, _lives, _timer, _answered, _endAction;
 function init() {
   _level = KZL.getLevel(GAME_ID);
   _cfg   = KZL.cfg(GAME_ID);
-  _mcfg  = MODE === 'money' ? moneyCfgForLevel(_level) : MATH_CFG[_level - 1];
+  _mcfg  = MODE === 'money' ? moneyCfgForLevel(_level) : mathCfgForLevel(_level);
   _total = _cfg.q;
   _qi    = 0;
   _score = 0;
@@ -442,6 +448,7 @@ function advance() {
 function levelDone() {
   const pct = _score / _total;
   const passed = pct >= 0.6;
+  KZL.recordResult(GAME_ID, passed);
 
   if (passed && KZL.getLevel(GAME_ID) === _level) {
     KZL.nextLevel(GAME_ID);
@@ -496,14 +503,14 @@ function buildDots() {
 }
 
 function openLevelSelector() {
-  const max = KZL.getLevel(GAME_ID);
+  const max = KZL.getBest(GAME_ID);
   const grid = document.getElementById('lvl-grid');
   grid.innerHTML = '';
-  for (let n = 1; n <= 20; n++) {
-    const cfg = KZL.CONFIGS[n - 1];
+  for (const {n} of KZL.levelWindow(GAME_ID)) {
+    const cfg = KZL.cfgFor(n);
     const btn = document.createElement('button');
     btn.className = 'lvl-btn' + (n === _level ? ' current' : '') + (n > max ? ' locked' : '');
-    const opsStr = MODE === 'money' ? '💰x' + moneyCfgForLevel(n).count : MATH_CFG[n - 1].ops.join('');
+    const opsStr = MODE === 'money' ? '💰x' + moneyCfgForLevel(n).count : mathCfgForLevel(n).ops.join('');
     btn.innerHTML = `${cfg.stars}<br><small>Lv${n}</small><br><small style="font-size:9px;opacity:.7">${opsStr}</small>`;
     if (n <= max) btn.onclick = () => { _level = n; KZL.setLevel(GAME_ID, n); closeLevelSelector(); init(); };
     grid.appendChild(btn);

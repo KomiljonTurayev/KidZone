@@ -109,6 +109,12 @@ fun MainScreen(
     val context = LocalContext.current
     val webMgrRef = remember { mutableStateOf<KidWebViewManager?>(null) }
 
+    // Game levels are kept per child: tell the WebView who is playing now.
+    LaunchedEffect(activeProfile?.id, webMgrRef.value) {
+        val id = activeProfile?.id?.let(::jsSafeId) ?: return@LaunchedEffect
+        webMgrRef.value?.evaluateJavascript("try{localStorage.setItem('kz-native-profile','$id')}catch(e){}")
+    }
+
     LaunchedEffect(uiState.pendingDeepLinkContentId) {
         val contentId = uiState.pendingDeepLinkContentId ?: return@LaunchedEffect
         webMgrRef.value?.evaluateJavascript("if(window.playContent)playContent('$contentId')")
@@ -201,8 +207,9 @@ fun MainScreen(
                             ChallengeBridge(challengeViewModel, context),
                             "AndroidChallenge",
                         )
+                        val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
                         mgr.loadUrl(
-                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}"
+                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}"
                         )
                         webMgrRef.value = mgr
                         addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
@@ -468,3 +475,6 @@ fun MainScreen(
     }
 }
 
+
+/** Profile ids are UUIDs; anything else is dropped before it goes into a JS string. */
+internal fun jsSafeId(id: String): String = id.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
