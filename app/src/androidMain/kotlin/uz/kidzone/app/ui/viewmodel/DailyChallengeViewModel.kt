@@ -64,6 +64,8 @@ open class DailyChallengeViewModel(
 
     fun gameLabel(id: String, lang: String): String? = repository.gameLabel(id, lang)
 
+    fun gameIds(): List<String> = repository.gameIds()
+
     fun updateGamesList(json: String) {
         repository.updateGamesList(json)
         activeProfileId?.let { loadChallenge(it) }

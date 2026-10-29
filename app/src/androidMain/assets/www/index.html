@@ -147,6 +147,15 @@
     .tk-bar i{display:block;height:100%;background:linear-gradient(90deg,#FFB74D,#FF6B35);border-radius:3px}
     .tk-go{background:#FF6B35;color:#fff;border:none;border-radius:14px;padding:6px 12px;font-size:12px;font-weight:900;cursor:pointer}
     .tk-crown{text-align:center;font-size:14px;font-weight:900;color:#7B1FA2;padding-top:6px}
+    #goal-card{background:linear-gradient(135deg,#7B1FA2,#E91E63);color:#fff;border-radius:20px;padding:12px 14px;margin:0 var(--pad) 12px;box-shadow:0 4px 0 rgba(0,0,0,0.12);display:flex;align-items:center;gap:12px}
+    #goal-card.h{display:none}
+    .gl-em{font-size:34px}
+    .gl-body{flex:1}
+    .gl-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:15px}
+    .gl-sub{font-size:12px;font-weight:800;opacity:.92;margin-top:2px}
+    .gl-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.3);margin-top:6px;overflow:hidden}
+    .gl-bar i{display:block;height:100%;background:#FFD600;border-radius:3px}
+    .gl-go{background:#fff;color:#7B1FA2;border:none;border-radius:14px;padding:7px 12px;font-size:12px;font-weight:900;cursor:pointer}
 
     /* ── LEVEL CARD ── */
     #level-card{
@@ -1180,6 +1189,9 @@
       </div>
     </div>
 
+    <!-- PARENT'S CHALLENGE -->
+    <div id="goal-card" class="h"></div>
+
     <!-- TODAY'S TASKS -->
     <div id="tasks-card" class="h"></div>
 
@@ -1890,6 +1902,7 @@
     // Legacy sync (will be fully integrated into GameManager)
     function updateLangUI() {
         if (window.kzTasks) kzTasks.rerender();
+        if (window.kzGoal) kzGoal.rerender();
         const t = T[app.translator.lang];
         document.getElementById("hero-h").innerHTML = t.heroH;
         document.getElementById("hero-p").innerHTML = t.heroP;

@@ -79,6 +79,13 @@ D C dan oldin: C ning 2-vazifasi `game_progress` ga tayanadi.
 - Real telefonda (USB): Hayvonlar 1 → 22-darajaga `setLevel` bilan sakrab, 21-daraja ochilishi, "Keyingi" tugmasi 20 dan keyin ham chiqishi; ikki profil bilan darajalar alohidaligi.
 - Mukofot navbati: level-up + badge bir vaqtda — ikkalasi ketma-ket ko'rinadi.
 
+## Amalga oshirishdagi o'zgarishlar (2026-10-29)
+
+- E (birga o'ynash): ota-onaga qiyinroq savol o'rniga **yordam (💡) berilmaydi** — har o'yinni qayta yozmaslik uchun. Rejim 10 ta savolli o'yinda (`KZL.duo`, `?duo=1`).
+- E (chaqiruv): hozircha **bitta qurilmada** — Room `parent_challenge` (migratsiya 6→7), bildirishnoma va oila qurilmalariga sinxron yo'q (backend kerak, keyingi qadam).
+- D: panel darajalarni shu qurilmadagi Room'dan oladi; boshqa oila qurilmasidagi `progress` hujjatlarini o'qish keyingi qadam.
+- C: kunlik vazifa kartasi ilgari umuman ko'rinmas edi (`#challenge-bar` yashirilgan) — endi `#tasks-card`.
+
 ## Doiradan tashqari
 
 - 16 ta arkada o'yiniga daraja (keyingi faza).

@@ -1403,6 +1403,45 @@ window.kzTasks = {
     },
 };
 
+/** The goal a parent set in the dashboard, sent by the app (MainScreen); null clears it. */
+window.kzGoal = {
+    data: null,
+    T: {
+        uz: {title: "🎯 Ota-onangdan chaqiruv!", goal: "{g}da {n}-darajaga chiq", now: "Hozir: {b}-daraja",
+             go: "Boshla", done: "✅ Chaqiruv bajarildi!", show: "Ota-onangga ko'rsat — ular xursand bo'ladi 🎉"},
+        ru: {title: "🎯 Вызов от родителей!", goal: "Дойди до {n} уровня в «{g}»", now: "Сейчас: уровень {b}",
+             go: "Вперёд", done: "✅ Вызов выполнен!", show: "Покажи родителям — они обрадуются 🎉"},
+        en: {title: "🎯 A challenge from your parent!", goal: "Reach level {n} in {g}", now: "Now: level {b}",
+             go: "Go", done: "✅ Challenge done!", show: "Show your parent — they'll be so happy 🎉"},
+    },
+    render(data) {
+        const was = this.data;
+        this.data = data;
+        this.rerender();
+        if (data && data.done && was && !was.done && window.app) app.spawnFireworks();
+    },
+    rerender() {
+        const card = document.getElementById('goal-card');
+        if (!card || !window.app) return;
+        if (!this.data) { card.classList.add('h'); return; }
+        const d = this.data, lang = app.translator.lang, t = this.T[lang] || this.T.en;
+        const g = app.games.find(x => x.id === d.gameId);
+        const name = g ? (typeof g.name === 'object' ? (g.name[lang] || g.name.en) : g.name) : d.gameId;
+        const pct = Math.min(100, Math.round(100 * d.best / d.target));
+        card.innerHTML = d.done
+            ? `<div class="gl-em">🏆</div><div class="gl-body"><div class="gl-title">${t.done}</div><div class="gl-sub">${t.show}</div></div>`
+            : `<div class="gl-em">${g ? g.em : '🎯'}</div><div class="gl-body"><div class="gl-title">${t.title}</div>` +
+              `<div class="gl-sub"></div><div class="gl-sub">${t.now.replace('{b}', d.best)}</div>` +
+              `<div class="gl-bar"><i style="width:${pct}%"></i></div></div>` +
+              (g ? `<button class="gl-go">${t.go}</button>` : '');
+        const sub = card.querySelector('.gl-sub');
+        if (sub && !d.done) sub.textContent = t.goal.replace('{g}', name).replace('{n}', d.target);
+        const go = card.querySelector('.gl-go');
+        if (go) go.onclick = () => app.openGame(g);
+        card.classList.remove('h');
+    },
+};
+
 // Initialize application
 let app;
 window.addEventListener("load", () => {

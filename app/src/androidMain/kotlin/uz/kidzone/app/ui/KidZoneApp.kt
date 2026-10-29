@@ -83,6 +83,10 @@ fun KidZoneApp(
             firestoreSync = uz.kidzone.app.FirestoreSync.getInstance(),
         )
     }
+    val parentChallenge = remember {
+        val db = KidZoneDatabase.getInstance(context)
+        uz.kidzone.app.data.ParentChallengeRepository(db.parentChallengeDao(), db.levelUpDao())
+    }
     val challengeViewModel: DailyChallengeViewModel = viewModel(
         factory = DailyChallengeViewModelFactory(challengeRepository) { prefs.getString("kz_age", "2-4") ?: "2-4" }
     )
@@ -144,6 +148,7 @@ fun KidZoneApp(
                         profileViewModel = profileViewModel,
                         challengeViewModel = challengeViewModel,
                         gameProgress = gameProgress,
+                        parentChallenge = parentChallenge,
                         onOpenDashboard = { navController.navigate("dashboard") },
                         onOpenSleep = { navController.navigate("sleep") },
                         onOpenPremium = { navController.navigate("premium") },
@@ -187,6 +192,7 @@ fun KidZoneApp(
                         profileViewModel = profileViewModel,
                         challengeViewModel = challengeViewModel,
                         gameProgress = gameProgress,
+                        parentChallenge = parentChallenge,
                         onNavigateToAddEdit = { profileId ->
                             navController.navigate("add_edit_profile/${profileId ?: "new"}")
                         },

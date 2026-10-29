@@ -14,8 +14,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         DailyChallengeEntity::class,
         StreakEntity::class,
         LevelUpEntity::class,
+        ParentChallengeEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = false,
 )
 abstract class KidZoneDatabase : RoomDatabase() {
@@ -24,6 +25,7 @@ abstract class KidZoneDatabase : RoomDatabase() {
     abstract fun dailyChallengeDao(): DailyChallengeDao
     abstract fun streakDao(): StreakDao
     abstract fun levelUpDao(): LevelUpDao
+    abstract fun parentChallengeDao(): ParentChallengeDao
 
     companion object {
         @Volatile private var instance: KidZoneDatabase? = null
@@ -81,6 +83,16 @@ abstract class KidZoneDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `parent_challenge` " +
+                    "(`profileId` TEXT NOT NULL, `gameId` TEXT NOT NULL, `targetLevel` INTEGER NOT NULL, " +
+                    "`createdAt` INTEGER NOT NULL, `completedAt` INTEGER, PRIMARY KEY(`profileId`))"
+                )
+            }
+        }
+
         fun getInstance(context: Context): KidZoneDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
@@ -88,7 +100,7 @@ abstract class KidZoneDatabase : RoomDatabase() {
                     KidZoneDatabase::class.java,
                     "kidzone.db",
                 )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                 .build().also { instance = it }
             }
     }

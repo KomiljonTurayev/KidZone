@@ -40,6 +40,9 @@ open class DailyChallengeRepository(
         } catch (_: Exception) {}
     }
 
+    /** Catalog game ids in catalog order (popular first). */
+    open fun gameIds(): List<String> = gamesList.map { it.id }
+
     /** "🐾 Animals" for a catalog game id, in [lang] when the catalog has it; null if unknown. */
     open fun gameLabel(id: String, lang: String): String? {
         val g = gamesList.firstOrNull { it.id == id } ?: return null

@@ -49,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import uz.kidzone.app.data.GameProgressRepository
+import uz.kidzone.app.data.ParentChallengeRepository
 import androidx.compose.runtime.setValue
 import uz.kidzone.app.PinUtil
 import uz.kidzone.app.ui.screens.PinGate
@@ -94,6 +95,7 @@ fun MainScreen(
     profileViewModel: ProfileViewModel,
     challengeViewModel: DailyChallengeViewModel,
     gameProgress: GameProgressRepository,
+    parentChallenge: ParentChallengeRepository,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
     onOpenPremium: () -> Unit = {},
@@ -120,6 +122,23 @@ fun MainScreen(
         val mgr = webMgrRef.value ?: return@LaunchedEffect
         if (challengeState.tasks.isEmpty()) return@LaunchedEffect
         mgr.evaluateJavascript("window.kzTasks&&kzTasks.render(${tasksJson(challengeState.tasks, challengeState.streakCount)})")
+    }
+
+    // The parent's challenge card on the home screen; levelTick refreshes "you are at level N".
+    var levelTick by remember { mutableStateOf(0) }
+    val parentGoal by remember(activeProfile?.id) {
+        activeProfile?.id?.let(parentChallenge::observe) ?: kotlinx.coroutines.flow.flowOf(null)
+    }.collectAsStateWithLifecycle(initialValue = null)
+    LaunchedEffect(parentGoal, levelTick, webMgrRef.value, challengeState.tasks) {
+        val mgr = webMgrRef.value ?: return@LaunchedEffect
+        val goal = parentGoal
+        val json = if (goal == null) "null" else org.json.JSONObject().apply {
+            put("gameId", goal.gameId)
+            put("target", goal.targetLevel)
+            put("best", parentChallenge.bestLevel(goal.profileId, goal.gameId))
+            put("done", goal.completedAt != null)
+        }.toString()
+        mgr.evaluateJavascript("window.kzGoal&&kzGoal.render($json)")
     }
 
     // Game levels are kept per child: tell the WebView who is playing now.
@@ -198,7 +217,11 @@ fun MainScreen(
                             onGameLaunched = statsManager::onGameLaunched,
                             onLevelReached = { gameId, level ->
                                 val pid = profileViewModel.activeProfile.value?.id
-                                if (pid != null) scope.launch { gameProgress.onLevelReached(pid, gameId, level) }
+                                if (pid != null) scope.launch {
+                                    gameProgress.onLevelReached(pid, gameId, level)
+                                    parentChallenge.onLevelReached(pid, gameId, level)
+                                    levelTick++
+                                }
                                 challengeViewModel.onLevelUp()
                             },
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
