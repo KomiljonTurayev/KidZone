@@ -1352,6 +1352,21 @@ class BadgeManager {
     }
 }
 
+/** Night mode for the home screen; the app decides (system / parent's pick) and calls apply(). */
+window.kzTheme = {
+    apply(mode) {
+        const dark = mode === 'dark';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        const ic = document.getElementById('theme-ic');
+        if (ic) ic.textContent = dark ? '☀️' : '🌙';
+    },
+    toggle() {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        this.apply(next);
+        if (window.AndroidBridge && window.AndroidBridge.setThemeMode) window.AndroidBridge.setThemeMode(next);
+    },
+};
+
 /** Today's three tasks, sent by the app (MainScreen.tasksJson) whenever they change. */
 window.kzTasks = {
     data: null,
@@ -1446,6 +1461,7 @@ window.kzGoal = {
 let app;
 window.addEventListener("load", () => {
     window.profileManager = new ProfileManager();
+    kzTheme.apply(document.documentElement.dataset.theme);
     // The native app passes the user's chosen language/age as URL query params
     // (e.g. index.html?lang=uz&age=2-4) so they're available synchronously here,
     // before any localStorage read. Seed the active profile's keys from them so

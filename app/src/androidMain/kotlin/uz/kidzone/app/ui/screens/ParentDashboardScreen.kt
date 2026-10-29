@@ -224,6 +224,18 @@ fun ParentDashboardScreen(
             SettingRow(if (savedPinHash.isNullOrEmpty()) tr("PIN o'rnatish", "Установить PIN", "Set PIN") else tr("PIN o'zgartirish", "Изменить PIN", "Change PIN"), onClick = { showSetPin = true }) {
                 Text("›", fontSize = 26.sp, color = Kid.Orange)
             }
+            val themeCtl = uz.kidzone.app.ui.theme.LocalThemeController.current
+            Text(tr("🌙 Tungi rejim", "🌙 Ночной режим", "🌙 Night mode"), style = MaterialTheme.typography.bodyLarge, color = Kid.Ink,
+                modifier = Modifier.padding(vertical = 6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    "system" to tr("📱 Tizim", "📱 Системный", "📱 System"),
+                    "light" to tr("☀️ Yorug'", "☀️ Светлый", "☀️ Light"),
+                    "dark" to tr("🌙 Tungi", "🌙 Ночной", "🌙 Night"),
+                ).forEach { (mode, label) ->
+                    KidChip(label, selected = themeCtl.mode == mode, modifier = Modifier.weight(1f)) { themeCtl.setMode(mode) }
+                }
+            }
             SettingRow(tr("Oila", "Семья", "Family"), onClick = { showFamily = true }) {
                 Text("›", fontSize = 26.sp, color = Kid.Orange)
             }
@@ -322,7 +334,7 @@ fun ParentDashboardScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            containerColor = Color.White,
+            containerColor = uz.kidzone.app.ui.components.Kid.Card,
             shape = RoundedCornerShape(28.dp),
             icon = { Text("⚠️", fontSize = 36.sp) },
             title = { Text(tr("Diqqat!", "Внимание!", "Warning!"), color = Kid.Ink) },

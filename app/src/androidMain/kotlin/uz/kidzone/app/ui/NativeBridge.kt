@@ -26,6 +26,8 @@ internal class NativeBridge(
     private val onGameLaunched: (String) -> Unit,
     /** A child reached a new best level in a game (Faza 18); checked in GameProgressRepository. */
     private val onLevelReached: (String, Int) -> Unit,
+    /** The 🌙/☀️ button on the home screen: "light" or "dark". */
+    private val onThemeModeChanged: (String) -> Unit,
     /** Persists a language/age the child picked in the WebView header (already validated). */
     private val onLanguageChanged: (String) -> Unit,
     private val onAgeChanged: (String) -> Unit,
@@ -218,6 +220,12 @@ internal class NativeBridge(
             viewModel.setInGame(true)
             onGameLaunched(gameId)
         }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun setThemeMode(mode: String) {
+        if (mode !in uz.kidzone.app.ui.theme.THEME_MODES) return
+        onMain { onThemeModeChanged(mode) }
     }
 
     @android.webkit.JavascriptInterface

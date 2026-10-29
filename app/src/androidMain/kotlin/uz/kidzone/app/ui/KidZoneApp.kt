@@ -46,9 +46,10 @@ fun KidZoneApp(
 ) {
     val mainUiState by mainViewModel.state.collectAsState()
     val appLang by rememberAppLang(prefs)
+    val theme = uz.kidzone.app.ui.theme.rememberThemeController(prefs)
     if (mainUiState.isBanned) {
-        KidZoneTheme {
-            CompositionLocalProvider(LocalAppLang provides appLang) { BannedScreen() }
+        KidZoneTheme(darkTheme = theme.dark) {
+            CompositionLocalProvider(LocalAppLang provides appLang, uz.kidzone.app.ui.theme.LocalThemeController provides theme) { BannedScreen() }
         }
         return
     }
@@ -99,8 +100,8 @@ fun KidZoneApp(
         else -> "main"
     }
 
-    KidZoneTheme {
-        CompositionLocalProvider(LocalAppLang provides appLang) {
+    KidZoneTheme(darkTheme = theme.dark) {
+        CompositionLocalProvider(LocalAppLang provides appLang, uz.kidzone.app.ui.theme.LocalThemeController provides theme) {
             NavHost(navController = navController, startDestination = startDestination) {
                 composable("onboarding") {
                     OnboardingScreen(

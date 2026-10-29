@@ -108,6 +108,8 @@ fun MainScreen(
     val uiState by mainViewModel.state.collectAsStateWithLifecycle()
     val activeProfile by profileViewModel.activeProfile.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val theme = uz.kidzone.app.ui.theme.LocalThemeController.current
+    val setThemeMode by rememberUpdatedState(theme.setMode)
 
     LaunchedEffect(activeProfile) {
         activeProfile?.id?.let { challengeViewModel.onProfileChanged(it) }
@@ -139,6 +141,11 @@ fun MainScreen(
             put("done", goal.completedAt != null)
         }.toString()
         mgr.evaluateJavascript("window.kzGoal&&kzGoal.render($json)")
+    }
+
+    // Night mode for the WebView home screen (the games keep their own colors).
+    LaunchedEffect(theme.dark, webMgrRef.value, challengeState.pageLoads) {
+        webMgrRef.value?.evaluateJavascript("window.kzTheme&&kzTheme.apply('${if (theme.dark) "dark" else "light"}')")
     }
 
     // Game levels are kept per child: tell the WebView who is playing now.
@@ -215,6 +222,7 @@ fun MainScreen(
                             onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
                             // Feeds the parent dashboard's "games played today".
                             onGameLaunched = statsManager::onGameLaunched,
+                            onThemeModeChanged = { setThemeMode(it) },
                             onLevelReached = { gameId, level ->
                                 val pid = profileViewModel.activeProfile.value?.id
                                 if (pid != null) scope.launch {
@@ -250,7 +258,7 @@ fun MainScreen(
                         )
                         val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
                         mgr.loadUrl(
-                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}"
+                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}&theme=${if (theme.dark) "dark" else "light"}"
                         )
                         webMgrRef.value = mgr
                         addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
@@ -425,7 +433,7 @@ fun MainScreen(
         AlertDialog(
             onDismissRequest = { mainViewModel.dismissExitDialog() },
             shape = RoundedCornerShape(24.dp),
-            containerColor = Color.White,
+            containerColor = uz.kidzone.app.ui.components.Kid.Card,
             icon = { Text(if (uiState.isExitFromGame) "🎮" else "👋", fontSize = 40.sp) },
             title = {
                 Text(
