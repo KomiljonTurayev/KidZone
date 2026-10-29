@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uz.kidzone.app.ai.AishaSpeechGenerator
 import uz.kidzone.app.ai.KidzoCompanionEngine
+import uz.kidzone.app.ai.KidzoReply
 import uz.kidzone.app.ai.KidzoVoiceRecognizer
 import uz.kidzone.app.arch.ViewModel
 import uz.kidzone.app.kidzo.ContentCard
@@ -51,6 +52,12 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     private val _lastSpokenText = MutableStateFlow(initialGreeting)
     val lastSpokenText: StateFlow<String> = _lastSpokenText.asStateFlow()
+
+    /** Set when the family's free questions for today are used up; the screen offers Premium. */
+    private val _dailyLimitReached = MutableStateFlow(false)
+    val dailyLimitReached: StateFlow<Boolean> = _dailyLimitReached.asStateFlow()
+
+    fun dailyLimitHandled() { _dailyLimitReached.value = false }
 
     private val _rmsLevel = MutableStateFlow(0f)
     val rmsLevel: StateFlow<Float> = _rmsLevel.asStateFlow()
@@ -87,7 +94,13 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
         scope.launch {
             val reply = try {
-                KidzoCompanionEngine.ask(query, lang, childName)
+                when (val answer = KidzoCompanionEngine.ask(query, lang, childName)) {
+                    is KidzoReply.Answer -> answer.text
+                    KidzoReply.DailyLimitReached -> {
+                        _dailyLimitReached.value = true
+                        dailyLimitReply(lang, childName)
+                    }
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error in KidzoCompanionEngine: ${e.message}", e)
                 fallbackReply(lang, childName)
@@ -290,6 +303,12 @@ internal fun greeting(lang: String): String = when (lang) {
     "ru" -> "Привет, дружок! 🐥 Я Kidzo. О чём поговорим?"
     "en" -> "Hi, friend! 🐥 I'm Kidzo. What shall we talk about?"
     else -> "Salom, do'stim! 🐥 Men Kidzo bo'laman. Nima haqida gaplashamiz?"
+}
+
+internal fun dailyLimitReply(lang: String, childName: String): String = when (lang) {
+    "ru" -> "Сегодня мы так много болтали, ${childName.ifBlank { "дружок" }}! 🌙 Kidzo немного отдохнёт — давай поиграем, а завтра продолжим!"
+    "en" -> "We talked so much today, ${childName.ifBlank { "friend" }}! 🌙 Kidzo needs a little rest — let's play, and we'll chat again tomorrow!"
+    else -> "Bugun juda ko'p suhbatlashdik, ${childName.ifBlank { "do'stim" }}! 🌙 Kidzo biroz dam oladi — keling o'ynaymiz, ertaga yana gaplashamiz!"
 }
 
 internal fun fallbackReply(lang: String, childName: String): String = when (lang) {

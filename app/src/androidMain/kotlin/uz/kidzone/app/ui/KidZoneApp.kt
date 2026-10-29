@@ -139,6 +139,7 @@ fun KidZoneApp(
                         challengeViewModel = challengeViewModel,
                         onOpenDashboard = { navController.navigate("dashboard") },
                         onOpenSleep = { navController.navigate("sleep") },
+                        onOpenPremium = { navController.navigate("premium") },
                         onRequireAccount = { feature -> navController.navigate("account/${feature.name}") },
                         unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
                         onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },

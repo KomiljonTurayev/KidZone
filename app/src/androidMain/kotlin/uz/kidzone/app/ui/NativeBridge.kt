@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import uz.kidzone.app.MusicManager
 import uz.kidzone.app.ai.StoryGenerator
+import uz.kidzone.app.ai.StoryResult
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 
 // Native JavaScript bridge
@@ -21,6 +22,7 @@ internal class NativeBridge(
     private val onAskKidzo: (String) -> Unit,
     private val isAiAvailable: () -> Boolean,
     private val onAiLocked: () -> Unit,
+    private val onAiDailyLimit: () -> Unit,
     /** Persists a language/age the child picked in the WebView header (already validated). */
     private val onLanguageChanged: (String) -> Unit,
     private val onAgeChanged: (String) -> Unit,
@@ -225,10 +227,16 @@ internal class NativeBridge(
         }
         scope.launch {
             try {
-                val story = StoryGenerator.generate(lang, ageRange, childName, scenario)
-                onMain {
-                    val payload = JSONObject().put("title", story.title).put("text", story.text).toString()
-                    evalJs("window.onAiStoryReady(${JSONObject.quote(payload)})")
+                when (val result = StoryGenerator.generate(lang, ageRange, childName, scenario)) {
+                    is StoryResult.Ready -> onMain {
+                        val story = result.story
+                        val payload = JSONObject().put("title", story.title).put("text", story.text).toString()
+                        evalJs("window.onAiStoryReady(${JSONObject.quote(payload)})")
+                    }
+                    StoryResult.DailyLimitReached -> onMain {
+                        evalJs("window.onAiStoryError && window.onAiStoryError()")
+                        onAiDailyLimit()
+                    }
                 }
             } catch (e: Exception) {
                 onMain {

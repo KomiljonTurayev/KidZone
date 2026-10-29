@@ -92,6 +92,7 @@ fun MainScreen(
     challengeViewModel: DailyChallengeViewModel,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
+    onOpenPremium: () -> Unit = {},
     onRequireAccount: (AccountFeature) -> Unit = {},
     unlockedFeature: AccountFeature? = null,
     onUnlockedFeatureHandled: () -> Unit = {},
@@ -115,6 +116,7 @@ fun MainScreen(
     }
     
     var showKidzoSheet by remember { mutableStateOf(false) }
+    var aiLimit by remember { mutableStateOf<AiLimitKind?>(null) }
 
     val kidzoAgentRef = remember {
         val filter = try { ContentFilter.fromAssets(context) } catch (e: Exception) { null }
@@ -172,6 +174,7 @@ fun MainScreen(
                             onOpenKidzo = { openKidzo() },
                             isAiAvailable = { aiAvailable() },
                             onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
+                            onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
                             // Without these the next launch's ?lang=/?age= would undo the child's pick.
                             onLanguageChanged = { lang ->
                                 prefs.edit().putString("kz_lang", lang).apply()
@@ -420,6 +423,26 @@ fun MainScreen(
                     border = BorderStroke(1.dp, KidZoneOrange),
                 ) { Text(tr("Yoʻq, qolish", "Нет, остаться", "No, stay")) }
             },
+        )
+    }
+
+    // The family's free AI allowance for today is used up: offer Premium to a parent.
+    val kidzoLimitReached = kidzoViewModel?.dailyLimitReached?.collectAsStateWithLifecycle()?.value == true
+    LaunchedEffect(kidzoLimitReached) {
+        if (kidzoLimitReached) {
+            aiLimit = AiLimitKind.QUESTIONS
+            kidzoViewModel?.dailyLimitHandled()
+        }
+    }
+    aiLimit?.let { kind ->
+        AiDailyLimitDialog(
+            kind = kind,
+            parentPinHash = activeProfile?.pinHash,
+            onOpenPremium = {
+                showKidzoSheet = false
+                onOpenPremium()
+            },
+            onDismiss = { aiLimit = null },
         )
     }
 
