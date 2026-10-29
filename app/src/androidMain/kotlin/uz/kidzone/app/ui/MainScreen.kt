@@ -118,7 +118,7 @@ fun MainScreen(
 
     // Today's tasks card on the WebView home screen (Faza 18).
     val challengeState by challengeViewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(challengeState.tasks, challengeState.streakCount, webMgrRef.value) {
+    LaunchedEffect(challengeState.tasks, challengeState.streakCount, challengeState.pageLoads, webMgrRef.value) {
         val mgr = webMgrRef.value ?: return@LaunchedEffect
         if (challengeState.tasks.isEmpty()) return@LaunchedEffect
         mgr.evaluateJavascript("window.kzTasks&&kzTasks.render(${tasksJson(challengeState.tasks, challengeState.streakCount)})")
@@ -129,7 +129,7 @@ fun MainScreen(
     val parentGoal by remember(activeProfile?.id) {
         activeProfile?.id?.let(parentChallenge::observe) ?: kotlinx.coroutines.flow.flowOf(null)
     }.collectAsStateWithLifecycle(initialValue = null)
-    LaunchedEffect(parentGoal, levelTick, webMgrRef.value, challengeState.tasks) {
+    LaunchedEffect(parentGoal, levelTick, webMgrRef.value, challengeState.pageLoads) {
         val mgr = webMgrRef.value ?: return@LaunchedEffect
         val goal = parentGoal
         val json = if (goal == null) "null" else org.json.JSONObject().apply {

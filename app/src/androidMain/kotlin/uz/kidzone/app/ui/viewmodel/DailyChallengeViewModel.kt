@@ -24,6 +24,8 @@ data class ChallengeState(
     val streakCount: Int = 0,
     val isLoading: Boolean = true,
     val celebrateMilestone: Int? = null,
+    /** Bumped each time the WebView page (re)loads, so its cards get today's data again. */
+    val pageLoads: Int = 0,
 )
 
 open class DailyChallengeViewModel(
@@ -52,11 +54,12 @@ open class DailyChallengeViewModel(
             val streak = repository.getStreak(profileId)
             if (activeProfileId != profileId) return@launch
             _state.update {
-                ChallengeState(
+                it.copy(
                     challenge = tasks.firstOrNull(),
                     tasks = tasks,
                     streakCount = streak.count,
                     isLoading = false,
+                    celebrateMilestone = null,
                 )
             }
         }
@@ -68,6 +71,7 @@ open class DailyChallengeViewModel(
 
     fun updateGamesList(json: String) {
         repository.updateGamesList(json)
+        _state.update { it.copy(pageLoads = it.pageLoads + 1) }
         activeProfileId?.let { loadChallenge(it) }
     }
 
