@@ -1294,6 +1294,11 @@ class BadgeManager {
         if (prog) prog.textContent = earned + ' / ' + total + label;
 
         grid.innerHTML = '';
+        this.renderStickers(grid, lang);
+        const bhead = document.createElement('div');
+        bhead.className = 'stk-head';
+        bhead.textContent = (lang==='uz' ? '🏅 Yutuqlar' : lang==='ru' ? '🏅 Достижения' : '🏅 Achievements') + ' • ' + earned + ' / ' + total;
+        grid.appendChild(bhead);
         BADGE_DEFS.forEach(def => {
             const ok   = this.isEarned(def.id);
             const name = def.name[lang] || def.name.uz;
@@ -1302,6 +1307,39 @@ class BadgeManager {
             card.innerHTML =
                 '<div class="bdg-em">' + (ok ? def.emoji : '🔒') + '</div>' +
                 '<div class="bdg-nm">' + (ok ? name : '???') + '</div>';
+            grid.appendChild(card);
+        });
+    }
+
+    /** Stickers the games hand out every 5 levels (kz-ui.js keeps them per child). */
+    renderStickers(grid, lang) {
+        const pid = localStorage.getItem('kz-native-profile') || localStorage.getItem('kz-active-profile') || 'p1';
+        let stickers = [];
+        try { stickers = JSON.parse(localStorage.getItem('kzl-stickers-' + pid) || '[]'); } catch (e) {}
+        const title = {uz: '🎨 Stikerlar albomi', ru: '🎨 Альбом наклеек', en: '🎨 Sticker album'};
+        const empty = {uz: "Har 5 darajada yangi stiker! O'ynashda davom et 🚀",
+                       ru: 'Новая наклейка каждые 5 уровней! Играй дальше 🚀',
+                       en: 'A new sticker every 5 levels! Keep playing 🚀'};
+        const lvl = {uz: '-daraja', ru: ' ур.', en: ' lvl'};
+        const head = document.createElement('div');
+        head.className = 'stk-head';
+        head.textContent = (title[lang] || title.en) + ' • ' + stickers.length;
+        grid.appendChild(head);
+        if (!stickers.length) {
+            const e = document.createElement('div');
+            e.className = 'stk-empty';
+            e.textContent = empty[lang] || empty.en;
+            grid.appendChild(e);
+            return;
+        }
+        stickers.slice().reverse().forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'bdg-card bdg-earned' + (s.gold ? ' stk-gold' : '');
+            const game = (window.app && app.games || []).find(g => g.id === s.g || (g.file || '').startsWith(s.g));
+            const gname = game ? (typeof game.name === 'object' ? (game.name[lang] || game.name.en) : game.name) : '';
+            card.innerHTML = '<div class="bdg-em"></div><div class="bdg-nm"></div>';
+            card.querySelector('.bdg-em').textContent = s.e;
+            card.querySelector('.bdg-nm').textContent = (gname ? gname + ' • ' : '') + s.lv + (lvl[lang] || lvl.en);
             grid.appendChild(card);
         });
     }

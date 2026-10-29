@@ -54,6 +54,34 @@ function currentAge() {
   return AGE_BAND[a] !== undefined ? a : '5-7';
 }
 function key(kind, id) { return 'kzl-' + kind + '-' + profileId() + '-' + id; }
+function langOf() {
+  return new URLSearchParams(location.search).get('lang') || localStorage.getItem('kz-lang') || 'en';
+}
+
+/* ══ STICKERS ══════════════════════════════════════════════════════════
+   Every 5th level gives a sticker, every 10th also +100 ⭐, every 50th a gold one.
+   The album (index.html, 🏅) reads kzl-stickers-<profile>. */
+const STICKERS = "🦁🐯🐼🐨🐸🐵🦊🐰🐻🐷🐮🦄🐲🐙🦋🐞🐢🐬🐳🦖🦕🐧🦉🦜🌈⭐🌙☀️🌸🌻🍀🍎🍓🍉🍩🍦🧁🚀🛸🚂🚁⛵🎈🎨🎸🥁🎺🏰🗿🌋🏝️💎👑🎁🧸🪁🪀🔮🧩".match(/\p{Extended_Pictographic}️?/gu);
+const GOLD = "🏆🥇👑💎🌟";
+function stickerFor(id, level) {
+  if (level % 50 === 0) return {e: [...GOLD][(level / 50 - 1) % [...GOLD].length], gold: true};
+  let h = level;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return {e: STICKERS[h % STICKERS.length], gold: false};
+}
+function stickerKey() { return 'kzl-stickers-' + profileId(); }
+function readStickers() {
+  try { return JSON.parse(localStorage.getItem(stickerKey()) || '[]'); } catch (e) { return []; }
+}
+const L = {
+  sticker: {uz: "Yangi stiker!", ru: "Новая наклейка!", en: "New sticker!"},
+  bonus:   {uz: "Katta bayram! +100 ⭐", ru: "Большой праздник! +100 ⭐", en: "Big party! +100 ⭐"},
+  map:     {uz: "Darajalar xaritasi", ru: "Карта уровней", en: "Level map"},
+  next:    {uz: "Keyingi sovg'a", ru: "Следующий подарок", en: "Next gift"},
+  level:   {uz: "daraja", ru: "уровень", en: "level"},
+  ok:      {uz: "Zo'r! ✨", ru: "Ура! ✨", en: "Yay! ✨"},
+};
+function tr(o) { const l = langOf(); return o[l] || o.en; }
 function readInt(k) { const v = parseInt(localStorage.getItem(k)); return v > 0 ? v : 0; }
 
 /* Levels used to live in kzl-<gameId>, shared by every child on the phone.
@@ -104,6 +132,29 @@ const CSS = `
 .kzl-lup-txt{font-size:18px;font-weight:800;margin:8px 0 22px;}
 .kzl-lup-btn{background:#FF6B35;color:#fff;border:none;border-radius:20px;padding:14px 34px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito','KZ Cyrillic',sans-serif;box-shadow:0 4px 0 #C94F20;transform:translateY(0);transition:transform .08s,box-shadow .08s;}
 .kzl-lup-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #C94F20;}
+.kzl-map-btn{bottom:136px;}
+.kzl-stk-big{display:inline-block;font-size:64px;line-height:1.1;animation:kzlPop .5s cubic-bezier(.34,1.56,.64,1);}
+.kzl-stk-big.gold{filter:drop-shadow(0 0 12px #FFD600);}
+.kzl-stk-row{display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:900;color:#7B1FA2;margin:-6px 0 14px;}
+.kzl-stk-row .kzl-stk-big{font-size:44px;}
+.kzl-stk-bonus{font-size:15px;font-weight:900;color:#FF6B35;margin:-6px 0 16px;}
+.kzl-burst{position:fixed;top:-40px;z-index:1100;font-size:28px;pointer-events:none;animation:kzlFall 1.6s ease-in forwards;}
+@keyframes kzlFall{to{transform:translateY(110vh) rotate(540deg);opacity:.6}}
+.kzl-map{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;background:linear-gradient(180deg,#B3E5FC 0%,#C8E6C9 55%,#FFF59D 100%);font-family:'Nunito','KZ Cyrillic',sans-serif;}
+.kzl-map-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 4px;font-size:20px;font-weight:900;color:#1B5E20;}
+.kzl-map-x{border:none;background:rgba(255,255,255,.85);border-radius:50%;width:40px;height:40px;font-size:18px;font-weight:900;color:#555;cursor:pointer;}
+.kzl-map-sub{padding:0 16px 8px;font-size:13px;font-weight:800;color:#33691E;}
+.kzl-map-path{flex:1;overflow-y:auto;padding:24px 0 48px;}
+.kzl-row{position:relative;height:84px;}
+.kzl-map-path{position:relative;}
+.kzl-map-line{position:absolute;left:0;top:24px;width:100%;pointer-events:none;}
+.kzl-map-line polyline{fill:none;stroke:rgba(255,255,255,.85);stroke-width:7;stroke-linecap:round;stroke-dasharray:2 12;vector-effect:non-scaling-stroke;}
+.kzl-node{position:absolute;top:12px;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;border:4px solid #fff;background:#FF6B35;color:#fff;font-size:20px;font-weight:900;box-shadow:0 5px 0 #C94F20,0 8px 18px rgba(0,0,0,.18);cursor:pointer;z-index:1;font-family:inherit;touch-action:manipulation;}
+.kzl-node.gift{background:#8E24AA;box-shadow:0 5px 0 #5E1675,0 8px 18px rgba(0,0,0,.18);}
+.kzl-node.locked{background:#CFD8DC;box-shadow:0 5px 0 #90A4AE;font-size:18px;cursor:default;}
+.kzl-node.cur{animation:kzlNode 1.4s ease-in-out infinite;outline:5px solid #FFD600;outline-offset:3px;}
+@keyframes kzlNode{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.1)}}
+.kzl-mark{position:absolute;top:-22px;right:-18px;font-size:30px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));}
 `;
 
 /* ══ PUBLIC API ════════════════════════════════════════════════════════ */
@@ -115,6 +166,7 @@ window.KZL = {
   /* ─── Level persistence (per child, no upper limit) ─── */
   /** The level being played. Replaying an old level lowers it; [getBest] keeps the record. */
   getLevel(id) {
+    this._gameId = this._gameId || id;
     migrate(id);
     return Math.max(1, readInt(key('lv', id)));
   },
@@ -134,9 +186,99 @@ window.KZL = {
   },
   nextLevel(id) {
     const next = this.getLevel(id) + 1;
+    const isNewBest = next > this.getBest(id);
     localStorage.removeItem(key('fails', id));
     this.setLevel(id, next);
+    if (isNewBest && next % 5 === 0) this._award(id, next);
     return next;
+  },
+
+  /** Stickers earned so far by the playing child: [{e, g, lv, gold}], oldest first. */
+  stickers: readStickers,
+  stickerFor,
+
+  _award(id, level) {
+    const s = Object.assign(stickerFor(id, level), {g: id, lv: level});
+    const all = readStickers();
+    all.push(s);
+    localStorage.setItem(stickerKey(), JSON.stringify(all));
+    s.bonus = level % 10 === 0;
+    if (s.bonus) {
+      const app = window.parent && window.parent.app;
+      if (app && app.addPoints) app.addPoints(100);
+    }
+    // Games that show the level-up card fold the sticker into it; the rest get their own card.
+    this._pending = s;
+    setTimeout(() => { if (this._pending === s) { this._pending = null; this._stickerCard(s); } }, 1200);
+  },
+
+  _stickerCard(s, onDone) {
+    this._inject();
+    const el = document.createElement('div');
+    el.className = 'kzl-level-up';
+    el.innerHTML =
+      `<div class="kzl-lup-card">
+        <div class="kzl-stk-big${s.gold ? ' gold' : ''}">${s.e}</div>
+        <div class="kzl-lup-txt">${tr(L.sticker)}</div>
+        ${s.bonus ? `<div class="kzl-stk-bonus">${tr(L.bonus)}</div>` : ''}
+        <button class="kzl-lup-btn">${tr(L.ok)}</button>
+      </div>`;
+    el.querySelector('button').onclick = () => { el.remove(); if (onDone) onDone(); };
+    document.body.appendChild(el);
+    if (s.bonus) this._burst();
+  },
+
+  _burst() {
+    for (let i = 0; i < 24; i++) {
+      const p = document.createElement('div');
+      p.className = 'kzl-burst';
+      p.textContent = ['🎉', '⭐', '✨', '🌟', '🎊'][i % 5];
+      p.style.left = (5 + Math.random() * 90) + 'vw';
+      p.style.animationDelay = (Math.random() * 0.6) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 2200);
+    }
+  },
+
+  /* ─── Level map: a winding path, gifts every 5 levels, castles every 10 ─── */
+  showMap(id, onPick) {
+    this._inject();
+    id = id || this._gameId;
+    if (!id) return;
+    const best = this.getBest(id), cur = this.getLevel(id);
+    const from = Math.max(1, best - 14), to = best + 5;
+    const got = {};
+    readStickers().filter(s => s.g === id).forEach(s => { got[s.lv] = s.e; });
+    const nextGift = Math.ceil((best + 1) / 5) * 5;
+    const X = [50, 74, 82, 74, 50, 26, 18, 26];
+    let rows = '';
+    const pts = [];
+    for (let n = to; n >= from; n--) {
+      pts.push(X[n % X.length] + ',' + ((to - n) * 84 + 42));
+      const locked = n > best;
+      const mark = n % 10 === 0 ? (got[n] || '🏰') : n % 5 === 0 ? (got[n] || '🎁') : '';
+      const cls = 'kzl-node' + (locked ? ' locked' : '') + (n === cur ? ' cur' : '') + (mark ? ' gift' : '');
+      rows += `<div class="kzl-row"><button class="${cls}" data-n="${n}" style="left:${X[n % X.length]}%">` +
+              `${mark ? `<span class="kzl-mark">${mark}</span>` : ''}${locked ? '🔒' : n}</button></div>`;
+    }
+    const el = document.createElement('div');
+    el.className = 'kzl-map';
+    el.innerHTML =
+      `<div class="kzl-map-hdr"><span>🗺️ ${tr(L.map)}</span><button class="kzl-map-x">✕</button></div>
+       <div class="kzl-map-sub">⭐ ${best} ${tr(L.level)} • 🎁 ${tr(L.next)}: ${nextGift}</div>
+       <div class="kzl-map-path"><svg class="kzl-map-line" viewBox="0 0 100 ${pts.length * 84}" preserveAspectRatio="none" style="height:${pts.length * 84}px"><polyline points="${pts.join(' ')}"/></svg>${rows}</div>`;
+    el.querySelector('.kzl-map-x').onclick = () => el.remove();
+    el.querySelectorAll('.kzl-node:not(.locked)').forEach(b => {
+      b.onclick = () => {
+        const n = +b.dataset.n;
+        this.setLevel(id, n);
+        el.remove();
+        if (onPick) onPick(n); else location.reload();
+      };
+    });
+    document.body.appendChild(el);
+    const c = el.querySelector('.kzl-node.cur') || el.querySelector('.kzl-node:not(.locked)');
+    if (c) c.scrollIntoView({block: 'center'});
   },
   /** Games report every finished round; two misses in a row soften the level. */
   recordResult(id, passed) {
@@ -220,6 +362,14 @@ window.KZL = {
     floatBtn.onclick = () => overlay.classList.remove('h');
     document.body.appendChild(floatBtn);
 
+    // Every game with a how-to also gets the level map, just above the ❓.
+    const mapBtn = document.createElement('button');
+    mapBtn.className = 'kzl-htp-btn kzl-map-btn';
+    mapBtn.textContent = '🗺️';
+    mapBtn.setAttribute('aria-label', tr(L.map));
+    mapBtn.onclick = () => this.showMap(cfg.levelId || this._gameId || cfg.id);
+    document.body.appendChild(mapBtn);
+
     const key = 'kzl-seen-' + (cfg.id || 'game');
     if (!localStorage.getItem(key)) {
       localStorage.setItem(key, '1');
@@ -250,6 +400,7 @@ window.KZL = {
           <div class="kzl-lup-stars" id="kzl-lup-s"></div>
           <div class="kzl-lup-num"   id="kzl-lup-n"></div>
           <div class="kzl-lup-txt"   id="kzl-lup-t"></div>
+          <div id="kzl-lup-k"></div>
           <button class="kzl-lup-btn" id="kzl-lup-b"></button>
         </div>`;
       document.body.appendChild(el);
@@ -257,6 +408,13 @@ window.KZL = {
     document.getElementById('kzl-lup-s').textContent = cfg ? cfg.stars : '🌟';
     document.getElementById('kzl-lup-n').textContent = newLevel;
     document.getElementById('kzl-lup-t').textContent = SUB[l] || SUB.en;
+    const s = this._pending;
+    this._pending = null;
+    document.getElementById('kzl-lup-k').innerHTML = s
+      ? `<div class="kzl-stk-row"><span class="kzl-stk-big${s.gold ? ' gold' : ''}">${s.e}</span>${tr(L.sticker)}</div>` +
+        (s.bonus ? `<div class="kzl-stk-bonus">${tr(L.bonus)}</div>` : '')
+      : '';
+    if (s && s.bonus) this._burst();
     const b = document.getElementById('kzl-lup-b');
     b.textContent = BTN[l] || BTN.en;
     b.onclick = () => { el.classList.add('h'); if (onContinue) onContinue(); };

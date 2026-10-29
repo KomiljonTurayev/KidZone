@@ -9,16 +9,16 @@ const vm = require('node:vm');
 const SRC = fs.readFileSync(
   path.join(__dirname, '..', 'app', 'src', 'androidMain', 'assets', 'www', 'kz-ui.js'), 'utf8');
 
-function load({search = '', store = {}, bridge = null} = {}) {
+function load({search = '', store = {}, bridge = null, app = null} = {}) {
   const data = {...store};
   const localStorage = {
     getItem: k => (k in data ? String(data[k]) : null),
     setItem: (k, v) => { data[k] = String(v); },
     removeItem: k => { delete data[k]; },
   };
-  const window = {AndroidBridge: bridge};
-  window.parent = window;
-  const ctx = {window, localStorage, location: {search}, URLSearchParams, document: {}};
+  // A game runs in an iframe; its parent is index.html with the star counter (app).
+  const window = {AndroidBridge: bridge, parent: {app}};
+  const ctx = {window, localStorage, location: {search}, URLSearchParams, document: {}, setTimeout: () => 0};
   vm.runInNewContext(SRC, ctx);
   return {KZL: window.KZL, data};
 }
@@ -109,4 +109,33 @@ test('a new best level is reported to the app, a replay is not', () => {
   KZL.setLevel('maze', 2);
   KZL.nextLevel('maze');
   assert.deepStrictEqual(calls, [['maze', 5]]);
+});
+
+test('every 5th new level gives a sticker, every 10th also 100 stars', () => {
+  const added = [];
+  const {KZL} = load({app: {addPoints: n => added.push(n)}});
+  KZL.setLevel('maze', 4);
+  for (let i = 0; i < 6; i++) KZL.nextLevel('maze'); // 5..10
+  const got = KZL.stickers();
+  assert.deepStrictEqual([...got.map(s => s.lv)], [5, 10]);
+  assert.ok(got.every(s => s.g === 'maze' && s.e && !s.gold));
+  assert.deepStrictEqual(added, [100]);
+});
+
+test('replaying a level does not hand out its sticker twice', () => {
+  const {KZL} = load();
+  KZL.setLevel('abc', 4);
+  KZL.nextLevel('abc');
+  KZL.setLevel('abc', 4);
+  KZL.nextLevel('abc');
+  assert.strictEqual(KZL.stickers().length, 1);
+});
+
+test('level 50 gives a gold sticker; stickers stay with their child', () => {
+  const env = load({store: {'kz-native-profile': 'kid-a'}});
+  env.KZL.setLevel('clock', 49);
+  env.KZL.nextLevel('clock');
+  assert.strictEqual(env.KZL.stickers()[0].gold, true);
+  env.data['kz-native-profile'] = 'kid-b';
+  assert.strictEqual(env.KZL.stickers().length, 0);
 });
