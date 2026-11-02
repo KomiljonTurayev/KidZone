@@ -70,6 +70,7 @@ class KidZoneApplication : Application() {
         }
         createNotificationChannel()
         appScope.launch { migrateToProfilesIfNeeded() }
+        BackendClient.warmUp()
     }
 
     private fun createNotificationChannel() {

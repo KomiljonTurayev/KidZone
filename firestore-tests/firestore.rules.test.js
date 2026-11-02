@@ -108,9 +108,9 @@ describe('users/{uid}', () => {
     );
   });
 
-  test('email-based admin (verified) can read any user doc', async () => {
+  test('admin@kidzone.uz without the admin claim is NOT treated as admin', async () => {
     await seed((db) => db.collection('users').doc(OWNER_UID).set({ status: 'active' }));
-    await assertSucceeds(
+    await assertFails(
       emailAdminCtx().firestore().collection('users').doc(OWNER_UID).get()
     );
   });
