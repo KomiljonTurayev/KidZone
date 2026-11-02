@@ -8,12 +8,12 @@ private val localProps = Properties().apply {
 private val revenueCatApiKey = System.getenv("REVENUECAT_API_KEY") ?: localProps.getProperty("REVENUECAT_API_KEY", "")
 
 plugins {
-    kotlin("multiplatform")
-    id("com.android.application")
-    id("org.jetbrains.compose")
-    kotlin("plugin.compose")
-    kotlin("plugin.serialization")
-    kotlin("kapt")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -46,14 +46,13 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
                 
-                implementation("dev.gitlive:firebase-auth:1.12.0")
-                implementation("dev.gitlive:firebase-firestore:1.12.0")
-                implementation("dev.gitlive:firebase-crashlytics:1.12.0")
+                implementation(libs.gitlive.firebase.auth)
+                implementation(libs.gitlive.firebase.firestore)
+                implementation(libs.gitlive.firebase.crashlytics)
                 
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-                implementation("io.coil-kt.coil3:coil-compose:3.0.0-alpha06")
-                implementation("io.coil-kt.coil3:coil-network-ktor:3.0.0-alpha06")
-                
+                implementation(libs.kotlinx.coroutines.core)
+                // Avatars are local files only, so no Coil network module is needed.
+                implementation(libs.coil.compose)
             }
         }
         val commonTest by getting {
@@ -63,49 +62,49 @@ kotlin {
         }
         val androidUnitTest by getting {
             dependencies {
-                implementation("junit:junit:4.13.2")
-                implementation("org.mockito:mockito-core:5.14.2")
-                implementation("org.robolectric:robolectric:4.14.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+                implementation(libs.junit)
+                implementation(libs.mockito.core)
+                implementation(libs.robolectric)
+                implementation(libs.kotlinx.coroutines.test)
                 // AGP's stub android.jar makes every org.json.JSONObject/JSONArray constructor
                 // throw "not mocked" (isReturnDefaultValues doesn't cover constructors). This
                 // real, non-Android org.json implementation shares the same package/class names
                 // and — per Gradle's test runtime classpath ordering — takes precedence over
                 // the stub, so ContentFilter/DailyChallengeRepository's real JSON parsing runs.
-                implementation("org.json:json:20240303")
+                implementation(libs.json)
             }
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.activity:activity-compose:1.9.0")
-                implementation("androidx.navigation:navigation-compose:2.7.7")
-                implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-                implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
-                implementation("androidx.appcompat:appcompat:1.7.0")
-                implementation("androidx.core:core-ktx:1.13.1")
-                implementation("com.google.android.material:material:1.12.0")
-                implementation("androidx.core:core-splashscreen:1.0.1")
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.navigation.compose)
+                implementation(libs.androidx.lifecycle.viewmodel.compose)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.androidx.appcompat)
+                implementation(libs.androidx.core.ktx)
+                implementation(libs.material)
+                implementation(libs.androidx.core.splashscreen)
                 
-                implementation(project.dependencies.platform("com.google.firebase:firebase-bom:33.7.0"))
-                implementation("com.google.firebase:firebase-auth")
-                implementation("com.google.firebase:firebase-firestore")
-                implementation("com.google.firebase:firebase-messaging")
-                implementation("com.google.firebase:firebase-crashlytics")
-                implementation("com.google.firebase:firebase-analytics")
+                implementation(project.dependencies.platform(libs.firebase.bom))
+                implementation(libs.firebase.auth)
+                implementation(libs.firebase.firestore)
+                implementation(libs.firebase.messaging)
+                implementation(libs.firebase.crashlytics)
+                implementation(libs.firebase.analytics)
 
                 // "Sign in with Google" via Credential Manager (see auth/GoogleSignIn.kt)
-                implementation("androidx.credentials:credentials:1.3.0")
-                implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
-                implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+                implementation(libs.androidx.credentials)
+                implementation(libs.androidx.credentials.play.services.auth)
+                implementation(libs.googleid)
 
-                implementation("androidx.work:work-runtime-ktx:2.9.0")
-                implementation("androidx.room:room-runtime:2.8.4")
-                implementation("androidx.room:room-ktx:2.8.4")
+                implementation(libs.androidx.work.runtime.ktx)
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.androidx.room.ktx)
                 
-                implementation("com.google.firebase:firebase-ai:16.0.0")
-                implementation("com.squareup.okhttp3:okhttp:4.12.0")
+                implementation(libs.firebase.ai)
+                implementation(libs.okhttp)
                 
-                implementation("androidx.webkit:webkit:1.11.0")
+                implementation(libs.androidx.webkit)
             }
         }
         val iosMain by creating {
@@ -211,21 +210,25 @@ android {
         compose = true
     }
     dependencies {
-        debugImplementation("androidx.compose.ui:ui-tooling")
-        debugImplementation("com.google.firebase:firebase-appcheck-debug")
+        debugImplementation(libs.androidx.compose.ui.tooling)
+        debugImplementation(libs.firebase.appcheck.debug)
         // Note: Adding pure Android revenuecat here because KMP version requires specific setup.
-        implementation("com.revenuecat.purchases:purchases:10.20.0")
-        implementation("com.revenuecat.purchases:purchases-ui:10.20.0")
-        add("kapt", "androidx.room:room-compiler:2.8.4")
+        implementation(libs.revenuecat.purchases)
+        implementation(libs.revenuecat.purchases.ui)
 
         // src/test/java's FirebaseManagerTest/PinUtilTest/ParentalStatsManagerTest/
         // KidZoneFirebaseMessagingServiceTest have referenced these since before this
         // module's history starts, but nothing ever declared them — silently broken because
         // CI never runs testDebugUnitTest, only assembleDebug/bundleRelease.
-        testImplementation("junit:junit:4.13.2")
-        testImplementation("org.mockito:mockito-core:5.14.2")
-        testImplementation("org.robolectric:robolectric:4.14.1")
+        testImplementation(libs.junit)
+        testImplementation(libs.mockito.core)
+        testImplementation(libs.robolectric)
     }
+}
+
+// Room's annotation processor, via KSP for the Android target (replaces kapt).
+dependencies {
+    add("kspAndroid", libs.androidx.room.compiler)
 }
 
 if (file("google-services.json").exists()) {
