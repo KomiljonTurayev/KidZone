@@ -196,6 +196,9 @@ fun MainScreen(
         }
     }
 
+    // A link that leaves the app, waiting for a grown-up to pass the parental gate.
+    var pendingExternalUri by remember { mutableStateOf<Uri?>(null) }
+
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
@@ -255,6 +258,7 @@ fun MainScreen(
                             evalJs = mgr::evaluateJavascript,
                             activity = context as Activity
                         )
+                        mgr.onExternalLink = { pendingExternalUri = it }
                         mgr.setup(nativeBridge, "AndroidBridge")
                         mgr.addInterface(
                             ChallengeBridge(challengeViewModel, context),
@@ -304,7 +308,11 @@ fun MainScreen(
                 if (showUnlockPin) {
                     PinGate(
                         hasPinSet = !savedPinHash.isNullOrEmpty(),
-                        onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+                        onVerifyPin = { pin ->
+                            val ok = savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash)
+                            if (ok && PinUtil.needsRehash(savedPinHash)) profileViewModel.setParentPin(PinUtil.hash(pin))
+                            ok
+                        },
                         onSuccess = {
                             mainViewModel.hideLock()
                             showUnlockPin = false
@@ -312,6 +320,20 @@ fun MainScreen(
                         onBack = { showUnlockPin = false },
                     )
                 }
+            }
+
+            // Parental gate before leaving the app (Google Play Families policy).
+            pendingExternalUri?.let { uri ->
+                val savedPinHash = activeProfile?.pinHash
+                PinGate(
+                    hasPinSet = !savedPinHash.isNullOrEmpty(),
+                    onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+                    onSuccess = {
+                        pendingExternalUri = null
+                        webMgrRef.value?.openExternal(uri)
+                    },
+                    onBack = { pendingExternalUri = null },
+                )
             }
 
             // Play-time countdown badge
