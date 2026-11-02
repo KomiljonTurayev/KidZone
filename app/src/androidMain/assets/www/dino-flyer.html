@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Flappy Dino 🦖</title>
+<title>Dino Flyer 🦖</title>
 <link rel="stylesheet" href="kids-theme.css">
 <script src="kz-ui.js"></script>
 <script src="kids-ui.js"></script>
@@ -38,7 +38,7 @@
 
 <div id="overlay">
   <div style="font-size: 70px;">🦖✨</div>
-  <h1 id="title" style="font-size: 30px; margin: 10px 0;">Flappy Dino</h1>
+  <h1 id="title" style="font-size: 30px; margin: 10px 0;">Dino Flyer</h1>
   <p id="hint" style="opacity: 0.9; font-size: 16px;">Uchish uchun ekranni bosing!</p>
   <button class="btn" onclick="start()">BOSHLASH</button>
 </div>
@@ -47,12 +47,12 @@
 const params = new URLSearchParams(location.search);
 const lang = params.get('lang') || 'uz';
 const I18N = {
-  uz: { hint: 'Uchish uchun ekranni bosing!', start: 'BOSHLASH', over: 'O\'yin Tugadi!', res: 'Natijangiz: ' },
-  ru: { title: 'Флаппи Дино', hint: 'Нажимайте на экран для полета!', start: 'СТАРТ', over: 'Игра Окончена!', res: 'Ваш результат: ' },
+  uz: { title: 'Uchar Dino', hint: 'Uchish uchun ekranni bosing!', start: 'BOSHLASH', over: 'O\'yin Tugadi!', res: 'Natijangiz: ' },
+  ru: { title: 'Летающий Дино', hint: 'Нажимайте на экран для полета!', start: 'СТАРТ', over: 'Игра Окончена!', res: 'Ваш результат: ' },
   en: { hint: 'Tap screen to flap and fly!', start: 'START', over: 'Game Over!', res: 'Your Score: ' }
 };
 const T = I18N[lang] || I18N.uz;
-document.getElementById('title').textContent = T.title || 'Flappy Dino';
+document.getElementById('title').textContent = T.title || 'Dino Flyer';
 window.addEventListener('load', () => {
   document.getElementById('hint').textContent = T.hint;
   document.querySelector('.btn').textContent = T.start;

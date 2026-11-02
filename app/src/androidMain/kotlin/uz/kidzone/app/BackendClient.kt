@@ -18,12 +18,39 @@ import org.json.JSONException
 import org.json.JSONObject
 import uz.kidzone.app.auth.AuthGraph
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 object BackendClient {
 
     private const val TAG = "BackendClient"
     private val BASE_URL = BackendConfig.BASE_URL
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // The backend's host suspends an idle instance and takes up to ~60s to wake it. The AI
+    // clients use short timeouts, so the first Kidzo question after a quiet period would fail;
+    // a warm-up ping with a long timeout gets the instance started before it is needed.
+    private const val WARM_UP_TIMEOUT_SECONDS = 70L
+    private val warmUpClient by lazy {
+        KidZoneApplication.httpClient.newBuilder()
+            .callTimeout(WARM_UP_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(WARM_UP_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
+    }
+
+    /** Fire-and-forget GET /health so a sleeping backend wakes before the first real request. */
+    @JvmStatic
+    fun warmUp() {
+        val request = Request.Builder().url("$BASE_URL/health").get().build()
+        warmUpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d(TAG, "warmUp failed: $e")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.close()
+            }
+        })
+    }
 
     /**
      * Registers the FCM token with the backend so push notifications reach this device.

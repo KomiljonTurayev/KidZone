@@ -72,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlin.math.roundToInt
 import uz.kidzone.app.ParentalStatsManager
+import uz.kidzone.app.BackendClient
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.auth.AccountFeature
 import uz.kidzone.app.auth.AuthGraph
@@ -186,6 +187,8 @@ fun MainScreen(
     fun aiAvailable(): Boolean = featureGate.isAvailable(AccountFeature.AI_COMPANION)
     fun openKidzo() {
         if (!aiAvailable()) return requireAccount(AccountFeature.AI_COMPANION)
+        // The app may have been open long enough for the backend to fall asleep again.
+        BackendClient.warmUp()
         kidzoViewModel?.requestRecommendations()
         showKidzoSheet = true
     }
