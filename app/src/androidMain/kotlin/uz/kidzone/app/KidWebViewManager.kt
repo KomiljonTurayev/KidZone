@@ -32,6 +32,14 @@ class KidWebViewManager(private val webView: WebView) {
 
     var currentLanguage: String = "en"
 
+    /**
+     * Called for every navigation that leaves the bundled assets. Google Play's Families policy
+     * requires a parental gate before a kids app sends the child out of the app, so the host
+     * shows one and calls [openExternal] only after a grown-up passes it. If unset, external
+     * links are blocked.
+     */
+    var onExternalLink: ((Uri) -> Unit)? = null
+
     fun setLanguage(lang: String) {
         currentLanguage = lang
     }
@@ -108,6 +116,15 @@ class KidWebViewManager(private val webView: WebView) {
         webView.post { webView.evaluateJavascript(script, cb) }
     }
 
+    /** Opens [uri] outside the app. Call only after the parental gate has been passed. */
+    fun openExternal(uri: Uri) {
+        try {
+            webView.context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+        } catch (e: Exception) {
+            Log.w(TAG, "Cannot open external URL: $uri")
+        }
+    }
+
     fun destroy() {
         webView.stopLoading()
         webView.onPause()
@@ -124,16 +141,14 @@ class KidWebViewManager(private val webView: WebView) {
         }
 
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            val url = request.url.toString()
-            if (url.startsWith("https://appassets.androidplatform.net") ||
-                url.startsWith("file://") ||
-                url.startsWith("http://localhost")) {
+            if (request.url.scheme == "https" && request.url.host == "appassets.androidplatform.net") {
                 return false
             }
-            try {
-                view.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-            } catch (e: Exception) {
-                Log.w(TAG, "Cannot open external URL: $url")
+            // Only a tap may start the gate; a page redirecting on its own is just blocked.
+            if (request.hasGesture()) {
+                onExternalLink?.invoke(request.url)
+            } else {
+                Log.w(TAG, "Blocked external navigation without user gesture: ${request.url}")
             }
             return true
         }

@@ -22,21 +22,46 @@ public class PinUtilTest {
         prefs.edit().clear().commit();
     }
 
+    // Legacy format: unsalted SHA-256("1234") as hex, as stored by app versions <= 1.6.1.
+    private static final String LEGACY_1234 =
+            "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
+
     @Test
-    public void hash_returns64CharHex() {
+    public void hash_isVersionedAndFitsFirestoreLimit() {
         String h = PinUtil.hash("1234");
-        assertEquals(64, h.length());
-        assertTrue(h.matches("[0-9a-f]+"));
+        assertTrue(h.startsWith("v2$"));
+        // firestore.rules caps profiles.pinHash at 64 chars.
+        assertTrue(h.length() <= 64);
     }
 
     @Test
-    public void hash_isDeterministic() {
-        assertEquals(PinUtil.hash("1234"), PinUtil.hash("1234"));
+    public void hash_isSalted() {
+        assertNotEquals(PinUtil.hash("1234"), PinUtil.hash("1234"));
     }
 
     @Test
     public void hash_differentInputsDifferentHashes() {
         assertNotEquals(PinUtil.hash("1234"), PinUtil.hash("4321"));
+    }
+
+    @Test
+    public void matches_legacyHash_stillVerifies() {
+        assertTrue(PinUtil.matches("1234", LEGACY_1234));
+        assertFalse(PinUtil.matches("4321", LEGACY_1234));
+    }
+
+    @Test
+    public void matches_malformedHash_false() {
+        assertFalse(PinUtil.matches("1234", "v2$not-base64!"));
+        assertFalse(PinUtil.matches("1234", "v2$@@$@@"));
+    }
+
+    @Test
+    public void needsRehash_onlyForLegacy() {
+        assertTrue(PinUtil.needsRehash(LEGACY_1234));
+        assertFalse(PinUtil.needsRehash(PinUtil.hash("1234")));
+        assertFalse(PinUtil.needsRehash(null));
+        assertFalse(PinUtil.needsRehash(""));
     }
 
     @Test
@@ -85,7 +110,7 @@ public class PinUtilTest {
     public void getOrMigrateHash_plainPin_migratesAndReturnsHash() {
         prefs.edit().putString("kz_pin", "1234").commit();
         String hash = PinUtil.getOrMigrateHash(prefs, "kz_pin");
-        assertEquals(PinUtil.hash("1234"), hash);
+        assertTrue(PinUtil.matches("1234", hash));
         assertEquals(hash, prefs.getString("kz_pin", null));
     }
 
