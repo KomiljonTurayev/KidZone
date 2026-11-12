@@ -78,6 +78,7 @@ class KidZoneApplication : Application() {
         createNotificationChannel()
         appScope.launch { migrateToProfilesIfNeeded() }
         appScope.launch { registerPushWhenAdultConfirmed() }
+        BackendClient.warmUp()
     }
 
     /**

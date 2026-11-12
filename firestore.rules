@@ -24,11 +24,10 @@ service cloud.firestore {
          request.resource.data.familyOwner == resource.data.familyOwner);
     }
 
+    // Admins are marked with the `admin: true` custom claim (set via the Admin SDK); an
+    // email address alone never grants admin rights.
     function isAdmin() {
-      return isAuthenticated() && (
-        request.auth.token.admin == true ||
-        (request.auth.token.email == "admin@kidzone.uz" && request.auth.token.email_verified == true)
-      );
+      return isAuthenticated() && request.auth.token.admin == true;
     }
 
     // Client writes to profiles/{id} come from two independent merge() calls

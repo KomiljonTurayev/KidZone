@@ -72,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlin.math.roundToInt
 import uz.kidzone.app.ParentalStatsManager
+import uz.kidzone.app.BackendClient
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.auth.AccountFeature
 import uz.kidzone.app.auth.AuthGraph
@@ -198,6 +199,8 @@ fun MainScreen(
     fun aiAvailable(): Boolean = featureGate.isAvailable(AccountFeature.AI_COMPANION)
     fun openKidzo() {
         if (!aiAvailable()) return requireAccount(AccountFeature.AI_COMPANION)
+        // The app may have been open long enough for the backend to fall asleep again.
+        BackendClient.warmUp()
         kidzoViewModel?.requestRecommendations()
         showKidzoSheet = true
     }
@@ -207,6 +210,9 @@ fun MainScreen(
             onUnlockedFeatureHandled()
         }
     }
+
+    // A link that leaves the app, waiting for a grown-up to pass the parental gate.
+    var pendingExternalUri by remember { mutableStateOf<Uri?>(null) }
 
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -267,6 +273,7 @@ fun MainScreen(
                             evalJs = mgr::evaluateJavascript,
                             activity = context as Activity
                         )
+                        mgr.onExternalLink = { pendingExternalUri = it }
                         mgr.setup(nativeBridge, "AndroidBridge")
                         mgr.addInterface(
                             ChallengeBridge(challengeViewModel, context),
@@ -318,7 +325,11 @@ fun MainScreen(
                 if (showUnlockPin) {
                     PinGate(
                         hasPinSet = !savedPinHash.isNullOrEmpty(),
-                        onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+                        onVerifyPin = { pin ->
+                            val ok = savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash)
+                            if (ok && PinUtil.needsRehash(savedPinHash)) profileViewModel.setParentPin(PinUtil.hash(pin))
+                            ok
+                        },
                         onSuccess = {
                             mainViewModel.hideLock()
                             showUnlockPin = false
@@ -326,6 +337,20 @@ fun MainScreen(
                         onBack = { showUnlockPin = false },
                     )
                 }
+            }
+
+            // Parental gate before leaving the app (Google Play Families policy).
+            pendingExternalUri?.let { uri ->
+                val savedPinHash = activeProfile?.pinHash
+                PinGate(
+                    hasPinSet = !savedPinHash.isNullOrEmpty(),
+                    onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+                    onSuccess = {
+                        pendingExternalUri = null
+                        webMgrRef.value?.openExternal(uri)
+                    },
+                    onBack = { pendingExternalUri = null },
+                )
             }
 
             // Play-time countdown badge

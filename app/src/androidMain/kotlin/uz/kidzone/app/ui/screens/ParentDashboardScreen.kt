@@ -105,7 +105,12 @@ fun ParentDashboardScreen(
     if (!pinVerified) {
         PinGate(
             hasPinSet = !savedPinHash.isNullOrEmpty(),
-            onVerifyPin = { pin -> savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash) },
+            onVerifyPin = { pin ->
+                val ok = savedPinHash.isNullOrEmpty() || PinUtil.matches(pin, savedPinHash)
+                // Upgrade a legacy unsalted hash now that we know the PIN.
+                if (ok && PinUtil.needsRehash(savedPinHash)) profileViewModel.setParentPin(PinUtil.hash(pin))
+                ok
+            },
             onSuccess = { pinVerified = true },
             onBack = onBack,
         )
