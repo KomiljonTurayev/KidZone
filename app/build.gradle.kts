@@ -101,7 +101,6 @@ kotlin {
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.room.ktx)
                 
-                implementation(libs.firebase.ai)
                 implementation(libs.okhttp)
                 
                 implementation(libs.androidx.webkit)
@@ -128,8 +127,8 @@ android {
         targetSdk = 36
         val propVersionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull()
         val propVersionName = project.findProperty("versionName")?.toString()
-        versionCode = propVersionCode ?: 10603
-        versionName = propVersionName ?: "1.6.3"
+        versionCode = propVersionCode ?: 10604
+        versionName = propVersionName ?: "1.6.4"
         buildConfigField("String", "REVENUECAT_API_KEY", "\"${revenueCatApiKey}\"")
     }
 
