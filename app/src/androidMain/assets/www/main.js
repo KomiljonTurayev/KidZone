@@ -1475,6 +1475,9 @@ window.addEventListener("load", () => {
     // Which child is playing; kz-ui.js keeps each child's game levels apart with it.
     const urlProfile = urlParams.get('profile');
     if (urlProfile) localStorage.setItem('kz-native-profile', urlProfile);
+    // Google Play Families Policy: the app passes child=1 when the neutral age screen says the
+    // user is 13 or younger — the AI features are then hidden (see .kz-child in index.html).
+    document.documentElement.classList.toggle('kz-child', urlParams.get('child') === '1');
     const translator = new TranslationManager(T);
     const ui = new UIManager();
     app = new GameManager(GAMES, ui, translator);

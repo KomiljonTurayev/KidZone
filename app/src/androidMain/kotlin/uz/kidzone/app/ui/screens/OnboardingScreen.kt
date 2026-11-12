@@ -45,12 +45,13 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.auth.isSignedIn
 import uz.kidzone.app.data.ProfileEntity
+import androidx.compose.ui.platform.LocalContext
+import uz.kidzone.app.agegate.AgeBracket
+import uz.kidzone.app.agegate.AgeGate
+import uz.kidzone.app.agegate.NeutralAgeScreen
 import uz.kidzone.app.ui.components.Kid
 import uz.kidzone.app.ui.components.KidButton
-import uz.kidzone.app.ui.components.DigitBoxes
 import uz.kidzone.app.ui.components.KidCard
-import uz.kidzone.app.ui.components.KidError
-import uz.kidzone.app.ui.components.KidNumberPad
 import uz.kidzone.app.ui.components.KidPage
 import uz.kidzone.app.ui.components.KidTextField
 import uz.kidzone.app.ui.components.KidSubtitle
@@ -60,8 +61,6 @@ import uz.kidzone.app.ui.components.StepHeader
 import uz.kidzone.app.ui.viewmodel.LoginViewModel
 import uz.kidzone.app.ui.viewmodel.OnboardingStep
 import uz.kidzone.app.ui.viewmodel.OnboardingViewModel
-import uz.kidzone.app.ui.viewmodel.isAdultBirthYear
-import java.util.Calendar
 
 /** Name the default profile gets before a parent names it (see KidZoneApplication). */
 private const val DEFAULT_PROFILE_NAME = "Asosiy"
@@ -70,8 +69,8 @@ private const val DEFAULT_PROFILE_NAME = "Asosiy"
 private const val PARENT_STEPS = 4
 
 /**
- * First launch, parent-first: language → birth-year gate → sign in (or "later") → child profile
- * → hand the phone to the child. See [OnboardingViewModel].
+ * First launch: language → neutral age screen (Google Play Families Policy) → sign in (or
+ * "later", adults only) → child profile → handoff. See [OnboardingViewModel].
  *
  * [profiles] lets the child step notice profiles restored from the cloud after a sign-in;
  * [onSaveChild] names the child's profile.
@@ -82,10 +81,14 @@ fun OnboardingScreen(
     profiles: List<ProfileEntity>,
     onSaveChild: (name: String, lang: String) -> Unit,
     onDone: () -> Unit,
-    vm: OnboardingViewModel = viewModel(),
+    vm: OnboardingViewModel = viewModel(
+        factory = viewModelFactory { initializer { OnboardingViewModel(AgeGate.current().bracket) } },
+    ),
 ) {
     val state by vm.state.collectAsState()
     val t = onboardingTexts(state.lang)
+    val context = LocalContext.current
+    fun signedIn() = runCatching { AuthGraph.auth.state.value.isSignedIn }.getOrDefault(false)
 
     AnimatedContent(
         targetState = state.step,
@@ -99,15 +102,16 @@ fun OnboardingScreen(
         when (step) {
             OnboardingStep.LANGUAGE -> LangStep(onSelect = { lang ->
                 prefs.edit().putString("kz_lang", lang).apply()
-                vm.setLang(lang)
+                vm.setLang(lang, alreadySignedIn = signedIn())
             })
-            OnboardingStep.PARENT_GATE -> ParentGateStep(
-                t = t,
-                onVerified = {
-                    val signedIn = runCatching { AuthGraph.auth.state.value.isSignedIn }.getOrDefault(false)
-                    vm.parentVerified(alreadySignedIn = signedIn)
+            OnboardingStep.AGE -> NeutralAgeScreen(
+                lang = state.lang,
+                top = { StepHeader(current = 0, total = PARENT_STEPS, onBack = vm::back) },
+                onSubmit = { year, month ->
+                    // Saved once; an unexpected missing result is treated as the restricted case.
+                    val bracket = AgeGate.submit(context, year, month).bracket ?: AgeBracket.CHILD
+                    vm.ageAnswered(bracket, alreadySignedIn = signedIn())
                 },
-                onBack = vm::back,
             )
             OnboardingStep.SIGN_IN -> {
                 val loginViewModel: LoginViewModel = viewModel(
@@ -137,6 +141,7 @@ fun OnboardingScreen(
                 } else {
                     ChildStep(
                         t = t,
+                        isChild = state.isChild,
                         onSubmit = { name, age ->
                             prefs.edit().putString("kz_age", age).apply()
                             onSaveChild(name.trim(), state.lang)
@@ -146,7 +151,7 @@ fun OnboardingScreen(
                     )
                 }
             }
-            OnboardingStep.HANDOFF -> HandoffStep(t = t, childName = state.childName, onDone = {
+            OnboardingStep.HANDOFF -> HandoffStep(t = t, childName = state.childName, isChild = state.isChild, onDone = {
                 prefs.edit().putBoolean("kz_onboarding_done", true).apply()
                 onDone()
             })
@@ -190,39 +195,12 @@ private fun LangStep(onSelect: (String) -> Unit) {
 }
 
 @Composable
-private fun ParentGateStep(t: OnboardingTexts, onVerified: () -> Unit, onBack: () -> Unit) {
-    var year by remember { mutableStateOf("") }
-    var failed by remember { mutableStateOf(false) }
-    val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
-
-    KidPage(top = { StepHeader(current = 0, total = PARENT_STEPS, onBack = onBack) }) {
-        MascotBubble("🔒", size = 108.dp)
-        Spacer(Modifier.height(20.dp))
-        KidTitle(t.parentTitle)
-        Spacer(Modifier.height(6.dp))
-        KidSubtitle(t.parentMessage)
-        Spacer(Modifier.height(24.dp))
-        Text(t.birthYear, style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft)
-        Spacer(Modifier.height(10.dp))
-        DigitBoxes(year, length = 4, error = failed)
-        if (failed) {
-            Spacer(Modifier.height(10.dp))
-            KidError(t.askParent)
-        }
-        Spacer(Modifier.height(20.dp))
-        KidNumberPad(
-            onDigit = { d -> if (year.length < 4) { year += d; failed = false } },
-            onDelete = { year = year.dropLast(1); failed = false },
-        )
-        Spacer(Modifier.height(20.dp))
-        KidButton(t.next, enabled = year.length == 4) {
-            if (isAdultBirthYear(year.toIntOrNull(), currentYear)) onVerified() else { failed = true; year = "" }
-        }
-    }
-}
-
-@Composable
-private fun ChildStep(t: OnboardingTexts, onSubmit: (name: String, age: String) -> Unit, onBack: () -> Unit) {
+private fun ChildStep(
+    t: OnboardingTexts,
+    isChild: Boolean,
+    onSubmit: (name: String, age: String) -> Unit,
+    onBack: () -> Unit,
+) {
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf<String?>(null) }
     val ages = listOf(
@@ -239,7 +217,8 @@ private fun ChildStep(t: OnboardingTexts, onSubmit: (name: String, age: String) 
         KidTextField(
             value = name,
             onValueChange = { if (it.length <= 24) name = it },
-            placeholder = t.childName,
+            // A child filling this in names themself, not "your child".
+            placeholder = if (isChild) t.ownName else t.childName,
         )
         Spacer(Modifier.height(24.dp))
         Text(t.childAge, style = MaterialTheme.typography.titleMedium, color = Kid.InkSoft)
@@ -295,14 +274,17 @@ private fun RestoredProfilesStep(t: OnboardingTexts, names: List<String>, onCont
 }
 
 @Composable
-private fun HandoffStep(t: OnboardingTexts, childName: String, onDone: () -> Unit) {
+private fun HandoffStep(t: OnboardingTexts, childName: String, isChild: Boolean, onDone: () -> Unit) {
     KidPage(top = { StepHeader(current = 3, total = PARENT_STEPS, onBack = null) }) {
         Confetti()
         MascotBubble("🎉", size = 148.dp)
         Spacer(Modifier.height(28.dp))
         KidTitle(t.handoffTitle)
-        Spacer(Modifier.height(8.dp))
-        KidSubtitle(t.handoffMessage(childName))
+        // "Hand the phone to your child" only makes sense when an adult set the app up.
+        if (!isChild) {
+            Spacer(Modifier.height(8.dp))
+            KidSubtitle(t.handoffMessage(childName))
+        }
         Spacer(Modifier.height(36.dp))
         KidButton(t.start, brush = Kid.Meadow, onClick = onDone)
     }
@@ -325,16 +307,13 @@ private fun Confetti() {
 }
 
 private class OnboardingTexts(
-    val parentTitle: String,
-    val parentMessage: String,
-    val birthYear: String,
-    val askParent: String,
     val signInTitle: String,
     val signInMessage: String,
     val benefits: List<String>,
     val later: String,
     val childTitle: String,
     val childName: String,
+    val ownName: String,
     val childAge: String,
     val ages: List<String>,
     val restoredTitle: String,
@@ -346,16 +325,13 @@ private class OnboardingTexts(
 
 private fun onboardingTexts(lang: String): OnboardingTexts = when (lang) {
     "ru" -> OnboardingTexts(
-        parentTitle = "Эту часть заполняет родитель",
-        parentMessage = "Настройка займёт минуту — потом передадите телефон ребёнку.",
-        birthYear = "Ваш год рождения",
-        askParent = "Пожалуйста, позовите маму или папу 🙂",
         signInTitle = "Аккаунт родителя",
         signInMessage = "Всё важное сохранится, даже если вы смените телефон.",
         benefits = listOf("Профили детей и прогресс", "Отчёты и лимиты времени", "Kidzo AI и Premium"),
         later = "Позже",
         childTitle = "Кто будет играть?",
         childName = "Имя ребёнка",
+        ownName = "Твоё имя",
         childAge = "Сколько лет?",
         ages = listOf("2–4", "5–7", "8+"),
         restoredTitle = "Профили восстановлены",
@@ -365,16 +341,13 @@ private fun onboardingTexts(lang: String): OnboardingTexts = when (lang) {
         next = "Далее",
     )
     "en" -> OnboardingTexts(
-        parentTitle = "This part is for parents",
-        parentMessage = "Setup takes a minute — then hand the phone to your child.",
-        birthYear = "Your year of birth",
-        askParent = "Please ask a grown-up for help 🙂",
         signInTitle = "Parent account",
         signInMessage = "Everything important is kept, even if you change phones.",
         benefits = listOf("Child profiles and progress", "Reports and time limits", "Kidzo AI and Premium"),
         later = "Maybe later",
         childTitle = "Who's going to play?",
         childName = "Child's name",
+        ownName = "Your name",
         childAge = "How old?",
         ages = listOf("2–4", "5–7", "8+"),
         restoredTitle = "Profiles restored",
@@ -384,16 +357,13 @@ private fun onboardingTexts(lang: String): OnboardingTexts = when (lang) {
         next = "Next",
     )
     else -> OnboardingTexts(
-        parentTitle = "Bu qismni ota-ona to'ldiradi",
-        parentMessage = "Sozlash bir daqiqa oladi — keyin telefonni bolangizga berasiz.",
-        birthYear = "Tug'ilgan yilingiz",
-        askParent = "Iltimos, ota-onangizni chaqiring 🙂",
         signInTitle = "Ota-ona hisobi",
         signInMessage = "Telefon almashsa ham hammasi saqlanib qoladi.",
         benefits = listOf("Bola profillari va natijalari", "Hisobotlar va vaqt limiti", "Kidzo AI va Premium"),
         later = "Keyinroq",
         childTitle = "Kim o'ynaydi?",
         childName = "Bolaning ismi",
+        ownName = "Ismingiz",
         childAge = "Necha yoshda?",
         ages = listOf("2–4", "5–7", "8+"),
         restoredTitle = "Profillar tiklandi",

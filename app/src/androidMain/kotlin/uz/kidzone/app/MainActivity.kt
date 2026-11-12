@@ -13,9 +13,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
+import com.revenuecat.purchases.Purchases
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import uz.kidzone.app.agegate.AgeGate
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.ui.KidZoneApp
 import uz.kidzone.app.ui.viewmodel.MainViewModel
@@ -33,7 +37,15 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        RevenueCatManager.init(this, this)
+        // Families Policy: RevenueCat (purchases) starts only once the neutral age screen says the
+        // user is older than 13 — including when that answer arrives later in this session.
+        lifecycleScope.launch {
+            AgeGate.state
+                .map { !it.isRestricted }
+                .distinctUntilChanged()
+                .filter { it }
+                .collect { if (!Purchases.isConfigured) RevenueCatManager.init(this@MainActivity, this@MainActivity) }
+        }
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -116,6 +128,8 @@ class MainActivity : ComponentActivity() {
 
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        // No push for a child (Families Policy), so no permission prompt either.
+        if (AgeGate.isRestricted) return
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
             == PackageManager.PERMISSION_GRANTED
         ) return

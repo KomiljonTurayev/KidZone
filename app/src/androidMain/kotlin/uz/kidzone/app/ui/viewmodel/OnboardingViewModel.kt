@@ -5,30 +5,46 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import uz.kidzone.app.agegate.AgeBracket
 
 /**
- * Parent-first setup, the way Khan Academy Kids / YouTube Kids / Lingokids do it: the parent
- * picks a language, proves they're an adult, signs in (or skips), creates the child's profile,
- * and only then hands the phone to the child.
+ * First-launch setup: language → neutral age screen (Google Play Families Policy) → sign in (or
+ * skip) → child profile → handoff.
+ *
+ * The age screen is answered once ([uz.kidzone.app.agegate.AgeGate]) and never shown again: going
+ * back from a later step returns to the language picker, and the age step is then skipped. A child
+ * ([AgeBracket.CHILD]) never sees the sign-in step.
  */
-enum class OnboardingStep { LANGUAGE, PARENT_GATE, SIGN_IN, CHILD, HANDOFF }
+enum class OnboardingStep { LANGUAGE, AGE, SIGN_IN, CHILD, HANDOFF }
 
 data class OnboardingState(
     val step: OnboardingStep = OnboardingStep.LANGUAGE,
     val lang: String = "uz",
     val age: String = "2-4",
     val childName: String = "",
-)
+    /** Answer of the neutral age screen; `null` until it is answered. */
+    val bracket: AgeBracket? = null,
+) {
+    val isChild: Boolean get() = bracket == AgeBracket.CHILD
+}
 
-class OnboardingViewModel : ViewModel() {
-    private val _state = MutableStateFlow(OnboardingState())
+class OnboardingViewModel(
+    /** Already-saved answer (e.g. after a reinstall that kept app data); skips the age step. */
+    initialBracket: AgeBracket? = null,
+) : ViewModel() {
+    private val _state = MutableStateFlow(OnboardingState(bracket = initialBracket))
     val state: StateFlow<OnboardingState> = _state.asStateFlow()
 
-    fun setLang(lang: String) { _state.update { it.copy(lang = lang, step = OnboardingStep.PARENT_GATE) } }
+    fun setLang(lang: String, alreadySignedIn: Boolean = false) {
+        _state.update {
+            val next = it.bracket?.let { b -> stepAfterAge(b, alreadySignedIn) } ?: OnboardingStep.AGE
+            it.copy(lang = lang, step = next)
+        }
+    }
 
-    /** A parent who is already signed in (e.g. after a reinstall) doesn't see the sign-in step again. */
-    fun parentVerified(alreadySignedIn: Boolean) {
-        _state.update { it.copy(step = if (alreadySignedIn) OnboardingStep.CHILD else OnboardingStep.SIGN_IN) }
+    /** The neutral age screen was answered (and saved). */
+    fun ageAnswered(bracket: AgeBracket, alreadySignedIn: Boolean) {
+        _state.update { it.copy(bracket = bracket, step = stepAfterAge(bracket, alreadySignedIn)) }
     }
 
     /** Called both after a successful sign-in and when the parent taps "later". */
@@ -41,21 +57,20 @@ class OnboardingViewModel : ViewModel() {
     fun back() {
         _state.update {
             val prev = when (it.step) {
-                OnboardingStep.LANGUAGE, OnboardingStep.PARENT_GATE -> OnboardingStep.LANGUAGE
-                OnboardingStep.SIGN_IN, OnboardingStep.CHILD -> OnboardingStep.PARENT_GATE
+                OnboardingStep.LANGUAGE, OnboardingStep.AGE -> OnboardingStep.LANGUAGE
+                // The age answer is final, so there is no way back to the age screen.
+                OnboardingStep.SIGN_IN, OnboardingStep.CHILD -> OnboardingStep.LANGUAGE
                 OnboardingStep.HANDOFF -> OnboardingStep.CHILD
             }
             it.copy(step = prev)
         }
     }
-}
 
-/**
- * Neutral age screen (Google Play Families): asks for a birth year without hinting at the
- * answer that unlocks the parent steps.
- */
-fun isAdultBirthYear(year: Int?, currentYear: Int): Boolean {
-    if (year == null) return false
-    val age = currentYear - year
-    return age in 18..100
+    private fun stepAfterAge(bracket: AgeBracket, alreadySignedIn: Boolean): OnboardingStep = when {
+        // Families Policy: no sign-in (and so no accounts, AI or purchases) for a child.
+        bracket == AgeBracket.CHILD -> OnboardingStep.CHILD
+        // A parent who is already signed in (e.g. after a reinstall) doesn't see sign-in again.
+        alreadySignedIn -> OnboardingStep.CHILD
+        else -> OnboardingStep.SIGN_IN
+    }
 }

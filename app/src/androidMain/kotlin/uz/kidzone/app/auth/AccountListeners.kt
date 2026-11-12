@@ -17,6 +17,8 @@ import java.util.UUID
 class CloudUserListener(
     private val firestoreSync: () -> FirestoreSync,
     private val prefs: SharedPreferences,
+    /** Families Policy: no push token for children or before the neutral age screen. */
+    private val allowPush: () -> Boolean = { true },
 ) : AccountListener {
     override suspend fun onAccountChanged(account: AccountState) {
         val uid = account.uid ?: return
@@ -24,7 +26,7 @@ class CloudUserListener(
         val sync = firestoreSync()
         val displayName = (account as? AccountState.SignedIn)?.displayName
         sync.syncUserProfile(uid, displayName, null, prefs.getString("kz_age_filter", "3-5") ?: "3-5")
-        FcmTokenManager.registerToken(uid, sync)
+        if (allowPush()) FcmTokenManager.registerToken(uid, sync)
     }
 }
 

@@ -43,6 +43,19 @@
             android:name="google_analytics_default_allow_ad_personalization_signals"
             android:value="false" />
 
+        <!-- Google Play Families Policy — Neutral Age Screen: nothing is collected before the
+             age screen is answered. AgeGatePolicy turns these on at runtime only for users
+             older than 13 (TEEN_OR_ADULT); children and unanswered installs stay off. -->
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+
         <!-- MAIN ACTIVITY -->
         <activity
             android:name=".MainActivity"
