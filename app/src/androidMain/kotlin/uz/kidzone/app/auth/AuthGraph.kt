@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import uz.kidzone.app.BackendConfig
 import uz.kidzone.app.KidZoneApplication
+import uz.kidzone.app.agegate.AgeGate
 
 /**
  * Wires the auth module once per process. Kept as a small service locator because the rest
@@ -29,7 +30,10 @@ object AuthGraph {
         get() = repository ?: IdTokenProvider { null }
 
     val featureGate: FeatureGate
-        get() = FeatureGate(repository?.state ?: MutableStateFlow(AccountState.Unavailable))
+        get() = FeatureGate(
+            account = repository?.state ?: MutableStateFlow(AccountState.Unavailable),
+            restricted = { AgeGate.isRestricted },
+        )
 
     val googleSignIn: GoogleIdTokenSource
         get() = googleSource ?: CredentialManagerGoogleSignIn(null)

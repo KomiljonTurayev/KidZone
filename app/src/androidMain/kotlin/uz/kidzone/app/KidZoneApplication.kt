@@ -10,8 +10,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import uz.kidzone.app.agegate.AgeGate
 import uz.kidzone.app.auth.AuthException
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.auth.CloudUserListener
@@ -36,6 +40,9 @@ class KidZoneApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Families Policy: the neutral age screen's saved answer decides which SDKs may collect
+        // data — applied before anything else (Analytics/Crashlytics/FCM are off in the manifest).
+        AgeGate.init(this)
         try {
             if (BuildConfig.DEBUG) {
                 FirebaseFirestore.setLoggingEnabled(true)
@@ -55,7 +62,7 @@ class KidZoneApplication : Application() {
             context = this,
             appScope = appScope,
             listeners = listOf(
-                CloudUserListener({ FirestoreSync.init(this) }, prefs),
+                CloudUserListener({ FirestoreSync.init(this) }, prefs, allowPush = { !AgeGate.isRestricted }),
                 ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore), appScope, PrefsLocalProfilesOwner(prefs)),
                 PurchasesIdentityListener(),
             ),
@@ -70,6 +77,19 @@ class KidZoneApplication : Application() {
         }
         createNotificationChannel()
         appScope.launch { migrateToProfilesIfNeeded() }
+        appScope.launch { registerPushWhenAdultConfirmed() }
+    }
+
+    /**
+     * The push token is normally registered on account change ([CloudUserListener]); an adult who
+     * answers the age screen later in the same session would otherwise wait for the next launch.
+     */
+    private suspend fun registerPushWhenAdultConfirmed() {
+        AgeGate.state
+            .map { !it.isRestricted }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect { FcmTokenManager.registerToken(AuthGraph.currentUid, FirestoreSync.init(this)) }
     }
 
     private fun createNotificationChannel() {

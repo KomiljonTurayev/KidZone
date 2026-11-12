@@ -4,20 +4,22 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import uz.kidzone.app.agegate.AgeBracket
 
 class OnboardingViewModelTest {
 
     @Test
-    fun `parent-first flow walks language, gate, sign-in, child, handoff`() {
+    fun `adult flow walks language, age, sign-in, child, handoff`() {
         val vm = OnboardingViewModel()
         assertEquals(OnboardingStep.LANGUAGE, vm.state.value.step)
 
         vm.setLang("ru")
-        assertEquals(OnboardingStep.PARENT_GATE, vm.state.value.step)
+        assertEquals(OnboardingStep.AGE, vm.state.value.step)
         assertEquals("ru", vm.state.value.lang)
 
-        vm.parentVerified(alreadySignedIn = false)
+        vm.ageAnswered(AgeBracket.TEEN_OR_ADULT, alreadySignedIn = false)
         assertEquals(OnboardingStep.SIGN_IN, vm.state.value.step)
+        assertFalse(vm.state.value.isChild)
 
         vm.signInFinished()
         assertEquals(OnboardingStep.CHILD, vm.state.value.step)
@@ -29,30 +31,59 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `signed-in parent skips the sign-in step`() {
+    fun `a child never sees the sign-in step`() {
         val vm = OnboardingViewModel()
         vm.setLang("uz")
-        vm.parentVerified(alreadySignedIn = true)
+        vm.ageAnswered(AgeBracket.CHILD, alreadySignedIn = false)
+        assertEquals(OnboardingStep.CHILD, vm.state.value.step)
+        assertTrue(vm.state.value.isChild)
+    }
+
+    @Test
+    fun `a child skips sign-in even on a signed-in device`() {
+        val vm = OnboardingViewModel()
+        vm.setLang("uz")
+        vm.ageAnswered(AgeBracket.CHILD, alreadySignedIn = true)
         assertEquals(OnboardingStep.CHILD, vm.state.value.step)
     }
 
     @Test
-    fun `back from child returns to the parent gate, not to a finished sign-in`() {
+    fun `signed-in adult skips the sign-in step`() {
         val vm = OnboardingViewModel()
         vm.setLang("uz")
-        vm.parentVerified(alreadySignedIn = false)
-        vm.signInFinished()
-        vm.back()
-        assertEquals(OnboardingStep.PARENT_GATE, vm.state.value.step)
+        vm.ageAnswered(AgeBracket.TEEN_OR_ADULT, alreadySignedIn = true)
+        assertEquals(OnboardingStep.CHILD, vm.state.value.step)
     }
 
     @Test
-    fun `only adult birth years pass the parent gate`() {
-        assertTrue(isAdultBirthYear(1990, 2026))
-        assertTrue(isAdultBirthYear(2008, 2026))
-        assertFalse(isAdultBirthYear(2009, 2026))
-        assertFalse(isAdultBirthYear(2020, 2026))
-        assertFalse(isAdultBirthYear(1900, 2026))
-        assertFalse(isAdultBirthYear(null, 2026))
+    fun `the age screen cannot be revisited once answered`() {
+        val vm = OnboardingViewModel()
+        vm.setLang("uz")
+        vm.ageAnswered(AgeBracket.CHILD, alreadySignedIn = false)
+
+        vm.back()
+        assertEquals(OnboardingStep.LANGUAGE, vm.state.value.step)
+
+        // Picking a language again goes past the age screen, keeping the first answer.
+        vm.setLang("en")
+        assertEquals(OnboardingStep.CHILD, vm.state.value.step)
+        assertEquals(AgeBracket.CHILD, vm.state.value.bracket)
+    }
+
+    @Test
+    fun `an answer saved before onboarding skips the age step`() {
+        val vm = OnboardingViewModel(initialBracket = AgeBracket.TEEN_OR_ADULT)
+        vm.setLang("uz")
+        assertEquals(OnboardingStep.SIGN_IN, vm.state.value.step)
+    }
+
+    @Test
+    fun `back from the unanswered age screen returns to the language picker`() {
+        val vm = OnboardingViewModel()
+        vm.setLang("uz")
+        vm.back()
+        assertEquals(OnboardingStep.LANGUAGE, vm.state.value.step)
+        vm.setLang("uz")
+        assertEquals(OnboardingStep.AGE, vm.state.value.step)
     }
 }

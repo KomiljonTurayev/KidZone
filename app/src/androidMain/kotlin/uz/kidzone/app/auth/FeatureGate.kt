@@ -56,7 +56,15 @@ enum class AccountFeature {
 class FeatureGate(
     private val account: StateFlow<AccountState>,
     private val accountOnly: Set<AccountFeature> = AccountFeature.entries.toSet(),
+    /**
+     * Families Policy (neutral age screen): `true` for a child or an unanswered age screen.
+     * Account-only features are then not offered at all — no sign-in prompt, no AI, no purchases.
+     */
+    private val restricted: () -> Boolean = { false },
 ) {
     fun isAvailable(feature: AccountFeature): Boolean =
-        feature !in accountOnly || account.value.isSignedIn
+        !isHidden(feature) && (feature !in accountOnly || account.value.isSignedIn)
+
+    /** Hidden features get no entry point and no sign-in prompt (see [restricted]). */
+    fun isHidden(feature: AccountFeature): Boolean = feature in accountOnly && restricted()
 }

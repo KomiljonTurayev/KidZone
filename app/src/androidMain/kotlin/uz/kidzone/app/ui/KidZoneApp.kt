@@ -17,6 +17,9 @@ import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileRepository
 import uz.kidzone.app.data.ProfileSyncManager
 import uz.kidzone.app.auth.AccountFeature
+import uz.kidzone.app.auth.AuthGraph
+import uz.kidzone.app.agegate.AgeGate
+import uz.kidzone.app.agegate.NeutralAgeScreen
 import uz.kidzone.app.ui.screens.AccountGate
 import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.BannedScreen
@@ -94,11 +97,17 @@ fun KidZoneApp(
 
     val profiles by profileViewModel.profiles.collectAsState()
 
+    // Families Policy: installs set up before the neutral age screen existed answer it once on
+    // their next launch; new installs answer it inside onboarding.
+    val ageGateDone = remember { AgeGate.current().completed }
+    val homeDestination = if (profiles.size >= 2) "profile_select" else "main"
     val startDestination = when {
         !onboardingDone -> "onboarding"
-        profiles.size >= 2 -> "profile_select"
-        else -> "main"
+        !ageGateDone -> "age_gate"
+        else -> homeDestination
     }
+    // Hidden for a child (or an unanswered age screen): no parent area, purchases or sign-in.
+    val featureGate = remember { AuthGraph.featureGate }
 
     KidZoneTheme(darkTheme = theme.dark) {
         CompositionLocalProvider(LocalAppLang provides appLang, uz.kidzone.app.ui.theme.LocalThemeController provides theme) {
@@ -122,6 +131,17 @@ fun KidZoneApp(
                                 popUpTo("onboarding") { inclusive = true }
                             }
                         }
+                    )
+                }
+                composable("age_gate") {
+                    NeutralAgeScreen(
+                        lang = appLang,
+                        onSubmit = { year, month ->
+                            AgeGate.submit(context, year, month)
+                            navController.navigate(homeDestination) {
+                                popUpTo("age_gate") { inclusive = true }
+                            }
+                        },
                     )
                 }
                 composable("profile_select") {
@@ -150,10 +170,16 @@ fun KidZoneApp(
                         challengeViewModel = challengeViewModel,
                         gameProgress = gameProgress,
                         parentChallenge = parentChallenge,
-                        onOpenDashboard = { navController.navigate("dashboard") },
+                        onOpenDashboard = {
+                            if (!featureGate.isHidden(AccountFeature.PARENT_DASHBOARD)) navController.navigate("dashboard")
+                        },
                         onOpenSleep = { navController.navigate("sleep") },
-                        onOpenPremium = { navController.navigate("premium") },
-                        onRequireAccount = { feature -> navController.navigate("account/${feature.name}") },
+                        onOpenPremium = {
+                            if (!featureGate.isHidden(AccountFeature.PREMIUM)) navController.navigate("premium")
+                        },
+                        onRequireAccount = { feature ->
+                            if (!featureGate.isHidden(feature)) navController.navigate("account/${feature.name}")
+                        },
                         unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
                         onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },
                     )

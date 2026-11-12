@@ -780,6 +780,8 @@
     .prof-btn-primary{background:#FF6B35;color:#fff}
     .prof-btn-secondary{background:#EEE;color:#555}
     #prof-grid-wrap.h{display:none}
+    /* Google Play Families Policy: no AI features for a child (neutral age screen → child=1). */
+    .kz-child .ai-only{display:none !important}
   </style>
   <link rel="stylesheet" href="kz-fonts.css">
 </head>
@@ -1186,20 +1188,20 @@
 
     <!-- AI STUDIO -->
     <div id="ai-studio">
-      <div class="ai-hdr">
+      <div class="ai-hdr ai-only">
         <div class="ai-badge" id="ai-badge">NEW • AI</div>
         <div class="ai-title" id="ai-studio-title">AI Bolalar Studiyasi</div>
       </div>
       <div class="ai-btns">
-        <button class="ai-btn" onclick="openKidzo()">
+        <button class="ai-btn ai-only" onclick="openKidzo()">
           <span class="ai-btn-ic">🐥</span>
           <span class="ai-btn-lb" id="ai-btn-kidzo">Aqlli Kidzo</span>
         </button>
-        <button class="ai-btn" onclick="generateAiStory()">
+        <button class="ai-btn ai-only" onclick="generateAiStory()">
           <span class="ai-btn-ic">📚</span>
           <span class="ai-btn-lb" id="ai-btn-story">Ertak To'qish</span>
         </button>
-        <button class="ai-btn" onclick="openPersonalStory()">
+        <button class="ai-btn ai-only" onclick="openPersonalStory()">
           <span class="ai-btn-ic">👶</span>
           <span class="ai-btn-lb" id="ai-btn-personal">Shaxsiy Ertak</span>
         </button>

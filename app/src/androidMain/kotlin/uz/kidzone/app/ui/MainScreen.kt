@@ -75,6 +75,8 @@ import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.KidWebViewManager
 import uz.kidzone.app.auth.AccountFeature
 import uz.kidzone.app.auth.AuthGraph
+import uz.kidzone.app.agegate.AgeGate
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberUpdatedState
 import uz.kidzone.app.kidzo.ContentFilter
 import uz.kidzone.app.kidzo.KidzoAgent
@@ -167,7 +169,13 @@ fun MainScreen(
     var showKidzoSheet by remember { mutableStateOf(false) }
     var aiLimit by remember { mutableStateOf<AiLimitKind?>(null) }
 
-    val kidzoAgentRef = remember {
+    // Families Policy (neutral age screen): for a child Kidzo AI, sign-in, purchases and the
+    // parent area are not offered at all — no agent (no Gemini), no FAB, no sign-in prompts.
+    val ageGate by AgeGate.state.collectAsState()
+    val restricted = ageGate.isRestricted
+
+    val kidzoAgentRef = remember(restricted) {
+        if (restricted) return@remember null
         val filter = try { ContentFilter.fromAssets(context) } catch (e: Exception) { null }
         filter?.let {
             KidzoAgent.createStatic(it) { block -> android.os.Handler(android.os.Looper.getMainLooper()).post(block) }
@@ -182,7 +190,11 @@ fun MainScreen(
     // sign-in instead. The WebView bridge below is created once, so it reads these through
     // rememberUpdatedState rather than capturing a stale lambda.
     val featureGate = remember { AuthGraph.featureGate }
-    val requireAccount by rememberUpdatedState(onRequireAccount)
+    val onRequireAccountState by rememberUpdatedState(onRequireAccount)
+    // A hidden feature (child mode) is silently ignored instead of opening the parent sign-in.
+    fun requireAccount(feature: AccountFeature) {
+        if (!featureGate.isHidden(feature)) onRequireAccountState(feature)
+    }
     fun aiAvailable(): Boolean = featureGate.isAvailable(AccountFeature.AI_COMPANION)
     fun openKidzo() {
         if (!aiAvailable()) return requireAccount(AccountFeature.AI_COMPANION)
@@ -262,7 +274,9 @@ fun MainScreen(
                         )
                         val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
                         mgr.loadUrl(
-                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}&theme=${if (theme.dark) "dark" else "light"}"
+                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}&theme=${if (theme.dark) "dark" else "light"}" +
+                                // Hides the web UI's AI Studio buttons for a child (Families Policy).
+                                if (restricted) "&child=1" else ""
                         )
                         webMgrRef.value = mgr
                         addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
@@ -349,7 +363,7 @@ fun MainScreen(
             }
 
             // FAB (Kidzo)
-            if (!uiState.inGame && kidzoViewModel != null) {
+            if (!uiState.inGame && kidzoViewModel != null && !restricted) {
                 val density = LocalDensity.current
                 val viewConfiguration = LocalViewConfiguration.current
                 val fabSizePx = with(density) { 56.dp.toPx() }

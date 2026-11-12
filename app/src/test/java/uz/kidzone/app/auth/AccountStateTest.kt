@@ -58,4 +58,34 @@ class AccountStateTest {
         assertTrue(gate.isAvailable(AccountFeature.AI_COMPANION))
         assertFalse(gate.isAvailable(AccountFeature.PREMIUM))
     }
+
+    @Test
+    fun `restricted (child) mode hides account-only features even when signed in`() {
+        val account = MutableStateFlow<AccountState>(AccountState.SignedIn("u1", null, AuthProvider.GOOGLE))
+        var restricted = true
+        val gate = FeatureGate(account, restricted = { restricted })
+
+        AccountFeature.entries.forEach {
+            assertTrue(gate.isHidden(it))
+            assertFalse(gate.isAvailable(it))
+        }
+
+        restricted = false
+        AccountFeature.entries.forEach {
+            assertFalse(gate.isHidden(it))
+            assertTrue(gate.isAvailable(it))
+        }
+    }
+
+    @Test
+    fun `restricted mode leaves free features alone`() {
+        val gate = FeatureGate(
+            MutableStateFlow(AccountState.Guest("g1")),
+            accountOnly = setOf(AccountFeature.PREMIUM),
+            restricted = { true },
+        )
+        assertFalse(gate.isHidden(AccountFeature.AI_COMPANION))
+        assertTrue(gate.isAvailable(AccountFeature.AI_COMPANION))
+        assertTrue(gate.isHidden(AccountFeature.PREMIUM))
+    }
 }
