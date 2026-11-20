@@ -455,6 +455,7 @@ fun MainScreen(
         val mgr = webMgrRef.value
         webMgrRef.value?.evaluateJavascript(
             """(function(){
+                if(window.KZBooks&&KZBooks.isOpen()){KZBooks.close();return 'overlay';}
                 var sv=document.getElementById('sleep-view');
                 if(sv&&!sv.classList.contains('h')){closeSleep();return 'overlay';}
                 var lv=document.getElementById('lyrics-viewer');

@@ -251,8 +251,10 @@ class ContentManager {
             lullaby: lang==='uz'?'Alla':lang==='ru'?'Колыбельная':'Lullaby',
             alphabet:lang==='uz'?'Alifbo':lang==='ru'?'Азбука':'Alphabet',
             dance:   lang==='uz'?'Raqs':lang==='ru'?'Танец':'Dance',
-            games:   lang==='uz'?"O'yin":lang==='ru'?'Игры':'Games'
+            games:   lang==='uz'?"O'yin":lang==='ru'?'Игры':'Games',
+            books:   window.KZBooks ? KZBooks.label(lang) : 'Book'
         };
+        const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         this.filtered.forEach(item => {
             const card = document.createElement('div');
@@ -261,8 +263,10 @@ class ContentManager {
             const catLabel = catLabels[item.category] || item.category;
             const isPlaying = item.id === this.currentId;
             card.innerHTML =
-                '<div class="cc-art">' + item.emoji + '</div>' +
-                '<div class="cc-title">' + title + '</div>' +
+                (item.cover
+                    ? '<div class="cc-art cc-cover"><img src="' + esc(item.cover) + '" alt="" loading="lazy" onerror="this.parentNode.textContent=&quot;📚&quot;"></div>'
+                    : '<div class="cc-art">' + item.emoji + '</div>') +
+                '<div class="cc-title">' + esc(title) + '</div>' +
                 '<div class="cc-cat">' + catLabel + '</div>' +
                 '<div class="cc-ic">' + (isPlaying ? (this.player.isPlaying() ? '⏸' : '▶') : '▶') + '</div>';
             card.onclick = () => this._play(item);
@@ -362,10 +366,47 @@ class ContentManager {
 class StoryManager extends ContentManager {
     constructor(player, translator, ui) {
         super('stories', player, translator, ui);
+        this._baseItems = [];
+        this._booksLang = null;
+    }
+
+    load() {
+        return super.load().then(() => { this._baseItems = this.items; });
+    }
+
+    render() {
+        // Picture books come from the backend per language (kz-storybook.js);
+        // (re)load them on first render and after a language switch.
+        if (window.KZBooks && this._booksLang !== this.translator.lang) {
+            this._loadBooks();
+            return;
+        }
+        super.render();
+    }
+
+    _loadBooks() {
+        const lang = this.translator.lang;
+        this._booksLang = lang;
+        const apply = (books) => {
+            if (this._booksLang !== lang) return;
+            const bookItems = books.map(b => ({
+                id: 'book-' + b.id, book: b, category: 'books', emoji: '📚',
+                cover: KZBooks.abs(b.cover), title: { [lang]: b.title, en: b.title }
+            }));
+            this.items = bookItems.concat(this._baseItems);
+            this.filter(this._searchQuery, this._catFilter);
+            super.render();
+        };
+        apply(KZBooks.list(lang, apply));
     }
 
     _play(item) {
         if (window.badgeManager) badgeManager.onStoryPlayed();
+        if (item.book) {
+            this.stop();
+            KZBooks.open(item.book.id, this.translator.lang);
+            return;
+        }
         const lang = this.translator.lang;
         const title = item.title[lang] || item.title.en;
         const text = item.text ? (item.text[lang] || item.text.en || '') : '';
@@ -1530,16 +1571,19 @@ window.addEventListener("load", () => {
 
     // NativeBridge.speakText(...) callbacks (see _doSpeak in GameManager).
     window.onNativeSpeechStart = function() {
+        if (window.KZBooks && KZBooks.isOpen()) return;
         app._nativeSpeaking = true;
         const btn = document.getElementById("ai-read-btn");
         if (btn) btn.querySelector('span').textContent = "⏹️";
     };
     window.onNativeSpeechEnd = function() {
+        if (window.KZBooks && KZBooks.onSpeechEnd()) return;
         app._nativeSpeaking = false;
         const btn = document.getElementById("ai-read-btn");
         if (btn) btn.querySelector('span').textContent = "🔊";
     };
     window.onNativeSpeechError = function() {
+        if (window.KZBooks && KZBooks.onSpeechError()) return;
         app._nativeSpeaking = false;
         app._doSpeakWeb();
     };
