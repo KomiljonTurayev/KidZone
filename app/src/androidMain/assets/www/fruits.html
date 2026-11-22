@@ -64,6 +64,7 @@ body {
 
 <div id="q-card">
   <div id="q-emoji">🍎</div>
+  <div id="photo-credit" class="kz-photo-credit"></div>
   <div id="q-hint">Bu nima? To'g'ri javobni tanlang!</div>
 </div>
 
@@ -86,6 +87,7 @@ body {
 </div>
 
 <script src="game-engine.js"></script>
+<script src="kz-photo.js"></script>
 <script>
 const game = new KidZoneGame({ id: 'fruits' });
 const lang = game.lang;
@@ -246,7 +248,8 @@ function loadQ() {
   if (qIdx >= questions.length) { showResult(); return; }
   answered = false;
   const q = questions[qIdx];
-  document.getElementById("q-emoji").textContent = q.em;
+  KZPhoto.show({ set:'fruits', id:KZPhoto.slug(q.name.en), emoji:q.em,
+    box:document.getElementById('q-emoji'), credit:document.getElementById('photo-credit') });
   document.getElementById("q-num").textContent   = `${qIdx + 1}/${questions.length}`;
   document.getElementById("prog-bar").style.width = `${(qIdx / questions.length) * 100}%`;
 

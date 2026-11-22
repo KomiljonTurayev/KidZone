@@ -40,6 +40,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
@@ -105,6 +107,7 @@ fun MainScreen(
     onRequireAccount: (AccountFeature) -> Unit = {},
     unlockedFeature: AccountFeature? = null,
     onUnlockedFeatureHandled: () -> Unit = {},
+    webViewHolder: HomeWebViewHolder,
 ) {
     // Yaxshilangan: collectAsState o'rniga collectAsStateWithLifecycle ishlatildi. 
     // Bu orqafon (background) da batareya isrofgarchiligini oldini oladi.
@@ -214,6 +217,56 @@ fun MainScreen(
     // A link that leaves the app, waiting for a grown-up to pass the parental gate.
     var pendingExternalUri by remember { mutableStateOf<Uri?>(null) }
 
+    // Every composition hands the long-lived bridge fresh callbacks (this screen's state).
+    val onOpenDashboardState by rememberUpdatedState(onOpenDashboard)
+    val onOpenSleepState by rememberUpdatedState(onOpenSleep)
+    SideEffect {
+        webViewHolder.callbacks = HomeWebViewHolder.Callbacks(
+            openKidzo = { openKidzo() },
+            askKidzo = { query ->
+                if (aiAvailable()) {
+                    val profileNow = profileViewModel.activeProfile.value
+                    val curLang = profileNow?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
+                    kidzoViewModel?.askKidzo(query, curLang, profileNow?.name ?: "", context)
+                    showKidzoSheet = true
+                } else {
+                    requireAccount(AccountFeature.AI_COMPANION)
+                }
+            },
+            isAiAvailable = { aiAvailable() },
+            onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
+            onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
+            onLevelReached = { gameId, level ->
+                val pid = profileViewModel.activeProfile.value?.id
+                if (pid != null) scope.launch {
+                    gameProgress.onLevelReached(pid, gameId, level)
+                    parentChallenge.onLevelReached(pid, gameId, level)
+                    levelTick++
+                }
+                challengeViewModel.onLevelUp()
+            },
+            onThemeModeChanged = { setThemeMode(it) },
+            // Without these the next launch's ?lang=/?age= would undo the child's pick. The page
+            // already shows the new value, so the kept WebView needs no reload for it either.
+            onLanguageChanged = { lang ->
+                prefs.edit().putString("kz_lang", lang).apply()
+                profileViewModel.activeProfile.value?.let { profileViewModel.updateProfile(it.copy(language = lang)) }
+                webViewHolder.loadedKey = webViewHolder.loadedKey?.copy(lang = lang)
+            },
+            onAgeChanged = { age ->
+                prefs.edit().putString("kz_age", age).apply()
+                webViewHolder.loadedKey = webViewHolder.loadedKey?.copy(age = age)
+            },
+            onOpenDashboard = { onOpenDashboardState() },
+            onOpenSleep = { onOpenSleepState() },
+            onExternalLink = { pendingExternalUri = it },
+        )
+    }
+    // Leaving the home screen pauses the kept WebView instead of destroying it.
+    DisposableEffect(webViewHolder) {
+        onDispose { webViewHolder.pause() }
+    }
+
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
@@ -223,76 +276,52 @@ fun MainScreen(
                 .weight(1f)
                 .onSizeChanged { containerSize = it },
         ) {
-            // WebView
+            // WebView — kept alive in [webViewHolder] while the child visits other screens.
             AndroidView(
                 factory = { ctx ->
-                    WebView(ctx).apply {
+                    val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
+                    val age = prefs.getString("kz_age", "2-4") ?: "2-4"
+                    val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
+                    val key = HomeWebViewHolder.LoadKey(lang, age, profile, restricted)
+                    val url = "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}&theme=${if (theme.dark) "dark" else "light"}" +
+                        // Hides the web UI's AI Studio buttons for a child (Families Policy).
+                        if (restricted) "&child=1" else ""
+                    webViewHolder.reuse(key, url)?.also { webMgrRef.value = webViewHolder.manager }
+                        ?: WebView(ctx).apply {
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT,
                         )
                         val mgr = KidWebViewManager(this)
-                        val lang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
-                        val age = prefs.getString("kz_age", "2-4") ?: "2-4"
+                        // The bridge outlives this composition: it reads the holder's current callbacks.
+                        val cb = { webViewHolder.callbacks }
                         val nativeBridge = NativeBridge(
                             viewModel = mainViewModel,
-                            onOpenDashboard = onOpenDashboard,
-                            onOpenSleep = onOpenSleep,
-                            onOpenKidzo = { openKidzo() },
-                            isAiAvailable = { aiAvailable() },
-                            onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
-                            onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
+                            onOpenDashboard = { cb().onOpenDashboard() },
+                            onOpenSleep = { cb().onOpenSleep() },
+                            onOpenKidzo = { cb().openKidzo() },
+                            isAiAvailable = { cb().isAiAvailable() },
+                            onAiLocked = { cb().onAiLocked() },
+                            onAiDailyLimit = { cb().onAiDailyLimit() },
                             // Feeds the parent dashboard's "games played today".
                             onGameLaunched = statsManager::onGameLaunched,
-                            onThemeModeChanged = { setThemeMode(it) },
-                            onLevelReached = { gameId, level ->
-                                val pid = profileViewModel.activeProfile.value?.id
-                                if (pid != null) scope.launch {
-                                    gameProgress.onLevelReached(pid, gameId, level)
-                                    parentChallenge.onLevelReached(pid, gameId, level)
-                                    levelTick++
-                                }
-                                challengeViewModel.onLevelUp()
-                            },
-                            // Without these the next launch's ?lang=/?age= would undo the child's pick.
-                            onLanguageChanged = { lang ->
-                                prefs.edit().putString("kz_lang", lang).apply()
-                                profileViewModel.activeProfile.value?.let { profileViewModel.updateProfile(it.copy(language = lang)) }
-                            },
-                            onAgeChanged = { age -> prefs.edit().putString("kz_age", age).apply() },
-                            onAskKidzo = { query ->
-                                if (aiAvailable()) {
-                                    val curLang = activeProfile?.language ?: prefs.getString("kz_lang", "uz") ?: "uz"
-                                    val cName = activeProfile?.name ?: ""
-                                    kidzoViewModel?.askKidzo(query, curLang, cName, context)
-                                    showKidzoSheet = true
-                                } else {
-                                    requireAccount(AccountFeature.AI_COMPANION)
-                                }
-                            },
+                            onThemeModeChanged = { cb().onThemeModeChanged(it) },
+                            onLevelReached = { gameId, level -> cb().onLevelReached(gameId, level) },
+                            onLanguageChanged = { cb().onLanguageChanged(it) },
+                            onAgeChanged = { cb().onAgeChanged(it) },
+                            onAskKidzo = { cb().askKidzo(it) },
                             evalJs = mgr::evaluateJavascript,
                             activity = context as Activity
                         )
-                        mgr.onExternalLink = { pendingExternalUri = it }
+                        mgr.onExternalLink = { cb().onExternalLink(it) }
                         mgr.setup(nativeBridge, "AndroidBridge")
                         mgr.addInterface(
                             ChallengeBridge(challengeViewModel, context),
                             "AndroidChallenge",
                         )
-                        val profile = activeProfile?.id?.let(::jsSafeId).orEmpty()
-                        mgr.loadUrl(
-                            "${KidWebViewManager.ASSET_BASE_URL}index.html?lang=${Uri.encode(lang)}&age=${Uri.encode(age)}&profile=${Uri.encode(profile)}&theme=${if (theme.dark) "dark" else "light"}" +
-                                // Hides the web UI's AI Studio buttons for a child (Families Policy).
-                                if (restricted) "&child=1" else ""
-                        )
+                        mgr.loadUrl(url)
+                        webViewHolder.attach(this, mgr, nativeBridge, key)
                         webMgrRef.value = mgr
-                        addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
-                            override fun onViewAttachedToWindow(v: android.view.View) {}
-                            override fun onViewDetachedFromWindow(v: android.view.View) {
-                                mgr.destroy()
-                                nativeBridge.shutdownTts()
-                            }
-                        })
                     }
                 },
                 modifier = Modifier.fillMaxSize(),
@@ -455,6 +484,7 @@ fun MainScreen(
         val mgr = webMgrRef.value
         webMgrRef.value?.evaluateJavascript(
             """(function(){
+                if(window.KZBooks&&KZBooks.isOpen()){KZBooks.close();return 'overlay';}
                 var sv=document.getElementById('sleep-view');
                 if(sv&&!sv.classList.contains('h')){closeSleep();return 'overlay';}
                 var lv=document.getElementById('lyrics-viewer');

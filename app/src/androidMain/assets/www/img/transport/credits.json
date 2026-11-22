@@ -1,0 +1,142 @@
+{
+ "car": {
+  "by": "Daniel Lu (User:dllu)",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:White_Toyota_Corolla_sedan_in_San_Jose_California_dllu.jpg"
+ },
+ "bus": {
+  "by": "SIA321",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:LTZ1328-19-20241030-160332.jpg"
+ },
+ "train": {
+  "by": "Алексей Задонский",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%BE%D0%B5%D0%B7%D0%B4_%D0%BD%D0%B0_%D1%84%D0%BE%D0%BD%D0%B5_%D0%B3%D0%BE%D1%80%D1%8B_%D0%A8%D0%B0%D1%82%D1%80%D0%B8%D1%89%D0%B5._%D0%92%D0%BE%D1%80%D0%BE%D0%BD%D0%B5%D0%B6%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C.jpg"
+ },
+ "helicopter": {
+  "by": "Fly45yt",
+  "license": "CC BY 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:VH-SUF_Taking_Off.jpg"
+ },
+ "ship": {
+  "by": "Ajepbah",
+  "license": "CC BY-SA 3.0 de",
+  "src": "https://commons.wikimedia.org/wiki/File:Containerterminal_Altenwerder_(Hamburg-Altenwerder).Iris_Bolten.4.phb.ajb.jpg"
+ },
+ "bicycle": {
+  "by": "齐健 from Peking, People's Republic of China",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Left_side_of_Flying_Pigeon.jpg"
+ },
+ "rocket": {
+  "by": "Bill Ingalls",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Soyuz_TMA-9_launch.jpg"
+ },
+ "speedboat": {
+  "by": "Kondicherry",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Motorboat_at_Kankaria_lake.JPG"
+ },
+ "small-plane": {
+  "by": "Seaotter7778",
+  "license": "CC BY 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Cessna_172_on_ground.jpg"
+ },
+ "rowboat": {
+  "by": "Poe artist",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Portland_Pudgy_safety_dinghy,_rowing.JPG"
+ },
+ "ambulance": {
+  "by": "AleWi",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Stockholm,_ambulans,_2014,_21.jpg"
+ },
+ "fire-truck": {
+  "by": "William Murphy",
+  "license": "CC BY-SA 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Dublin_Fire_Brigade_Pump_Ladder_D32.jpg"
+ },
+ "police-car": {
+  "by": "Raymond Wambsgans",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Washington_DC_Metropolitan_Police_Department_Dodge_Charger_No._1605.jpg"
+ },
+ "rickshaw": {
+  "by": "calflier001, cropped by uploader Mr.choppers",
+  "license": "CC BY-SA 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Bajaj_auto-rickshaw_in_Sri_Lanka.jpg"
+ },
+ "scooter": {
+  "by": "Thomas Wiersma",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Yamaha_Aerox_2011_.jpg"
+ },
+ "cable-car": {
+  "by": "JuergenG",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Expo2000_seilbahn1.jpg"
+ },
+ "canoe": {
+  "by": "Motorrad-67 at English Wikipedia",
+  "license": "Attribution",
+  "src": "https://commons.wikimedia.org/wiki/File:Morris-canoe-600.jpg"
+ },
+ "monorail": {
+  "by": "Baycrest",
+  "license": "CC BY-SA 2.5",
+  "src": "https://commons.wikimedia.org/wiki/File:Chongqing_Rail_Transit_Line_3_Monorail_Train_near_Xuetangwan_Station.jpg"
+ },
+ "pickup": {
+  "by": "IFCAR",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Ford_F-150_crew_cab_--_05-28-2011.jpg"
+ },
+ "aerial-tram": {
+  "by": "Fin.Seaman",
+  "license": "CC0",
+  "src": "https://commons.wikimedia.org/wiki/File:Corona_Cable_Cars,_Table_Mountain.jpg"
+ },
+ "cruise-ship": {
+  "by": "Corey Seeman",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Icon_of_the_Seas_Puerto_Rico_2025_(cropped).jpg"
+ },
+ "minibus": {
+  "by": "Pehaha",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Jumper_Distribus_(cropped).jpg"
+ },
+ "airplane": {
+  "by": "Jetstar Airways from Melbourne, Australia",
+  "license": "CC BY-SA 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Jetstar_Airbus_A320_in_flight_(6768081249).jpg"
+ },
+ "motorcycle": {
+  "by": "S de Santi",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Honda_XL1000V_Varadero_side_view.jpg"
+ },
+ "ferry": {
+  "by": "Jan Derk Remmers",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Sea_of_Marmara_car_ferry.jpg"
+ },
+ "truck": {
+  "by": "Pierre André Leclercq",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Bakersfield,_(CA)_Truck_Peterbilt_at_Flying_J_Travel_Plaza_(en2016)_(4).JPG"
+ },
+ "motor-boat": {
+  "by": "EgorovaSvetlana",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Motor_Yacht_Ocean_Reef_Bay_Freeport_Grand_Bahama.jpg"
+ },
+ "landing": {
+  "by": "Glenn Beltz",
+  "license": "CC BY 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:United_Airbus_A320_N464UA.jpg"
+ }
+}

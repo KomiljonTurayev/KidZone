@@ -1,0 +1,152 @@
+{
+ "banana": {
+  "by": "TimothyPilgrim",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Bananavarieties.jpg"
+ },
+ "grapes": {
+  "by": "Vyacheslav Argenberg",
+  "license": "CC BY 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Grapes,_Rostov-on-Don,_Russia.jpg"
+ },
+ "orange": {
+  "by": "Ivar Leidus",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Oranges_-_whole-halved-segment.jpg"
+ },
+ "lemon": {
+  "by": "Elena Chochkova",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:P1030323.JPG"
+ },
+ "strawberry": {
+  "by": "Ivar Leidus",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Garden_strawberry_(Fragaria_%C3%97_ananassa)_single2.jpg"
+ },
+ "cherry": {
+  "by": "spurekar",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Cherry_season_(48216568227).jpg"
+ },
+ "pear": {
+  "by": "Keith Weller",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Pears.jpg"
+ },
+ "mango": {
+  "by": "Ivar Leidus",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Mangos_-_single_and_halved.jpg"
+ },
+ "pineapple": {
+  "by": "Suniltg at Malayalam Wikipedia",
+  "license": "CC BY 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:%E0%B4%95%E0%B5%88%E0%B4%A4%E0%B4%9A%E0%B5%8D%E0%B4%9A%E0%B4%95%E0%B5%8D%E0%B4%95.jpg"
+ },
+ "kiwi": {
+  "by": "Tiia Monto",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Kiwifruit_halved.jpg"
+ },
+ "carrot": {
+  "by": "Evan-Amos",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Vegetable-Carrot-Bundle-wStalks.jpg"
+ },
+ "corn": {
+  "by": "Jonathunder",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:CookedCornOnTheCob.JPG"
+ },
+ "potato": {
+  "by": "Scott Bauer, USDA ARS",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Patates.jpg"
+ },
+ "tomato": {
+  "by": "Softeis",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Tomato_je.jpg"
+ },
+ "onion": {
+  "by": "Colin",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Mixed_onions.jpg"
+ },
+ "pepper": {
+  "by": "Kham Tran - www.khamtran.com",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Green-Yellow-Red-Pepper-2009.jpg"
+ },
+ "eggplant": {
+  "by": "Joydeep",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Solanum_melongena_24_08_2012_(1).JPG"
+ },
+ "avocado": {
+  "by": "B.navez",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Persea_americana_fruit_2.JPG"
+ },
+ "watermelon": {
+  "by": "USDA photo by Scott Bauer",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Watermelon.jpg"
+ },
+ "blueberry": {
+  "by": "The original Uploader was Oven Fresh at English Wikipedia",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Blueberries.jpg"
+ },
+ "melon": {
+  "by": "Atomicbre at English Wikipedia",
+  "license": "CC BY 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Cantaloupe_and_canary_melon.jpg"
+ },
+ "olive": {
+  "by": "en:User:Nickfraser",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Olivesfromjordan.jpg"
+ },
+ "chestnut": {
+  "by": "Grzegorz Gigol",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Sweet_Chestnut_Fruit.jpg"
+ },
+ "apple": {
+  "by": "Abhijit Tembhekar from Mumbai, India",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Red_Apple.jpg"
+ },
+ "broccoli": {
+  "by": "HaJunkiyada",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Fresh_Broccoli.jpg"
+ },
+ "cabbage": {
+  "by": "Jeffery Martin",
+  "license": "CC0",
+  "src": "https://commons.wikimedia.org/wiki/File:Cabbage_in_a_stack.jpg"
+ },
+ "coconut": {
+  "by": "Shameelnurani313",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Young_Coconut_Drink.jpg"
+ },
+ "peach": {
+  "by": "Jack Dykinga, USDA",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Autumn_Red_peaches.jpg"
+ },
+ "peanut": {
+  "by": "TorbeyCharbel",
+  "license": "CC BY 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Peanuts_in_their_shells.jpg"
+ },
+ "ginger": {
+  "by": "Miansari66",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Fresh_Ginger.JPG"
+ }
+}

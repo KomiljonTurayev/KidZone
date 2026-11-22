@@ -312,7 +312,7 @@
       height:100px;display:flex;align-items:center;justify-content:center;
       font-size:52px;position:relative;overflow:hidden;
     }
-    .feat-em{filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));animation:featFloat 3s ease-in-out infinite;will-change:transform}
+    .feat-em{text-shadow:0 4px 8px rgba(0,0,0,.2);animation:featFloat 3s ease-in-out infinite}
     @keyframes featFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
     .feat-badge-hot{
       position:absolute;top:7px;left:7px;z-index:3;
@@ -355,15 +355,11 @@
     }
     .gc-em{
       font-size:clamp(28px,7vw,44px);position:relative;z-index:1;
-      filter:drop-shadow(0 3px 6px rgba(0,0,0,.15));
-      will-change:transform;
-      animation:gcFloat 3s ease-in-out infinite;
+      /* No infinite float / will-change / filter here: 50 cards = 50 GPU layers
+         repainted every frame, which made the home screen janky on low-RAM phones. */
+      text-shadow:0 3px 6px rgba(0,0,0,.15);
     }
-    @keyframes gcFloat{0%,100%{transform:translateY(0) translateZ(0)}50%{transform:translateY(-4px) translateZ(0)}}
-    .gc:nth-child(2n) .gc-em{animation-delay:-.6s}
-    .gc:nth-child(3n) .gc-em{animation-delay:-1.2s}
-    .gc:nth-child(4n) .gc-em{animation-delay:-1.8s}
-    @media(prefers-reduced-motion:reduce){.gc-em,.lv-icon,#kt-owl,.feat-em{animation:none}}
+    @media(prefers-reduced-motion:reduce){.lv-icon,#kt-owl,.feat-em{animation:none}}
     .gc-lock{
       position:absolute;inset:0;background:rgba(255,248,240,.75);
       display:flex;align-items:center;justify-content:center;
@@ -583,8 +579,7 @@
 
     /* ── BLOBS ── */
     #blobs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-    .blob{position:absolute;border-radius:50%;opacity:.04;animation:blobD ease-in-out infinite}
-    @keyframes blobD{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-15px) scale(1.04)}66%{transform:translate(-15px,10px) scale(.97)}}
+    .blob{position:absolute;border-radius:50%;opacity:.04} /* static: a full-screen animated layer at 4% opacity cost a repaint every frame */
 
     /* ── TAB BAR ── */
     #tab-bar{display:flex;background:var(--surface);border-bottom:2px solid rgba(0,0,0,0.06);flex-shrink:0}
@@ -625,6 +620,8 @@
     .content-card:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,0.08)}
     .content-card.playing{background:rgba(255,107,53,0.08);outline:2px solid var(--accent)}
     .cc-art{font-size:52px;line-height:1}
+    .cc-cover{width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#EDE9FE;display:flex;align-items:center;justify-content:center}
+    .cc-cover img{width:100%;height:100%;object-fit:cover;display:block}
     .cc-title{font-family:'Fredoka One','KZ Cyrillic',cursive;font-size:13px;color:var(--text);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%}
     .cc-cat{font-size:10px;font-weight:800;color:var(--dim);background:rgba(0,0,0,0.05);border-radius:8px;padding:2px 8px}
     .cc-ic{font-size:16px;color:var(--accent);font-weight:900}
@@ -1292,6 +1289,7 @@
       <!-- 1. Categories first (easier to browse) -->
       <div class="cc-cats" id="stories-cats">
         <button class="cc-chip active" onclick="storyFilter(document.getElementById('stories-search').value,'all',this)">🎯 <span id="scat-all">Hammasi</span></button>
+        <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'books',this)">📚 <span id="scat-books">Rasmli</span></button>
         <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'animals',this)">🐾 <span id="scat-animals">Hayvonlar</span></button>
         <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'nature',this)">🌿 <span id="scat-nature">Tabiat</span></button>
         <button class="cc-chip" onclick="storyFilter(document.getElementById('stories-search').value,'heroes',this)">🦸 <span id="scat-heroes">Qahramonlar</span></button>
@@ -1357,6 +1355,7 @@
   </button>
 </div>
 
+  <script src="kz-storybook.js"></script>
   <script src="main.js"></script>
   <script>
     // ════════════════════════════════════════════════════
@@ -2058,7 +2057,8 @@
         // Story category chip labels
         const scatMap = {
           'scat-all':t2.catAll,'scat-animals':t2.catAnimals,'scat-nature':t2.catNature,
-          'scat-heroes':t2.catHeroes,'scat-family':t2.catFamily,'scat-space':t2.catSpace
+          'scat-heroes':t2.catHeroes,'scat-family':t2.catFamily,'scat-space':t2.catSpace,
+          'scat-books':({uz:'Rasmli',ru:'С картинками',en:'Picture books'})[app.translator.lang]||'Picture books'
         };
         Object.entries(scatMap).forEach(([id,lbl]) => { const el=document.getElementById(id); if(el) el.textContent=lbl; });
 
@@ -2173,6 +2173,7 @@
     const heroEmojis = ["🎮","🌈","🦋","🎪","🚀","🌟","🎨","🎭","🦄","🐉"];
     let heroIdx = 0;
     setInterval(()=>{
+        if (document.hidden) return;
         heroIdx = (heroIdx+1) % heroEmojis.length;
         const em = document.getElementById("hero-em");
         if(em) {

@@ -1,0 +1,152 @@
+{
+ "dog": {
+  "by": "M. Rehemtulla",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Huskiesatrest.jpg"
+ },
+ "cat": {
+  "by": "Karin Langner-Bahmann",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Siam_lilacpoint.jpg"
+ },
+ "cow": {
+  "by": "Kim Hansen",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Cow_(Fleckvieh_breed)_Oeschinensee_Slaunger_2009-07-07.jpg"
+ },
+ "lion": {
+  "by": "Giles Laurent",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:020_The_lion_king_Snyggve_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg"
+ },
+ "frog": {
+  "by": "Charlie Jackson",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Red-eyed_Leaf_Frog_(49661076226).jpg"
+ },
+ "duck": {
+  "by": "Richard Bartz",
+  "license": "CC BY-SA 2.5",
+  "src": "https://commons.wikimedia.org/wiki/File:Anas_platyrhynchos_male_female_quadrat.jpg"
+ },
+ "bird": {
+  "by": "Rhododendrites",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:House_sparrow_male_in_Prospect_Park_(53532).jpg"
+ },
+ "elephant": {
+  "by": "Giles Laurent",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:178_Male_African_bush_elephant_in_Etosha_National_Park_Photo_by_Giles_Laurent.jpg"
+ },
+ "monkey": {
+  "by": "Deerpeter",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Ubud_Monkey_Family.jpg"
+ },
+ "horse": {
+  "by": "François Marchal, Dana boomer",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Nokota_Horses_cropped.jpg"
+ },
+ "bear": {
+  "by": "Yathin S Krishnappa",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:2010-kodiak-bear-1.jpg"
+ },
+ "rabbit": {
+  "by": "JM Ligero Loarte",
+  "license": "CC BY 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Oryctolagus_cuniculus_Rcdo.jpg"
+ },
+ "sheep": {
+  "by": "Keith Weller",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Flock_of_sheep.jpg"
+ },
+ "pig": {
+  "by": "Public domain",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Sow_and_five_piglets.jpg"
+ },
+ "giraffe": {
+  "by": "Giles Laurent",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:006_Giraffe_portrait_in_the_Lake_Manyara_National_Park_Photo_by_Giles_Laurent.jpg"
+ },
+ "zebra": {
+  "by": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Plains_zebra_(Equus_quagga)_Kruger.jpg"
+ },
+ "penguin": {
+  "by": "Godot13",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:South_Shetland-2016-Deception_Island%E2%80%93Chinstrap_penguin_(Pygoscelis_antarctica)_04.jpg"
+ },
+ "crocodile": {
+  "by": "Leigh Bedford",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Nile_crocodile_head.jpg"
+ },
+ "dolphin": {
+  "by": "NASA",
+  "license": "Public domain",
+  "src": "https://commons.wikimedia.org/wiki/File:Tursiops_truncatus_01.jpg"
+ },
+ "snake": {
+  "by": "Rushenb",
+  "license": "CC BY-SA 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Trimeresurus_sabahi_fucatus,_Banded_pit_viper_-_Takua_Pa_District,_Phang-nga_Province_(46710893582).jpg"
+ },
+ "wolf": {
+  "by": "Mas3cf",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Eurasian_wolf_2.jpg"
+ },
+ "owl": {
+  "by": "Carlos Delgado",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Bubo_bubo_sibiricus_-_01.JPG"
+ },
+ "tiger": {
+  "by": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Bengal_tiger_(Panthera_tigris_tigris)_female_3_crop.jpg"
+ },
+ "gorilla": {
+  "by": "Thurundir",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Gorille_des_plaines_de_l%27ouest_%C3%A0_l%27Espace_Zoologique.jpg"
+ },
+ "flamingo": {
+  "by": "Valdiney Pimenta",
+  "license": "CC BY 2.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Flamingos_Laguna_Colorada.jpg"
+ },
+ "kangaroo": {
+  "by": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Forester_kangaroo_(Macropus_giganteus_tasmaniensis)_juvenile_hopping_Esk_Valley.jpg"
+ },
+ "parrot": {
+  "by": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Rainbow_lorikeet_(Trichoglossus_moluccanus_moluccanus)_Sydney.jpg"
+ },
+ "hedgehog": {
+  "by": "Gibe",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Igel.JPG"
+ },
+ "camel": {
+  "by": "Jjron",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:07._Camel_Profile,_near_Silverton,_NSW,_07.07.2007.jpg"
+ },
+ "panda": {
+  "by": "J. Patrick Fischer",
+  "license": "CC BY-SA 3.0",
+  "src": "https://commons.wikimedia.org/wiki/File:Grosser_Panda.JPG"
+ }
+}

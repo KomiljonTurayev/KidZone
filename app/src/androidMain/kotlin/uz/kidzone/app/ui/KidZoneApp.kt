@@ -3,6 +3,7 @@ package uz.kidzone.app.ui
 import uz.kidzone.app.arch.AppPreferences
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -58,6 +59,9 @@ fun KidZoneApp(
     }
 
     val navController = rememberNavController()
+    // The home WebView survives trips to other screens; it goes away with the app UI.
+    val homeWebView = remember { HomeWebViewHolder() }
+    DisposableEffect(homeWebView) { onDispose { homeWebView.destroy() } }
     val onboardingDone = prefs.getBoolean("kz_onboarding_done", false)
     val context = LocalContext.current
 
@@ -182,6 +186,7 @@ fun KidZoneApp(
                         },
                         unlockedFeature = unlocked?.let { name -> AccountFeature.entries.firstOrNull { it.name == name } },
                         onUnlockedFeatureHandled = { backStack.savedStateHandle[UNLOCKED_FEATURE_KEY] = null },
+                        webViewHolder = homeWebView,
                     )
                 }
                 composable("account/{feature}") { backStack ->

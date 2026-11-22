@@ -61,6 +61,7 @@ body {
   <div id="q-card">
     <div id="ui-quest" style="color:#7C3AED;font-weight:900;margin-bottom:8px;font-size:15px;"></div>
     <div id="animal-display" onclick="playAnimalSound()">🐶</div>
+    <div id="photo-credit" class="kz-photo-credit"></div>
     <div id="animal-sound"></div>
     <div id="ui-hint"></div>
   </div>
@@ -104,6 +105,7 @@ body {
 
 <script src="kz-ui.js"></script>
 <script src="game-engine.js"></script>
+<script src="kz-photo.js"></script>
 <script>
 /* ════════════ DATA: 30 animals (easy → expert) ════════════ */
 const ANIMALS = [
@@ -301,7 +303,8 @@ function loadQ() {
   answered = false;
   currentAnimal = questions[qIdx];
 
-  document.getElementById('animal-display').textContent = currentAnimal.em;
+  KZPhoto.show({ set:'animals', id:currentAnimal.id, emoji:currentAnimal.em,
+    box:document.getElementById('animal-display'), credit:document.getElementById('photo-credit') });
   document.getElementById('animal-sound').textContent   = currentAnimal.snd[lang] || '';
   document.getElementById('ui-quest').textContent       = t.quest;
 
