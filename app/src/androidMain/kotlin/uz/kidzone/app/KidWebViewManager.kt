@@ -84,7 +84,8 @@ class KidWebViewManager(private val webView: WebView) {
         settings.allowFileAccess = false
         settings.mediaPlaybackRequiresUserGesture = false
         settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-        webView.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+        // No setLayerType(HARDWARE): WebView is already GPU-composited; an extra
+        // offscreen layer doubles its memory and re-renders it on every frame.
     }
 
     @SuppressLint("JavascriptInterface")
@@ -129,7 +130,8 @@ class KidWebViewManager(private val webView: WebView) {
         webView.stopLoading()
         webView.onPause()
         webView.clearHistory()
-        webView.clearCache(true)
+        // No clearCache(true): it deletes the disk cache synchronously on the main thread
+        // each time the user leaves the home screen; bundled games come from assets anyway.
         webView.removeAllViews()
         webView.destroy()
     }
