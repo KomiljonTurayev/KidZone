@@ -9,15 +9,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Genuine Uzbek narration via the KidZone backend, which proxies Aisha AI's
- * "Navoiy TTS" REST API (Gulnoza voice) server-side. The Aisha API key must
- * never live in the client: it's trivially extractable from the APK, and the
- * backend also handles Aisha's submit/poll/download dance so the client makes
- * one call. No on-device Android TTS engine ships an Uzbek voice at all
- * (confirmed via TextToSpeech.isLanguageAvailable — Google's engine's
- * supported-language set doesn't include "uz") — this is the only source of
- * real Uzbek pronunciation. Caller falls back to on-device TTS on any failure:
- * no network, no signed-in user, backend/Aisha error, or a slow/failed synth job.
+ * Genuine Uzbek narration via the KidZone backend's POST /ai/tts, which calls
+ * Azure AI Speech (uz-UZ-MadinaNeural) server-side and returns MP3. The Azure
+ * key must never live in the client: it's trivially extractable from the APK.
+ * No on-device Android TTS engine ships an Uzbek voice at all (confirmed via
+ * TextToSpeech.isLanguageAvailable — Google's engine's supported-language set
+ * doesn't include "uz") — this is the only source of real Uzbek pronunciation.
+ * Caller falls back to on-device TTS on any failure: no network, no signed-in
+ * user, backend without a speech key (503), or an Azure error (502).
+ * (The object keeps its old name: Aisha's Navoiy TTS was the first plan.)
  */
 object AishaSpeechGenerator {
     private const val TAG = "AishaSpeechGenerator"
@@ -64,8 +64,7 @@ object AishaSpeechGenerator {
                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
                 // Short: a child is waiting for the voice; on-device TTS is the fallback.
                 connectTimeout = 3_000
-                // Backend synchronously waits on Aisha's submit/poll/download cycle;
-                // longer than this and the voice no longer matches the screen.
+                // Longer than this and the voice no longer matches the screen.
                 readTimeout = 6_000
             }
             conn.outputStream.use { it.write(payload) }
@@ -77,7 +76,7 @@ object AishaSpeechGenerator {
                 backOff(if (code in setOf(401, 403, 404, 405, 501)) Long.MAX_VALUE else RETRY_AFTER_ERROR_MS)
                 return@withContext null
             }
-            val file = File(cacheDir, "kidzo_tts_${System.currentTimeMillis()}.wav")
+            val file = File(cacheDir, "kidzo_tts_${System.currentTimeMillis()}.mp3")
             conn.inputStream.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
             file
         }
