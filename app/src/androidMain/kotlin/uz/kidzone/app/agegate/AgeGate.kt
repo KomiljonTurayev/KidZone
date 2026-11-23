@@ -3,6 +3,7 @@ package uz.kidzone.app.agegate
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 
 /**
  * Neytral yosh ekrani natijasini jarayon bo'ylab ulaydi ([uz.kidzone.app.auth.AuthGraph] kabi).
@@ -23,6 +24,11 @@ object AgeGate {
 
     /** Kidzo AI, kirish, to'lovlar va push yopiqmi (bola yoki ekran hali o'tilmagan). */
     val isRestricted: Boolean get() = current().isRestricted
+
+    /** Suspends until the age screen has been answered (returns at once if it already was). */
+    suspend fun awaitCompleted() {
+        state.first { it.completed }
+    }
 
     fun init(context: Context) {
         if (repository != null) return

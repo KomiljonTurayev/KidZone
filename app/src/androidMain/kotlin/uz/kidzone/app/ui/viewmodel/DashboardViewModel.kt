@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uz.kidzone.app.FamilyApiClient
+import uz.kidzone.app.FamilyError
+import uz.kidzone.app.FamilyResult
 import uz.kidzone.app.FirestoreSync
 import uz.kidzone.app.ParentalStatsManager
 import uz.kidzone.app.auth.AccountState
@@ -39,6 +41,8 @@ class DashboardViewModel(
     private val statsManager: ParentalStatsManager,
     private val prefs: AppPreferences,
     private val auth: AuthRepository,
+    private val wipeDevice: () -> Boolean,
+    private val deleteOnServer: suspend () -> FamilyResult<Unit> = FamilyApiClient::deleteAccount,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState(account = auth.state.value))
@@ -66,11 +70,15 @@ class DashboardViewModel(
     /** Signing out returns the app to guest mode; the dashboard then asks to sign in again. */
     fun logout() = runAccountAction { auth.signOut() }
 
-    // Family links go first: once the account is gone it can no longer ask the backend to
-    // drop them. Best effort: if this call fails, the members keep reading the old profiles.
+    /** The server erases everything first; the device is wiped only once that succeeded. */
     fun deleteAccount(onDone: (Boolean) -> Unit) = runAccountAction(onDone) {
-        FamilyApiClient.forgetMe()
-        auth.deleteAccount()
+        val result = deleteOnServer()
+        if (result is FamilyResult.Failed) {
+            val reason = if (result.error == FamilyError.NETWORK) AuthException.Reason.NETWORK else AuthException.Reason.FAILED
+            throw AuthException(reason)
+        }
+        // Wiping closes the app; signing out is only for a device that refuses to be wiped.
+        if (!wipeDevice()) auth.signOut()
     }
 
     fun syncNow() {

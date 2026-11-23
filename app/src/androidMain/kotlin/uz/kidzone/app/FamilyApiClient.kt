@@ -41,6 +41,11 @@ object FamilyApiClient {
             .build()
     }
 
+    // Deleting must not fail just because the free-tier backend takes about a minute to wake up.
+    private val wakingClient by lazy {
+        httpClient.newBuilder().readTimeout(90, TimeUnit.SECONDS).build()
+    }
+
     suspend fun family(): FamilyResult<Family> = call("GET", BASE) { parseFamily(it) }
 
     suspend fun invite(): FamilyResult<FamilyInvite> = call("POST", "$BASE/invite") {
@@ -55,13 +60,15 @@ object FamilyApiClient {
 
     suspend fun removeMember(uid: String): FamilyResult<Unit> = call("DELETE", "$BASE/members/$uid") { }
 
-    /** Drops all of this account's family links; called just before the account is deleted. */
-    suspend fun forgetMe(): FamilyResult<Unit> = call("DELETE", "$BASE/me") { }
+    /** Deletes the account and everything the server keeps for it, the children's profiles included. */
+    suspend fun deleteAccount(): FamilyResult<Unit> =
+        call("DELETE", "${BackendConfig.BASE_URL}/account", client = wakingClient) { }
 
     private suspend fun <T> call(
         method: String,
         url: String,
         json: String? = null,
+        client: OkHttpClient = httpClient,
         parse: (String) -> T,
     ): FamilyResult<T> = withContext(Dispatchers.IO) {
         try {
@@ -73,7 +80,7 @@ object FamilyApiClient {
                 .addHeader("Authorization", "Bearer $idToken")
                 .method(method, body)
                 .build()
-            httpClient.newCall(request).execute().use { response ->
+            client.newCall(request).execute().use { response ->
                 when {
                     response.isSuccessful -> FamilyResult.Ok(parse(response.body?.string().orEmpty()))
                     else -> FamilyResult.Failed(errorFor(response.code))

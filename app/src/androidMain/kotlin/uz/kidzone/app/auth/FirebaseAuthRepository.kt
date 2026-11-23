@@ -75,13 +75,6 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth?) : AuthRepository {
         ensureGuestSession()
     }
 
-    override suspend fun deleteAccount() {
-        val auth = requireAuth()
-        val user = auth.currentUser ?: throw AuthException(AuthException.Reason.NO_SESSION)
-        call { user.delete().await() }
-        ensureGuestSession()
-    }
-
     private fun publish(user: FirebaseUser?) {
         _state.value = stateOf(user)
     }

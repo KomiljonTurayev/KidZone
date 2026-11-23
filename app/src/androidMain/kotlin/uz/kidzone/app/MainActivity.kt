@@ -68,20 +68,24 @@ class MainActivity : ComponentActivity() {
         // Push-token registration happens in the Application's AccountSessionCoordinator;
         // here we only need the UI-facing checks, re-run whenever the account changes.
         lifecycleScope.launch {
+            AgeGate.awaitCompleted()
             AuthGraph.auth.state
                 .mapNotNull { it.uid }
                 .distinctUntilChanged()
                 .collect { uid -> checkAccountStatus(uid) }
         }
-        BannerChecker.checkAsync(firestoreSync) { banner ->
-            if (banner != null) runOnUiThread {
-                mainViewModel.setPromoBanner(
-                    PromoBannerData(
-                        title = banner.title,
-                        body = banner.body,
-                        url = banner.url,
+        lifecycleScope.launch {
+            AgeGate.awaitCompleted()
+            BannerChecker.checkAsync(firestoreSync) { banner ->
+                if (banner != null) runOnUiThread {
+                    mainViewModel.setPromoBanner(
+                        PromoBannerData(
+                            title = banner.title,
+                            body = banner.body,
+                            url = banner.url,
+                        )
                     )
-                )
+                }
             }
         }
 

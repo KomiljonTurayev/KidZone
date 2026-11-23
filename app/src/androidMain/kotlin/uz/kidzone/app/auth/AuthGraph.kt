@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import uz.kidzone.app.BackendConfig
 import uz.kidzone.app.KidZoneApplication
 import uz.kidzone.app.agegate.AgeGate
@@ -54,6 +55,10 @@ object AuthGraph {
         val repo = FirebaseAuthRepository(firebaseAuth)
         repository = repo
         googleSource = CredentialManagerGoogleSignIn(CredentialManagerGoogleSignIn.webClientIdOf(context))
-        AccountSessionCoordinator(repo.state, listeners).start(appScope)
+        // The listeners send data out, so they wait for the neutral age screen's answer.
+        appScope.launch {
+            AgeGate.awaitCompleted()
+            AccountSessionCoordinator(repo.state, listeners).start(appScope)
+        }
     }
 }
