@@ -69,6 +69,18 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth?) : AuthRepository {
         call { user.reauthenticate(GoogleAuthProvider.getCredential(googleIdToken, null)).await() }
     }
 
+    override suspend fun isAccountGone(): Boolean {
+        val user = auth?.currentUser ?: return false
+        return try {
+            withTimeout(NETWORK_TIMEOUT) { user.reload().await() }
+            false
+        } catch (e: FirebaseAuthInvalidUserException) {
+            e.errorCode == "ERROR_USER_NOT_FOUND"
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     override suspend fun signOut() {
         val auth = requireAuth()
         auth.signOut()

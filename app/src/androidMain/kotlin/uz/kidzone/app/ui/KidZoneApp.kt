@@ -25,6 +25,7 @@ import uz.kidzone.app.ui.screens.AccountGate
 import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.BannedScreen
 import uz.kidzone.app.ui.screens.PaywallScreen
+import uz.kidzone.app.ui.screens.PrivacyScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
 import uz.kidzone.app.ui.screens.ProfileSelectScreen
@@ -175,9 +176,11 @@ fun KidZoneApp(
                         gameProgress = gameProgress,
                         parentChallenge = parentChallenge,
                         onOpenDashboard = {
-                            if (!featureGate.isHidden(AccountFeature.PARENT_DASHBOARD)) navController.navigate("dashboard")
+                            // A child's device has no dashboard; the parent still gets the policy and data deletion.
+                            navController.navigate(if (featureGate.isHidden(AccountFeature.PARENT_DASHBOARD)) "privacy" else "dashboard")
                         },
                         onOpenSleep = { navController.navigate("sleep") },
+                        onOpenPrivacy = { navController.navigate("privacy") },
                         onOpenPremium = {
                             if (!featureGate.isHidden(AccountFeature.PREMIUM)) navController.navigate("premium")
                         },
@@ -205,6 +208,10 @@ fun KidZoneApp(
                         onBack = { navController.popBackStack() },
                     )
                 }
+                composable("privacy") {
+                    val activeProfile by profileViewModel.activeProfile.collectAsState()
+                    PrivacyScreen(pinHash = activeProfile?.pinHash, onBack = { navController.popBackStack() })
+                }
                 composable("premium") {
                     PaywallScreen(
                         onDismiss = { navController.popBackStack() },
@@ -230,6 +237,7 @@ fun KidZoneApp(
                         },
                         // Reached only from the signed-in dashboard, so PREMIUM is already unlocked.
                         onOpenPremium = { navController.navigate("premium") },
+                        onOpenPrivacy = { navController.navigate("privacy") },
                     )
                 }
                 composable("add_edit_profile/{profileId}") { backStack ->

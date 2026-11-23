@@ -1,5 +1,7 @@
 package uz.kidzone.app.ui.screens
 
+import kotlinx.coroutines.launch
+import uz.kidzone.app.ui.i18n.tr
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -225,6 +227,7 @@ fun KidzoSheet(
         label = "pulse"
     )
 
+    val reportScope = androidx.compose.runtime.rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
@@ -388,6 +391,19 @@ fun KidzoSheet(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            // The greeting is not an AI answer; anything after the first question is.
+                            if (messages.size > 1 && !messages.last().first) {
+                                val reported = tr("Xabar yuborildi. Rahmat!", "Жалоба отправлена. Спасибо!", "Report sent. Thank you!")
+                                val failed = tr("Yuborilmadi. Internetni tekshiring.", "Не отправлено. Проверьте интернет.", "Not sent. Check the internet.")
+                                val answer = messages.last().second
+                                androidx.compose.material3.TextButton(onClick = {
+                                    reportScope.launch {
+                                        val ok = uz.kidzone.app.ai.AiReportClient.report(answer)
+                                        android.widget.Toast.makeText(context, if (ok) reported else failed, android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                }) { Text(tr("🚩 Shikoyat", "🚩 Пожаловаться", "🚩 Report"), fontSize = 12.sp, color = Color.Gray) }
+                                Spacer(Modifier.width(8.dp))
+                            }
                             if (isSpeaking) {
                                 Button(
                                     onClick = { viewModel.stopSpeaking() },

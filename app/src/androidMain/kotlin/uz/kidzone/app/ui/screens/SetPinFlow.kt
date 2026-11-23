@@ -48,34 +48,18 @@ internal fun SetPinFlow(
     var confirmed by remember { mutableStateOf(false) }
 
     if (!confirmed) {
-        val confirmViewModel: LoginViewModel = viewModel(
+        ConfirmAccount(
+            account = account,
             key = "set_pin_confirm",
-            factory = viewModelFactory {
-                initializer {
-                    LoginViewModel(AuthGraph.auth, AuthGraph.telegramLogin, AuthGraph.googleSignIn, confirmOnly = true)
-                }
-            },
-        )
-        LoginScreen(
-            viewModel = confirmViewModel,
-            title = tr(lang, "Hisobingiz bilan tasdiqlang", "Подтвердите аккаунтом", "Confirm with your account"),
+            title = title,
             message = tr(
                 lang,
                 "PIN'ni faqat ota-ona hisobi egasi o'rnata oladi.",
                 "PIN может установить только владелец родительского аккаунта.",
                 "Only the owner of the parent account can set the PIN.",
             ),
-            skipLabel = tr(lang, "Bekor qilish", "Отмена", "Cancel"),
-            lang = lang,
-            // Reset the (screen-scoped) view model, or reopening this flow would count as confirmed.
-            onSignedIn = { confirmViewModel.cancel(); confirmed = true },
-            onSkip = onCancel,
-            emoji = "🛡️",
-            header = { KidTopBar(title, onBack = onCancel) },
-            providers = when (account.provider) {
-                AuthProvider.GOOGLE, AuthProvider.TELEGRAM -> setOf(account.provider)
-                else -> setOf(AuthProvider.GOOGLE, AuthProvider.TELEGRAM)
-            },
+            onConfirmed = { confirmed = true },
+            onCancel = onCancel,
         )
         return
     }
@@ -121,4 +105,41 @@ internal fun SetPinFlow(
         Spacer(Modifier.height(12.dp))
         KidTextButton(tr(lang, "Bekor qilish", "Отмена", "Cancel"), onClick = onCancel)
     }
+}
+
+/** Asks the signed-in parent to prove again that the account is theirs; it never switches accounts. */
+@Composable
+internal fun ConfirmAccount(
+    account: AccountState.SignedIn,
+    key: String,
+    title: String,
+    message: String,
+    onConfirmed: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val lang = LocalAppLang.current
+    val confirmViewModel: LoginViewModel = viewModel(
+        key = key,
+        factory = viewModelFactory {
+            initializer {
+                LoginViewModel(AuthGraph.auth, AuthGraph.telegramLogin, AuthGraph.googleSignIn, confirmOnly = true)
+            }
+        },
+    )
+    LoginScreen(
+        viewModel = confirmViewModel,
+        title = tr(lang, "Hisobingiz bilan tasdiqlang", "Подтвердите аккаунтом", "Confirm with your account"),
+        message = message,
+        skipLabel = tr(lang, "Bekor qilish", "Отмена", "Cancel"),
+        lang = lang,
+        // Reset the (screen-scoped) view model, or reopening this flow would count as confirmed.
+        onSignedIn = { confirmViewModel.cancel(); onConfirmed() },
+        onSkip = onCancel,
+        emoji = "🛡️",
+        header = { KidTopBar(title, onBack = onCancel) },
+        providers = when (account.provider) {
+            AuthProvider.GOOGLE, AuthProvider.TELEGRAM -> setOf(account.provider)
+            else -> setOf(AuthProvider.GOOGLE, AuthProvider.TELEGRAM)
+        },
+    )
 }

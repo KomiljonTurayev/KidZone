@@ -30,6 +30,9 @@ interface AuthRepository : IdTokenProvider {
      */
     suspend fun reauthenticateWithGoogle(googleIdToken: String)
 
+    /** The server says this session's account no longer exists (it was deleted). */
+    suspend fun isAccountGone(): Boolean
+
     /** Signs out and immediately starts a fresh guest session, so the app keeps working. */
     suspend fun signOut()
 }

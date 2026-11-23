@@ -3,6 +3,7 @@ package uz.kidzone.app
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import uz.kidzone.app.agegate.AgeGate
+import uz.kidzone.app.auth.AccountState
 import uz.kidzone.app.auth.AuthException
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.auth.CloudUserListener
@@ -38,6 +40,12 @@ class KidZoneApplication : Application() {
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /** Runs before the content providers that start Firebase, so nothing has the files open yet. */
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        DeviceWipe.runIfPending(this)
+    }
+
     override fun onCreate() {
         super.onCreate()
         // Families Policy: the neutral age screen's saved answer decides which SDKs may collect
@@ -58,6 +66,7 @@ class KidZoneApplication : Application() {
         // Per-account setup (users/{uid} doc, push token, profile sync, purchase identity)
         // runs once per account change from here — on first launch, after sign-in and after
         // sign-out alike — instead of being repeated by each screen that can change the user.
+        FirestoreSync.writesBlocked = { AgeGate.isRestricted && AuthGraph.auth.state.value !is AccountState.SignedIn }
         AuthGraph.init(
             context = this,
             appScope = appScope,
@@ -68,7 +77,7 @@ class KidZoneApplication : Application() {
             ),
         )
         // Everyone starts as a guest: the app is fully usable without signing in.
-        // Children too (Uzbek speech and play-time limits need a session), but only after the age screen.
+        // Children too (Uzbek speech needs a session), but only after the age screen.
         appScope.launch {
             AgeGate.awaitCompleted()
             BackendClient.warmUp()

@@ -18,6 +18,7 @@ internal class NativeBridge(
     private val viewModel: MainViewModel,
     private val onOpenDashboard: () -> Unit,
     private val onOpenSleep: () -> Unit,
+    private val onOpenPrivacy: () -> Unit,
     private val onOpenKidzo: () -> Unit,
     private val onAskKidzo: (String) -> Unit,
     private val isAiAvailable: () -> Boolean,
@@ -197,6 +198,20 @@ internal class NativeBridge(
     @android.webkit.JavascriptInterface
     fun openParentalDashboard() {
         onMain { onOpenDashboard() }
+    }
+
+    @android.webkit.JavascriptInterface
+    fun openPrivacy() {
+        onMain { onOpenPrivacy() }
+    }
+
+    /** A parent flags an AI story; answers `window.onAiReported(ok)`. */
+    @android.webkit.JavascriptInterface
+    fun reportAi(text: String) {
+        scope.launch {
+            val ok = uz.kidzone.app.ai.AiReportClient.report(text)
+            onMain { evalJs("window.onAiReported && window.onAiReported($ok)") }
+        }
     }
 
     @android.webkit.JavascriptInterface

@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch {
             AgeGate.awaitCompleted()
+            if (AgeGate.isRestricted) return@launch // no promo links for a child
             BannerChecker.checkAsync(firestoreSync) { banner ->
                 if (banner != null) runOnUiThread {
                     mainViewModel.setPromoBanner(

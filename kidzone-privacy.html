@@ -45,8 +45,8 @@
 
   <h2>3. What we process for every user, children included</h2>
   <ul>
-    <li><b>Anonymous session ID</b> (Firebase Authentication), with no name or email. It is used for play-time limits and speech.</li>
-    <li><b>Game activity under that ID</b>: age group, random profile ID, levels, streaks, daily tasks, play time, and the time of last use.</li>
+    <li><b>Anonymous session ID</b> (Firebase Authentication), with no name or email. It is used for Uzbek speech.</li>
+    <li><b>Game activity</b> of a guest aged 13 or younger stays on the device. For an older guest we store, under the anonymous ID, the age group, random profile ID, levels, streaks, daily tasks and the time of last use.</li>
     <li><b>Uzbek speech</b>: the text to be read aloud may be sent to our server and to Microsoft Azure AI Speech to produce the audio. This text can include the name entered for a child when a story uses it. The server may keep recent audio in memory for a while.</li>
     <li><b>Technical data</b>: like any online service, our servers and the services in section 5 receive the IP address and basic device data.</li>
     <li><b>On the device only</b>: birth month and year, avatar picture. A guest's profile name is not synced to our servers.</li>
@@ -56,7 +56,7 @@
   <ul>
     <li><b>Sign-in with Google</b>: account ID, name, email. <b>Sign-in with Telegram</b>: Telegram ID, first name, username.</li>
     <li><b>Profile sync</b> (signed-in parent): profile names, language, time limit, PIN hash, progress and statistics, stored in Google Cloud Firestore. A second parent who joins the family with a code can use the same profiles.</li>
-    <li><b>AI (Kidzo, stories)</b>: the question or topic, the name entered for the child, language and age range are sent to our server and to Google Gemini to produce an answer. We do not store this text in our database; we store the daily number of requests.</li>
+    <li><b>AI (Kidzo, stories)</b>: the question or topic, the name entered for the child, language and age range are sent to our server and to Google Gemini to produce an answer. We do not store this text in our database; we store the daily number of requests. If you tap Report, we store the reported answer without your account so that we can review it.</li>
     <li><b>Microphone</b>: only after the button is tapped. Speech is turned into text by the device's speech recognition service, which may send audio to its provider (for example Google). We do not receive or store the recording.</li>
     <li><b>Premium</b>: handled by Google Play and RevenueCat (purchase and subscription status, account ID). We do not receive card details.</li>
     <li><b>Analytics, Crashlytics, push</b>: usage events, crash reports, device data and a push token. Advertising ID collection is off.</li>
@@ -64,7 +64,7 @@
 
   <h2>5. Services that receive data</h2>
   <ul>
-    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play, Google Fonts (font files load from Google)</li>
+    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play</li>
     <li>Microsoft Azure AI Speech</li>
     <li>RevenueCat</li>
     <li>Telegram (only for Telegram sign-in)</li>
@@ -73,8 +73,8 @@
   <p>KidZone shows no third-party advertising network ads, does not sell personal data and does not use it for targeted advertising. The app may show our own announcements.</p>
 
   <h2>6. Keeping and deleting data</h2>
-  <p>We keep account data until the account is deleted. A signed-in parent can delete the account in the app; this removes the account, the profiles of children that belong to it and their statistics from our servers, and the data on that device. See <a href="delete-account.html">how to delete your account</a>.</p>
-  <p>A guest can clear the app data on the device and can write to us to have server data deleted. Daily totals that identify nobody are kept.</p>
+  <p>We keep account data until the account is deleted. A parent can delete the account in the app ("Privacy Policy" on the home screen, behind the parent lock); this removes the account, the profiles of children that belong to it and their statistics from our servers, and the data on that device. See <a href="delete-account.html">how to delete your account</a>.</p>
+  <p>A guest can delete all data in the same place. For up to about two hours after deletion, or until our next clean-up, we keep only the deleted account ID and time, so that another device cannot write the data back. Daily totals that identify nobody are kept.</p>
 
   <h2>7. Parents' rights</h2>
   <p>You can ask to see, correct or delete your child's data, or withdraw consent. Write to <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>; we answer within 14 days. Section 3 describes what is processed for children.</p>
@@ -97,8 +97,8 @@
 
   <h2>3. Har bir foydalanuvchi, jumladan bolalar uchun nimani qayta ishlaymiz</h2>
   <ul>
-    <li><b>Anonim sessiya ID'si</b> (Firebase Authentication), ism va emailsiz. O'yin vaqti limiti va ovoz uchun kerak.</li>
-    <li><b>Shu ID ostidagi o'yin faolligi</b>: yosh guruhi, tasodifiy profil ID'si, darajalar, ketma-ket kunlar, kunlik vazifalar, o'yin vaqti, oxirgi foydalanish vaqti.</li>
+    <li><b>Anonim sessiya ID'si</b> (Firebase Authentication), ism va emailsiz. O'zbekcha ovoz uchun kerak.</li>
+    <li><b>O'yin faolligi</b>: 13 yosh va undan kichik mehmonniki qurilmada qoladi. Kattaroq mehmon uchun anonim ID ostida yosh guruhi, tasodifiy profil ID'si, darajalar, ketma-ket kunlar, kunlik vazifalar va oxirgi foydalanish vaqti saqlanadi.</li>
     <li><b>O'zbekcha ovoz</b>: o'qiladigan matn ovoz tayyorlash uchun serverimizga va Microsoft Azure AI Speech'ga yuborilishi mumkin. Ertakda ishlatilsa, matnda bola uchun kiritilgan ism bo'lishi mumkin. Server so'nggi audioni xotirada vaqtincha saqlashi mumkin.</li>
     <li><b>Texnik ma'lumot</b>: har qanday onlayn xizmat kabi, serverlarimiz va 5-banddagi xizmatlar IP-manzil va asosiy qurilma ma'lumotini oladi.</li>
     <li><b>Faqat qurilmada</b>: tug'ilgan oy va yil, avatar rasmi. Mehmon profilining ismi serverlarimizga sinxronlanmaydi.</li>
@@ -108,7 +108,7 @@
   <ul>
     <li><b>Google orqali kirish</b>: hisob ID'si, ism, email. <b>Telegram orqali kirish</b>: Telegram ID, ism, username.</li>
     <li><b>Profillarni sinxronlash</b> (kirgan ota-ona): profil nomlari, til, vaqt limiti, PIN xeshi, yutuqlar va statistika Google Cloud Firestore'da saqlanadi. Kod bilan oilaga qo'shilgan ikkinchi ota-ona ham shu profillardan foydalanadi.</li>
-    <li><b>AI (Kidzo, ertaklar)</b>: savol yoki mavzu, bola uchun kiritilgan ism, til va yosh oralig'i javob olish uchun serverimizga va Google Gemini'ga yuboriladi. Bu matnni bazamizda saqlamaymiz; kunlik so'rovlar soni saqlanadi.</li>
+    <li><b>AI (Kidzo, ertaklar)</b>: savol yoki mavzu, bola uchun kiritilgan ism, til va yosh oralig'i javob olish uchun serverimizga va Google Gemini'ga yuboriladi. Bu matnni bazamizda saqlamaymiz; kunlik so'rovlar soni saqlanadi. «Shikoyat» bosilsa, o'sha javobni ko'rib chiqish uchun hisobingizsiz saqlaymiz.</li>
     <li><b>Mikrofon</b>: faqat tugma bosilganda. Nutqni qurilmaning tanish xizmati matnga aylantiradi, u audioni o'z provayderiga (masalan, Google) yuborishi mumkin. Biz yozuvni olmaymiz va saqlamaymiz.</li>
     <li><b>Premium</b>: Google Play va RevenueCat orqali (xarid va obuna holati, hisob ID'si). Karta ma'lumotini olmaymiz.</li>
     <li><b>Analytics, Crashlytics, push</b>: foydalanish hodisalari, xatolik hisobotlari, qurilma ma'lumoti va push-token. Reklama ID'si yig'ilmaydi.</li>
@@ -116,7 +116,7 @@
 
   <h2>5. Ma'lumot oladigan xizmatlar</h2>
   <ul>
-    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play, Google Fonts (shriftlar Google'dan yuklanadi)</li>
+    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play</li>
     <li>Microsoft Azure AI Speech</li>
     <li>RevenueCat</li>
     <li>Telegram (faqat Telegram orqali kirganda)</li>
@@ -125,8 +125,8 @@
   <p>KidZone'da uchinchi tomon reklama tarmoqlari reklamasi yo'q, shaxsiy ma'lumot sotilmaydi va maqsadli reklama uchun ishlatilmaydi. Ilova o'z e'lonlarimizni ko'rsatishi mumkin.</p>
 
   <h2>6. Ma'lumotni saqlash va o'chirish</h2>
-  <p>Hisob ma'lumotlarini hisob o'chirilguncha saqlaymiz. Kirgan ota-ona hisobni ilovada o'chira oladi: hisob, unga tegishli bolalar profillari va statistikasi serverlarimizdan, shuningdek o'sha qurilmadagi ma'lumotlar o'chadi. <a href="delete-account.html">Hisobni o'chirish yo'riqnomasi</a>.</p>
-  <p>Mehmon qurilmadagi ilova ma'lumotlarini tozalashi va serverdagi ma'lumotni o'chirishni bizdan so'rashi mumkin. Hech kimni tanitmaydigan kunlik jami sonlar saqlanadi.</p>
+  <p>Hisob ma'lumotlarini hisob o'chirilguncha saqlaymiz. Ota-ona hisobni ilovada o'chira oladi (bosh sahifadagi «Maxfiylik», ota-ona qulfi ortida): hisob, unga tegishli bolalar profillari va statistikasi serverlarimizdan, shuningdek o'sha qurilmadagi ma'lumotlar o'chadi. <a href="delete-account.html">Hisobni o'chirish yo'riqnomasi</a>.</p>
+  <p>Mehmon ham shu yerda barcha ma'lumotni o'chira oladi. Boshqa qurilma ma'lumotni qayta yozmasligi uchun o'chirilgan hisob ID'si va vaqtinigina taxminan ikki soat yoki keyingi tozalashgacha saqlaymiz. Hech kimni tanitmaydigan kunlik jami sonlar saqlanadi.</p>
 
   <h2>7. Ota-ona huquqlari</h2>
   <p>Bolangiz ma'lumotini ko'rish, tuzatish yoki o'chirishni so'rashingiz, rozilikni qaytarib olishingiz mumkin. Yozing: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>; 14 kun ichida javob beramiz. Bolalar uchun nima qayta ishlanishi 3-bandda yozilgan.</p>
@@ -149,8 +149,8 @@
 
   <h2>3. Что обрабатывается у всех пользователей, включая детей</h2>
   <ul>
-    <li><b>Анонимный ID сессии</b> (Firebase Authentication) без имени и email. Нужен для лимита времени и озвучки.</li>
-    <li><b>Игровая активность под этим ID</b>: возрастная группа, случайный ID профиля, уровни, серии дней, задания дня, время игры, время последнего использования.</li>
+    <li><b>Анонимный ID сессии</b> (Firebase Authentication) без имени и email. Нужен для узбекской озвучки.</li>
+    <li><b>Игровая активность</b> гостя 13 лет или младше остаётся на устройстве. Для более старшего гостя под анонимным ID хранятся возрастная группа, случайный ID профиля, уровни, серии дней, задания дня и время последнего использования.</li>
     <li><b>Узбекская озвучка</b>: читаемый текст может отправляться на наш сервер и в Microsoft Azure AI Speech для создания аудио. Если в сказке используется имя, введённое для ребёнка, оно может быть в тексте. Сервер может временно держать недавнее аудио в памяти.</li>
     <li><b>Технические данные</b>: как любой онлайн-сервис, наши серверы и сервисы из раздела 5 получают IP-адрес и основные данные устройства.</li>
     <li><b>Только на устройстве</b>: месяц и год рождения, изображение аватара. Имя профиля гостя не синхронизируется с нашими серверами.</li>
@@ -160,7 +160,7 @@
   <ul>
     <li><b>Вход через Google</b>: ID аккаунта, имя, email. <b>Вход через Telegram</b>: Telegram ID, имя, username.</li>
     <li><b>Синхронизация профилей</b> (вошедший родитель): имена профилей, язык, лимит времени, хеш PIN, прогресс и статистика хранятся в Google Cloud Firestore. Второй родитель, вступивший в семью по коду, пользуется теми же профилями.</li>
-    <li><b>ИИ (Kidzo, сказки)</b>: вопрос или тема, имя, введённое для ребёнка, язык и возрастной диапазон отправляются на наш сервер и в Google Gemini для ответа. Этот текст мы не храним в базе; хранится число запросов за день.</li>
+    <li><b>ИИ (Kidzo, сказки)</b>: вопрос или тема, имя, введённое для ребёнка, язык и возрастной диапазон отправляются на наш сервер и в Google Gemini для ответа. Этот текст мы не храним в базе; хранится число запросов за день. Если нажать «Пожаловаться», мы сохраним этот ответ без вашего аккаунта для проверки.</li>
     <li><b>Микрофон</b>: только после нажатия кнопки. Речь превращает в текст служба распознавания устройства, которая может отправлять аудио своему поставщику (например, Google). Мы не получаем и не храним запись.</li>
     <li><b>Premium</b>: через Google Play и RevenueCat (статус покупки и подписки, ID аккаунта). Данные карт мы не получаем.</li>
     <li><b>Analytics, Crashlytics, push</b>: события использования, отчёты о сбоях, данные устройства и push-токен. Рекламный ID не собирается.</li>
@@ -168,7 +168,7 @@
 
   <h2>5. Сервисы, получающие данные</h2>
   <ul>
-    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play, Google Fonts (шрифты загружаются с Google)</li>
+    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play</li>
     <li>Microsoft Azure AI Speech</li>
     <li>RevenueCat</li>
     <li>Telegram (только при входе через Telegram)</li>
@@ -177,8 +177,8 @@
   <p>В KidZone нет рекламы сторонних рекламных сетей, персональные данные не продаются и не используются для таргетированной рекламы. Приложение может показывать наши собственные объявления.</p>
 
   <h2>6. Хранение и удаление данных</h2>
-  <p>Данные аккаунта хранятся до его удаления. Вошедший родитель может удалить аккаунт в приложении: с серверов удаляются аккаунт, принадлежащие ему профили детей и их статистика, а также данные на этом устройстве. <a href="delete-account.html">Как удалить аккаунт</a>.</p>
-  <p>Гость может очистить данные приложения на устройстве и попросить нас удалить данные с сервера. Обезличенные дневные итоги сохраняются.</p>
+  <p>Данные аккаунта хранятся до его удаления. Родитель может удалить аккаунт в приложении («Конфиденциальность» на главном экране, за родительским замком): с серверов удаляются аккаунт, принадлежащие ему профили детей и их статистика, а также данные на этом устройстве. <a href="delete-account.html">Как удалить аккаунт</a>.</p>
+  <p>Гость может удалить все данные там же. Чтобы другое устройство не записало данные обратно, примерно два часа или до следующей очистки мы храним только ID удалённого аккаунта и время удаления. Обезличенные дневные итоги сохраняются.</p>
 
   <h2>7. Права родителей</h2>
   <p>Вы можете попросить показать, исправить или удалить данные ребёнка либо отозвать согласие. Пишите: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>; ответим в течение 14 дней. Что обрабатывается у детей, описано в разделе 3.</p>

@@ -10,6 +10,14 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
+    // Deleting an account leaves a short-lived deleted_accounts/{uid}: sessions signed in before
+    // it (another phone, ID token valid for up to an hour) must not write the data back.
+    function ownerCanWrite(uid) {
+      return isOwner(uid) &&
+        (!exists(/databases/$(database)/documents/deleted_accounts/$(uid)) ||
+         request.auth.token.auth_time > get(/databases/$(database)/documents/deleted_accounts/$(uid)).data.deletedAt);
+    }
+
     // Faza 16: a second parent who joined this owner's family. Membership docs are written
     // only by the backend (see the families/ match below), so they can be trusted here.
     function isFamilyMember(ownerUid) {
@@ -86,14 +94,14 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
       // Owner can initialize their profile with status=active or no status; cannot forge other statuses
-      allow create: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == 'active') && keepsFamilyOwner()) || isAdmin();
+      allow create: if (ownerCanWrite(uid) && (!('status' in request.resource.data) || request.resource.data.status == 'active') && keepsFamilyOwner()) || isAdmin();
       // Owner cannot alter status field once set (cannot unban themselves); only admin can change status
-      allow update: if (isOwner(uid) && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status) && keepsFamilyOwner()) || isAdmin();
+      allow update: if (ownerCanWrite(uid) && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status) && keepsFamilyOwner()) || isAdmin();
       allow delete: if isAdmin();
 
       match /profiles/{profileId} {
         allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
-        allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProfileWrite(request.resource.data)) || isAdmin();
+        allow create, update: if ((ownerCanWrite(uid) || isFamilyMember(uid)) && isValidProfileWrite(request.resource.data)) || isAdmin();
         allow delete: if isOwner(uid) || isAdmin();
 
         // Server-authoritative daily play-time counters (written only by the backend via
@@ -113,19 +121,19 @@ service cloud.firestore {
         // counter; caught by firestore-tests/firestore.rules.test.js).
         match /daily_challenges/{date} {
           allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
-          allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidChallengeWrite(request.resource.data)) || isAdmin();
+          allow create, update: if ((ownerCanWrite(uid) || isFamilyMember(uid)) && isValidChallengeWrite(request.resource.data)) || isAdmin();
           allow delete: if isOwner(uid) || isAdmin();
         }
 
         match /stats/{date} {
           allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
-          allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProfileStatsWrite(request.resource.data)) || isAdmin();
+          allow create, update: if ((ownerCanWrite(uid) || isFamilyMember(uid)) && isValidProfileStatsWrite(request.resource.data)) || isAdmin();
           allow delete: if isOwner(uid) || isAdmin();
         }
 
         match /progress/{gameId} {
           allow read: if isOwner(uid) || isFamilyMember(uid) || isAdmin();
-          allow create, update: if ((isOwner(uid) || isFamilyMember(uid)) && isValidProgressWrite(request.resource.data)) || isAdmin();
+          allow create, update: if ((ownerCanWrite(uid) || isFamilyMember(uid)) && isValidProgressWrite(request.resource.data)) || isAdmin();
           allow delete: if isOwner(uid) || isAdmin();
         }
       }
