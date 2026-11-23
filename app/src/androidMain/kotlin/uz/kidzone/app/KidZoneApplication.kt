@@ -68,7 +68,10 @@ class KidZoneApplication : Application() {
             ),
         )
         // Everyone starts as a guest: the app is fully usable without signing in.
+        // Children too (Uzbek speech and play-time limits need a session), but only after the age screen.
         appScope.launch {
+            AgeGate.awaitCompleted()
+            BackendClient.warmUp()
             try {
                 AuthGraph.auth.ensureGuestSession()
             } catch (e: AuthException) {
@@ -78,7 +81,6 @@ class KidZoneApplication : Application() {
         createNotificationChannel()
         appScope.launch { migrateToProfilesIfNeeded() }
         appScope.launch { registerPushWhenAdultConfirmed() }
-        BackendClient.warmUp()
     }
 
     /**

@@ -26,7 +26,7 @@
 <body>
 
 <h1>KidZone — Privacy Policy</h1>
-<p class="meta">Last updated: 26 August 2026 · Effective: 26 August 2026</p>
+<p class="meta">Last updated: 23 November 2026</p>
 
 <div class="tabs">
   <button class="tab active" onclick="switchLang('en', this)">English</button>
@@ -36,174 +36,158 @@
 
 <!-- ENGLISH -->
 <div class="lang active" id="en">
-  <div class="highlight">
-    <strong>For Parents and Families:</strong> KidZone is a family-friendly educational app designed for both children and adults to enjoy together. We comply with the Children's Online Privacy Protection Act (COPPA), Google Play Families Policy, and applicable data protection laws. We do not knowingly collect personal information from children.
-  </div>
+  <h2>1. Who we are</h2>
+  <p>KidZone is developed by Turayev Komiljon, an independent developer in Tashkent, Uzbekistan. Contact: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a></p>
 
-  <h2>1. Who We Are</h2>
-  <p>KidZone ("the App") is developed by <strong>Turayev Komiljon</strong> ("we", "our", "us"), an independent developer based in Uzbekistan. Contact: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a></p>
+  <h2>2. Audience and the age question</h2>
+  <p>KidZone is for families: children, teens and adults. On first launch the app asks for a month and year of birth. The answer stays on the device. Until it is given, the app does not create a session with our servers, and Analytics, Crashlytics and push are off.</p>
+  <p>If the answer is age 13 or younger, these are not available: sign-in, AI features, purchases, push notifications, Firebase Analytics and Crashlytics.</p>
 
-  <h2>2. Audience</h2>
-  <p>KidZone is designed for a <strong>mixed audience</strong> — children, teens, and adults who play together as a family. As such, the App follows the strictest privacy protections suitable for children under 13.</p>
-
-  <h2>3. Information We Do Not Collect</h2>
-  <p>The App does <strong>not</strong> collect, store, or share:</p>
+  <h2>3. What we process for every user, children included</h2>
   <ul>
-    <li>Names, email addresses, phone numbers, or postal addresses</li>
-    <li>Photos, videos, or voice recordings</li>
-    <li>Precise geolocation</li>
-    <li>Contacts, calendar, or other personal device data</li>
-    <li>Account credentials (the App requires no sign-in)</li>
+    <li><b>Anonymous session ID</b> (Firebase Authentication), with no name or email. It is used for play-time limits and speech.</li>
+    <li><b>Game activity under that ID</b>: age group, random profile ID, levels, streaks, daily tasks, play time, and the time of last use.</li>
+    <li><b>Uzbek speech</b>: the text to be read aloud may be sent to our server and to Microsoft Azure AI Speech to produce the audio. This text can include the name entered for a child when a story uses it. The server may keep recent audio in memory for a while.</li>
+    <li><b>Technical data</b>: like any online service, our servers and the services in section 5 receive the IP address and basic device data.</li>
+    <li><b>On the device only</b>: birth month and year, avatar picture. A guest's profile name is not synced to our servers.</li>
   </ul>
 
-  <h2>4. Information Automatically Processed & Microphone Access</h2>
-  <p>The App processes only the minimum technical data needed to function:</p>
+  <h2>4. What we also process when an older user chooses a feature</h2>
   <ul>
-    <li><strong>Microphone & Voice Input (Kidzo Companion)</strong> — When a user voluntarily taps the microphone button, audio is processed in real-time solely to convert spoken questions into text for playful educational responses. Audio is <strong>ephemeral</strong>: it is processed in memory and immediately discarded. We do <strong>not</strong> save, store, transmit to ad networks, or use voice data for biometric profiling.</li>
-    <li><strong>Device type and OS version</strong> — to ensure compatibility</li>
-    <li><strong>Crash logs</strong> — anonymous, used solely for fixing bugs</li>
-    <li><strong>Child name & Game progress</strong> — stored locally on the device only; never uploaded to external servers</li>
+    <li><b>Sign-in with Google</b>: account ID, name, email. <b>Sign-in with Telegram</b>: Telegram ID, first name, username.</li>
+    <li><b>Profile sync</b> (signed-in parent): profile names, language, time limit, PIN hash, progress and statistics, stored in Google Cloud Firestore. A second parent who joins the family with a code can use the same profiles.</li>
+    <li><b>AI (Kidzo, stories)</b>: the question or topic, the name entered for the child, language and age range are sent to our server and to Google Gemini to produce an answer. We do not store this text in our database; we store the daily number of requests.</li>
+    <li><b>Microphone</b>: only after the button is tapped. Speech is turned into text by the device's speech recognition service, which may send audio to its provider (for example Google). We do not receive or store the recording.</li>
+    <li><b>Premium</b>: handled by Google Play and RevenueCat (purchase and subscription status, account ID). We do not receive card details.</li>
+    <li><b>Analytics, Crashlytics, push</b>: usage events, crash reports, device data and a push token. Advertising ID collection is off.</li>
   </ul>
 
-  <h2>5. Third-Party Services</h2>
-  <p>KidZone does <strong>not</strong> display advertisements and does not use Google AdMob or any other ad network. We use only the following Families-approved services:</p>
+  <h2>5. Services that receive data</h2>
   <ul>
-    <li><strong>Google Play Services</strong> — required for app delivery and security</li>
+    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play, Google Fonts (font files load from Google)</li>
+    <li>Microsoft Azure AI Speech</li>
+    <li>RevenueCat</li>
+    <li>Telegram (only for Telegram sign-in)</li>
+    <li>Render (hosting of our server)</li>
   </ul>
-  <p>We do <strong>not</strong> use Facebook SDK, behavioral analytics, ad networks, or any social media integration.</p>
+  <p>KidZone shows no third-party advertising network ads, does not sell personal data and does not use it for targeted advertising. The app may show our own announcements.</p>
 
-  <h2>6. Parental Rights (COPPA)</h2>
-  <p>Although we do not knowingly collect personal information from children, parents have the right to:</p>
-  <ul>
-    <li>Request information about any data associated with their child's device</li>
-    <li>Request deletion of any such data</li>
-    <li>Refuse further data processing</li>
-  </ul>
-  <p>To exercise these rights, contact <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>. We will respond within 14 days.</p>
+  <h2>6. Keeping and deleting data</h2>
+  <p>We keep account data until the account is deleted. A signed-in parent can delete the account in the app; this removes the account, the profiles of children that belong to it and their statistics from our servers, and the data on that device. See <a href="delete-account.html">how to delete your account</a>.</p>
+  <p>A guest can clear the app data on the device and can write to us to have server data deleted. Daily totals that identify nobody are kept.</p>
 
-  <h2>7. Data Security</h2>
-  <p>All app data is stored locally on the user's device. We do not operate servers that store user data.</p>
+  <h2>7. Parents' rights</h2>
+  <p>You can ask to see, correct or delete your child's data, or withdraw consent. Write to <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>; we answer within 14 days. Section 3 describes what is processed for children.</p>
 
-  <h2>8. Changes to This Policy</h2>
-  <p>If we update this Privacy Policy, the new version will be posted at this URL with a revised "Last updated" date. Material changes will be communicated through an in-app notice.</p>
+  <h2>8. Security</h2>
+  <p>Data is sent over HTTPS. Access to a profile is limited to its owner, invited family members and administrators. No system is completely secure.</p>
 
-  <h2>9. Contact</h2>
-  <p>Questions or concerns?<br>
-  Email: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a><br>
-  Developer: Turayev Komiljon, Tashkent, Uzbekistan</p>
+  <h2>9. Changes</h2>
+  <p>We publish changes on this page with a new date.</p>
 </div>
 
-<!-- O'ZBEKCHA -->
+<!-- UZBEK -->
 <div class="lang" id="uz">
-  <div class="highlight">
-    <strong>Ota-onalar va oilalar uchun:</strong> KidZone — oilaviy ta'limiy ilova bo'lib, bolalar va kattalar birga o'ynashi uchun mo'ljallangan. Biz COPPA (AQSh bolalar himoyasi qonuni), Google Play Families Policy va amaldagi ma'lumotlar himoyasi qonunlariga to'liq mos keladi. Bolalardan shaxsiy ma'lumot to'plamaymiz.
-  </div>
-
   <h2>1. Biz kimmiz</h2>
-  <p>KidZone ("Ilova") — mustaqil dasturchi <strong>Turayev Komiljon</strong> ("biz", "bizning") tomonidan ishlab chiqilgan. Aloqa: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a></p>
+  <p>KidZone ilovasini Toshkentdagi (O'zbekiston) mustaqil dasturchi Turayev Komiljon yaratgan. Aloqa: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a></p>
 
-  <h2>2. Auditoriya</h2>
-  <p>KidZone <strong>aralash auditoriya</strong> uchun mo'ljallangan — bolalar, o'smirlar va kattalar oila bo'lib birga o'ynaydi. Shuning uchun ilova 13 yoshgacha bo'lgan bolalarga mos eng qattiq maxfiylik talablariga rioya qiladi.</p>
+  <h2>2. Auditoriya va yosh savoli</h2>
+  <p>KidZone oilalar uchun: bolalar, o'smirlar va kattalar. Birinchi ishga tushishda ilova tug'ilgan oy va yilni so'raydi. Javob faqat qurilmada qoladi. Javobgacha serverlarimizda sessiya ochilmaydi, Analytics, Crashlytics va push o'chiq turadi.</p>
+  <p>Javob 13 yosh yoki undan kichik bo'lsa, quyidagilar yo'q: kirish, AI funksiyalari, xaridlar, push-bildirishnomalar, Firebase Analytics va Crashlytics.</p>
 
-  <h2>3. Biz to'plamaydigan ma'lumotlar</h2>
-  <p>Ilova quyidagilarni <strong>to'plamaydi</strong>:</p>
+  <h2>3. Har bir foydalanuvchi, jumladan bolalar uchun nimani qayta ishlaymiz</h2>
   <ul>
-    <li>Ism, email, telefon raqami, manzil</li>
-    <li>Foto, video, ovoz yozuvlari</li>
-    <li>Aniq geolokatsiya</li>
-    <li>Kontaktlar, kalendar yoki shaxsiy qurilma ma'lumotlari</li>
-    <li>Akkaunt ma'lumotlari (ilova ro'yxatdan o'tishni talab qilmaydi)</li>
+    <li><b>Anonim sessiya ID'si</b> (Firebase Authentication), ism va emailsiz. O'yin vaqti limiti va ovoz uchun kerak.</li>
+    <li><b>Shu ID ostidagi o'yin faolligi</b>: yosh guruhi, tasodifiy profil ID'si, darajalar, ketma-ket kunlar, kunlik vazifalar, o'yin vaqti, oxirgi foydalanish vaqti.</li>
+    <li><b>O'zbekcha ovoz</b>: o'qiladigan matn ovoz tayyorlash uchun serverimizga va Microsoft Azure AI Speech'ga yuborilishi mumkin. Ertakda ishlatilsa, matnda bola uchun kiritilgan ism bo'lishi mumkin. Server so'nggi audioni xotirada vaqtincha saqlashi mumkin.</li>
+    <li><b>Texnik ma'lumot</b>: har qanday onlayn xizmat kabi, serverlarimiz va 5-banddagi xizmatlar IP-manzil va asosiy qurilma ma'lumotini oladi.</li>
+    <li><b>Faqat qurilmada</b>: tug'ilgan oy va yil, avatar rasmi. Mehmon profilining ismi serverlarimizga sinxronlanmaydi.</li>
   </ul>
 
-  <h2>4. Avtomatik qayta ishlanadigan ma'lumotlar va Mikrofon</h2>
-  <p>Ilova ishlashi uchun zarur bo'lgan minimal texnik ma'lumotlarni qayta ishlaydi:</p>
+  <h2>4. Kattaroq foydalanuvchi funksiyani o'zi tanlasa, qo'shimcha nimani qayta ishlaymiz</h2>
   <ul>
-    <li><strong>Mikrofon va Ovozli Suhbat (Kidzo)</strong> — Foydalanuvchi "Aqlli Kidzo"da mikrofon tugmasini ixtiyoriy bosganda, ovoz faqat real vaqt rejimida savolga ta'limiy javob qaytarish uchun qayta ishlanadi. Ovoz fayllari serverlarda <strong>saqlanmaydi</strong>, arxivlanmaydi va shaxsiy profil yaratishda foydalanilmaydi.</li>
-    <li><strong>Qurilma turi va OS versiyasi</strong> — moslik uchun</li>
-    <li><strong>Crash loglari</strong> — anonim, faqat xatolarni tuzatish uchun</li>
-    <li><strong>Bola ismi va O'yin progressi</strong> — faqat qurilmaning o'zida saqlanadi, serverlarga yuklanmaydi</li>
+    <li><b>Google orqali kirish</b>: hisob ID'si, ism, email. <b>Telegram orqali kirish</b>: Telegram ID, ism, username.</li>
+    <li><b>Profillarni sinxronlash</b> (kirgan ota-ona): profil nomlari, til, vaqt limiti, PIN xeshi, yutuqlar va statistika Google Cloud Firestore'da saqlanadi. Kod bilan oilaga qo'shilgan ikkinchi ota-ona ham shu profillardan foydalanadi.</li>
+    <li><b>AI (Kidzo, ertaklar)</b>: savol yoki mavzu, bola uchun kiritilgan ism, til va yosh oralig'i javob olish uchun serverimizga va Google Gemini'ga yuboriladi. Bu matnni bazamizda saqlamaymiz; kunlik so'rovlar soni saqlanadi.</li>
+    <li><b>Mikrofon</b>: faqat tugma bosilganda. Nutqni qurilmaning tanish xizmati matnga aylantiradi, u audioni o'z provayderiga (masalan, Google) yuborishi mumkin. Biz yozuvni olmaymiz va saqlamaymiz.</li>
+    <li><b>Premium</b>: Google Play va RevenueCat orqali (xarid va obuna holati, hisob ID'si). Karta ma'lumotini olmaymiz.</li>
+    <li><b>Analytics, Crashlytics, push</b>: foydalanish hodisalari, xatolik hisobotlari, qurilma ma'lumoti va push-token. Reklama ID'si yig'ilmaydi.</li>
   </ul>
 
-  <h2>5. Uchinchi tomon xizmatlari</h2>
-  <p>KidZone reklama ko'rsatmaydi va Google AdMob yoki boshqa hech qanday reklama tarmog'idan foydalanmaydi. Biz faqat quyidagi Families-approved xizmatdan foydalanamiz:</p>
+  <h2>5. Ma'lumot oladigan xizmatlar</h2>
   <ul>
-    <li><strong>Google Play Services</strong> — ilova yetkazib berish va xavfsizlik uchun</li>
+    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play, Google Fonts (shriftlar Google'dan yuklanadi)</li>
+    <li>Microsoft Azure AI Speech</li>
+    <li>RevenueCat</li>
+    <li>Telegram (faqat Telegram orqali kirganda)</li>
+    <li>Render (serverimiz hostingi)</li>
   </ul>
-  <p>Biz Facebook SDK, xulq-atvor tahlili, reklama tarmoqlari yoki ijtimoiy tarmoq integratsiyasidan <strong>foydalanmaymiz</strong>.</p>
+  <p>KidZone'da uchinchi tomon reklama tarmoqlari reklamasi yo'q, shaxsiy ma'lumot sotilmaydi va maqsadli reklama uchun ishlatilmaydi. Ilova o'z e'lonlarimizni ko'rsatishi mumkin.</p>
 
-  <h2>6. Ota-ona huquqlari (COPPA)</h2>
-  <p>Biz bolalardan ataylab shaxsiy ma'lumot to'plamasak ham, ota-onalar quyidagi huquqlarga ega:</p>
-  <ul>
-    <li>Bolaning qurilmasi bilan bog'liq har qanday ma'lumot haqida so'rash</li>
-    <li>Bunday ma'lumotlarni o'chirishni talab qilish</li>
-    <li>Keyingi ma'lumot qayta ishlashdan voz kechish</li>
-  </ul>
-  <p>So'rov uchun: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>. 14 kun ichida javob beramiz.</p>
+  <h2>6. Ma'lumotni saqlash va o'chirish</h2>
+  <p>Hisob ma'lumotlarini hisob o'chirilguncha saqlaymiz. Kirgan ota-ona hisobni ilovada o'chira oladi: hisob, unga tegishli bolalar profillari va statistikasi serverlarimizdan, shuningdek o'sha qurilmadagi ma'lumotlar o'chadi. <a href="delete-account.html">Hisobni o'chirish yo'riqnomasi</a>.</p>
+  <p>Mehmon qurilmadagi ilova ma'lumotlarini tozalashi va serverdagi ma'lumotni o'chirishni bizdan so'rashi mumkin. Hech kimni tanitmaydigan kunlik jami sonlar saqlanadi.</p>
 
-  <h2>7. Ma'lumotlar xavfsizligi</h2>
-  <p>Barcha ilova ma'lumotlari faqat foydalanuvchi qurilmasida saqlanadi.</p>
+  <h2>7. Ota-ona huquqlari</h2>
+  <p>Bolangiz ma'lumotini ko'rish, tuzatish yoki o'chirishni so'rashingiz, rozilikni qaytarib olishingiz mumkin. Yozing: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>; 14 kun ichida javob beramiz. Bolalar uchun nima qayta ishlanishi 3-bandda yozilgan.</p>
 
-  <h2>8. Siyosat o'zgarishlari</h2>
-  <p>Maxfiylik siyosati yangilansa, yangi versiya shu URL'da yangi sana bilan e'lon qilinadi.</p>
+  <h2>8. Xavfsizlik</h2>
+  <p>Ma'lumot HTTPS orqali yuboriladi. Profilga faqat egasi, taklif qilingan oila a'zolari va administratorlar kira oladi. Hech bir tizim mutlaq xavfsiz emas.</p>
 
-  <h2>9. Aloqa</h2>
-  <p>Email: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a><br>
-  Dasturchi: Turayev Komiljon, Toshkent, O'zbekiston</p>
+  <h2>9. O'zgarishlar</h2>
+  <p>O'zgarishlarni shu sahifada yangi sana bilan e'lon qilamiz.</p>
 </div>
 
-<!-- РУССКИЙ -->
+<!-- RUSSIAN -->
 <div class="lang" id="ru">
-  <div class="highlight">
-    <strong>Для родителей и семей:</strong> KidZone — семейное образовательное приложение, в котором могут играть дети и взрослые вместе. Мы соблюдаем закон COPPA, Google Play Families Policy и применимые законы о защите данных.
-  </div>
-
   <h2>1. Кто мы</h2>
-  <p>KidZone ("Приложение") разработано независимым разработчиком <strong>Тураев Комилжон</strong> ("мы"). Контакт: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a></p>
+  <p>KidZone разработал независимый разработчик Тураев Комилжон, Ташкент, Узбекистан. Связь: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a></p>
 
-  <h2>2. Аудитория</h2>
-  <p>KidZone предназначен для <strong>смешанной аудитории</strong> — детей, подростков и взрослых, играющих вместе как семья. Поэтому приложение соблюдает самые строгие требования конфиденциальности для детей младше 13 лет.</p>
+  <h2>2. Аудитория и вопрос о возрасте</h2>
+  <p>KidZone предназначен для семей: детей, подростков и взрослых. При первом запуске приложение спрашивает месяц и год рождения. Ответ хранится только на устройстве. До ответа сессия на наших серверах не создаётся, Analytics, Crashlytics и push выключены.</p>
+  <p>Если указан возраст 13 лет или младше, недоступны: вход, функции ИИ, покупки, push-уведомления, Firebase Analytics и Crashlytics.</p>
 
-  <h2>3. Какие данные мы НЕ собираем</h2>
+  <h2>3. Что обрабатывается у всех пользователей, включая детей</h2>
   <ul>
-    <li>Имена, email, телефоны, адреса</li>
-    <li>Фото, видео, аудио</li>
-    <li>Точную геолокацию</li>
-    <li>Контакты, календарь, личные данные устройства</li>
-    <li>Учётные данные (приложение не требует регистрации)</li>
+    <li><b>Анонимный ID сессии</b> (Firebase Authentication) без имени и email. Нужен для лимита времени и озвучки.</li>
+    <li><b>Игровая активность под этим ID</b>: возрастная группа, случайный ID профиля, уровни, серии дней, задания дня, время игры, время последнего использования.</li>
+    <li><b>Узбекская озвучка</b>: читаемый текст может отправляться на наш сервер и в Microsoft Azure AI Speech для создания аудио. Если в сказке используется имя, введённое для ребёнка, оно может быть в тексте. Сервер может временно держать недавнее аудио в памяти.</li>
+    <li><b>Технические данные</b>: как любой онлайн-сервис, наши серверы и сервисы из раздела 5 получают IP-адрес и основные данные устройства.</li>
+    <li><b>Только на устройстве</b>: месяц и год рождения, изображение аватара. Имя профиля гостя не синхронизируется с нашими серверами.</li>
   </ul>
 
-  <h2>4. Автоматически обрабатываемые данные и Микрофон</h2>
+  <h2>4. Что обрабатывается дополнительно, если более старший пользователь выбирает функцию</h2>
   <ul>
-    <li><strong>Микрофон и Голосовой помощник (Кидзо)</strong> — При добровольном нажатии кнопки микрофона аудиоданные обрабатываются в реальном времени исключительно для генерации обучающих ответов. Аудиосигнал является <strong>эфемерным</strong>: обрабатывается в оперативной памяти и сразу удаляется. Записи не сохраняются и не используются для биометрического профилирования.</li>
-    <li><strong>Тип устройства и версия ОС</strong> — для совместимости</li>
-    <li><strong>Логи сбоев</strong> — анонимно, только для исправления ошибок</li>
-    <li><strong>Имя ребёнка и Прогресс игры</strong> — сохраняются исключительно локально на устройстве</li>
+    <li><b>Вход через Google</b>: ID аккаунта, имя, email. <b>Вход через Telegram</b>: Telegram ID, имя, username.</li>
+    <li><b>Синхронизация профилей</b> (вошедший родитель): имена профилей, язык, лимит времени, хеш PIN, прогресс и статистика хранятся в Google Cloud Firestore. Второй родитель, вступивший в семью по коду, пользуется теми же профилями.</li>
+    <li><b>ИИ (Kidzo, сказки)</b>: вопрос или тема, имя, введённое для ребёнка, язык и возрастной диапазон отправляются на наш сервер и в Google Gemini для ответа. Этот текст мы не храним в базе; хранится число запросов за день.</li>
+    <li><b>Микрофон</b>: только после нажатия кнопки. Речь превращает в текст служба распознавания устройства, которая может отправлять аудио своему поставщику (например, Google). Мы не получаем и не храним запись.</li>
+    <li><b>Premium</b>: через Google Play и RevenueCat (статус покупки и подписки, ID аккаунта). Данные карт мы не получаем.</li>
+    <li><b>Analytics, Crashlytics, push</b>: события использования, отчёты о сбоях, данные устройства и push-токен. Рекламный ID не собирается.</li>
   </ul>
 
-  <h2>5. Сторонние сервисы</h2>
-  <p>KidZone не показывает рекламу и не использует Google AdMob или любые другие рекламные сети. Мы используем только следующий Families-approved сервис:</p>
+  <h2>5. Сервисы, получающие данные</h2>
   <ul>
-    <li><strong>Google Play Services</strong></li>
+    <li>Google: Firebase (Authentication, Firestore, Analytics, Crashlytics, Cloud Messaging), Gemini, Google Play, Google Fonts (шрифты загружаются с Google)</li>
+    <li>Microsoft Azure AI Speech</li>
+    <li>RevenueCat</li>
+    <li>Telegram (только при входе через Telegram)</li>
+    <li>Render (хостинг нашего сервера)</li>
   </ul>
-  <p>Мы <strong>не используем</strong> Facebook SDK, поведенческую аналитику, рекламные сети или соцсети.</p>
+  <p>В KidZone нет рекламы сторонних рекламных сетей, персональные данные не продаются и не используются для таргетированной рекламы. Приложение может показывать наши собственные объявления.</p>
 
-  <h2>6. Права родителей (COPPA)</h2>
-  <ul>
-    <li>Запросить информацию о данных, связанных с устройством ребёнка</li>
-    <li>Запросить удаление таких данных</li>
-    <li>Отказаться от дальнейшей обработки</li>
-  </ul>
-  <p>Связь: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>. Ответ в течение 14 дней.</p>
+  <h2>6. Хранение и удаление данных</h2>
+  <p>Данные аккаунта хранятся до его удаления. Вошедший родитель может удалить аккаунт в приложении: с серверов удаляются аккаунт, принадлежащие ему профили детей и их статистика, а также данные на этом устройстве. <a href="delete-account.html">Как удалить аккаунт</a>.</p>
+  <p>Гость может очистить данные приложения на устройстве и попросить нас удалить данные с сервера. Обезличенные дневные итоги сохраняются.</p>
 
-  <h2>7. Безопасность данных</h2>
-  <p>Все данные хранятся локально на устройстве.</p>
+  <h2>7. Права родителей</h2>
+  <p>Вы можете попросить показать, исправить или удалить данные ребёнка либо отозвать согласие. Пишите: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a>; ответим в течение 14 дней. Что обрабатывается у детей, описано в разделе 3.</p>
 
-  <h2>8. Изменения политики</h2>
-  <p>Обновления публикуются по этому URL с новой датой.</p>
+  <h2>8. Безопасность</h2>
+  <p>Данные передаются по HTTPS. Доступ к профилю есть у владельца, приглашённых членов семьи и администраторов. Абсолютно защищённых систем не бывает.</p>
 
-  <h2>9. Контакты</h2>
-  <p>Email: <a href="mailto:turayevkomiljon@gmail.com">turayevkomiljon@gmail.com</a><br>
-  Разработчик: Тураев Комилжон, Ташкент, Узбекистан</p>
+  <h2>9. Изменения</h2>
+  <p>Изменения публикуются на этой странице с новой датой.</p>
 </div>
 
 <script>

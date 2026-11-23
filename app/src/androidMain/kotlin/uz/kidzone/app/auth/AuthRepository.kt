@@ -32,7 +32,4 @@ interface AuthRepository : IdTokenProvider {
 
     /** Signs out and immediately starts a fresh guest session, so the app keeps working. */
     suspend fun signOut()
-
-    /** Permanently deletes the signed-in account, then continues as a fresh guest. */
-    suspend fun deleteAccount()
 }

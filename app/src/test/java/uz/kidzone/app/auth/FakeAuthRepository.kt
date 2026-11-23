@@ -49,10 +49,6 @@ class FakeAuthRepository(
         _state.value = AccountState.Guest("new-guest-uid")
     }
 
-    override suspend fun deleteAccount() {
-        _state.value = AccountState.Guest("new-guest-uid")
-    }
-
     fun emit(state: AccountState) {
         _state.value = state
     }

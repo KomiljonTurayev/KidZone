@@ -84,7 +84,11 @@ fun ParentDashboardScreen(
 ) {
     val context = LocalContext.current
     val statsManager = remember { ParentalStatsManager(context) }
-    val vm = remember { DashboardViewModel(statsManager, AppPreferences(context), AuthGraph.auth) }
+    val vm = remember { DashboardViewModel(
+            statsManager, AppPreferences(context), AuthGraph.auth,
+            wipeDevice = { context.getSystemService(android.app.ActivityManager::class.java).clearApplicationUserData() },
+        )
+    }
     val state by vm.state.collectAsState()
 
     // PIN gate
@@ -346,9 +350,9 @@ fun ParentDashboardScreen(
             text = {
                 Text(
                     tr(
-                        "Barcha ma'lumotlaringiz, statistika va profillar serverdan butunlay o'chirib tashlanadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
-                        "Все ваши данные, статистика и профили будут безвозвратно удалены с сервера. Это нельзя отменить. Вы уверены?",
-                        "All your data, stats and profiles will be permanently deleted from the server. This can't be undone. Are you sure?",
+                        "Barcha ma'lumotlaringiz, bolalar profillari va statistika serverdan ham, shu qurilmadan ham butunlay o'chiriladi va ilova yopiladi. Premium obuna Google Play'da alohida bekor qilinadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
+                        "Все ваши данные, профили детей и статистика будут удалены с сервера и с этого устройства, приложение закроется. Подписка Premium отменяется отдельно в Google Play. Это нельзя отменить. Вы уверены?",
+                        "All your data, the children's profiles and stats will be deleted from the server and from this device, and the app will close. Cancel a Premium subscription separately in Google Play. This can't be undone. Are you sure?",
                     ),
                     color = Kid.InkSoft,
                 )
@@ -358,6 +362,7 @@ fun ParentDashboardScreen(
                     onClick = {
                         vm.deleteAccount { showDeleteDialog = false }
                     },
+                    enabled = !state.isSyncing,
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
