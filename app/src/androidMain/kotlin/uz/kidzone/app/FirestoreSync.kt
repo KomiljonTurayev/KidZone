@@ -21,6 +21,9 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
 
         @Volatile private var instance: FirestoreSync? = null
 
+        /** Families Policy: a child playing as a guest stores nothing in Firestore. Set by the Application. */
+        @Volatile var writesBlocked: () -> Boolean = { false }
+
         @JvmStatic
         @Synchronized
         fun init(@Suppress("UNUSED_PARAMETER") ctx: Context): FirestoreSync {
@@ -73,6 +76,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
 
     fun syncUserProfile(uid: String?, displayName: String?, email: String?, ageGroup: String?) {
         Log.d(TAG, "syncUserProfile: uid=$uid available=${isAvailable()}")
+        if (writesBlocked()) return
         if (!isAvailable() || uid == null) return
         val data = mutableMapOf<String, Any>(
             "displayName" to (displayName ?: ""),
@@ -106,6 +110,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
     }
 
     fun updateFcmToken(uid: String?, token: String?) {
+        if (writesBlocked()) return
         if (!isAvailable() || uid == null || token == null) return
         val data = mapOf<String, Any>("fcmToken" to token)
         db!!.collection("users").document(uid).set(data, SetOptions.merge())
@@ -163,6 +168,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
     }
 
     fun recordSession(uid: String?, sessionMinutes: Long, gamePlays: Map<String, String>?, isFirstSession: Boolean) {
+        if (writesBlocked()) return
         if (!isAvailable() || uid == null || sessionMinutes <= 0) {
             Log.w(TAG, "recordSession skipped: available=${isAvailable()} uid=$uid minutes=$sessionMinutes")
             return
@@ -186,6 +192,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
     }
 
     open fun syncStreak(uid: String, profileId: String, count: Int, lastDate: String) {
+        if (writesBlocked()) return
         if (!isAvailable()) return
         val data = mapOf<String, Any>(
             "streak" to mapOf(
@@ -206,6 +213,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
         gameId: String,
         gameTitle: String,
     ) {
+        if (writesBlocked()) return
         if (!isAvailable()) return
         val data = mapOf<String, Any>(
             "gameId" to gameId,
@@ -222,6 +230,7 @@ open class FirestoreSync internal constructor(private val db: FirebaseFirestore?
 
     /** Best level of one game; the dashboard on any family device reads it. */
     open fun syncGameProgress(uid: String, profileId: String, gameId: String, level: Int) {
+        if (writesBlocked()) return
         if (!isAvailable()) return
         val data = mapOf<String, Any>(
             "level" to level,

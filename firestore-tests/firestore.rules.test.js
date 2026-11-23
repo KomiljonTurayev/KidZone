@@ -714,3 +714,21 @@ describe('profiles/{profileId}/progress/{gameId}', () => {
     await assertFails(ownerCtx().firestore().doc(p).set({ level: 5, stars: 999 }));
   });
 });
+
+// ---- deleted accounts --------------------------------------------------------
+
+describe('a deleted account', () => {
+  const session = (authTime) =>
+    testEnv.authenticatedContext(OWNER_UID, { auth_time: authTime }).firestore().collection('users').doc(OWNER_UID);
+
+  beforeEach(() => seed((db) => db.collection('deleted_accounts').doc(OWNER_UID).set({ deletedAt: 1000 })));
+
+  test('an older session cannot write the data back', async () => {
+    await assertFails(session(900).set({ status: 'active' }));
+    await assertFails(session(900).collection('profiles').doc('p').set({ name: 'A' }));
+  });
+
+  test('a later sign-in can', async () => {
+    await assertSucceeds(session(1100).set({ status: 'active' }));
+  });
+});

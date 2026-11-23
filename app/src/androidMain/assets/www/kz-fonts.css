@@ -10,3 +10,10 @@
   unicode-range: U+0400-04FF;
   font-display: swap;
 }
+
+/* Bundled (SIL OFL) instead of Google Fonts: works offline and a child's device contacts no one. */
+@font-face { font-family: 'Fredoka One'; src: url('fonts/fredoka-one.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Nunito'; src: url('fonts/nunito-400.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Nunito'; src: url('fonts/nunito-700.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Nunito'; src: url('fonts/nunito-800.ttf') format('truetype'); font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Nunito'; src: url('fonts/nunito-900.ttf') format('truetype'); font-weight: 900; font-display: swap; }

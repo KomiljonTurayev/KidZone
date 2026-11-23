@@ -16,8 +16,12 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
         private const val TAG = "ProfileSyncManager"
     }
 
+    /** A guest's profiles (the child's name) stay on the device. */
+    private fun signedInUid(): String? =
+        FirebaseAuth.getInstance().currentUser?.takeUnless { it.isAnonymous }?.uid
+
     open fun pushProfile(profile: ProfileEntity) {
-        val uid = ProfileOwner.uidFor(FirebaseAuth.getInstance().currentUser?.uid) ?: return
+        val uid = ProfileOwner.uidFor(signedInUid()) ?: return
         val db = db ?: return
         val data = mapOf(
             "name" to profile.name,
@@ -41,7 +45,7 @@ open class ProfileSyncManager(private val db: FirebaseFirestore?) {
     // daily play-time limit. That decision comes from the backend's /playtime/heartbeat
     // (PlaytimeApiClient), which tracks elapsedSeconds under profiles/{id}/playtime/{date}.
     open fun pushStats(stats: ProfileStatsEntity) {
-        val uid = ProfileOwner.uidFor(FirebaseAuth.getInstance().currentUser?.uid) ?: return
+        val uid = ProfileOwner.uidFor(signedInUid()) ?: return
         val db = db ?: return
         val data = mapOf(
             "minutesPlayed" to stats.minutesPlayed,

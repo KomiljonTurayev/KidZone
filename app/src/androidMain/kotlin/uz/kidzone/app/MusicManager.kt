@@ -42,27 +42,6 @@ object MusicManager {
                 setVolume(if (isMuted) 0f else 0.15f, if (isMuted) 0f else 0.15f)
                 if (!isMuted) start()
             }
-        } else {
-            loadNetworkMusic()
-        }
-    }
-
-    private fun loadNetworkMusic() {
-        try {
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource("https://www.bensound.com/bensound-music/bensound-lullaby.mp3")
-                isLooping = true
-                setVolume(if (isMuted) 0f else 0.15f, if (isMuted) 0f else 0.15f)
-                setOnPreparedListener { if (!isMuted) it.start() }
-                setOnErrorListener { mp, what, _ ->
-                    Log.w(TAG, "Network music unavailable (what=$what). Running silent.")
-                    mp.reset(); mp.release(); mediaPlayer = null; true
-                }
-                prepareAsync()
-            }
-        } catch (e: Exception) {
-            Log.w(TAG, "Could not start network music: ${e.message}")
-            mediaPlayer = null
         }
     }
 

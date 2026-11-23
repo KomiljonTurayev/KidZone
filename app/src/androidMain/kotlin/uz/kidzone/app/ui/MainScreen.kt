@@ -103,6 +103,7 @@ fun MainScreen(
     parentChallenge: ParentChallengeRepository,
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
+    onOpenPrivacy: () -> Unit = {},
     onOpenPremium: () -> Unit = {},
     onRequireAccount: (AccountFeature) -> Unit = {},
     unlockedFeature: AccountFeature? = null,
@@ -220,6 +221,7 @@ fun MainScreen(
     // Every composition hands the long-lived bridge fresh callbacks (this screen's state).
     val onOpenDashboardState by rememberUpdatedState(onOpenDashboard)
     val onOpenSleepState by rememberUpdatedState(onOpenSleep)
+    val onOpenPrivacyState by rememberUpdatedState(onOpenPrivacy)
     SideEffect {
         webViewHolder.callbacks = HomeWebViewHolder.Callbacks(
             openKidzo = { openKidzo() },
@@ -259,6 +261,7 @@ fun MainScreen(
             },
             onOpenDashboard = { onOpenDashboardState() },
             onOpenSleep = { onOpenSleepState() },
+            onOpenPrivacy = { onOpenPrivacyState() },
             onExternalLink = { pendingExternalUri = it },
         )
     }
@@ -299,6 +302,7 @@ fun MainScreen(
                             viewModel = mainViewModel,
                             onOpenDashboard = { cb().onOpenDashboard() },
                             onOpenSleep = { cb().onOpenSleep() },
+                            onOpenPrivacy = { cb().onOpenPrivacy() },
                             onOpenKidzo = { cb().openKidzo() },
                             isAiAvailable = { cb().isAiAvailable() },
                             onAiLocked = { cb().onAiLocked() },

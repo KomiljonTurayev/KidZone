@@ -40,6 +40,8 @@ object PlaytimeApiClient {
 
     suspend fun heartbeat(profileId: String): HeartbeatResult? = withContext(Dispatchers.IO) {
         try {
+            // Only a signed-in parent's profiles exist on the server; guests use the local count.
+            if (AuthGraph.auth.state.value !is uz.kidzone.app.auth.AccountState.SignedIn) return@withContext null
             val idToken = AuthGraph.idTokens.idToken() ?: return@withContext null
 
             val requestJson = JSONObject().apply {

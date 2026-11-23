@@ -7,7 +7,7 @@
   <!-- Night mode before first paint (Faza 18): the app passes ?theme=dark|light. -->
   <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';</script>
   <title>KidZone — Bolalar Olami 🌈</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  
 
   <style>
     /* ── RESET ── */
@@ -48,7 +48,7 @@
 
     /* ── SHELL ── */
     #shell{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column}
-    #main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 calc(var(--bh)+68px+16px);scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+    #main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 calc(var(--bh) + 68px + 16px);scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
     #main::-webkit-scrollbar{display:none}
 
     /* ── HEADER ── */
@@ -587,7 +587,7 @@
     .kz-tab.active{color:var(--accent);border-bottom-color:var(--accent);border-bottom-width:3px}
 
     /* ── MAIN WITH PLAYER ── */
-    #main.with-player{padding-bottom:calc(var(--bh)+68px+78px+16px)!important}
+    #main.with-player{padding-bottom:calc(var(--bh) + 68px + 78px + 16px)!important}
 
     /* ── CONTENT SECTIONS ── */
     #games-section.h{display:none}
@@ -1009,13 +1009,6 @@
         <div class="pin-key" onclick="pinTap(0)">0</div>
         <div class="pin-key" onclick="closeModal('parent-modal')">✕</div>
       </div>
-      <div style="text-align:center;margin-top:16px">
-        <a href="https://komiljonturayev.github.io/KidZone/kidzone-privacy.html"
-           id="privacy-link" target="_blank"
-           style="color:var(--accent);font-size:12px;font-weight:800;text-decoration:none">
-          🔒 Privacy Policy
-        </a>
-      </div>
     </div>
   </div>
 </div>
@@ -1093,6 +1086,9 @@
     </button>
     <button id="aiv-regen-btn" class="aiv-play-btn h" style="background:#4CAF50" onclick="regenerateAiStory()">
       <span>🔄</span> <span id="ai-regen-label">Yangi ertak</span>
+    </button>
+    <button id="aiv-report-btn" class="aiv-play-btn h" style="background:#757575" onclick="app.reportAiStory()">
+      <span>🚩</span> <span id="ai-report-label">Shikoyat</span>
     </button>
   </div>
 </div>
@@ -1272,6 +1268,7 @@
     </div>
     <div id="game-grid"></div>
 
+    <div style="text-align:center;padding:14px 0"><button id="privacy-link" onclick="openPrivacy()" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:800;padding:12px">🔒 Privacy Policy</button></div>
     <!-- PARENT BANNER -->
     <div id="parent-banner">
       <div class="pb-icon">👨‍👩‍👧</div>
@@ -1747,6 +1744,12 @@
       else openModal('parent-modal');
     }
 
+    // Behind the parental gate in the app: privacy policy and data deletion.
+    function openPrivacy() {
+      if (window.AndroidBridge && AndroidBridge.openPrivacy) AndroidBridge.openPrivacy();
+      else window.open('https://komiljonturayev.github.io/KidZone/kidzone-privacy.html', '_blank');
+    }
+
     function openBadges() {
       document.getElementById('badges-overlay').classList.remove('h');
       if (window.badgeManager) badgeManager.renderOverlay();
@@ -1995,6 +1998,7 @@
         document.getElementById("ai-loading-text").textContent = t.aiLoading;
         document.getElementById("ai-read-label").textContent = t.aiRead;
         document.getElementById("ai-regen-label").textContent = t.aiRegen;
+        document.getElementById("ai-report-label").textContent = { uz: "Shikoyat", ru: "Пожаловаться", en: "Report" }[this.lang] || "Report";
 
         // Personal Story modal
         document.getElementById("ps-title").textContent = t.psTitle;

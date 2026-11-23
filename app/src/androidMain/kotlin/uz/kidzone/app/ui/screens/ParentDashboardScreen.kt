@@ -81,14 +81,11 @@ fun ParentDashboardScreen(
     parentChallenge: ParentChallengeRepository,
     onNavigateToAddEdit: (String?) -> Unit,
     onOpenPremium: () -> Unit,
+    onOpenPrivacy: () -> Unit,
 ) {
     val context = LocalContext.current
     val statsManager = remember { ParentalStatsManager(context) }
-    val vm = remember { DashboardViewModel(
-            statsManager, AppPreferences(context), AuthGraph.auth,
-            wipeDevice = { context.getSystemService(android.app.ActivityManager::class.java).clearApplicationUserData() },
-        )
-    }
+    val vm = remember { DashboardViewModel(statsManager, AppPreferences(context), AuthGraph.auth) }
     val state by vm.state.collectAsState()
 
     // PIN gate
@@ -144,7 +141,6 @@ fun ParentDashboardScreen(
         FamilyScreen(onBack = { showFamily = false })
         return
     }
-    var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (showSetPin) {
         SetPinFlow(
@@ -337,44 +333,7 @@ fun ParentDashboardScreen(
         KidButton(tr("➕ Yangi profil qo'shish", "➕ Добавить профиль", "➕ Add profile"), brush = Kid.Meadow, onClick = { onNavigateToAddEdit(null) })
 
         Spacer(Modifier.height(20.dp))
-        KidTextButton(tr("Hisobni butunlay o'chirish", "Удалить аккаунт навсегда", "Delete account permanently"), color = MaterialTheme.colorScheme.error) { showDeleteDialog = true }
-    }
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            containerColor = uz.kidzone.app.ui.components.Kid.Card,
-            shape = RoundedCornerShape(28.dp),
-            icon = { Text("⚠️", fontSize = 36.sp) },
-            title = { Text(tr("Diqqat!", "Внимание!", "Warning!"), color = Kid.Ink) },
-            text = {
-                Text(
-                    tr(
-                        "Barcha ma'lumotlaringiz, bolalar profillari va statistika serverdan ham, shu qurilmadan ham butunlay o'chiriladi va ilova yopiladi. Premium obuna Google Play'da alohida bekor qilinadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
-                        "Все ваши данные, профили детей и статистика будут удалены с сервера и с этого устройства, приложение закроется. Подписка Premium отменяется отдельно в Google Play. Это нельзя отменить. Вы уверены?",
-                        "All your data, the children's profiles and stats will be deleted from the server and from this device, and the app will close. Cancel a Premium subscription separately in Google Play. This can't be undone. Are you sure?",
-                    ),
-                    color = Kid.InkSoft,
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        vm.deleteAccount { showDeleteDialog = false }
-                    },
-                    enabled = !state.isSyncing,
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(tr("O'chirish", "Удалить", "Delete"), color = Color.White)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(tr("Bekor qilish", "Отмена", "Cancel"), color = Kid.InkSoft)
-                }
-            }
-        )
+        KidTextButton(tr("🔒 Maxfiylik va hisobni o'chirish", "🔒 Конфиденциальность и удаление аккаунта", "🔒 Privacy and account deletion"), onClick = onOpenPrivacy)
     }
 }
 

@@ -32,6 +32,7 @@ class HomeWebViewHolder {
         val onAgeChanged: (String) -> Unit = {},
         val onOpenDashboard: () -> Unit = {},
         val onOpenSleep: () -> Unit = {},
+        val onOpenPrivacy: () -> Unit = {},
         val onExternalLink: (Uri) -> Unit = {},
     )
 

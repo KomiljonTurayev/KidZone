@@ -19,6 +19,7 @@ class FakeAuthRepository(
     /** uid of the Google account the next re-authentication proves; null = the current one. */
     var reauthGoogleUid: String? = null
     var signOutCount = 0
+    var accountGone = false
 
     override suspend fun idToken(): String? = idToken
 
@@ -43,6 +44,8 @@ class FakeAuthRepository(
         customTokensUsed += customToken
         _state.value = AccountState.SignedIn("telegram:777", "Aziz", AuthProvider.TELEGRAM)
     }
+
+    override suspend fun isAccountGone(): Boolean = accountGone
 
     override suspend fun signOut() {
         signOutCount++
