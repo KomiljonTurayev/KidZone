@@ -76,9 +76,9 @@ internal class NativeBridge(
             onMain { speakOnDevice(text, lang) }
             return
         }
-        val cacheDir = activity.get()?.cacheDir
+        val context = activity.get()?.applicationContext
         scope.launch {
-            val audioFile = uz.kidzone.app.ai.AishaSpeechGenerator.synthesize(text, cacheDir)
+            val audioFile = uz.kidzone.app.ai.AishaSpeechGenerator.synthesize(text, context)
             val played = audioFile != null && playAudioFile(audioFile)
             if (!played) onMain { speakOnDevice(text, lang) }
         }

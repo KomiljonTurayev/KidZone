@@ -1,5 +1,6 @@
 package uz.kidzone.app.ai
 
+import android.content.Context
 import android.util.Log
 import uz.kidzone.app.auth.AuthGraph
 import java.io.File
@@ -9,12 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Genuine Uzbek narration via the KidZone backend's POST /ai/tts, which calls
+ * Genuine Uzbek narration: a [BundledVoice] clip when the text has one, otherwise
+ * the KidZone backend's POST /ai/tts, which calls
  * Azure AI Speech (uz-UZ-MadinaNeural) server-side and returns MP3. The Azure
  * key must never live in the client: it's trivially extractable from the APK.
  * No on-device Android TTS engine ships an Uzbek voice at all (confirmed via
  * TextToSpeech.isLanguageAvailable — Google's engine's supported-language set
- * doesn't include "uz") — this is the only source of real Uzbek pronunciation.
+ * doesn't include "uz") — these are the only sources of real Uzbek pronunciation.
  * Caller falls back to on-device TTS on any failure: no network, no signed-in
  * user, backend without a speech key (503), or an Azure error (502).
  * (The object keeps its old name: Aisha's Navoiy TTS was the first plan.)
@@ -32,12 +34,13 @@ object AishaSpeechGenerator {
     @Volatile private var skipUntil = 0L
     private const val RETRY_AFTER_ERROR_MS = 5 * 60_000L
 
-    suspend fun synthesize(text: String, cacheDir: File?): File? {
-        if (cacheDir == null) return null
+    suspend fun synthesize(text: String, context: Context?, childName: String = ""): File? {
+        if (context == null) return null
+        withContext(Dispatchers.IO) { BundledVoice.find(context, text, childName) }?.let { return it }
         if (android.os.SystemClock.elapsedRealtime() < skipUntil) return null
         return try {
             val idToken = AuthGraph.idTokens.idToken() ?: return null
-            downloadFromBackend(text.take(1000), idToken, cacheDir)
+            downloadFromBackend(text.take(1000), idToken, context.cacheDir)
         } catch (e: Exception) {
             Log.w(TAG, "Speech generation failed: ${e.javaClass.simpleName}: ${e.message}")
             backOff(RETRY_AFTER_ERROR_MS)

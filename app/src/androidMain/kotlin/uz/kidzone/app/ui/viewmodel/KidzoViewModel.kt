@@ -66,6 +66,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     private var mediaPlayer: MediaPlayer? = null
     private var ttsEngine: TextToSpeech? = null
     private var ttsReady = false
+    private var spokenToName = ""
 
     fun requestRecommendations() { agent.requestRecommendations() }
 
@@ -87,6 +88,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         Log.d(TAG, "askKidzo requested: query='$query', lang='$lang', childName='$childName'")
         stopVoiceInput()
         stopSpeaking()
+        spokenToName = childName
 
         // Add user message
         _messages.value = _messages.value + (true to query)
@@ -160,8 +162,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         scope.launch {
             var cloudPlayed = false
             if (lang == "uz") {
-                val cacheDir = context.cacheDir
-                val audioFile = AishaSpeechGenerator.synthesize(text, cacheDir)
+                val audioFile = AishaSpeechGenerator.synthesize(text, context.applicationContext, spokenToName)
                 cloudPlayed = audioFile != null && playAudioFile(audioFile)
             }
             if (!cloudPlayed) {
