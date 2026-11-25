@@ -18,7 +18,7 @@ class AuthTextsTest {
     @Test
     fun `an unknown language falls back to Uzbek`() {
         assertEquals(AuthException.Reason.NETWORK.userMessage("uz"), AuthException.Reason.NETWORK.userMessage("de"))
-        assertEquals(AccountFeature.PREMIUM.title("uz"), AccountFeature.PREMIUM.title("de"))
+        assertEquals(AccountFeature.CLOUD_SYNC.title("uz"), AccountFeature.CLOUD_SYNC.title("de"))
     }
 
     @Test

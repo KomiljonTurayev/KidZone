@@ -53,10 +53,10 @@ class AccountStateTest {
 
     @Test
     fun `features outside the account-only set stay free for guests`() {
-        val gate = FeatureGate(MutableStateFlow(AccountState.Guest("g1")), setOf(AccountFeature.PREMIUM))
+        val gate = FeatureGate(MutableStateFlow(AccountState.Guest("g1")), setOf(AccountFeature.CLOUD_SYNC))
 
         assertTrue(gate.isAvailable(AccountFeature.AI_COMPANION))
-        assertFalse(gate.isAvailable(AccountFeature.PREMIUM))
+        assertFalse(gate.isAvailable(AccountFeature.CLOUD_SYNC))
     }
 
     @Test
@@ -81,11 +81,11 @@ class AccountStateTest {
     fun `restricted mode leaves free features alone`() {
         val gate = FeatureGate(
             MutableStateFlow(AccountState.Guest("g1")),
-            accountOnly = setOf(AccountFeature.PREMIUM),
+            accountOnly = setOf(AccountFeature.CLOUD_SYNC),
             restricted = { true },
         )
         assertFalse(gate.isHidden(AccountFeature.AI_COMPANION))
         assertTrue(gate.isAvailable(AccountFeature.AI_COMPANION))
-        assertTrue(gate.isHidden(AccountFeature.PREMIUM))
+        assertTrue(gate.isHidden(AccountFeature.CLOUD_SYNC))
     }
 }

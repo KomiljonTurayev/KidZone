@@ -24,7 +24,6 @@ import uz.kidzone.app.agegate.NeutralAgeScreen
 import uz.kidzone.app.ui.screens.AccountGate
 import uz.kidzone.app.ui.screens.AddEditProfileScreen
 import uz.kidzone.app.ui.screens.BannedScreen
-import uz.kidzone.app.ui.screens.PaywallScreen
 import uz.kidzone.app.ui.screens.PrivacyScreen
 import uz.kidzone.app.ui.screens.OnboardingScreen
 import uz.kidzone.app.ui.screens.ParentDashboardScreen
@@ -181,9 +180,6 @@ fun KidZoneApp(
                         },
                         onOpenSleep = { navController.navigate("sleep") },
                         onOpenPrivacy = { navController.navigate("privacy") },
-                        onOpenPremium = {
-                            if (!featureGate.isHidden(AccountFeature.PREMIUM)) navController.navigate("premium")
-                        },
                         onRequireAccount = { feature ->
                             if (!featureGate.isHidden(feature)) navController.navigate("account/${feature.name}")
                         },
@@ -212,12 +208,6 @@ fun KidZoneApp(
                     val activeProfile by profileViewModel.activeProfile.collectAsState()
                     PrivacyScreen(pinHash = activeProfile?.pinHash, onBack = { navController.popBackStack() })
                 }
-                composable("premium") {
-                    PaywallScreen(
-                        onDismiss = { navController.popBackStack() },
-                        onSuccess = { navController.popBackStack() },
-                    )
-                }
                 composable("sleep") {
                     val curLang = appLang
                     SleepScreen(
@@ -235,8 +225,6 @@ fun KidZoneApp(
                         onNavigateToAddEdit = { profileId ->
                             navController.navigate("add_edit_profile/${profileId ?: "new"}")
                         },
-                        // Reached only from the signed-in dashboard, so PREMIUM is already unlocked.
-                        onOpenPremium = { navController.navigate("premium") },
                         onOpenPrivacy = { navController.navigate("privacy") },
                     )
                 }

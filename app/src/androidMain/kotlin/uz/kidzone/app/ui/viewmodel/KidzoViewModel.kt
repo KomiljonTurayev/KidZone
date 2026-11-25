@@ -16,9 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uz.kidzone.app.ai.AishaSpeechGenerator
-import uz.kidzone.app.ai.KidzoCompanionEngine
-import uz.kidzone.app.ai.KidzoReply
 import uz.kidzone.app.ai.KidzoVoiceRecognizer
+import uz.kidzone.app.ai.OfflineKidzoBrain
 import uz.kidzone.app.arch.ViewModel
 import uz.kidzone.app.kidzo.ContentCard
 import uz.kidzone.app.kidzo.KidzoAgent
@@ -53,12 +52,6 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     private val _lastSpokenText = MutableStateFlow(initialGreeting)
     val lastSpokenText: StateFlow<String> = _lastSpokenText.asStateFlow()
 
-    /** Set when the family's free questions for today are used up; the screen offers Premium. */
-    private val _dailyLimitReached = MutableStateFlow(false)
-    val dailyLimitReached: StateFlow<Boolean> = _dailyLimitReached.asStateFlow()
-
-    fun dailyLimitHandled() { _dailyLimitReached.value = false }
-
     private val _rmsLevel = MutableStateFlow(0f)
     val rmsLevel: StateFlow<Float> = _rmsLevel.asStateFlow()
 
@@ -86,7 +79,6 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     fun askKidzo(query: String, lang: String, childName: String, context: Context) {
         if (query.isBlank()) return
-        Log.d(TAG, "askKidzo requested: query='$query', lang='$lang', childName='$childName'")
         stopVoiceInput()
         stopSpeaking()
         spokenToName = childName
@@ -96,20 +88,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         _isThinking.value = true
 
         scope.launch {
-            val reply = try {
-                when (val answer = KidzoCompanionEngine.ask(query, lang, childName)) {
-                    is KidzoReply.Answer -> answer.text
-                    KidzoReply.DailyLimitReached -> {
-                        _dailyLimitReached.value = true
-                        dailyLimitReply(lang, childName)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in KidzoCompanionEngine: ${e.message}", e)
-                fallbackReply(lang, childName)
-            }
-
-            Log.d(TAG, "Kidzo replied: '$reply'")
+            val reply = OfflineKidzoBrain.respond(query.trim(), lang, childName)
             _isThinking.value = false
             _messages.value = _messages.value + (false to reply)
             _lastSpokenText.value = reply
@@ -129,7 +108,6 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         recognizer = KidzoVoiceRecognizer(
             context = context,
             onSpeechResult = { text ->
-                Log.d(TAG, "Speech recognized: $text")
                 _isListening.value = false
                 askKidzo(text, lang, childName, context)
             },
@@ -156,7 +134,6 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
 
     fun speakText(text: String, lang: String, context: Context) {
         if (text.isBlank()) return
-        Log.d(TAG, "speakText: text='$text', lang='$lang'")
         stopSpeaking()
         _isSpeaking.value = true
         val request = speechRequest
@@ -311,16 +288,4 @@ internal fun greeting(lang: String): String = when (lang) {
     "ru" -> "Привет, дружок! 🐥 Я Kidzo. О чём поговорим?"
     "en" -> "Hi, friend! 🐥 I'm Kidzo. What shall we talk about?"
     else -> "Salom, do'stim! 🐥 Men Kidzo bo'laman. Nima haqida gaplashamiz?"
-}
-
-internal fun dailyLimitReply(lang: String, childName: String): String = when (lang) {
-    "ru" -> "Сегодня мы так много болтали, ${childName.ifBlank { "дружок" }}! 🌙 Kidzo немного отдохнёт — давай поиграем, а завтра продолжим!"
-    "en" -> "We talked so much today, ${childName.ifBlank { "friend" }}! 🌙 Kidzo needs a little rest — let's play, and we'll chat again tomorrow!"
-    else -> "Bugun juda ko'p suhbatlashdik, ${childName.ifBlank { "do'stim" }}! 🌙 Kidzo biroz dam oladi — keling o'ynaymiz, ertaga yana gaplashamiz!"
-}
-
-internal fun fallbackReply(lang: String, childName: String): String = when (lang) {
-    "ru" -> "Я тебя слышу, ${childName.ifBlank { "дружок" }}! 🐥 Давай вместе поиграем во что-нибудь весёлое! ✨"
-    "en" -> "I hear you, ${childName.ifBlank { "friend" }}! 🐥 Let's play something fun together! ✨"
-    else -> "Seni eshitdim, ${childName.ifBlank { "do'stim" }}! 🐥 Keling, birgalikda quvnoq o'yin o'ynaymiz! ✨"
 }

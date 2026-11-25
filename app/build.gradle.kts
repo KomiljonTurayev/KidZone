@@ -1,12 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-private val localProps = Properties().apply {
-    val f = rootProject.file("local.properties")
-    if (f.exists()) load(FileInputStream(f))
-}
-private val revenueCatApiKey = System.getenv("REVENUECAT_API_KEY") ?: localProps.getProperty("REVENUECAT_API_KEY", "")
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.application)
@@ -127,9 +121,8 @@ android {
         targetSdk = 36
         val propVersionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull()
         val propVersionName = project.findProperty("versionName")?.toString()
-        versionCode = propVersionCode ?: 10606
-        versionName = propVersionName ?: "1.6.6"
-        buildConfigField("String", "REVENUECAT_API_KEY", "\"${revenueCatApiKey}\"")
+        versionCode = propVersionCode ?: 10607
+        versionName = propVersionName ?: "1.6.7"
     }
 
     val keystoreProps = Properties()
@@ -211,9 +204,6 @@ android {
     dependencies {
         debugImplementation(libs.androidx.compose.ui.tooling)
         debugImplementation(libs.firebase.appcheck.debug)
-        // Note: Adding pure Android revenuecat here because KMP version requires specific setup.
-        implementation(libs.revenuecat.purchases)
-        implementation(libs.revenuecat.purchases.ui)
 
         // src/test/java's FirebaseManagerTest/PinUtilTest/ParentalStatsManagerTest/
         // KidZoneFirebaseMessagingServiceTest have referenced these since before this

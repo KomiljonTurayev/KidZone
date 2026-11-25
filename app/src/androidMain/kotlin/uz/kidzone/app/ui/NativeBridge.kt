@@ -9,8 +9,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import uz.kidzone.app.MusicManager
-import uz.kidzone.app.ai.StoryGenerator
-import uz.kidzone.app.ai.StoryResult
+import uz.kidzone.app.ai.PersonalizedStoryEngine
 import uz.kidzone.app.ui.viewmodel.MainViewModel
 
 // Native JavaScript bridge
@@ -23,7 +22,6 @@ internal class NativeBridge(
     private val onAskKidzo: (String) -> Unit,
     private val isAiAvailable: () -> Boolean,
     private val onAiLocked: () -> Unit,
-    private val onAiDailyLimit: () -> Unit,
     private val onGameLaunched: (String) -> Unit,
     /** A child reached a new best level in a game (Faza 18); checked in GameProgressRepository. */
     private val onLevelReached: (String, Int) -> Unit,
@@ -213,15 +211,6 @@ internal class NativeBridge(
         onMain { onOpenPrivacy() }
     }
 
-    /** A parent flags an AI story; answers `window.onAiReported(ok)`. */
-    @android.webkit.JavascriptInterface
-    fun reportAi(text: String) {
-        scope.launch {
-            val ok = uz.kidzone.app.ai.AiReportClient.report(text)
-            onMain { evalJs("window.onAiReported && window.onAiReported($ok)") }
-        }
-    }
-
     @android.webkit.JavascriptInterface
     fun openKidzo() {
         onMain { onOpenKidzo() }
@@ -269,17 +258,9 @@ internal class NativeBridge(
         }
         scope.launch {
             try {
-                when (val result = StoryGenerator.generate(lang, ageRange, childName, scenario)) {
-                    is StoryResult.Ready -> onMain {
-                        val story = result.story
-                        val payload = JSONObject().put("title", story.title).put("text", story.text).toString()
-                        evalJs("window.onAiStoryReady(${JSONObject.quote(payload)})")
-                    }
-                    StoryResult.DailyLimitReached -> onMain {
-                        evalJs("window.onAiStoryError && window.onAiStoryError()")
-                        onAiDailyLimit()
-                    }
-                }
+                val story = PersonalizedStoryEngine.generate(lang, ageRange, childName.trim().take(30), scenario.trim().take(200))
+                val payload = JSONObject().put("title", story.title).put("text", story.text).toString()
+                onMain { evalJs("window.onAiStoryReady(${JSONObject.quote(payload)})") }
             } catch (e: Exception) {
                 onMain {
                     evalJs("window.onAiStoryError && window.onAiStoryError()")

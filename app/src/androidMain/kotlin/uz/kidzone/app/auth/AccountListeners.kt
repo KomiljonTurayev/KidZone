@@ -1,7 +1,6 @@
 package uz.kidzone.app.auth
 
 import android.content.SharedPreferences
-import com.revenuecat.purchases.Purchases
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import uz.kidzone.app.FcmTokenManager
@@ -106,18 +105,5 @@ class ProfileCloudSyncListener(
         live?.close()
         live = null
         syncedOwner = null
-    }
-}
-
-/** Ties purchases to the parent account so Premium follows them to a new phone. */
-class PurchasesIdentityListener : AccountListener {
-    override suspend fun onAccountChanged(account: AccountState) {
-        if (!Purchases.isConfigured) return
-        val purchases = Purchases.sharedInstance
-        when (account) {
-            is AccountState.SignedIn -> purchases.logIn(account.uid)
-            is AccountState.Guest -> if (!purchases.isAnonymous) purchases.logOut()
-            AccountState.Unavailable -> Unit
-        }
     }
 }

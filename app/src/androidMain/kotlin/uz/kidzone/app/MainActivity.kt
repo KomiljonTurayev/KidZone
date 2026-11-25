@@ -13,10 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.revenuecat.purchases.Purchases
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import uz.kidzone.app.agegate.AgeGate
@@ -36,16 +33,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        // Families Policy: RevenueCat (purchases) starts only once the neutral age screen says the
-        // user is older than 13 — including when that answer arrives later in this session.
-        lifecycleScope.launch {
-            AgeGate.state
-                .map { !it.isRestricted }
-                .distinctUntilChanged()
-                .filter { it }
-                .collect { if (!Purchases.isConfigured) RevenueCatManager.init(this@MainActivity, this@MainActivity) }
-        }
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         WindowCompat.setDecorFitsSystemWindows(window, false)

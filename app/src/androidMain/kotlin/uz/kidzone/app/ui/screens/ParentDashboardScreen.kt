@@ -80,7 +80,6 @@ fun ParentDashboardScreen(
     gameProgress: GameProgressRepository,
     parentChallenge: ParentChallengeRepository,
     onNavigateToAddEdit: (String?) -> Unit,
-    onOpenPremium: () -> Unit,
     onOpenPrivacy: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -292,9 +291,6 @@ fun ParentDashboardScreen(
             }
         }
         Spacer(Modifier.height(20.dp))
-        KidButton(tr("⭐ Premium obuna", "⭐ Подписка Premium", "⭐ Premium"), brush = Kid.Royal, onClick = onOpenPremium)
-        Spacer(Modifier.height(8.dp))
-
         // 6. Profillar bo'limi
         Spacer(Modifier.height(20.dp))
         Text(

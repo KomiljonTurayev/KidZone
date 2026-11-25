@@ -1067,13 +1067,13 @@
 <div id="ai-viewer" class="h">
   <div class="aiv-hdr">
     <button class="ni-pill" style="width:40px;background:#F0F0F0" onclick="closeAi()">✕</button>
-    <div class="ai-title" style="color:var(--text);flex:1;text-align:center" id="aiv-title-text">AI Story</div>
+    <div class="ai-title" style="color:var(--text);flex:1;text-align:center" id="aiv-title-text">Ertak</div>
     <div style="width:40px"></div>
   </div>
   <div class="aiv-body">
     <div id="aiv-loading" class="h" style="text-align:center;padding:40px 0">
       <div class="ld-logo">🧠</div>
-      <p style="font-weight:800;margin-top:10px;color:var(--dim)" id="ai-loading-text">AI ertak to'qimoqda...</p>
+      <p style="font-weight:800;margin-top:10px;color:var(--dim)" id="ai-loading-text">Ertak to'qilmoqda...</p>
     </div>
     <div id="aiv-content-wrap">
       <div class="aiv-story-title" id="aiv-story-title">Yulduzli Sarguzasht</div>
@@ -1086,9 +1086,6 @@
     </button>
     <button id="aiv-regen-btn" class="aiv-play-btn h" style="background:#4CAF50" onclick="regenerateAiStory()">
       <span>🔄</span> <span id="ai-regen-label">Yangi ertak</span>
-    </button>
-    <button id="aiv-report-btn" class="aiv-play-btn h" style="background:#757575" onclick="app.reportAiStory()">
-      <span>🚩</span> <span id="ai-report-label">Shikoyat</span>
     </button>
   </div>
 </div>
@@ -1182,8 +1179,8 @@
     <!-- AI STUDIO -->
     <div id="ai-studio">
       <div class="ai-hdr ai-only">
-        <div class="ai-badge" id="ai-badge">NEW • AI</div>
-        <div class="ai-title" id="ai-studio-title">AI Bolalar Studiyasi</div>
+        <div class="ai-badge" id="ai-badge">NEW</div>
+        <div class="ai-title" id="ai-studio-title">Bolalar Studiyasi</div>
       </div>
       <div class="ai-btns">
         <button class="ai-btn ai-only" onclick="openKidzo()">
@@ -1491,11 +1488,11 @@
         playMode: "O'ynash rejimi",
         learnMode: "O'rganish rejimi",
         yourStars: "Yutuqlaringiz",
-        aiStudioTitle: "✨ AI Bolalar Studiyasi", aiBadge: "Yangi • AI", topBadge: "Eng zo'r 5",
+        aiStudioTitle: "✨ Bolalar Studiyasi", aiBadge: "Yangi", topBadge: "Eng zo'r 5",
         aiBtnKidzo: "Aqlli Kidzo",
         aiBtnStory: "Ertak To'qish",
         aiBtnMusic: "Sehrli Uyqu",
-        aiLoading: "AI ertak to'qimoqda...",
+        aiLoading: "Ertak to'qilmoqda...",
         aiRead: "Eshittirish",
         aiRegen: "Yangi ertak",
         aiBtnPersonal: "Shaxsiy Ertak",
@@ -1555,11 +1552,11 @@
         playMode: "Режим игры",
         learnMode: "Режим обучения",
         yourStars: "Ваши звезды",
-        aiStudioTitle: "✨ AI Студия", aiBadge: "Новое • AI", topBadge: "Топ-5",
+        aiStudioTitle: "✨ Студия", aiBadge: "Новое", topBadge: "Топ-5",
         aiBtnKidzo: "Умный Кидзо",
         aiBtnStory: "Создать Сказку",
         aiBtnMusic: "Сладкий Сон",
-        aiLoading: "AI сочиняет сказку...",
+        aiLoading: "Сочиняем сказку...",
         aiRead: "Слушать",
         aiRegen: "Новая сказка",
         aiBtnPersonal: "Именная Сказка",
@@ -1619,11 +1616,11 @@
         playMode: "Play mode",
         learnMode: "Learn mode",
         yourStars: "Your stars",
-        aiStudioTitle: "✨ AI Kids Studio", aiBadge: "New • AI", topBadge: "Top 5",
+        aiStudioTitle: "✨ Kids Studio", aiBadge: "New", topBadge: "Top 5",
         aiBtnKidzo: "Smart Kidzo",
         aiBtnStory: "Create Story",
         aiBtnMusic: "Magic Sleep",
-        aiLoading: "AI is creating a story...",
+        aiLoading: "Creating a story...",
         aiRead: "Listen",
         aiRegen: "New Story",
         aiBtnPersonal: "Personal Story",
@@ -1998,7 +1995,6 @@
         document.getElementById("ai-loading-text").textContent = t.aiLoading;
         document.getElementById("ai-read-label").textContent = t.aiRead;
         document.getElementById("ai-regen-label").textContent = t.aiRegen;
-        document.getElementById("ai-report-label").textContent = { uz: "Shikoyat", ru: "Пожаловаться", en: "Report" }[this.lang] || "Report";
 
         // Personal Story modal
         document.getElementById("ps-title").textContent = t.psTitle;
