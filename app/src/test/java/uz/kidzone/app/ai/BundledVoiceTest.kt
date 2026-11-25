@@ -5,8 +5,6 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import uz.kidzone.app.ui.viewmodel.dailyLimitReply
-import uz.kidzone.app.ui.viewmodel.fallbackReply
 import uz.kidzone.app.ui.viewmodel.greeting
 
 class BundledVoiceTest {
@@ -37,9 +35,7 @@ class BundledVoiceTest {
                 val line = OfflineKidzoBrain.respond(q, "uz", name)
                 assertTrue(line, hasClip(line, name))
             }
-            for (line in listOf(greeting("uz"), dailyLimitReply("uz", name), fallbackReply("uz", name))) {
-                assertTrue(line, hasClip(line, name))
-            }
+            assertTrue(hasClip(greeting("uz"), name))
         }
     }
 }

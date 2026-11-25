@@ -22,7 +22,6 @@ import uz.kidzone.app.auth.AuthException
 import uz.kidzone.app.auth.AuthGraph
 import uz.kidzone.app.auth.CloudUserListener
 import uz.kidzone.app.auth.ProfileCloudSyncListener
-import uz.kidzone.app.auth.PurchasesIdentityListener
 import uz.kidzone.app.data.KidZoneDatabase
 import uz.kidzone.app.data.ProfileEntity
 import uz.kidzone.app.data.PrefsLocalProfilesOwner
@@ -73,7 +72,6 @@ class KidZoneApplication : Application() {
             listeners = listOf(
                 CloudUserListener({ FirestoreSync.init(this) }, prefs, allowPush = { !AgeGate.isRestricted }),
                 ProfileCloudSyncListener(db.profileDao(), ProfileSyncManager(firestore), appScope, PrefsLocalProfilesOwner(prefs)),
-                PurchasesIdentityListener(),
             ),
         )
         // Everyone starts as a guest: the app is fully usable without signing in.

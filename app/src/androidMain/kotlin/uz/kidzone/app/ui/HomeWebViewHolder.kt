@@ -7,7 +7,7 @@ import uz.kidzone.app.KidWebViewManager
 
 /**
  * Keeps the home WebView alive while the child is on another screen (sleep, dashboard,
- * sign-in, paywall). Leaving "main" used to destroy it, so every return re-parsed index.html
+ * sign-in). Leaving "main" used to destroy it, so every return re-parsed index.html
  * and re-ran all its scripts — the slowest thing the app did. Now the page is paused and
  * re-attached; it is destroyed only when the whole app UI goes away ([destroy]).
  *
@@ -25,7 +25,6 @@ class HomeWebViewHolder {
         val askKidzo: (String) -> Unit = {},
         val isAiAvailable: () -> Boolean = { false },
         val onAiLocked: () -> Unit = {},
-        val onAiDailyLimit: () -> Unit = {},
         val onLevelReached: (String, Int) -> Unit = { _, _ -> },
         val onThemeModeChanged: (String) -> Unit = {},
         val onLanguageChanged: (String) -> Unit = {},

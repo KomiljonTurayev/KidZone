@@ -787,29 +787,13 @@ class GameManager {
 
         loading.classList.add("h");
         content.classList.remove("h");
-        document.getElementById('aiv-report-btn').classList.remove('h');
         this.addPoints(10);
         this._doSpeak();
-    }
-
-    reportAiStory() {
-        if (!window.AndroidBridge || !window.AndroidBridge.reportAi) return;
-        const btn = document.getElementById('aiv-report-btn');
-        btn.disabled = true;
-        window.onAiReported = ok => {
-            btn.disabled = false;
-            const t = ok ? { uz: "Xabar yuborildi. Rahmat!", ru: "Жалоба отправлена. Спасибо!", en: "Report sent. Thank you!" }
-                         : { uz: "Yuborilmadi. Internetni tekshiring.", ru: "Не отправлено. Проверьте интернет.", en: "Not sent. Check the internet." };
-            this.ui.showToast(t[this.translator.lang] || t.en);
-        };
-        const text = id => document.getElementById(id).textContent;
-        window.AndroidBridge.reportAi(text('aiv-story-title') + '\n' + text('aiv-content'));
     }
 
     closeAi() {
         document.getElementById("ai-viewer").classList.add("h");
         document.getElementById('aiv-regen-btn').classList.add('h');
-        document.getElementById('aiv-report-btn').classList.add('h');
         if (window.AndroidBridge && window.AndroidBridge.stopSpeaking) {
             window.AndroidBridge.stopSpeaking();
         } else {

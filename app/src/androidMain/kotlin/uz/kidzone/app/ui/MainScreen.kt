@@ -106,7 +106,6 @@ fun MainScreen(
     onOpenDashboard: () -> Unit,
     onOpenSleep: () -> Unit = {},
     onOpenPrivacy: () -> Unit = {},
-    onOpenPremium: () -> Unit = {},
     onRequireAccount: (AccountFeature) -> Unit = {},
     unlockedFeature: AccountFeature? = null,
     onUnlockedFeatureHandled: () -> Unit = {},
@@ -174,7 +173,6 @@ fun MainScreen(
     }
     
     var showKidzoSheet by remember { mutableStateOf(false) }
-    var aiLimit by remember { mutableStateOf<AiLimitKind?>(null) }
 
     // Families Policy (neutral age screen): for a child Kidzo AI, sign-in, purchases and the
     // parent area are not offered at all — no agent (no Gemini), no FAB, no sign-in prompts.
@@ -205,8 +203,6 @@ fun MainScreen(
     fun aiAvailable(): Boolean = featureGate.isAvailable(AccountFeature.AI_COMPANION)
     fun openKidzo() {
         if (!aiAvailable()) return requireAccount(AccountFeature.AI_COMPANION)
-        // The app may have been open long enough for the backend to fall asleep again.
-        BackendClient.warmUp()
         kidzoViewModel?.requestRecommendations()
         showKidzoSheet = true
     }
@@ -239,7 +235,6 @@ fun MainScreen(
             },
             isAiAvailable = { aiAvailable() },
             onAiLocked = { requireAccount(AccountFeature.AI_COMPANION) },
-            onAiDailyLimit = { aiLimit = AiLimitKind.STORIES },
             onLevelReached = { gameId, level ->
                 val pid = profileViewModel.activeProfile.value?.id
                 if (pid != null) scope.launch {
@@ -312,7 +307,6 @@ fun MainScreen(
                             onOpenKidzo = { cb().openKidzo() },
                             isAiAvailable = { cb().isAiAvailable() },
                             onAiLocked = { cb().onAiLocked() },
-                            onAiDailyLimit = { cb().onAiDailyLimit() },
                             // Feeds the parent dashboard's "games played today".
                             onGameLaunched = statsManager::onGameLaunched,
                             onThemeModeChanged = { cb().onThemeModeChanged(it) },
@@ -566,26 +560,6 @@ fun MainScreen(
                     border = BorderStroke(1.dp, KidZoneOrange),
                 ) { Text(tr("Yoʻq, qolish", "Нет, остаться", "No, stay")) }
             },
-        )
-    }
-
-    // The family's free AI allowance for today is used up: offer Premium to a parent.
-    val kidzoLimitReached = kidzoViewModel?.dailyLimitReached?.collectAsStateWithLifecycle()?.value == true
-    LaunchedEffect(kidzoLimitReached) {
-        if (kidzoLimitReached) {
-            aiLimit = AiLimitKind.QUESTIONS
-            kidzoViewModel?.dailyLimitHandled()
-        }
-    }
-    aiLimit?.let { kind ->
-        AiDailyLimitDialog(
-            kind = kind,
-            parentPinHash = activeProfile?.pinHash,
-            onOpenPremium = {
-                showKidzoSheet = false
-                onOpenPremium()
-            },
-            onDismiss = { aiLimit = null },
         )
     }
 

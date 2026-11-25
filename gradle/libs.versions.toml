@@ -24,7 +24,6 @@ work = "2.9.0"
 room = "2.8.4"
 okhttp = "4.12.0"
 webkit = "1.11.0"
-revenuecat = "10.20.0"
 
 junit = "4.13.2"
 mockito = "5.14.2"
@@ -66,8 +65,6 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-revenuecat-purchases = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecat" }
-revenuecat-purchases-ui = { module = "com.revenuecat.purchases:purchases-ui", version.ref = "revenuecat" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }

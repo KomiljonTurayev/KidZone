@@ -327,7 +327,7 @@ private fun onboardingTexts(lang: String): OnboardingTexts = when (lang) {
     "ru" -> OnboardingTexts(
         signInTitle = "Аккаунт родителя",
         signInMessage = "Всё важное сохранится, даже если вы смените телефон.",
-        benefits = listOf("Профили детей и прогресс", "Отчёты и лимиты времени", "Kidzo AI и Premium"),
+        benefits = listOf("Профили детей и прогресс", "Отчёты и лимиты времени", "Беседы с Kidzo"),
         later = "Позже",
         childTitle = "Кто будет играть?",
         childName = "Имя ребёнка",
@@ -343,7 +343,7 @@ private fun onboardingTexts(lang: String): OnboardingTexts = when (lang) {
     "en" -> OnboardingTexts(
         signInTitle = "Parent account",
         signInMessage = "Everything important is kept, even if you change phones.",
-        benefits = listOf("Child profiles and progress", "Reports and time limits", "Kidzo AI and Premium"),
+        benefits = listOf("Child profiles and progress", "Reports and time limits", "Chats with Kidzo"),
         later = "Maybe later",
         childTitle = "Who's going to play?",
         childName = "Child's name",
@@ -359,7 +359,7 @@ private fun onboardingTexts(lang: String): OnboardingTexts = when (lang) {
     else -> OnboardingTexts(
         signInTitle = "Ota-ona hisobi",
         signInMessage = "Telefon almashsa ham hammasi saqlanib qoladi.",
-        benefits = listOf("Bola profillari va natijalari", "Hisobotlar va vaqt limiti", "Kidzo AI va Premium"),
+        benefits = listOf("Bola profillari va natijalari", "Hisobotlar va vaqt limiti", "Kidzo bilan suhbat"),
         later = "Keyinroq",
         childTitle = "Kim o'ynaydi?",
         childName = "Bolaning ismi",

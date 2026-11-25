@@ -136,9 +136,9 @@ fun PrivacyScreen(pinHash: String?, onBack: () -> Unit) {
             text = {
                 Text(
                     tr(
-                        "Barcha ma'lumotlaringiz, bolalar profillari va statistika serverdan ham, shu qurilmadan ham butunlay o'chiriladi va ilova qayta ishga tushadi. Premium obuna Google Play'da alohida bekor qilinadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
-                        "Все ваши данные, профили детей и статистика будут удалены с сервера и с этого устройства, приложение перезапустится. Подписка Premium отменяется отдельно в Google Play. Это нельзя отменить. Вы уверены?",
-                        "All your data, the children's profiles and stats will be deleted from the server and from this device, and the app will restart. Cancel a Premium subscription separately in Google Play. This can't be undone. Are you sure?",
+                        "Barcha ma'lumotlaringiz, bolalar profillari va statistika serverdan ham, shu qurilmadan ham butunlay o'chiriladi va ilova qayta ishga tushadi. Buni ortga qaytarib bo'lmaydi. Ishonchingiz komilmi?",
+                        "Все ваши данные, профили детей и статистика будут удалены с сервера и с этого устройства, приложение перезапустится. Это нельзя отменить. Вы уверены?",
+                        "All your data, the children's profiles and stats will be deleted from the server and from this device, and the app will restart. This can't be undone. Are you sure?",
                     ),
                     color = Kid.InkSoft,
                 )
