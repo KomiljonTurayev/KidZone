@@ -118,6 +118,13 @@ fun PrivacyScreen(pinHash: String?, onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.error,
             ) { if (signedIn != null) confirmAccount = true else confirmDelete = true }
         }
+        Spacer(Modifier.height(20.dp))
+        // Credit the CC BY 4.0 licence of the voice asks for.
+        KidSubtitle(
+            tr("O'zbekcha ovoz", "Узбекский голос", "Uzbek voice") +
+                ": Gapiring by Gapi (https://gapi.uz), an adaptation of Kyutai Pocket TTS " +
+                "(https://huggingface.co/kyutai/pocket-tts), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+        )
     }
 
     if (confirmDelete) {

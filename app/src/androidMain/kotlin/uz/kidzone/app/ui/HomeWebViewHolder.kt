@@ -67,6 +67,13 @@ class HomeWebViewHolder {
         return view
     }
 
+    /** The app went to the background: stop narration only, sleep sounds may go on. */
+    fun stopNarration() {
+        val view = webView ?: return
+        bridge?.stopSpeaking()
+        view.evaluateJavascript(STOP_NARRATION_JS, null)
+    }
+
     /** The child left the home screen: silence it and stop its timers' work. */
     fun pause() {
         val view = webView ?: return
@@ -86,6 +93,11 @@ class HomeWebViewHolder {
     }
 
     private companion object {
+        const val STOP_NARRATION_JS = """(function(){
+            try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+            if(window.KZBooks&&KZBooks.isOpen())KZBooks.pause();
+            else if(window.onNativeSpeechEnd)onNativeSpeechEnd();
+        })()"""
         const val PAUSE_MEDIA_JS = """(function(){
             function stop(d){try{d.querySelectorAll('audio,video').forEach(function(m){m.pause()});
               d.querySelectorAll('iframe').forEach(function(f){try{stop(f.contentDocument)}catch(e){}})}catch(e){}}

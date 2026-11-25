@@ -66,6 +66,8 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     private var mediaPlayer: MediaPlayer? = null
     private var ttsEngine: TextToSpeech? = null
     private var ttsReady = false
+    private var spokenToName = ""
+    private var speechRequest = 0 // main thread only
 
     fun requestRecommendations() { agent.requestRecommendations() }
 
@@ -87,6 +89,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         Log.d(TAG, "askKidzo requested: query='$query', lang='$lang', childName='$childName'")
         stopVoiceInput()
         stopSpeaking()
+        spokenToName = childName
 
         // Add user message
         _messages.value = _messages.value + (true to query)
@@ -156,12 +159,16 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
         Log.d(TAG, "speakText: text='$text', lang='$lang'")
         stopSpeaking()
         _isSpeaking.value = true
+        val request = speechRequest
 
         scope.launch {
             var cloudPlayed = false
             if (lang == "uz") {
-                val cacheDir = context.cacheDir
-                val audioFile = AishaSpeechGenerator.synthesize(text, cacheDir)
+                val audioFile = AishaSpeechGenerator.synthesize(text, context.applicationContext, spokenToName)
+                if (request != speechRequest) { // stopped or replaced while loading
+                    audioFile?.delete()
+                    return@launch
+                }
                 cloudPlayed = audioFile != null && playAudioFile(audioFile)
             }
             if (!cloudPlayed) {
@@ -187,13 +194,11 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
                 _isSpeaking.value = false
                 it.release()
                 mediaPlayer = null
-                file.delete()
             }
             mp.setOnErrorListener { it, _, _ ->
                 _isSpeaking.value = false
                 it.release()
                 mediaPlayer = null
-                file.delete()
                 true
             }
             mp.prepare()
@@ -204,6 +209,8 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
             Log.w(TAG, "Audio playback error: ${e.message}")
             _isSpeaking.value = false
             false
+        } finally {
+            file.delete() // the player keeps it open
         }
     }
 
@@ -272,6 +279,7 @@ class KidzoViewModel(val agent: KidzoAgent) : ViewModel() {
     }
 
     fun stopSpeaking() {
+        speechRequest++
         _isSpeaking.value = false
         try {
             mediaPlayer?.let {

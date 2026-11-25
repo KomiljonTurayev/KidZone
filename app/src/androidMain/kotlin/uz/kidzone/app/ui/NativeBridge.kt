@@ -68,6 +68,7 @@ internal class NativeBridge(
         }
     }
 
+    private val speechRequest = java.util.concurrent.atomic.AtomicInteger()
     private var currentPlayer: android.media.MediaPlayer? = null
 
     @android.webkit.JavascriptInterface
@@ -76,11 +77,17 @@ internal class NativeBridge(
             onMain { speakOnDevice(text, lang) }
             return
         }
-        val cacheDir = activity.get()?.cacheDir
+        val context = activity.get()?.applicationContext
+        val request = speechRequest.incrementAndGet()
         scope.launch {
-            val audioFile = uz.kidzone.app.ai.AishaSpeechGenerator.synthesize(text, cacheDir)
-            val played = audioFile != null && playAudioFile(audioFile)
-            if (!played) onMain { speakOnDevice(text, lang) }
+            val audioFile = uz.kidzone.app.ai.AishaSpeechGenerator.synthesize(text, context)
+            onMain { // same thread as stopSpeaking(), so a stop cannot slip in between
+                if (request != speechRequest.get()) {
+                    audioFile?.delete()
+                } else if (audioFile == null || !playAudioFile(audioFile)) {
+                    speakOnDevice(text, lang)
+                }
+            }
         }
     }
 
@@ -99,13 +106,11 @@ internal class NativeBridge(
                 onMain { evalJs("window.onNativeSpeechEnd && window.onNativeSpeechEnd()") }
                 if (currentPlayer === it) currentPlayer = null
                 it.release()
-                file.delete()
             }
             player.setOnErrorListener { p, _, _ ->
                 onMain { evalJs("window.onNativeSpeechEnd && window.onNativeSpeechEnd()") }
                 if (currentPlayer === p) currentPlayer = null
                 p.release()
-                file.delete()
                 true
             }
             player.prepare()
@@ -116,6 +121,8 @@ internal class NativeBridge(
         } catch (e: Exception) {
             Log.w("NativeBridge", "Cloud audio playback failed: ${e.message}")
             false
+        } finally {
+            file.delete() // the player keeps it open
         }
     }
 
@@ -148,6 +155,7 @@ internal class NativeBridge(
 
     @android.webkit.JavascriptInterface
     fun stopSpeaking() {
+        speechRequest.incrementAndGet()
         onMain {
             tts?.stop()
             currentPlayer?.let { it.stop(); it.release() }

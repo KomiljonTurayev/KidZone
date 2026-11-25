@@ -43,6 +43,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -264,6 +266,10 @@ fun MainScreen(
             onOpenPrivacy = { onOpenPrivacyState() },
             onExternalLink = { pendingExternalUri = it },
         )
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        webViewHolder.stopNarration()
+        kidzoViewModel?.stopSpeaking()
     }
     // Leaving the home screen pauses the kept WebView instead of destroying it.
     DisposableEffect(webViewHolder) {
