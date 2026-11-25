@@ -310,5 +310,5 @@
   }
 
   window.KZBooks = { list, open, close, onSpeechEnd, onSpeechError, abs, label: (lang) => tr(lang).book,
-                     isOpen: () => !!st };
+                     isOpen: () => !!st, pause: () => { if (st && st.auto) togglePlay(); } };
 })();
