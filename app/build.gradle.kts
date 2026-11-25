@@ -127,8 +127,8 @@ android {
         targetSdk = 36
         val propVersionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull()
         val propVersionName = project.findProperty("versionName")?.toString()
-        versionCode = propVersionCode ?: 10605
-        versionName = propVersionName ?: "1.6.5"
+        versionCode = propVersionCode ?: 10606
+        versionName = propVersionName ?: "1.6.6"
         buildConfigField("String", "REVENUECAT_API_KEY", "\"${revenueCatApiKey}\"")
     }
 
